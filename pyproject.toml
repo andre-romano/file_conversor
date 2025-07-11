@@ -1,0 +1,19 @@
+[project]
+name = "file_conversor"
+version = "1.0.0"
+description = "Default template for PDM package"
+authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
+dependencies = ["ffmpeg-python>=0.2.0"]
+requires-python = "==3.13.*"
+readme = "README.md"
+license = "LICENCE"
+
+
+[tool.pdm]
+distribution = false
+
+[dependency-groups]
+dev = [
+    "coverage>=7.9.2",
+    "pytest>=8.4.1",
+]
