@@ -1,3 +1,23 @@
 {
-    "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe"
+    "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
+    "python.analysis.exclude": [
+        "**/node_modules",
+        "**/bower_components",
+        "**/dist",
+        "**/build",
+        "**/docs",
+        "**/.venv",
+    ],
+    "git.ignoreLimitWarning": false,
+    "cSpell.ignorePaths": [
+        "**/*",
+    ],
+    "python.analysis.extraPaths": [
+        "src"
+    ],
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

@@ -1,19 +1,31 @@
+# pyproject.toml
+
 [project]
 name = "file_conversor"
 version = "1.0.0"
 description = "Default template for PDM package"
 authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
-dependencies = ["ffmpeg-python>=0.2.0"]
+dependencies = ["ffmpeg-python>=0.2.0", "imageio-ffmpeg>=0.6.0"]
 requires-python = "==3.13.*"
 readme = "README.md"
 license = "LICENCE"
-
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: APACHE License",
+    "Operating System :: OS Independent",
+]
 
 [tool.pdm]
+package-dir = { "" = "src" }
 distribution = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-x --cov=src --cov-report=term-missing --cov-report=html"
 
 [dependency-groups]
 dev = [
-    "coverage>=7.9.2",
     "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
 ]
