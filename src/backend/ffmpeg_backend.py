@@ -11,10 +11,7 @@ import imageio_ffmpeg
 import ffmpeg
 import os
 
-# Get the FFmpeg binary path
-FFMPEG_BINARY = imageio_ffmpeg.get_ffmpeg_exe()
-os.environ["FFMPEG_BINARY"] = FFMPEG_BINARY
-print("FFmpeg path:", FFMPEG_BINARY)
+FFMPEG_BINARY = None
 
 
 class FFmpegBackend(BackendAbstract):
@@ -23,30 +20,34 @@ class FFmpegBackend(BackendAbstract):
     It inherits from BackendAbstract and implements methods to set input and output files.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        '3gp': {},
+    SUPPORTED_IN_AUDIO_FORMATS = {
         'aac': {},
         'ac3': {},
-        'asf': {},
-        'avi': {},
         'flac': {},
-        'flv': {},
-        'h264': {},
-        'hevc': {},
         'm4a': {},
-        'm4v': {},
-        'mkv': {},
-        'mov': {},
         'mp3': {},
-        'mp4': {},
-        'mpeg': {},
-        'mpg': {},
         'ogg': {},
         'opus': {},
         'wav': {},
+    }
+    SUPPORTED_IN_VIDEO_FORMATS = {
+        '3gp': {},
+        'asf': {},
+        'avi': {},
+        'flv': {},
+        'h264': {},
+        'hevc': {},
+        'm4v': {},
+        'mkv': {},
+        'mov': {},
+        'mp4': {},
+        'mpeg': {},
+        'mpg': {},
         'webm': {},
     }
-    SUPPORTED_OUT_FORMATS = {
+    SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
+
+    SUPPORTED_OUT_AUDIO_FORMATS = {
         'mp3': {
             'format': 'mp3',
             'acodec': 'libmp3lame',
@@ -57,6 +58,22 @@ class FFmpegBackend(BackendAbstract):
             'acodec': 'aac',
             'audio_bitrate': '192k',
         },
+        'ogg': {
+            'format': 'ogg',
+            'acodec': 'libvorbis',
+            'audio_bitrate': '192k',
+        },
+        'opus': {
+            'format': 'opus',
+            'acodec': 'libopus',
+            'audio_bitrate': '192k',
+        },
+        'flac': {
+            'format': 'flac',
+            'acodec': 'flac',
+        },
+    }
+    SUPPORTED_OUT_VIDEO_FORMATS = {
         'mp4': {
             'format': 'mp4',
             'vcodec': 'libx264',
@@ -81,24 +98,16 @@ class FFmpegBackend(BackendAbstract):
             'acodec': 'libvorbis',
             'audio_bitrate': '192k',
         },
-        'ogg': {
-            'format': 'ogg',
-            'acodec': 'libvorbis',
-            'audio_bitrate': '192k',
-        },
-        'opus': {
-            'format': 'opus',
-            'acodec': 'libopus',
-            'audio_bitrate': '192k',
-        },
-        'flac': {
-            'format': 'flac',
-            'acodec': 'flac',
-        },
     }
+    SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     def __init__(self, input_file: str, output_file: str, **kwargs):
         super().__init__(input_file, output_file, **kwargs)
+
+        # Get the FFmpeg binary path
+        FFMPEG_BINARY = imageio_ffmpeg.get_ffmpeg_exe()
+        os.environ["FFMPEG_BINARY"] = FFMPEG_BINARY
+        print("FFmpeg path:", FFMPEG_BINARY)
 
     def _set_input(self, input_file: str):
         """
@@ -125,6 +134,7 @@ class FFmpegBackend(BackendAbstract):
 
         :raises FileNotFoundError: If the output directory could not be created.
         :raises ValueError: If the output file format is not supported.
+        :return: self (FFmpegBackend instance)
         """
         super()._set_output(output_file)
         out_file = File(output_file)
@@ -166,10 +176,4 @@ class FFmpegBackend(BackendAbstract):
         if "error" in stderr_text:
             raise RuntimeError(f"FFmpeg error: {stderr_text}")
         else:
-            print(f"------------------------------")
-            print(f"Output: {stdout_text}")
-            print(f"Error: {stderr_text}")
-            print(f"------------------------------")
-            print(f"FFmpeg finished successfully.")
-
-        return stdout_text, stderr_text
+            return stdout_text, stderr_text

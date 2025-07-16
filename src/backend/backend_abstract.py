@@ -20,6 +20,8 @@ class BackendAbstract:
 
         :raises FileNotFoundError: If the input file does not exist, or output directory could not be created.
         """
+        super().__init__()
+
         self.input_file = ""
         self.output_file = ""
         self.options = {}
@@ -40,7 +42,6 @@ class BackendAbstract:
             raise FileNotFoundError(
                 f"Input file '{input_file}' does not exist.")
         self.input_file = input_file
-        return self
 
     def _set_output(self, output_file: str):
         """
@@ -55,7 +56,6 @@ class BackendAbstract:
             File(dir).create_dir()
 
         self.output_file = output_file
-        return self
 
     def set_options(self, **kwargs):
         """

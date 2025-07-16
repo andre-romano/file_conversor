@@ -5,27 +5,87 @@ name = "file_conversor"
 version = "1.0.0"
 description = "Default template for PDM package"
 authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
-dependencies = ["ffmpeg-python>=0.2.0", "imageio-ffmpeg>=0.6.0"]
+dependencies = [
+    "ffmpeg-python>=0.2.0",
+    "imageio-ffmpeg>=0.6.0",
+    "typer>=0.16.0",
+    "rich>=14.0.0",
+]
 requires-python = "==3.13.*"
 readme = "README.md"
-license = "LICENCE"
+license-files = ["LICEN[CS]E*", "AUTHORS.md"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: APACHE License",
-    "Operating System :: OS Independent",
-]
+    "Operating System :: OS Independent", 
+] 
+keywords = ["file", "conversion", "multimedia", "docs", "video", "audio", "image", "converter"]
 
-[tool.pdm]
+[project.scripts]
+src = "src.__main__:main"  # CLI entry point
+
+[tool.pdm] 
 package-dir = { "" = "src" }
-distribution = false
+distribution = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-x --cov=src --cov-report=term-missing --cov-report=html"
 
+[tool.pyright]
+# Specify the language server (Pylance should be set by default if using Pyright)
+languageServer = "Pylance"
+typeCheckingMode = "basic"      # Type checking mode (options: "off", "basic", "strict")
+diagnosticMode = "workspace"    # Diagnostic mode (options: "workspace", "openFiles")
+
+extraPaths = ["src"]            # Extra search path
+autoSearchPaths = true          # Automatically adds paths to the environment
+indexing = true                 # Enable indexing for better suggestions
+useLibraryCodeForTypes = true   # Use type stubs from libraries for better error detection
+
+# Report all types of issues including circular imports AND
+reportImportCycles = true 
+# Duplicate imports, deprecated features, unused functions and classes
+reportDuplicateImport = "warning"
+reportDeprecated = "warning"
+reportUnusedFunction = "warning"
+reportUnusedClass = "warning"
+
+# INHERITANCE ISSUES
+reportMissingSuperCall = "error"           # missing super() call in a constructor
+reportInconsistentConstructor = "error"    # inconsistent constructor signatures
+reportIncompatibleMethodOverride = "error" # incompatible method overrides (base class)
+reportOverlappingOverload = "error"        # overlapping overloads
+
+# TYPE ISSUES
+reportIncompleteStub = "error" # Incomplete stub files
+reportInvalidStubStatement = "error" # Invalid statements in stub files
+reportPropertyTypeMismatch = "error" # Property type mismatch
+
+# Exclude files from analysis
+ignore = ["**/*.bak"]
+  
+# Exclude directories from analysis
+exclude = [
+    "**/.venv/**",
+    "**/venv/**",
+    "**/__pycache__/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/.tox/**",
+    "**/.nox/**",
+    "**/.coverage/**",
+    "**/.mypy_cache/**",
+    "**/.pytest_cache/**",
+    "**/*.egg-info",
+    "**/*.egg",
+    "**/node_modules/**",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
+    "pdoc>=15.0.4",
+    "pyinstaller>=6.14.2",
 ]

@@ -14,6 +14,8 @@ class File:
         :param path: The path to the file or directory.
         :raises ValueError: If the path is not specified or is not a string.
         """
+        super().__init__()
+
         if not path or not isinstance(path, str):
             raise ValueError("Path must be specified (string)")
         self.path = path
@@ -86,6 +88,14 @@ class File:
         :return: The directory name.
         """
         return os.path.dirname(self.path)
+
+    def get_full_dirname(self) -> str:
+        """
+        Get the full absolute path of the directory.
+
+        :return: The full absolute path of the directory.
+        """
+        return os.path.abspath(self.get_dirname())
 
     def get_full_path(self) -> str:
         """

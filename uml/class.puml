@@ -1,4 +1,4 @@
-@startuml
+@startuml class
 ' skinparam classAttributeIconSize 0
 
 ' Example class diagram template

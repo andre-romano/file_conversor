@@ -12,6 +12,7 @@ class DummyFile:
     """A dummy file class to mock File behavior for testing."""
 
     def __init__(self, path):
+        super().__init__()
         self.path = path
 
     def check_supported_format(self, formats):
