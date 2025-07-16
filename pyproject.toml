@@ -22,7 +22,7 @@ classifiers = [
 keywords = ["file", "conversion", "multimedia", "docs", "video", "audio", "image", "converter"]
 
 [project.scripts]
-src = "src.__main__:main"  # CLI entry point
+src = "src.file_conversor:main"  # CLI entry point
 
 [tool.pdm] 
 package-dir = { "" = "src" }
@@ -88,4 +88,6 @@ dev = [
     "pytest-cov>=6.2.1",
     "pdoc>=15.0.4",
     "pyinstaller>=6.14.2",
+    "pydeps>=3.0.1",
+    "pylint>=3.3.7",
 ]

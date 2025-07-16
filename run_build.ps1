@@ -5,7 +5,9 @@
 ./run_gen_docs.ps1
 
 Write-Host "Building package..."
+Remove-Item -Recurse build/*
+Remove-Item -Recurse dist/*
 pdm build
 
 Write-Host "Building EXE..."
-pdm run pyinstaller src/__main__.py --name file-conversor --onefile
+pdm run pyinstaller src/file_conversor.py --name file_conversor --onefile
