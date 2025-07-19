@@ -108,6 +108,8 @@ def test_get_full_path_is_absolute(tmp_path):
     file_path.write_text("abc")
     f = File(str(file_path))
     assert os.path.isabs(f.get_full_path())
+    assert os.path.isabs(f.get_full_dirname())
+    assert f.get_full_dirname() == str(tmp_path)
     assert f.get_full_path().endswith("afile.txt")
 
 
@@ -118,6 +120,8 @@ def test_get_extension_and_filename_and_dirname(tmp_path):
     assert f.get_extension() == "txt"
     assert f.get_filename() == "foo.bar"
     assert f.get_dirname() == str(tmp_path)
+    assert f.get_full_dirname() == str(tmp_path)
+    assert os.path.isabs(f.get_full_dirname())
 
 
 def test_get_extension_no_extension(tmp_path):

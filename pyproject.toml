@@ -6,8 +6,6 @@ version = "1.0.0"
 description = "Default template for PDM package"
 authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
 dependencies = [
-    "ffmpeg-python>=0.2.0",
-    "imageio-ffmpeg>=0.6.0",
     "typer>=0.16.0",
     "rich>=14.0.0",
 ]

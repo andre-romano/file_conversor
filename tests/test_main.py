@@ -5,7 +5,7 @@ import pytest
 
 from typer.testing import CliRunner
 
-from __main__ import *
+from file_conversor import *
 
 runner = CliRunner()
 

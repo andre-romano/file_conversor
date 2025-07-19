@@ -1,4 +1,3 @@
 
 Write-Host "Running CLI..."
-$pdmArgs = $args -join " "
-pdm run python src/__main__.py $pdmArgs
+pdm run python src/file_conversor.py @args
