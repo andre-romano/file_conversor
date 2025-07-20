@@ -17,7 +17,10 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
+        "**/build": true,
+        "**/htmlcov": true,
         "**/Thumbs.db": true,
+        "**/*.spec": true,
         "**/pdm.lock/**": true,
     }
 }
