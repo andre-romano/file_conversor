@@ -1,37 +1,67 @@
-# file_conversor
+# File Conversor
 Python CLI to convert and compress audio/video/text/etc files to other formats
 
 **Summary**:
-- [file\_conversor](#file_conversor)
-  - [Install dependencies](#install-dependencies)
-  - [Run program](#run-program)
-  - [Build and Install](#build-and-install)
+- [File Conversor](#file-conversor)
+  - [Installing](#installing)
+    - [For Windows](#for-windows)
+    - [For Linux](#for-linux)
+  - [External dependencies](#external-dependencies)
+  - [Usage (CLI)](#usage-cli)
+    - [CLI - Command line interface](#cli---command-line-interface)
+    - [GUI - Graphical user interface](#gui---graphical-user-interface)
+  - [License and Copyright](#license-and-copyright)
+
+## Installing
+
+### For Windows
+
+1. Download the latest installer (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
+2. Run the installer
+
+**Attention:** External dependencies are installed automatically in Windows systems, during program installation. 
+   - The installer will use [Chocolatey package manager](https://chocolatey.org/) to install those dependencies in Windows.
+
+### For Linux
+
+1. Install `python` in your distro
+2. Install external dependencies in your distro
+3. Build and install `.whl` file
+  ```bash
+  pip install pdm invoke
+  pdm install
+  pdm build
+  pip install dist/*.whl
+  ```
 
 
-## Install dependencies
+## External dependencies
+
+This project requires the following external dependencies to work properly:
+- FFmpeg
+- Ghostscript
+
+## Usage (CLI)
+
+### CLI - Command line interface
 
 ```bash
-pip install pdm
-pdm install
+file_conversor COMMANDS [OPTIONS]
 ```
 
-## Run program
+For more information about the usage:
+- Issue `--help` command in the program
+- Read the [docs/](docs/) folder
 
-```bash
-pdm run python src/__main__.py 
-```
+### GUI - Graphical user interface
 
-For more information about the usage, read the [docs/](docs/) folder or issue `--help` command in the program.
+**TODO**: build GUI
 
-## Build and Install
+## License and Copyright
 
-```bash
-# for Python Wheel (cross-platform)
-pdm build
-pip install dist/*.whl
+Copyright (C) [2025] Andre Luiz Romano Madureira
 
-# for Windows (build .EXE)
-pdm run pyinstaller src/__main__.py --name file-conversor --onefile
-./dist/*.exe
-```
+This project is licensed under the Apache License 2.0.  
+
+For more details, see the full license text (see [./LICENSE](./LICENSE) file).
 

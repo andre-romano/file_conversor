@@ -2,13 +2,15 @@
 # src/file_conversor.py
 
 import json
+import locale
 import subprocess
 import time
 import typer
+import gettext  # app translations / locales
 
 from rich import print
 from rich.pretty import Pretty
-from rich.progress import track, Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from pathlib import Path
 from typing import Annotated, Optional
@@ -36,6 +38,15 @@ config_path = Path(f".config.json")
 if config_path.exists():
     CONFIG.update(json.loads(config_path.read_text()))
 
+# Get translations
+lang, encoding = locale.getlocale()
+translation = gettext.translation(
+    'messages', 'locales',
+    languages=[lang if lang else "en_US", "en_US"],
+    fallback=False
+)
+_ = translation.gettext
+
 # Create a Typer CLI application
 app_cmd = typer.Typer(
     rich_markup_mode="markdown",
@@ -43,8 +54,8 @@ app_cmd = typer.Typer(
 )
 
 # panels
-CONFIG_PANEL = "Utils and Config"
-MULTIMEDIA_PANEL = "Multimedia files"
+CONFIG_PANEL = _("Utils and Config")
+MULTIMEDIA_PANEL = _("Multimedia files")
 
 # subcommands
 audio_video_cmd = typer.Typer()
@@ -52,10 +63,10 @@ config_cmd = typer.Typer()
 
 # register subcommands
 app_cmd.add_typer(audio_video_cmd, name="audio_video",
-                  help="Audio / Video manipulation commands",
+                  help=_("Audio / Video manipulation commands"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 app_cmd.add_typer(config_cmd, name="config",
-                  help="Configure default options",
+                  help=_("Configure default options"),
                   rich_help_panel=CONFIG_PANEL)
 
 # confirmacoes
@@ -87,8 +98,8 @@ def info(name: Annotated[str, typer.Option("--name", "-n", prompt=True)]):
 
 # audio_video convert
 @audio_video_cmd.command(name="convert",
-                         epilog="""
-    **Examples:** 
+                         epilog=f"""
+    **{_('Examples')}:** 
 
     - `file_conversor audio_video convert input_file.webm output_file.mp4 --audio-bitrate 192`
 
@@ -96,31 +107,31 @@ def info(name: Annotated[str, typer.Option("--name", "-n", prompt=True)]):
     """)
 def audio_video_convert(
     input_file: Annotated[str, typer.Argument(
-        help=f"Input file path ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
+        help=f"{_('Input file path')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: x if check_format(
             File(x).get_extension(), FFmpegBackend.SUPPORTED_IN_FORMATS
         ) else x,
     )],
     output_file: Annotated[str, typer.Argument(
-        help=f"Output file path ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
+        help=f"{_('Output file path')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
         callback=lambda x: x if check_format(
             File(x).get_extension(), FFmpegBackend.SUPPORTED_OUT_FORMATS
         ) else x,
     )],
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help="Audio bitrate in kbps",
+                                               help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["audio-bitrate"],
 
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help="Video bitrate in kbps",
+                                               help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 ):
-    """
-    Convert a audio/video file to a different format.
+    f"""
+    {_('Convert a audio/video file to a different format.')}
 
-    This command can be used to convert audio or video files to the specified format.
+    {_('This command can be used to convert audio or video files to the specified format.')}
     """
     process: subprocess.Popen | None = None
     in_options = []
@@ -143,7 +154,8 @@ def audio_video_convert(
 
     # display current progress
     with Progress() as progress:
-        ffmpeg_task = progress.add_task("[blue]Processing file...", total=100)
+        ffmpeg_task = progress.add_task(
+            f"[blue]{_('Processing file')}...", total=100)
         while process.poll() is None:
             progress.update(
                 ffmpeg_task, completed=ffmpeg_backend.get_progress())
@@ -155,7 +167,7 @@ def audio_video_convert(
     if process.returncode == 0:
         print(f"--------------------------------")
         print(
-            f"FFMpeg convertion: [green][bold]SUCCESS[/bold][/green] ({process.returncode})")
+            f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
         print(f"--------------------------------")
     else:
         # print output
@@ -167,14 +179,14 @@ def audio_video_convert(
                 print(line)
         print(f"\n--------------------------------")
         print(
-            f"FFMpeg convertion: [red][bold]FAILED[/bold][/red] ({process.returncode if process else "?"})")
+            f"{_('FFMpeg convertion')}: [red][bold]{_('FAILED')}[/bold][/red] ({process.returncode if process else "?"})")
         print(f"--------------------------------")
 
 
 # audio_video info
 @audio_video_cmd.command(name="info",
-                         epilog="""
-    **Examples:** 
+                         epilog=f"""
+    **{_('Examples')}:** 
 
     - `file_conversor audio_video info filename.webm`
 
@@ -188,18 +200,18 @@ def audio_video_info(
         ) else x,
     )],
 ):
-    """
-    Get information about a audio/video file.
+    f"""
+    {_('Get information about a audio/video file.')}
 
-    This command retrieves metadata and other information about the audio / video file:
+    {_('This command retrieves metadata and other information about the audio / video file')}:
 
-    - Format (mp3, mp4, mov, etc)
+    - {_('Format')} (mp3, mp4, mov, etc)
 
-    - Duration (HH:MM:SS)
+    - {_('Duration')} (HH:MM:SS)
 
     - Bitrate
 
-    - Other properties
+    - {_('Other properties')}
     """
     pass
 
@@ -207,41 +219,41 @@ def audio_video_info(
 # config show
 @config_cmd.command(name="show")
 def config_show():
+    f"""
+    {_('Show the current configuration of the application')}.
     """
-    Show the current configuration of the application.
-    """
-    print(f"Configuration:", Pretty(CONFIG, expand_all=True))
+    print(f"{_('Configuration')}:", Pretty(CONFIG, expand_all=True))
 
 
 # config set
 @config_cmd.command(name="set")
 def config_set(
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help="Audio bitrate in kbps",
+                                               help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["audio-bitrate"],
 
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help="Video bitrate in kbps",
+                                               help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 
     video_format: Annotated[str, typer.Option("--video-format", "-vf",
-                                              help=f"Video output format ({', '.join(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)})",
+                                              help=f"{_('Video output format')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)})",
                                               callback=lambda x: check_format(
                                                   x, FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS),
                                               )] = CONFIG["video-format"],
 
     audio_format: Annotated[str, typer.Option("--audio-format", "-af",
-                                              help=f"Audio output format ({', '.join(FFmpegBackend.SUPPORTED_OUT_AUDIO_FORMATS)})",
+                                              help=f"{_('Audio output format')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_AUDIO_FORMATS)})",
                                               callback=lambda x: check_format(
                                                   x, FFmpegBackend.SUPPORTED_OUT_AUDIO_FORMATS),
                                               )] = CONFIG["audio-format"],
 ):
-    """
-    Configure the default options for the file converter.
+    f"""
+    {_('Configure the default options for the file converter.')}
 
-    **Example:** `file_conversor configure --video-format mp4 --video-bitrate 5000`
+    **{_('Example')}:** `file_conversor configure --video-format mp4 --video-bitrate 5000`
     """
     # update the configuration dictionary
     CONFIG.update({
@@ -250,41 +262,44 @@ def config_set(
         "video-format": video_format,
         "audio-format": audio_format,
     })
-    print(f"Configuration:", Pretty(CONFIG, expand_all=True))
+    print(f"{_('Configuration')}:", Pretty(CONFIG, expand_all=True))
     config_path.write_text(json.dumps(CONFIG))
-    typer.echo(f"Configuration file '{str(config_path)}' updated.")
+    typer.echo(
+        f"{_('Configuration file')} '{str(config_path)}' {_('updated')}.")
 
 
 # help
 @app_cmd.command(rich_help_panel=CONFIG_PANEL)
 def help():
-    """
-    Show the application help.
+    f"""
+    {_('Show the application help')}
     """
     ctx = typer.Context(typer.main.get_command(app_cmd))
     print(ctx.command.get_help(ctx))
 
 
-@app_cmd.callback(epilog="For more information, visit [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)")
+@app_cmd.callback(epilog=f"{_('For more information, visit')} [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)")
 def main_callback(verbose: Annotated[bool, typer.Option("--verbose", "-v",
-                                                        help="Enable verbose output",
+                                                        help=_(
+                                                            "Enable verbose output"),
                                                         is_flag=True,
                                                         )] = False):
-    """
+    f"""
     # File Conversor - CLI
 
-    **Features:**
+    **{_('Features')}:**
 
-    - Compress image / audio / video / doc / spreadsheet files
+    - {_('Compress image / audio / video / doc / spreadsheet files')}
 
-    - Convert image / audio / video / doc / spreadsheet files
+    - {_('Convert image / audio / video / doc / spreadsheet files')}
 
-    - Configure default options for conversion / compression
+    - {_('Configure default options for conversion / compression')}
 
-    - Supports various input and output formats (mp3, mp4, jpg, png, pdf, docx, xlsx, csv, etc)
+    - {_('Supports various input and output formats')} (mp3, mp4, jpg, png, pdf, docx, xlsx, csv, etc)
     """
     if verbose:
-        print("Verbose output: [blue][bold]ENABLED[/bold][/blue]")
+        print(
+            f"{_('Verbose output')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
         STATE["verbose"] = True
 
 

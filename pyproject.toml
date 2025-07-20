@@ -8,6 +8,7 @@ authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
 dependencies = [
     "typer>=0.16.0",
     "rich>=14.0.0",
+    "Babel>=2.17.0",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
@@ -22,8 +23,15 @@ keywords = ["file", "conversion", "multimedia", "docs", "video", "audio", "image
 [project.scripts]
 src = "src.file_conversor:main"  # CLI entry point
 
+[project.urls]
+Homepage = "https://github.com/andre-romano/file_conversor"
+
 [tool.pdm] 
 package-dir = { "" = "src" }
+includes = [
+    "locales/**",  # Recursively include all files in locales/
+    "data/**",  # Recursively include all files in locales/
+]
 distribution = true
 
 [tool.pytest.ini_options]
@@ -91,4 +99,6 @@ dev = [
     "pyinstaller>=6.14.2",
     "pydeps>=3.0.1",
     "pylint>=3.3.7",
+    "invoke>=2.2.0",
+    "twine>=6.1.0",
 ]

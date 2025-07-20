@@ -1,0 +1,180 @@
+# English (United States) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-07-20 16:00-0300\n"
+"PO-Revision-Date: 2025-07-20 15:34-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en_US\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: src/file_conversor.py:57
+msgid "Utils and Config"
+msgstr "Utils and Config"
+
+#: src/file_conversor.py:58
+msgid "Multimedia files"
+msgstr "Multimedia files"
+
+#: src/file_conversor.py:66
+msgid "Audio / Video manipulation commands"
+msgstr "Audio / Video manipulation commands"
+
+#: src/file_conversor.py:69
+msgid "Configure default options"
+msgstr "Configure default options"
+
+#: src/file_conversor.py:102 src/file_conversor.py:189
+msgid "Examples"
+msgstr "Examples xxx"
+
+#: src/file_conversor.py:110
+msgid "Input file path"
+msgstr "Input file path"
+
+#: src/file_conversor.py:116
+msgid "Output file path"
+msgstr "Output file path"
+
+#: src/file_conversor.py:122 src/file_conversor.py:232
+msgid "Audio bitrate in kbps"
+msgstr "Audio bitrate in kbps"
+
+#: src/file_conversor.py:127 src/file_conversor.py:237
+msgid "Video bitrate in kbps"
+msgstr "Video bitrate in kbps"
+
+#: src/file_conversor.py:132
+msgid "Convert a audio/video file to a different format."
+msgstr "Convert a audio/video file to a different format."
+
+#: src/file_conversor.py:134
+msgid ""
+"This command can be used to convert audio or video files to the specified"
+" format."
+msgstr ""
+"This command can be used to convert audio or video files to the specified"
+" format."
+
+#: src/file_conversor.py:158
+msgid "Processing file"
+msgstr "Processing file"
+
+#: src/file_conversor.py:170 src/file_conversor.py:182
+msgid "FFMpeg convertion"
+msgstr "FFMpeg convertion"
+
+#: src/file_conversor.py:170
+msgid "SUCCESS"
+msgstr "SUCCESS"
+
+#: src/file_conversor.py:182
+msgid "FAILED"
+msgstr "FAILED"
+
+#: src/file_conversor.py:204
+msgid "Get information about a audio/video file."
+msgstr "Get information about a audio/video file."
+
+#: src/file_conversor.py:206
+msgid ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+msgstr ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+
+#: src/file_conversor.py:208
+msgid "Format"
+msgstr "Format"
+
+#: src/file_conversor.py:210
+msgid "Duration"
+msgstr "Duration"
+
+#: src/file_conversor.py:214
+msgid "Other properties"
+msgstr "Other properties"
+
+#: src/file_conversor.py:223
+msgid "Show the current configuration of the application"
+msgstr "Show the current configuration of the application"
+
+#: src/file_conversor.py:225 src/file_conversor.py:265
+msgid "Configuration"
+msgstr "Configuration"
+
+#: src/file_conversor.py:242
+msgid "Video output format"
+msgstr "Video output format"
+
+#: src/file_conversor.py:248
+msgid "Audio output format"
+msgstr "Audio output format"
+
+#: src/file_conversor.py:254
+msgid "Configure the default options for the file converter."
+msgstr "Configure the default options for the file converter."
+
+#: src/file_conversor.py:256
+msgid "Example"
+msgstr "Example"
+
+#: src/file_conversor.py:268
+msgid "Configuration file"
+msgstr "Configuration file"
+
+#: src/file_conversor.py:268
+msgid "updated"
+msgstr "updated"
+
+#: src/file_conversor.py:275
+msgid "Show the application help"
+msgstr "Show the application help"
+
+#: src/file_conversor.py:281
+msgid "For more information, visit"
+msgstr "For more information, visit"
+
+#: src/file_conversor.py:284
+msgid "Enable verbose output"
+msgstr "Enable verbose output"
+
+#: src/file_conversor.py:290
+msgid "Features"
+msgstr "Features"
+
+#: src/file_conversor.py:292
+msgid "Compress image / audio / video / doc / spreadsheet files"
+msgstr "Compress image / audio / video / doc / spreadsheet files"
+
+#: src/file_conversor.py:294
+msgid "Convert image / audio / video / doc / spreadsheet files"
+msgstr "Convert image / audio / video / doc / spreadsheet files"
+
+#: src/file_conversor.py:296
+msgid "Configure default options for conversion / compression"
+msgstr "Configure default options for conversion / compression"
+
+#: src/file_conversor.py:298
+msgid "Supports various input and output formats"
+msgstr "Supports various input and output formats"
+
+#: src/file_conversor.py:302
+msgid "Verbose output"
+msgstr "Verbose output"
+
+#: src/file_conversor.py:302
+msgid "ENABLED"
+msgstr "ENABLED"
+
