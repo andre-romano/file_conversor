@@ -6,8 +6,13 @@ import time
 import typer
 
 from typing import Annotated, Optional
+from datetime import timedelta
 
 from rich import print
+from rich.text import Text
+from rich.panel import Panel
+from rich.console import Group
+from rich.markdown import Markdown
 from rich.pretty import Pretty
 from rich.progress import Progress
 
@@ -17,7 +22,7 @@ from backend import FFmpegBackend
 from config import get_translation
 from config import Configuration, State
 
-from utils import check_positive_integer, check_format
+from utils import check_positive_integer, check_format, format_bitrate, format_bytes
 from utils import File
 
 # get app config
@@ -58,7 +63,73 @@ def info(
         ) else x,
     )],
 ):
-    pass
+
+    formatted = []
+    metadata = FFmpegBackend.get_file_info(filename)
+    # 📁 Informações gerais do arquivo
+    if "format" in metadata:
+        format_info: dict = metadata["format"]
+
+        duration = format_info.get('duration', 'N/A')
+        if duration != "N/A":
+            duration_secs = int(float(duration))
+            duration_td = timedelta(seconds=duration_secs)
+            duration = str(duration_td)
+        size = format_info.get("size", "N/A")
+        if size != "N/A":
+            size = format_bytes(float(size))
+        bitrate = format_info.get('bit_rate', 'N/A')
+        if bitrate != "N/A":
+            bitrate = format_bitrate(int(bitrate))
+
+        formatted.append(Text("📁 Informações do Arquivo:", style="bold cyan"))
+        formatted.append(f"  - Nome: {filename}")
+        formatted.append(
+            f"  - Formato: {format_info.get('format_name', 'N/A')}")
+        formatted.append(f"  - Duração: {duration}")
+        formatted.append(
+            f"  - Tamanho: {size}")
+        formatted.append(
+            f"  - Bitrate: {bitrate}")
+
+    # 🎬 Streams de Mídia
+    if "streams" in metadata:
+        if len(metadata["streams"]) > 0:
+            formatted.append(
+                Text("\n🎬 Streams de Mídia:", style="bold yellow"))
+        for i, stream in enumerate(metadata["streams"]):
+            stream_type = stream.get("codec_type", "unknown")
+            codec = stream.get("codec_name", "N/A")
+            resolution = f"{stream.get('width', '?')}x{stream.get('height', '?')}" if stream_type == "video" else ""
+            bitrate = stream.get("bit_rate", "N/A")
+
+            if bitrate != "N/A":
+                bitrate = format_bitrate(int(bitrate))
+
+            formatted.append(f"\n  🔹 Stream #{i} ({stream_type.upper()}):")
+            formatted.append(f"    - Codec: {codec}")
+            if resolution:
+                formatted.append(f"    - Resolução: {resolution}")
+            formatted.append(f"    - Bitrate: {bitrate}")
+            if stream_type == "audio":
+                formatted.append(
+                    f"    - Taxa de amostragem: {stream.get('sample_rate', 'N/A')} Hz")
+                formatted.append(
+                    f"    - Canais: {stream.get('channels', 'N/A')}")
+
+    # 📖 Capítulos
+    if "chapters" in metadata:
+        if len(metadata["chapters"]) > 0:
+            formatted.append(Text("\n📖 Capítulos:", style="bold green"))
+        for chapter in metadata["chapters"]:
+            title = chapter.get('tags', {}).get('title', 'N/A')
+            start = chapter.get('start_time', 'N/A')
+            formatted.append(f"  - {title} (Tempo: {start}s)")
+
+    # Agrupar e exibir tudo com Rich
+    group = Group(*formatted)
+    print(
+        Panel(group, title=f"🧾 Análise do Arquivo", border_style="blue"))
 
 
 # audio_video convert

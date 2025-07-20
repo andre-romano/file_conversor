@@ -4,12 +4,14 @@
 This module provides functionalities for handling audio and video files using FFmpeg.
 """
 
+import json
 import subprocess
 import re
 
+from datetime import timedelta
 from typing import Iterable
 
-from utils.file import File
+from utils import File
 
 
 class FFmpegBackend:
@@ -93,7 +95,7 @@ class FFmpegBackend:
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
     @staticmethod
-    def calculate_file_total_duration(file: str) -> float:
+    def calculate_file_total_duration(file_path: str) -> float:
         """
         Calculate file total duration (in secs), using `ffprobe`.
 
@@ -102,12 +104,70 @@ class FFmpegBackend:
         result = subprocess.run(
             ['ffprobe', '-v', 'error', '-show_entries',
              'format=duration', '-of',
-             'default=noprint_wrappers=1:nokey=1', file],
+             'default=noprint_wrappers=1:nokey=1', file_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True
         )
-        return float(result.stdout.strip())
+        duration_str = result.stdout.strip()
+        return float(duration_str if duration_str else "0")
+
+    @staticmethod
+    def calculate_file_formatted_duration(file_path: str) -> str:
+        """
+        Calculate file duration (formatted), using `ffprobe`.
+
+        :return: Total duration  (format HH:MM:SS).
+        """
+        duration_secs = FFmpegBackend.calculate_file_total_duration(file_path)
+
+        # Converte segundos para timedelta e formata como HH:MM:SS
+        td = timedelta(seconds=int(duration_secs))
+        return str(td)
+
+    @staticmethod
+    def get_file_info(file_path: str) -> dict:
+        """
+        Executa ffprobe e retorna os metadados no formato JSON
+
+        result = {
+            streams: [],
+            chapters: [],
+            format: {},
+        }
+
+        stream = {
+            index,
+            codec_name,
+            codec_long_name,
+            codec_type: audio|video,
+            sampling_rate,
+            channels,
+            channel_layout: stereo|mono,
+        }
+
+        format = {
+            format_name,
+            format_long_name,
+            duration,
+            size,
+        }
+
+        :return: JSON object
+        """
+        command = [
+            "ffprobe",
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            "-show_chapters",
+            "-show_error",
+            file_path
+        ]
+        result = subprocess.run(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return json.loads(result.stdout)
 
     def __init__(
         self,
