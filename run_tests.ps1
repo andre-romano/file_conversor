@@ -1,3 +1,3 @@
 
 Write-Host "Running tests..."
-pdm run pytest
+pdm run pytest @args

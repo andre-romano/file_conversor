@@ -10,4 +10,4 @@ Remove-Item -Recurse dist/*
 pdm build
 
 Write-Host "Building EXE..."
-pdm run pyinstaller src/file_conversor.py --name file_conversor --onefile
+pdm run pyinstaller src/file_conversor.py --name file_conversor --icon data/icon.ico --onefile

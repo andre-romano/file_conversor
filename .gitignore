@@ -1,5 +1,5 @@
 # config file
-.file_conversor.json
+.config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

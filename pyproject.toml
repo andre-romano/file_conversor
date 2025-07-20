@@ -28,7 +28,10 @@ distribution = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-x --cov=src --cov-report=term-missing --cov-report=html"
+addopts = "-x --ff --cov=src --cov-report=term-missing --cov-report=html"
+filterwarnings = [
+  "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer"
+]
 
 [tool.pyright]
 # Specify the language server (Pylance should be set by default if using Pyright)
