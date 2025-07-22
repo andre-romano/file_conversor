@@ -3,16 +3,24 @@ Python program to convert and compress audio/video/text/etc files to other forma
 
 **Summary**:
 - [File Conversor](#file-conversor)
+  - [External dependencies](#external-dependencies)
   - [Installing](#installing)
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
-      - [Option 2. Setup file (.EXE)](#option-2-setup-file-exe)
+      - [Option 2. Portable EXE](#option-2-portable-exe)
     - [For Linux](#for-linux)
-  - [External dependencies](#external-dependencies)
+      - [Option 1. Using ``pip``](#option-1-using-pip)
+      - [Option 2. Building and installing .WHL](#option-2-building-and-installing-whl)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
   - [License and Copyright](#license-and-copyright)
+
+## External dependencies
+
+This project requires the following external dependencies to work properly:
+- FFmpeg
+- Ghostscript
 
 ## Installing
 
@@ -25,32 +33,32 @@ Python program to convert and compress audio/video/text/etc files to other forma
   choco install file_conversor
   ```
 
-#### Option 2. Setup file (.EXE)
+#### Option 2. Portable EXE
 
-1. Download the latest installer (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-2. Run the installer
+1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
+2. Extract ZIP file
 
-**Attention:** External dependencies are installed automatically in Windows systems, during program installation. 
-   - The installer will use [Chocolatey package manager](https://chocolatey.org/) to install those dependencies in Windows.
 
 ### For Linux
+
+#### Option 1. Using ``pip`` 
+
+1. Run the following commands:
+```bash
+pip install file_conversor
+```
+
+#### Option 2. Building and installing .WHL
 
 1. Install `python` in your distro
 2. Install external dependencies in your distro
 3. Build and install `.whl` file
   ```bash
   pip install pdm invoke
-  pdm install
-  pdm build
-  pip install dist/*.whl
+  invoke install-deps
+  invoke build-whl
+  invoke install-whl
   ```
-
-
-## External dependencies
-
-This project requires the following external dependencies to work properly:
-- FFmpeg
-- Ghostscript
 
 ## Usage
 
@@ -66,7 +74,7 @@ For more information about the usage:
 
 ### GUI - Graphical user interface
 
-**TODO**: build GUI
+*TODO*
 
 ## License and Copyright
 

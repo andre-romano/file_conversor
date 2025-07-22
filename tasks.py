@@ -336,7 +336,7 @@ def build_zip(c):
         for file_path in dist_folder.rglob("*"):
             # Make path relative to dist_folder for zip structure
             print(f"Adding '{file_path}' to zip file ...")
-            relative_path = file_path.relative_to(dist_folder)
+            relative_path = file_path.relative_to(dist_folder.parent)
             zipf.write(file_path, arcname=relative_path)
 
     print(f"[bold] Building ZIP portable ... [/][bold green]OK[/]")
