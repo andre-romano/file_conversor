@@ -12,9 +12,8 @@ from rich import print
 from rich.text import Text
 from rich.panel import Panel
 from rich.console import Group
-from rich.markdown import Markdown
-from rich.pretty import Pretty
-from rich.progress import Progress
+# from rich.markdown import Markdown
+# from rich.pretty import Pretty
 
 # user-provided modules
 from backend import FFmpegBackend
@@ -22,8 +21,10 @@ from backend import FFmpegBackend
 from config import get_translation
 from config import Configuration, State
 
-from utils import check_positive_integer, check_format, format_bitrate, format_bytes
 from utils import File
+from utils.validators import check_positive_integer, check_format
+from utils.formatters import format_bitrate, format_bytes
+from utils.rich import get_progress_bar
 
 # get app config
 _ = get_translation()
@@ -65,7 +66,10 @@ def info(
 ):
 
     formatted = []
-    metadata = FFmpegBackend.get_file_info(filename)
+    with get_progress_bar() as progress:
+        progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
+
+        metadata = FFmpegBackend.get_file_info(filename)
     # 📁 Informações gerais do arquivo
     if "format" in metadata:
         format_info: dict = metadata["format"]
@@ -82,21 +86,17 @@ def info(
         if bitrate != "N/A":
             bitrate = format_bitrate(int(bitrate))
 
-        formatted.append(Text("📁 Informações do Arquivo:", style="bold cyan"))
-        formatted.append(f"  - Nome: {filename}")
-        formatted.append(
-            f"  - Formato: {format_info.get('format_name', 'N/A')}")
-        formatted.append(f"  - Duração: {duration}")
-        formatted.append(
-            f"  - Tamanho: {size}")
-        formatted.append(
-            f"  - Bitrate: {bitrate}")
+        formatted.append(Text(f"📁 {_('File Information')}:", style="bold cyan"))
+        formatted.append(f"  - {_('Name')}: {filename}")
+        formatted.append(f"  - {_('Format')}: {format_info.get('format_name', 'N/A')}")
+        formatted.append(f"  - {_('Duration')}: {duration}")
+        formatted.append(f"  - {_('Size')}: {size}")
+        formatted.append(f"  - {_('Bitrate')}: {bitrate}")
 
     # 🎬 Streams de Mídia
     if "streams" in metadata:
         if len(metadata["streams"]) > 0:
-            formatted.append(
-                Text("\n🎬 Streams de Mídia:", style="bold yellow"))
+            formatted.append(Text(f"\n🎬 {_("Media Streams")}:", style="bold yellow"))
         for i, stream in enumerate(metadata["streams"]):
             stream_type = stream.get("codec_type", "unknown")
             codec = stream.get("codec_name", "N/A")
@@ -106,30 +106,27 @@ def info(
             if bitrate != "N/A":
                 bitrate = format_bitrate(int(bitrate))
 
-            formatted.append(f"\n  🔹 Stream #{i} ({stream_type.upper()}):")
-            formatted.append(f"    - Codec: {codec}")
+            formatted.append(f"\n  🔹 {_('Stream')} #{i} ({stream_type.upper()}):")
+            formatted.append(f"    - {_('Codec')}: {codec}")
             if resolution:
-                formatted.append(f"    - Resolução: {resolution}")
-            formatted.append(f"    - Bitrate: {bitrate}")
+                formatted.append(f"    - {_('Resolution')}: {resolution}")
+            formatted.append(f"    - {_('Bitrate')}: {bitrate}")
             if stream_type == "audio":
-                formatted.append(
-                    f"    - Taxa de amostragem: {stream.get('sample_rate', 'N/A')} Hz")
-                formatted.append(
-                    f"    - Canais: {stream.get('channels', 'N/A')}")
+                formatted.append(f"    - {_('Sampling rate')}: {stream.get('sample_rate', 'N/A')} Hz")
+                formatted.append(f"    - {_('Channels')}: {stream.get('channels', 'N/A')}")
 
     # 📖 Capítulos
     if "chapters" in metadata:
         if len(metadata["chapters"]) > 0:
-            formatted.append(Text("\n📖 Capítulos:", style="bold green"))
+            formatted.append(Text(f"\n📖 {_('Chapters')}:", style="bold green"))
         for chapter in metadata["chapters"]:
             title = chapter.get('tags', {}).get('title', 'N/A')
             start = chapter.get('start_time', 'N/A')
-            formatted.append(f"  - {title} (Tempo: {start}s)")
+            formatted.append(f"  - {title} ({_('Time')}: {start}s)")
 
     # Agrupar e exibir tudo com Rich
     group = Group(*formatted)
-    print(
-        Panel(group, title=f"🧾 Análise do Arquivo", border_style="blue"))
+    print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
 
 
 # audio_video convert
@@ -189,12 +186,10 @@ def convert(
     process = ffmpeg_backend.execute()
 
     # display current progress
-    with Progress() as progress:
-        ffmpeg_task = progress.add_task(
-            f"[blue]{_('Processing file')}...", total=100)
+    with get_progress_bar() as progress:
+        ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
         while process.poll() is None:
-            progress.update(
-                ffmpeg_task, completed=ffmpeg_backend.get_progress())
+            progress.update(ffmpeg_task, completed=ffmpeg_backend.get_progress())
             time.sleep(0.25)
 
     process.wait()
@@ -202,8 +197,7 @@ def convert(
 
     if process.returncode == 0:
         print(f"--------------------------------")
-        print(
-            f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
+        print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
         print(f"--------------------------------")
     else:
         # print output
@@ -214,6 +208,5 @@ def convert(
             for line in process.stdout:
                 print(line)
         print(f"\n--------------------------------")
-        print(
-            f"{_('FFMpeg convertion')}: [red][bold]{_('FAILED')}[/bold][/red] ({process.returncode if process else "?"})")
+        print(f"{_('FFMpeg convertion')}: [red][bold]{_('FAILED')}[/bold][/red] ({process.returncode if process else "?"})")
         print(f"--------------------------------")

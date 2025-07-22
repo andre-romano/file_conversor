@@ -44,13 +44,11 @@ class File:
         :raises FileNotFoundError: If the directory could not be created, or if path is a file.
         """
         if os.path.isfile(self.path):
-            raise FileExistsError(
-                f"Path '{self.path}' is a file, not a directory.")
+            raise FileExistsError(f"Path '{self.path}' is a file, not a directory.")
 
         os.makedirs(self.path, exist_ok=True)
         if not os.path.isdir(self.path):
-            raise FileNotFoundError(
-                f"Directory '{self.path}' could not be created.")
+            raise FileNotFoundError(f"Directory '{self.path}' could not be created.")
 
     def check_supported_format(self, supported_formats: list | dict):
         """
@@ -62,8 +60,7 @@ class File:
         """
         extension = self.get_extension()
         if extension not in supported_formats:
-            raise ValueError(
-                f"Unsupported format: {extension}. Supported formats are: {', '.join(supported_formats)}")
+            raise ValueError(f"Unsupported format: {extension}. Supported formats are: {', '.join(supported_formats)}")
 
     def get_extension(self) -> str:
         """
@@ -71,7 +68,7 @@ class File:
 
         :return: The file extension.
         """
-        return (os.path.splitext(self.path)[1])[1:]
+        return (os.path.splitext(self.path)[1])[1:].lower()
 
     def get_filename(self) -> str:
         """

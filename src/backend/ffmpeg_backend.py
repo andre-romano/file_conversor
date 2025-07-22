@@ -213,8 +213,7 @@ class FFmpegBackend:
         self._in_options.extend(in_options if in_options else [])
         self._out_options.extend(out_options if out_options else [])
 
-        self._input_file_total_duration = self.calculate_file_total_duration(
-            self._input_file)
+        self._input_file_total_duration = self.calculate_file_total_duration(self._input_file)
 
         self._create_command()
 

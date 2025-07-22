@@ -9,12 +9,10 @@ from rich import print
 from rich.pretty import Pretty
 
 # user-provided modules
-from backend import FFmpegBackend
-
 from config import get_translation
 from config import Configuration, State
 
-from utils import check_positive_integer, check_format
+from utils.validators import check_positive_integer
 
 # app configuration
 _ = get_translation()
@@ -58,5 +56,4 @@ def set(
     })
     CONFIG.save()
     show()
-    print(
-        f"{_('Configuration file')} {_('updated')}.")
+    print(f"{_('Configuration file')} {_('updated')}.")
