@@ -1,13 +1,15 @@
 # File Conversor
-Python CLI to convert and compress audio/video/text/etc files to other formats
+Python program to convert and compress audio/video/text/etc files to other formats
 
 **Summary**:
 - [File Conversor](#file-conversor)
   - [Installing](#installing)
     - [For Windows](#for-windows)
+      - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
+      - [Option 2. Setup file (.EXE)](#option-2-setup-file-exe)
     - [For Linux](#for-linux)
   - [External dependencies](#external-dependencies)
-  - [Usage (CLI)](#usage-cli)
+  - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
   - [License and Copyright](#license-and-copyright)
@@ -15,6 +17,15 @@ Python CLI to convert and compress audio/video/text/etc files to other formats
 ## Installing
 
 ### For Windows
+
+#### Option 1. Chocolatey Package Manager
+
+1. Open PowerShell with Admin priviledges and run:
+  ```bash
+  choco install file_conversor
+  ```
+
+#### Option 2. Setup file (.EXE)
 
 1. Download the latest installer (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
 2. Run the installer
@@ -41,7 +52,7 @@ This project requires the following external dependencies to work properly:
 - FFmpeg
 - Ghostscript
 
-## Usage (CLI)
+## Usage
 
 ### CLI - Command line interface
 

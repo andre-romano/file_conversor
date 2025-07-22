@@ -175,66 +175,63 @@
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        :raises FileNotFoundError: If the directory could not be created, or if path is a file.</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>                <span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>                <span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Check if the file has a supported format.</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">        Check if the file has a supported format.</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>                <span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        Get the file extension.</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        :return: The file extension.</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        Get the file name without the extension.</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        :return: The file name without the extension.</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        Get the directory name of the file.</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        :return: The directory name.</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        Get the full absolute path of the directory.</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        Get the full absolute path of the file.</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">        :return: The full absolute path of the file.</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        Get the file extension.</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">        :return: The file extension.</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">        Get the file name without the extension.</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        :return: The file name without the extension.</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        Get the directory name of the file.</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        :return: The directory name.</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        Get the full absolute path of the directory.</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        Get the full absolute path of the file.</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        :return: The full absolute path of the file.</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -292,66 +289,63 @@
 </span><span id="File-45"><a href="#File-45"><span class="linenos"> 45</span></a><span class="sd">        :raises FileNotFoundError: If the directory could not be created, or if path is a file.</span>
 </span><span id="File-46"><a href="#File-46"><span class="linenos"> 46</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="File-47"><a href="#File-47"><span class="linenos"> 47</span></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="File-48"><a href="#File-48"><span class="linenos"> 48</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
-</span><span id="File-49"><a href="#File-49"><span class="linenos"> 49</span></a>                <span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
-</span><span id="File-50"><a href="#File-50"><span class="linenos"> 50</span></a>
-</span><span id="File-51"><a href="#File-51"><span class="linenos"> 51</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="File-52"><a href="#File-52"><span class="linenos"> 52</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="File-53"><a href="#File-53"><span class="linenos"> 53</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-</span><span id="File-54"><a href="#File-54"><span class="linenos"> 54</span></a>                <span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
-</span><span id="File-55"><a href="#File-55"><span class="linenos"> 55</span></a>
-</span><span id="File-56"><a href="#File-56"><span class="linenos"> 56</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="File-57"><a href="#File-57"><span class="linenos"> 57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-58"><a href="#File-58"><span class="linenos"> 58</span></a><span class="sd">        Check if the file has a supported format.</span>
+</span><span id="File-48"><a href="#File-48"><span class="linenos"> 48</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
+</span><span id="File-49"><a href="#File-49"><span class="linenos"> 49</span></a>
+</span><span id="File-50"><a href="#File-50"><span class="linenos"> 50</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="File-51"><a href="#File-51"><span class="linenos"> 51</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+</span><span id="File-52"><a href="#File-52"><span class="linenos"> 52</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
+</span><span id="File-53"><a href="#File-53"><span class="linenos"> 53</span></a>
+</span><span id="File-54"><a href="#File-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="File-55"><a href="#File-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-56"><a href="#File-56"><span class="linenos"> 56</span></a><span class="sd">        Check if the file has a supported format.</span>
+</span><span id="File-57"><a href="#File-57"><span class="linenos"> 57</span></a>
+</span><span id="File-58"><a href="#File-58"><span class="linenos"> 58</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
 </span><span id="File-59"><a href="#File-59"><span class="linenos"> 59</span></a>
-</span><span id="File-60"><a href="#File-60"><span class="linenos"> 60</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
-</span><span id="File-61"><a href="#File-61"><span class="linenos"> 61</span></a>
-</span><span id="File-62"><a href="#File-62"><span class="linenos"> 62</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
-</span><span id="File-63"><a href="#File-63"><span class="linenos"> 63</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-64"><a href="#File-64"><span class="linenos"> 64</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
-</span><span id="File-65"><a href="#File-65"><span class="linenos"> 65</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
-</span><span id="File-66"><a href="#File-66"><span class="linenos"> 66</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="File-67"><a href="#File-67"><span class="linenos"> 67</span></a>                <span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="File-68"><a href="#File-68"><span class="linenos"> 68</span></a>
-</span><span id="File-69"><a href="#File-69"><span class="linenos"> 69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File-70"><a href="#File-70"><span class="linenos"> 70</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-71"><a href="#File-71"><span class="linenos"> 71</span></a><span class="sd">        Get the file extension.</span>
-</span><span id="File-72"><a href="#File-72"><span class="linenos"> 72</span></a>
-</span><span id="File-73"><a href="#File-73"><span class="linenos"> 73</span></a><span class="sd">        :return: The file extension.</span>
-</span><span id="File-74"><a href="#File-74"><span class="linenos"> 74</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-75"><a href="#File-75"><span class="linenos"> 75</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span>
-</span><span id="File-76"><a href="#File-76"><span class="linenos"> 76</span></a>
-</span><span id="File-77"><a href="#File-77"><span class="linenos"> 77</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File-78"><a href="#File-78"><span class="linenos"> 78</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-79"><a href="#File-79"><span class="linenos"> 79</span></a><span class="sd">        Get the file name without the extension.</span>
-</span><span id="File-80"><a href="#File-80"><span class="linenos"> 80</span></a>
-</span><span id="File-81"><a href="#File-81"><span class="linenos"> 81</span></a><span class="sd">        :return: The file name without the extension.</span>
-</span><span id="File-82"><a href="#File-82"><span class="linenos"> 82</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-83"><a href="#File-83"><span class="linenos"> 83</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="File-84"><a href="#File-84"><span class="linenos"> 84</span></a>
-</span><span id="File-85"><a href="#File-85"><span class="linenos"> 85</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File-86"><a href="#File-86"><span class="linenos"> 86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-87"><a href="#File-87"><span class="linenos"> 87</span></a><span class="sd">        Get the directory name of the file.</span>
-</span><span id="File-88"><a href="#File-88"><span class="linenos"> 88</span></a>
-</span><span id="File-89"><a href="#File-89"><span class="linenos"> 89</span></a><span class="sd">        :return: The directory name.</span>
-</span><span id="File-90"><a href="#File-90"><span class="linenos"> 90</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-91"><a href="#File-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-</span><span id="File-92"><a href="#File-92"><span class="linenos"> 92</span></a>
-</span><span id="File-93"><a href="#File-93"><span class="linenos"> 93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File-94"><a href="#File-94"><span class="linenos"> 94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-95"><a href="#File-95"><span class="linenos"> 95</span></a><span class="sd">        Get the full absolute path of the directory.</span>
-</span><span id="File-96"><a href="#File-96"><span class="linenos"> 96</span></a>
-</span><span id="File-97"><a href="#File-97"><span class="linenos"> 97</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
-</span><span id="File-98"><a href="#File-98"><span class="linenos"> 98</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-99"><a href="#File-99"><span class="linenos"> 99</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
-</span><span id="File-100"><a href="#File-100"><span class="linenos">100</span></a>
-</span><span id="File-101"><a href="#File-101"><span class="linenos">101</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File-102"><a href="#File-102"><span class="linenos">102</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File-103"><a href="#File-103"><span class="linenos">103</span></a><span class="sd">        Get the full absolute path of the file.</span>
-</span><span id="File-104"><a href="#File-104"><span class="linenos">104</span></a>
-</span><span id="File-105"><a href="#File-105"><span class="linenos">105</span></a><span class="sd">        :return: The full absolute path of the file.</span>
-</span><span id="File-106"><a href="#File-106"><span class="linenos">106</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File-107"><a href="#File-107"><span class="linenos">107</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</span><span id="File-60"><a href="#File-60"><span class="linenos"> 60</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
+</span><span id="File-61"><a href="#File-61"><span class="linenos"> 61</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-62"><a href="#File-62"><span class="linenos"> 62</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
+</span><span id="File-63"><a href="#File-63"><span class="linenos"> 63</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
+</span><span id="File-64"><a href="#File-64"><span class="linenos"> 64</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="File-65"><a href="#File-65"><span class="linenos"> 65</span></a>
+</span><span id="File-66"><a href="#File-66"><span class="linenos"> 66</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File-67"><a href="#File-67"><span class="linenos"> 67</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-68"><a href="#File-68"><span class="linenos"> 68</span></a><span class="sd">        Get the file extension.</span>
+</span><span id="File-69"><a href="#File-69"><span class="linenos"> 69</span></a>
+</span><span id="File-70"><a href="#File-70"><span class="linenos"> 70</span></a><span class="sd">        :return: The file extension.</span>
+</span><span id="File-71"><a href="#File-71"><span class="linenos"> 71</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-72"><a href="#File-72"><span class="linenos"> 72</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="File-73"><a href="#File-73"><span class="linenos"> 73</span></a>
+</span><span id="File-74"><a href="#File-74"><span class="linenos"> 74</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File-75"><a href="#File-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-76"><a href="#File-76"><span class="linenos"> 76</span></a><span class="sd">        Get the file name without the extension.</span>
+</span><span id="File-77"><a href="#File-77"><span class="linenos"> 77</span></a>
+</span><span id="File-78"><a href="#File-78"><span class="linenos"> 78</span></a><span class="sd">        :return: The file name without the extension.</span>
+</span><span id="File-79"><a href="#File-79"><span class="linenos"> 79</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-80"><a href="#File-80"><span class="linenos"> 80</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="File-81"><a href="#File-81"><span class="linenos"> 81</span></a>
+</span><span id="File-82"><a href="#File-82"><span class="linenos"> 82</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File-83"><a href="#File-83"><span class="linenos"> 83</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-84"><a href="#File-84"><span class="linenos"> 84</span></a><span class="sd">        Get the directory name of the file.</span>
+</span><span id="File-85"><a href="#File-85"><span class="linenos"> 85</span></a>
+</span><span id="File-86"><a href="#File-86"><span class="linenos"> 86</span></a><span class="sd">        :return: The directory name.</span>
+</span><span id="File-87"><a href="#File-87"><span class="linenos"> 87</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-88"><a href="#File-88"><span class="linenos"> 88</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</span><span id="File-89"><a href="#File-89"><span class="linenos"> 89</span></a>
+</span><span id="File-90"><a href="#File-90"><span class="linenos"> 90</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File-91"><a href="#File-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-92"><a href="#File-92"><span class="linenos"> 92</span></a><span class="sd">        Get the full absolute path of the directory.</span>
+</span><span id="File-93"><a href="#File-93"><span class="linenos"> 93</span></a>
+</span><span id="File-94"><a href="#File-94"><span class="linenos"> 94</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
+</span><span id="File-95"><a href="#File-95"><span class="linenos"> 95</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-96"><a href="#File-96"><span class="linenos"> 96</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
+</span><span id="File-97"><a href="#File-97"><span class="linenos"> 97</span></a>
+</span><span id="File-98"><a href="#File-98"><span class="linenos"> 98</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File-99"><a href="#File-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File-100"><a href="#File-100"><span class="linenos">100</span></a><span class="sd">        Get the full absolute path of the file.</span>
+</span><span id="File-101"><a href="#File-101"><span class="linenos">101</span></a>
+</span><span id="File-102"><a href="#File-102"><span class="linenos">102</span></a><span class="sd">        :return: The full absolute path of the file.</span>
+</span><span id="File-103"><a href="#File-103"><span class="linenos">103</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File-104"><a href="#File-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -495,13 +489,11 @@
 </span><span id="File.create_dir-45"><a href="#File.create_dir-45"><span class="linenos">45</span></a><span class="sd">        :raises FileNotFoundError: If the directory could not be created, or if path is a file.</span>
 </span><span id="File.create_dir-46"><a href="#File.create_dir-46"><span class="linenos">46</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="File.create_dir-47"><a href="#File.create_dir-47"><span class="linenos">47</span></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="File.create_dir-48"><a href="#File.create_dir-48"><span class="linenos">48</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
-</span><span id="File.create_dir-49"><a href="#File.create_dir-49"><span class="linenos">49</span></a>                <span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
-</span><span id="File.create_dir-50"><a href="#File.create_dir-50"><span class="linenos">50</span></a>
-</span><span id="File.create_dir-51"><a href="#File.create_dir-51"><span class="linenos">51</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="File.create_dir-52"><a href="#File.create_dir-52"><span class="linenos">52</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
-</span><span id="File.create_dir-53"><a href="#File.create_dir-53"><span class="linenos">53</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-</span><span id="File.create_dir-54"><a href="#File.create_dir-54"><span class="linenos">54</span></a>                <span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
+</span><span id="File.create_dir-48"><a href="#File.create_dir-48"><span class="linenos">48</span></a>            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; is a file, not a directory.&quot;</span><span class="p">)</span>
+</span><span id="File.create_dir-49"><a href="#File.create_dir-49"><span class="linenos">49</span></a>
+</span><span id="File.create_dir-50"><a href="#File.create_dir-50"><span class="linenos">50</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="File.create_dir-51"><a href="#File.create_dir-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+</span><span id="File.create_dir-52"><a href="#File.create_dir-52"><span class="linenos">52</span></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; could not be created.&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -528,18 +520,17 @@
 
     </div>
     <a class="headerlink" href="#File.check_supported_format"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.check_supported_format-56"><a href="#File.check_supported_format-56"><span class="linenos">56</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="File.check_supported_format-57"><a href="#File.check_supported_format-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.check_supported_format-58"><a href="#File.check_supported_format-58"><span class="linenos">58</span></a><span class="sd">        Check if the file has a supported format.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.check_supported_format-54"><a href="#File.check_supported_format-54"><span class="linenos">54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_supported_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supported_formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="File.check_supported_format-55"><a href="#File.check_supported_format-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.check_supported_format-56"><a href="#File.check_supported_format-56"><span class="linenos">56</span></a><span class="sd">        Check if the file has a supported format.</span>
+</span><span id="File.check_supported_format-57"><a href="#File.check_supported_format-57"><span class="linenos">57</span></a>
+</span><span id="File.check_supported_format-58"><a href="#File.check_supported_format-58"><span class="linenos">58</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
 </span><span id="File.check_supported_format-59"><a href="#File.check_supported_format-59"><span class="linenos">59</span></a>
-</span><span id="File.check_supported_format-60"><a href="#File.check_supported_format-60"><span class="linenos">60</span></a><span class="sd">        :param supported_formats: List or dict of supported file formats.</span>
-</span><span id="File.check_supported_format-61"><a href="#File.check_supported_format-61"><span class="linenos">61</span></a>
-</span><span id="File.check_supported_format-62"><a href="#File.check_supported_format-62"><span class="linenos">62</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
-</span><span id="File.check_supported_format-63"><a href="#File.check_supported_format-63"><span class="linenos">63</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.check_supported_format-64"><a href="#File.check_supported_format-64"><span class="linenos">64</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
-</span><span id="File.check_supported_format-65"><a href="#File.check_supported_format-65"><span class="linenos">65</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
-</span><span id="File.check_supported_format-66"><a href="#File.check_supported_format-66"><span class="linenos">66</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="File.check_supported_format-67"><a href="#File.check_supported_format-67"><span class="linenos">67</span></a>                <span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="File.check_supported_format-60"><a href="#File.check_supported_format-60"><span class="linenos">60</span></a><span class="sd">        :raises ValueError: If the file format is not supported.</span>
+</span><span id="File.check_supported_format-61"><a href="#File.check_supported_format-61"><span class="linenos">61</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.check_supported_format-62"><a href="#File.check_supported_format-62"><span class="linenos">62</span></a>        <span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extension</span><span class="p">()</span>
+</span><span id="File.check_supported_format-63"><a href="#File.check_supported_format-63"><span class="linenos">63</span></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
+</span><span id="File.check_supported_format-64"><a href="#File.check_supported_format-64"><span class="linenos">64</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">. Supported formats are: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supported_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -571,13 +562,13 @@
 
     </div>
     <a class="headerlink" href="#File.get_extension"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_extension-69"><a href="#File.get_extension-69"><span class="linenos">69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File.get_extension-70"><a href="#File.get_extension-70"><span class="linenos">70</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.get_extension-71"><a href="#File.get_extension-71"><span class="linenos">71</span></a><span class="sd">        Get the file extension.</span>
-</span><span id="File.get_extension-72"><a href="#File.get_extension-72"><span class="linenos">72</span></a>
-</span><span id="File.get_extension-73"><a href="#File.get_extension-73"><span class="linenos">73</span></a><span class="sd">        :return: The file extension.</span>
-</span><span id="File.get_extension-74"><a href="#File.get_extension-74"><span class="linenos">74</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.get_extension-75"><a href="#File.get_extension-75"><span class="linenos">75</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_extension-66"><a href="#File.get_extension-66"><span class="linenos">66</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File.get_extension-67"><a href="#File.get_extension-67"><span class="linenos">67</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.get_extension-68"><a href="#File.get_extension-68"><span class="linenos">68</span></a><span class="sd">        Get the file extension.</span>
+</span><span id="File.get_extension-69"><a href="#File.get_extension-69"><span class="linenos">69</span></a>
+</span><span id="File.get_extension-70"><a href="#File.get_extension-70"><span class="linenos">70</span></a><span class="sd">        :return: The file extension.</span>
+</span><span id="File.get_extension-71"><a href="#File.get_extension-71"><span class="linenos">71</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.get_extension-72"><a href="#File.get_extension-72"><span class="linenos">72</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -603,13 +594,13 @@
 
     </div>
     <a class="headerlink" href="#File.get_filename"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_filename-77"><a href="#File.get_filename-77"><span class="linenos">77</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File.get_filename-78"><a href="#File.get_filename-78"><span class="linenos">78</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.get_filename-79"><a href="#File.get_filename-79"><span class="linenos">79</span></a><span class="sd">        Get the file name without the extension.</span>
-</span><span id="File.get_filename-80"><a href="#File.get_filename-80"><span class="linenos">80</span></a>
-</span><span id="File.get_filename-81"><a href="#File.get_filename-81"><span class="linenos">81</span></a><span class="sd">        :return: The file name without the extension.</span>
-</span><span id="File.get_filename-82"><a href="#File.get_filename-82"><span class="linenos">82</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.get_filename-83"><a href="#File.get_filename-83"><span class="linenos">83</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_filename-74"><a href="#File.get_filename-74"><span class="linenos">74</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File.get_filename-75"><a href="#File.get_filename-75"><span class="linenos">75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.get_filename-76"><a href="#File.get_filename-76"><span class="linenos">76</span></a><span class="sd">        Get the file name without the extension.</span>
+</span><span id="File.get_filename-77"><a href="#File.get_filename-77"><span class="linenos">77</span></a>
+</span><span id="File.get_filename-78"><a href="#File.get_filename-78"><span class="linenos">78</span></a><span class="sd">        :return: The file name without the extension.</span>
+</span><span id="File.get_filename-79"><a href="#File.get_filename-79"><span class="linenos">79</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.get_filename-80"><a href="#File.get_filename-80"><span class="linenos">80</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -635,13 +626,13 @@
 
     </div>
     <a class="headerlink" href="#File.get_dirname"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_dirname-85"><a href="#File.get_dirname-85"><span class="linenos">85</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File.get_dirname-86"><a href="#File.get_dirname-86"><span class="linenos">86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.get_dirname-87"><a href="#File.get_dirname-87"><span class="linenos">87</span></a><span class="sd">        Get the directory name of the file.</span>
-</span><span id="File.get_dirname-88"><a href="#File.get_dirname-88"><span class="linenos">88</span></a>
-</span><span id="File.get_dirname-89"><a href="#File.get_dirname-89"><span class="linenos">89</span></a><span class="sd">        :return: The directory name.</span>
-</span><span id="File.get_dirname-90"><a href="#File.get_dirname-90"><span class="linenos">90</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.get_dirname-91"><a href="#File.get_dirname-91"><span class="linenos">91</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_dirname-82"><a href="#File.get_dirname-82"><span class="linenos">82</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File.get_dirname-83"><a href="#File.get_dirname-83"><span class="linenos">83</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.get_dirname-84"><a href="#File.get_dirname-84"><span class="linenos">84</span></a><span class="sd">        Get the directory name of the file.</span>
+</span><span id="File.get_dirname-85"><a href="#File.get_dirname-85"><span class="linenos">85</span></a>
+</span><span id="File.get_dirname-86"><a href="#File.get_dirname-86"><span class="linenos">86</span></a><span class="sd">        :return: The directory name.</span>
+</span><span id="File.get_dirname-87"><a href="#File.get_dirname-87"><span class="linenos">87</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.get_dirname-88"><a href="#File.get_dirname-88"><span class="linenos">88</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -667,13 +658,13 @@
 
     </div>
     <a class="headerlink" href="#File.get_full_dirname"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_full_dirname-93"><a href="#File.get_full_dirname-93"><span class="linenos">93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File.get_full_dirname-94"><a href="#File.get_full_dirname-94"><span class="linenos">94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.get_full_dirname-95"><a href="#File.get_full_dirname-95"><span class="linenos">95</span></a><span class="sd">        Get the full absolute path of the directory.</span>
-</span><span id="File.get_full_dirname-96"><a href="#File.get_full_dirname-96"><span class="linenos">96</span></a>
-</span><span id="File.get_full_dirname-97"><a href="#File.get_full_dirname-97"><span class="linenos">97</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
-</span><span id="File.get_full_dirname-98"><a href="#File.get_full_dirname-98"><span class="linenos">98</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.get_full_dirname-99"><a href="#File.get_full_dirname-99"><span class="linenos">99</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_full_dirname-90"><a href="#File.get_full_dirname-90"><span class="linenos">90</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File.get_full_dirname-91"><a href="#File.get_full_dirname-91"><span class="linenos">91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.get_full_dirname-92"><a href="#File.get_full_dirname-92"><span class="linenos">92</span></a><span class="sd">        Get the full absolute path of the directory.</span>
+</span><span id="File.get_full_dirname-93"><a href="#File.get_full_dirname-93"><span class="linenos">93</span></a>
+</span><span id="File.get_full_dirname-94"><a href="#File.get_full_dirname-94"><span class="linenos">94</span></a><span class="sd">        :return: The full absolute path of the directory.</span>
+</span><span id="File.get_full_dirname-95"><a href="#File.get_full_dirname-95"><span class="linenos">95</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.get_full_dirname-96"><a href="#File.get_full_dirname-96"><span class="linenos">96</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dirname</span><span class="p">())</span>
 </span></pre></div>
 
 
@@ -699,13 +690,13 @@
 
     </div>
     <a class="headerlink" href="#File.get_full_path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_full_path-101"><a href="#File.get_full_path-101"><span class="linenos">101</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="File.get_full_path-102"><a href="#File.get_full_path-102"><span class="linenos">102</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="File.get_full_path-103"><a href="#File.get_full_path-103"><span class="linenos">103</span></a><span class="sd">        Get the full absolute path of the file.</span>
-</span><span id="File.get_full_path-104"><a href="#File.get_full_path-104"><span class="linenos">104</span></a>
-</span><span id="File.get_full_path-105"><a href="#File.get_full_path-105"><span class="linenos">105</span></a><span class="sd">        :return: The full absolute path of the file.</span>
-</span><span id="File.get_full_path-106"><a href="#File.get_full_path-106"><span class="linenos">106</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="File.get_full_path-107"><a href="#File.get_full_path-107"><span class="linenos">107</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="File.get_full_path-98"><a href="#File.get_full_path-98"><span class="linenos"> 98</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="File.get_full_path-99"><a href="#File.get_full_path-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="File.get_full_path-100"><a href="#File.get_full_path-100"><span class="linenos">100</span></a><span class="sd">        Get the full absolute path of the file.</span>
+</span><span id="File.get_full_path-101"><a href="#File.get_full_path-101"><span class="linenos">101</span></a>
+</span><span id="File.get_full_path-102"><a href="#File.get_full_path-102"><span class="linenos">102</span></a><span class="sd">        :return: The full absolute path of the file.</span>
+</span><span id="File.get_full_path-103"><a href="#File.get_full_path-103"><span class="linenos">103</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="File.get_full_path-104"><a href="#File.get_full_path-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 </span></pre></div>
 
 

@@ -3,7 +3,7 @@
 [project]
 name = "file_conversor"
 version = "1.0.0"
-description = "Default template for PDM package"
+description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
 dependencies = [
     "typer>=0.16.0",

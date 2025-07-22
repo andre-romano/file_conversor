@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-20 16:00-0300\n"
+"POT-Creation-Date: 2025-07-22 01:11-0300\n"
 "PO-Revision-Date: 2025-07-20 15:34-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -18,163 +18,490 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: src/file_conversor.py:57
+#: src/file_conversor.py:28
 msgid "Utils and Config"
 msgstr "Utils and Config"
 
-#: src/file_conversor.py:58
+#: src/file_conversor.py:29
 msgid "Multimedia files"
 msgstr "Multimedia files"
 
-#: src/file_conversor.py:66
-msgid "Audio / Video manipulation commands"
+#: src/file_conversor.py:34
+#, fuzzy
+msgid "Audio / Video file manipulation"
 msgstr "Audio / Video manipulation commands"
 
-#: src/file_conversor.py:69
+#: src/file_conversor.py:39
+msgid "PDF file manipulation"
+msgstr ""
+
+#: src/file_conversor.py:44
 msgid "Configure default options"
 msgstr "Configure default options"
 
-#: src/file_conversor.py:102 src/file_conversor.py:189
-msgid "Examples"
-msgstr "Examples xxx"
-
-#: src/file_conversor.py:110
-msgid "Input file path"
-msgstr "Input file path"
-
-#: src/file_conversor.py:116
-msgid "Output file path"
-msgstr "Output file path"
-
-#: src/file_conversor.py:122 src/file_conversor.py:232
-msgid "Audio bitrate in kbps"
-msgstr "Audio bitrate in kbps"
-
-#: src/file_conversor.py:127 src/file_conversor.py:237
-msgid "Video bitrate in kbps"
-msgstr "Video bitrate in kbps"
-
-#: src/file_conversor.py:132
-msgid "Convert a audio/video file to a different format."
-msgstr "Convert a audio/video file to a different format."
-
-#: src/file_conversor.py:134
-msgid ""
-"This command can be used to convert audio or video files to the specified"
-" format."
-msgstr ""
-"This command can be used to convert audio or video files to the specified"
-" format."
-
-#: src/file_conversor.py:158
-msgid "Processing file"
-msgstr "Processing file"
-
-#: src/file_conversor.py:170 src/file_conversor.py:182
-msgid "FFMpeg convertion"
-msgstr "FFMpeg convertion"
-
-#: src/file_conversor.py:170
-msgid "SUCCESS"
-msgstr "SUCCESS"
-
-#: src/file_conversor.py:182
-msgid "FAILED"
-msgstr "FAILED"
-
-#: src/file_conversor.py:204
-msgid "Get information about a audio/video file."
-msgstr "Get information about a audio/video file."
-
-#: src/file_conversor.py:206
-msgid ""
-"This command retrieves metadata and other information about the audio / "
-"video file"
-msgstr ""
-"This command retrieves metadata and other information about the audio / "
-"video file"
-
-#: src/file_conversor.py:208
-msgid "Format"
-msgstr "Format"
-
-#: src/file_conversor.py:210
-msgid "Duration"
-msgstr "Duration"
-
-#: src/file_conversor.py:214
-msgid "Other properties"
-msgstr "Other properties"
-
-#: src/file_conversor.py:223
-msgid "Show the current configuration of the application"
-msgstr "Show the current configuration of the application"
-
-#: src/file_conversor.py:225 src/file_conversor.py:265
-msgid "Configuration"
-msgstr "Configuration"
-
-#: src/file_conversor.py:242
-msgid "Video output format"
-msgstr "Video output format"
-
-#: src/file_conversor.py:248
-msgid "Audio output format"
-msgstr "Audio output format"
-
-#: src/file_conversor.py:254
-msgid "Configure the default options for the file converter."
-msgstr "Configure the default options for the file converter."
-
-#: src/file_conversor.py:256
-msgid "Example"
-msgstr "Example"
-
-#: src/file_conversor.py:268
-msgid "Configuration file"
-msgstr "Configuration file"
-
-#: src/file_conversor.py:268
-msgid "updated"
-msgstr "updated"
-
-#: src/file_conversor.py:275
+#: src/file_conversor.py:54
 msgid "Show the application help"
 msgstr "Show the application help"
 
-#: src/file_conversor.py:281
-msgid "For more information, visit"
-msgstr "For more information, visit"
-
-#: src/file_conversor.py:284
-msgid "Enable verbose output"
-msgstr "Enable verbose output"
-
-#: src/file_conversor.py:290
+#: src/file_conversor.py:67
 msgid "Features"
 msgstr "Features"
 
-#: src/file_conversor.py:292
+#: src/file_conversor.py:69
 msgid "Compress image / audio / video / doc / spreadsheet files"
 msgstr "Compress image / audio / video / doc / spreadsheet files"
 
-#: src/file_conversor.py:294
+#: src/file_conversor.py:71
 msgid "Convert image / audio / video / doc / spreadsheet files"
 msgstr "Convert image / audio / video / doc / spreadsheet files"
 
-#: src/file_conversor.py:296
+#: src/file_conversor.py:73
 msgid "Configure default options for conversion / compression"
 msgstr "Configure default options for conversion / compression"
 
-#: src/file_conversor.py:298
+#: src/file_conversor.py:75
 msgid "Supports various input and output formats"
 msgstr "Supports various input and output formats"
 
-#: src/file_conversor.py:302
+#: src/file_conversor.py:78
+msgid "For more information, visit"
+msgstr "For more information, visit"
+
+#: src/file_conversor.py:83
+msgid "Enable verbose output"
+msgstr "Enable verbose output"
+
+#: src/file_conversor.py:88
 msgid "Verbose output"
 msgstr "Verbose output"
 
-#: src/file_conversor.py:302
+#: src/file_conversor.py:88
 msgid "ENABLED"
 msgstr "ENABLED"
+
+#: src/cli/audio_video_cmd.py:40
+msgid "Get information about a audio/video file."
+msgstr "Get information about a audio/video file."
+
+#: src/cli/audio_video_cmd.py:42
+msgid ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+msgstr ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+
+#: src/cli/audio_video_cmd.py:44 src/cli/audio_video_cmd.py:91
+msgid "Format"
+msgstr "Format"
+
+#: src/cli/audio_video_cmd.py:46 src/cli/audio_video_cmd.py:92
+msgid "Duration"
+msgstr "Duration"
+
+#: src/cli/audio_video_cmd.py:50
+msgid "Other properties"
+msgstr "Other properties"
+
+#: src/cli/audio_video_cmd.py:53 src/cli/audio_video_cmd.py:140
+#: src/cli/pdf_cmd.py:46 src/cli/pdf_cmd.py:105 src/cli/pdf_cmd.py:154
+#: src/cli/pdf_cmd.py:220 src/cli/pdf_cmd.py:294 src/cli/pdf_cmd.py:397
+msgid "Examples"
+msgstr "Examples xxx"
+
+#: src/cli/audio_video_cmd.py:61
+#, fuzzy
+msgid "File path"
+msgstr "Input file path"
+
+#: src/cli/audio_video_cmd.py:70
+#, fuzzy
+msgid "Parsing file metadata"
+msgstr "Processing file"
+
+#: src/cli/audio_video_cmd.py:89
+#, fuzzy
+msgid "File Information"
+msgstr "For more information, visit"
+
+#: src/cli/audio_video_cmd.py:90
+msgid "Name"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:93
+msgid "Size"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:94 src/cli/audio_video_cmd.py:113
+msgid "Bitrate"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:99
+msgid "Media Streams"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:109
+msgid "Stream"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:110
+msgid "Codec"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:112
+msgid "Resolution"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:115
+msgid "Sampling rate"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:116
+msgid "Channels"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:121
+msgid "Chapters"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:125
+msgid "Time"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:129
+msgid "File Analysis"
+msgstr ""
+
+#: src/cli/audio_video_cmd.py:135
+msgid "Convert a audio/video file to a different format."
+msgstr "Convert a audio/video file to a different format."
+
+#: src/cli/audio_video_cmd.py:137
+msgid ""
+"This command can be used to convert audio or video files to the specified"
+" format."
+msgstr ""
+"This command can be used to convert audio or video files to the specified"
+" format."
+
+#: src/cli/audio_video_cmd.py:148 src/cli/pdf_cmd.py:61 src/cli/pdf_cmd.py:120
+#: src/cli/pdf_cmd.py:163 src/cli/pdf_cmd.py:235 src/cli/pdf_cmd.py:301
+#: src/cli/pdf_cmd.py:404
+msgid "Input file path"
+msgstr "Input file path"
+
+#: src/cli/audio_video_cmd.py:154 src/cli/pdf_cmd.py:63 src/cli/pdf_cmd.py:123
+#: src/cli/pdf_cmd.py:166 src/cli/pdf_cmd.py:238 src/cli/pdf_cmd.py:304
+#: src/cli/pdf_cmd.py:407
+msgid "Output file path"
+msgstr "Output file path"
+
+#: src/cli/audio_video_cmd.py:160 src/cli/config_cmd.py:43
+msgid "Audio bitrate in kbps"
+msgstr "Audio bitrate in kbps"
+
+#: src/cli/audio_video_cmd.py:165 src/cli/config_cmd.py:48
+msgid "Video bitrate in kbps"
+msgstr "Video bitrate in kbps"
+
+#: src/cli/audio_video_cmd.py:190
+msgid "Processing file"
+msgstr "Processing file"
+
+#: src/cli/audio_video_cmd.py:200 src/cli/audio_video_cmd.py:211
+msgid "FFMpeg convertion"
+msgstr "FFMpeg convertion"
+
+#: src/cli/audio_video_cmd.py:200 src/cli/pdf_cmd.py:91 src/cli/pdf_cmd.py:142
+#: src/cli/pdf_cmd.py:208 src/cli/pdf_cmd.py:281 src/cli/pdf_cmd.py:384
+#: src/cli/pdf_cmd.py:423
+msgid "SUCCESS"
+msgstr "SUCCESS"
+
+#: src/cli/audio_video_cmd.py:211 src/cli/pdf_cmd.py:94 src/cli/pdf_cmd.py:145
+#: src/cli/pdf_cmd.py:211 src/cli/pdf_cmd.py:284 src/cli/pdf_cmd.py:387
+#: src/cli/pdf_cmd.py:426
+msgid "FAILED"
+msgstr "FAILED"
+
+#: src/cli/config_cmd.py:28
+msgid "Show the current configuration of the application"
+msgstr "Show the current configuration of the application"
+
+#: src/cli/config_cmd.py:31
+msgid "Configuration"
+msgstr "Configuration"
+
+#: src/cli/config_cmd.py:36
+msgid "Configure the default options for the file converter."
+msgstr "Configure the default options for the file converter."
+
+#: src/cli/config_cmd.py:38 src/cli/config_cmd.py:39
+msgid "Example"
+msgstr "Example"
+
+#: src/cli/config_cmd.py:59
+msgid "Configuration file"
+msgstr "Configuration file"
+
+#: src/cli/config_cmd.py:59
+msgid "updated"
+msgstr "updated"
+
+#: src/cli/pdf_cmd.py:27
+msgid "Security commands"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:43
+msgid "Merge (join) input PDFs into a single PDF file."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:50
+msgid ""
+"Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into "
+"\"output_file.pdf\""
+msgstr ""
+
+#: src/cli/pdf_cmd.py:56
+msgid ""
+"Merge protected PDF \"input_file1.pdf\" with password \"unlock_password\""
+" with unprotected file \"input_file2.pdf\""
+msgstr ""
+
+#: src/cli/pdf_cmd.py:61
+msgid ""
+"If file is protected, provide its password using the format "
+"`\"filepath:password\"`"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:69
+msgid "Merging PDFs"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:77
+msgid "Invalid filepath format"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:77
+msgid "Valid format is 'filepath:password' or 'filepath'"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:91 src/cli/pdf_cmd.py:94
+msgid "Merge pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:93 src/cli/pdf_cmd.py:144 src/cli/pdf_cmd.py:210
+#: src/cli/pdf_cmd.py:283 src/cli/pdf_cmd.py:386 src/cli/pdf_cmd.py:425
+msgid "ERROR"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:100
+msgid "Split PDF pages into several 1-page PDFs."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:102
+msgid ""
+"For every PDF page, a new single page PDF will be created using the "
+"format `output_file_X.pdf`, where X is the page number."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:109
+msgid "Split pages of input_file.pdf into output_file_X.pdf files"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:115
+msgid "For every PDF page, generate a \"input_file_X.pdf\" file"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:127 src/cli/pdf_cmd.py:172 src/cli/pdf_cmd.py:244
+msgid "Password used to open protected file. Defaults to None (do not decrypt)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:132
+msgid "Splitting pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:142 src/cli/pdf_cmd.py:145
+msgid "Split pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:151
+msgid "Extract specific pages from a PDF."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:158
+msgid "Extract pages 1-2 and 3"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:169
+msgid "List of pages to extract. Format page_num1 page_num2 ..."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:177
+msgid "Extracting pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:185
+msgid "Invalid page instruction"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:185
+msgid "Valid format is 'begin-end' or 'page_num'"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:191 src/cli/pdf_cmd.py:264
+msgid "Invalid begin-end page interval"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:191 src/cli/pdf_cmd.py:264
+msgid "End Page < Begin Page"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:208 src/cli/pdf_cmd.py:211
+msgid "Extract pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:217
+msgid "Rotate PDF pages (clockwise or anti-clockwise)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:224
+msgid "Rotate page 1 by 180 degress"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:230
+msgid "Rotate page 5-7 by 90 degress, 9 by -90 degrees, 10-15 by 180 degrees"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:241
+msgid ""
+"List of pages to rotate. Format ``\"page1:rotation1\"`` "
+"``\"page2:rotation2\"`` ..."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:249
+msgid "Rotating pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:257
+msgid "Invalid rotation instruction"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:257
+msgid "Valid format is 'begin-end:degree' or 'page:degree'"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:281 src/cli/pdf_cmd.py:284
+msgid "Rotate pages"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:291
+msgid "Protect PDF file with a password (create encrypted PDF file)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:309
+msgid ""
+"Owner password for encryption. Owner has ALL PERMISSIONS in the output "
+"PDF file."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:312
+msgid ""
+"User password for encryption. User has ONLY THE PERMISSIONS specified in "
+"the arguments. Defaults to None (user and owner password are the same)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:315
+msgid ""
+"Decrypt password used to open protected file. Defaults to None (do not "
+"decrypt)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:319
+msgid ""
+"User can add/modify annotations (comments, highlight text, etc) and "
+"interactive forms. Default to False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:323
+msgid ""
+"User can fill form fields (subset permission of --annotate). Default to "
+"False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:327
+msgid ""
+"User can modify the document (e.g., add / edit text, add / edit images, "
+"etc). Default to False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:331
+msgid ""
+"User can insert, delete, or rotate pages (subset of --modify). Default to"
+" False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:335
+msgid "User can copy text/images. Default to False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:339
+msgid "User can use screen readers for accessibility. Default to True (allow)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:343
+msgid "User can print (low quality). Defaults to True (allow)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:347
+msgid ""
+"User can print (high quality). Requires --allow-print. Defaults to True "
+"(allow)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:351
+msgid ""
+"User has ALL PERMISSIONS. If set, it overrides all other permissions. "
+"Defaults to False (not set)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:355
+msgid ""
+"Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, "
+"AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and "
+"compatibility)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:361
+#, fuzzy
+msgid "Encripting file"
+msgstr "Configuration file"
+
+#: src/cli/pdf_cmd.py:384 src/cli/pdf_cmd.py:387
+msgid "Encryption"
+msgstr ""
+
+#: src/cli/pdf_cmd.py:394
+msgid "Remove password protection from a PDF file  (create decrypted PDF file)."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:412
+msgid "Password used for decryption."
+msgstr ""
+
+#: src/cli/pdf_cmd.py:417
+#, fuzzy
+msgid "Decripting file"
+msgstr "Configuration file"
+
+#: src/cli/pdf_cmd.py:423 src/cli/pdf_cmd.py:426
+#, fuzzy
+msgid "Decryption"
+msgstr "Duration"
+
+#~ msgid "Video output format"
+#~ msgstr "Video output format"
+
+#~ msgid "Audio output format"
+#~ msgstr "Audio output format"
 
