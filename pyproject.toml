@@ -4,7 +4,7 @@
 name = "file_conversor"
 version = "1.0.0"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
-authors = [{ name = "Andre Madureira", email = "andre@domain.com" }]
+authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
     "typer>=0.16.0",
     "rich>=14.0.0",
@@ -28,11 +28,22 @@ src = "src.file_conversor:main"  # CLI entry point
 [project.urls]
 Homepage = "https://github.com/andre-romano/file_conversor"
 
+[tool.myproject]
+title = "File Conversor"
+icon = "icons/icon.ico"
+locales_path = "locales"
+choco_path = "choco"
+choco_deps = [  # dependencies to include in choco package
+    "ffmpeg", 
+    "ghostscript",
+]
+
 [tool.pdm] 
 package-dir = { "" = "src" }
-includes = [
-    "locales/**",  # Recursively include all files in locales/
-    "data/**",  # Recursively include all files in locales/
+includes = [ # include files into .whl package
+    "locales/**", 
+    "data/**",  
+    "icons/**",  
 ]
 distribution = true
 

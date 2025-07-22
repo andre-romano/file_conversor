@@ -5,28 +5,100 @@ import shutil
 import hashlib
 import tomllib
 
-from invoke.tasks import task
+from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import Element
+
+from typing import Any
 
 from pathlib import Path
+import zipfile
 from rich import print
 
-# CONSTANTS
-PROJECT_NAME = f"file_conversor"
-ICON_FILE = f"data/icon.ico"
+from invoke.tasks import task
 
-I18N_PATH = f"locales"
+# Read version from pyproject.toml
+PYPROJECT: dict[str, Any]
+with open("pyproject.toml", "rb") as f:
+    PYPROJECT = tomllib.load(f)
+
+# CONSTANTS
+PROJECT_AUTHORS: list[str] = list(str(a["name"]) if isinstance(a, dict) else str(a) for a in PYPROJECT["project"]["authors"])
+PROJECT_KEYWORDS: list[str] = PYPROJECT["project"]["keywords"]
+
+PROJECT_VERSION = str(PYPROJECT["project"]["version"])
+PROJECT_NAME = str(PYPROJECT["project"]["name"])
+
+PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
+
+ICON_FILE = str(PYPROJECT["tool"]["myproject"]["icon"])
+
+I18N_PATH = str(PYPROJECT["tool"]["myproject"]["locales_path"])
 I18N_TEMPLATE = f"{I18N_PATH}/messages.pot"
 
-CHOCO_PATH = f"choco"
+CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
+CHOCO_NUSPEC = f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec"
 
-ISS_FILE = f"setup/setup.iss"
+CHOCO_DEPS = {}
+for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
+    re_pattern = re.compile(r"^(.+?)([@](.+))?$")
+    match = re_pattern.search(dependency)
+    if not match:
+        raise RuntimeError(f"Invalid dependency '{dependency}' format. Valid format is 'package@version' or 'package'.")
+    package, version = match.group(1), match.group(3)
+    CHOCO_DEPS[package] = version
+
+GIT_RELEASE_NAME = f"v{PROJECT_VERSION}"
+GIT_RELEASE_COMMIT = f"Release {GIT_RELEASE_NAME}"
 
 
-def get_pyproject_version() -> str:
-    # Read version from pyproject.toml
-    with open("pyproject.toml", "rb") as f:
-        pyproject = tomllib.load(f)
-    return str(pyproject["project"]["version"])
+class NuSpecParser:
+    def __init__(self, nuspec_path: Path) -> None:
+        super().__init__()
+
+        self.nuspec_path = nuspec_path
+        self.load()
+
+    def load(self):
+        self.tree = ET.parse(self.nuspec_path)
+        self.root = self.tree.getroot()
+        self.ns = {"ns": "http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd"}
+
+    def save(self):
+        self.indent(self.root)
+        self.tree.write(self.nuspec_path, encoding="utf-8", xml_declaration=True)
+        self.fix_xml_format()
+
+    def indent(self, elem: ET.Element, level: int = 0):
+        """Indent XML elements for pretty printing."""
+        i = "\n" + level * "  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            for child in elem:
+                self.indent(child, level + 1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+
+    def fix_xml_format(self):
+        content = self.nuspec_path.read_text(encoding="utf-8")
+        content = content.replace("ns0:", "")
+        content = content.replace(":ns0", "")
+        self.nuspec_path.write_text(content, encoding="utf-8")
+
+    def get_element(self, tag: str, root: Element | None = None):
+        if root is None:
+            root = self.root
+        elem = root.find(f"ns:{tag}", self.ns)
+        if elem is None:
+            raise RuntimeError(f"Tag <{tag}> not found.")
+        return elem
+
+    def set_tag_text(self, tag: str, value: str, root: Element | None = None):
+        elem = self.get_element(tag, root=root)
+        elem.text = value
 
 
 def generate_sha256(file_path: str) -> str:
@@ -115,7 +187,7 @@ def locales_build(c):
     print(f"[bold] Building locales .mo files ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_tests, locales_build])
+@task(pre=[clean_tests, ])
 def tests(c, args: str = ""):
     print("[bold] Running tests ... [/]")
     c.run(f"pdm run pytest {args.split()}")
@@ -143,79 +215,140 @@ def deps_graph(c):
 
 
 @task
-def version_choco(c):
-    """Update version for choco .nuspec, based on pyproject.toml"""
+def update_choco_nuspec(c):
+    """Update choco .nuspec, based on pyproject.toml"""
 
-    print("[bold] Updating Chocolatey project version ... [/]", end="")
-    version = get_pyproject_version()
+    print("[bold] Updating Chocolatey .nuspec file ... [/]", end="")
 
-    nuspec_path = Path(f"{CHOCO_PATH}/file_conversor.nuspec")
-    content = nuspec_path.read_text()
-    content = re.sub(
-        r'(<version>)[^<]+(</version>)',
-        lambda m: f"{m.group(1)}{version}{m.group(2)}",
-        content
-    )
-    nuspec_path.write_text(content)
+    # rename .nuspec to new filename
+    nuspec_path_old = next(Path(CHOCO_PATH).glob("*.nuspec"), None)
+    if nuspec_path_old is None:
+        raise RuntimeError("No .nuspec file found in CHOCO_PATH")
+    nuspec_path_new = Path(CHOCO_NUSPEC)
+    if nuspec_path_old != nuspec_path_new:
+        nuspec_path_old.rename(nuspec_path_new)
+
+    # create nuspec parser
+    nuspec_parser = NuSpecParser(nuspec_path_new)
+
+    # update <metadata> in .nuspec file
+    metadata_elem = nuspec_parser.get_element("metadata")
+    nuspec_parser.set_tag_text("id", str(PYPROJECT["project"]["name"]), root=metadata_elem)
+    nuspec_parser.set_tag_text("version", str(PYPROJECT["project"]["version"]), root=metadata_elem)
+    nuspec_parser.set_tag_text("description", str(PYPROJECT["project"]["description"]), root=metadata_elem)
+    nuspec_parser.set_tag_text("title", PROJECT_TITLE, root=metadata_elem)
+    nuspec_parser.set_tag_text("authors", ", ".join(PROJECT_AUTHORS), root=metadata_elem)
+    nuspec_parser.set_tag_text("tags", " ".join(PROJECT_KEYWORDS), root=metadata_elem)
+
+    # update <dependencies> in .nuspec file
+    deps_elem = nuspec_parser.get_element("dependencies")
+    deps_elem.clear()  # Remove existing dependencies
+    for dep_name, dep_version in CHOCO_DEPS.items():
+        attribs = {"id": dep_name}
+        if dep_version:
+            attribs["version"] = dep_version
+        ET.SubElement(deps_elem, "dependency", attrib=attribs)
+
+    # save changes
+    nuspec_parser.save()
     print("[bold green]OK[/]")
 
 
 @task
-def version_innosetup(c):
-    """Update version for setup.iss, based on pyproject.toml"""
+def update_choco_install(c):
+    """Update choco Install.ps1 file, based on pyproject.toml"""
 
-    print("[bold] Updating InnoSetup project version ... [/]", end="")
-    version = get_pyproject_version()
+    print("[bold] Updating Chocolatey Install.ps1 file ... [/]", end="")
 
-    iss_path = Path("setup/setup.iss")
-    content = iss_path.read_text()
-    content = re.sub(
-        r'(AppVersion\s*=\s*)[^\n]+',
-        lambda m: f"{m.group(1)}{version}",
-        content
-    )
-    iss_path.write_text(content)
+    # Read the content
+    install_ps1_path = Path(f"{CHOCO_PATH}/tools/chocolateyInstall.ps1")
+    content = install_ps1_path.read_text(encoding="utf-8")
+
+    # Replace $packageName and $url values
+    content = re.sub(r'(?m)^\s*\$packageName\s*=.*$', f'$packageName = "{PROJECT_NAME}"', content)
+    content = re.sub(r'(?m)^\s*\$url\s*=.*$', f'$url = "https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE_NAME}/{PROJECT_NAME}_win.zip"', content)
+
+    # Save updated content
+    install_ps1_path.write_text(content, encoding="utf-8")
+
     print("[bold green]OK[/]")
 
 
-@task(pre=[version_choco, version_innosetup,])
-def version_update(c):
-    """Version number set in other project files, based on pyproject.toml"""
-    # empty on purpose
-    pass
-
-
-@task(pre=[locales_build, version_update, docs,])
-def update(c):
+@task(pre=[docs, uml, deps_graph,])
+def update_files(c):
     """
-    Update program dependencies (list)
+    Update program documentation (docs, uml, etc)
     """
     # empty on purpose
     pass
 
 
-@task(pre=[clean_build, update])
+@task(pre=[clean_build, ])
+def copy_include_folders(c):
+    # create package folder
+    print(f"[bold] Copying [tool.pdm] includes into dist/ ... [/]")
+    dest_base = Path("dist") / PROJECT_NAME
+    dest_base.mkdir(parents=True, exist_ok=True)
+
+    copied_paths = set([])
+    pdm: dict = PYPROJECT["tool"]["pdm"]
+    for path_glob_str in pdm.get("includes", []):
+        for src_path in Path(".").glob(path_glob_str):
+            dest_path = dest_base / src_path
+            print(f"Copying '{src_path}' to '{dest_path}' ...")
+            if src_path.is_dir():
+                dest_path.mkdir(parents=True, exist_ok=True)
+            else:
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src_path, dest_path)
+    print(f"[bold] Copying [tool.pdm] includes into dist/ ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_build, update_choco_nuspec, update_choco_install,])
+def build_choco(c):
+    print(f"[bold] Building choco package ... [/]")
+    c.run(f"choco pack -y --outdir dist/ {CHOCO_PATH}")
+    print(f"[bold] Building choco package ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_build, ])
 def build_whl(c):
     print("[bold] Building WHL (build tools) ... [/]")
     c.run("pdm build")
     print("[bold] Building WHL ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_build, update])
+@task(pre=[clean_build, ], post=[copy_include_folders,])
 def build_exe(c):
     print(f"[bold] Building EXE (pyinstaller) ... [/]")
-    c.run(f"pdm run pyinstaller src/file_conversor.py --name {PROJECT_NAME} -i {ICON_FILE} --onefile")
+    c.run(f"pdm run pyinstaller src/file_conversor.py --name {PROJECT_NAME} -i {ICON_FILE} --onedir")
     print(f"[bold] Building EXE (pyinstaller) ... [/][bold green]OK[/]")
 
 
-@task(pre=[build_exe])
-def build_setup(c):
-    print(f"[bold] Building setup.exe (InnoSetup) ... [/]")
-    c.run(f'ISCC {ISS_FILE}')
-    print(f"[bold] Building setup.exe (InnoSetup) ...  [/][bold green]OK[/]")
+@task(pre=[clean_build, build_exe, ])
+def build_zip(c):
+    print(f"[bold] Building ZIP portable ... [/]")
+
+    dist_folder = Path("dist") / PROJECT_NAME
+    zip_path = Path("dist") / f"{PROJECT_NAME}_win.zip"
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in dist_folder.rglob("*"):
+            # Make path relative to dist_folder for zip structure
+            print(f"Adding '{file_path}' to zip file ...")
+            relative_path = file_path.relative_to(dist_folder)
+            zipf.write(file_path, arcname=relative_path)
+
+    print(f"[bold] Building ZIP portable ... [/][bold green]OK[/]")
 
 
-@task(pre=[build_whl, build_exe, build_setup])
+@task(pre=[build_zip, build_exe, build_whl, build_choco,])
+def build(c):
+    # empty on purpose
+    pass
+
+
+@task(pre=[build_zip, build_exe, build_whl,])
 def gen_checksum_file(c):
     """
     Generate checksum.sha256 file
@@ -229,35 +362,6 @@ def gen_checksum_file(c):
                 checksum = generate_sha256(str(file))
                 f.write(f"{checksum}  {file.name}\n")
     print("[bold green]OK[/]")
-
-
-@task(pre=[build_setup])
-def gen_verification_file(c):
-    """
-    Generate VERIFICATION.txt for choco package
-    """
-    verification_path = Path(f"{CHOCO_PATH}/tools/VERIFICATION.txt")
-    print(f"[bold] Generating '{str(verification_path)}' file ... [/]", end="")
-
-    setup_path = Path("dist/file_conversor_setup.exe")
-    setup_checksum = generate_sha256(str(setup_path))
-
-    content = f"""VERIFICATION
-============
-1. File: {Path(setup_path).name}
-2. SHA-256: {setup_checksum}
-3. Generated by Python hashlib (SHA-256)
-"""
-    with open(verification_path, "w") as f:
-        f.write(content)
-    print("[bold green]OK[/]")
-
-
-@task(pre=[build_setup, gen_verification_file])
-def build_choco(c):
-    print(f"[bold] Building choco package ... [/]")
-    c.run(f"choco pack -y --outdir dist/ {CHOCO_PATH}")
-    print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 
 @task
@@ -288,7 +392,25 @@ def install_choco(c):
     print(f"[bold] Installing program using `choco` ... [/][bold green]OK[/]")
 
 
-@task(pre=[build_whl])
+@task(pre=[build_zip, update_files, gen_checksum_file,])
+def publish_github(c):
+    """"Publish GitHub Release (using CI/CD Git Actions with ``git tag``)"""
+    print(f"[bold] Commiting pending changes in Git ... [/]")
+    c.run(f"git add .")
+    c.run(f"git commit -m '{GIT_RELEASE_COMMIT}'")
+    print(f"[bold] Commiting pending changes in Git ... [/][bold green]OK[/]")
+
+    print(f"[bold] Creating Git Tag '{GIT_RELEASE_NAME}' ... [/]")
+    c.run(f"git tag {GIT_RELEASE_NAME}")
+    c.run(f"git push --all")
+    print(f"[bold] Creating Git Tag '{GIT_RELEASE_NAME}' ... [/][bold green]OK[/]")
+
+    print(f"[bold] Publishing Git Release '{GIT_RELEASE_NAME}' ... [/]")
+    c.run(f"gh release create '{GIT_RELEASE_NAME}' dist/*.zip --title '{GIT_RELEASE_NAME}' --notes '{GIT_RELEASE_COMMIT}'")
+    print(f"[bold] Publishing Git Release '{GIT_RELEASE_NAME}' ... [/][bold green]OK[/]")
+
+
+@task(pre=[build_whl, publish_github,])
 def publish_whl(c):
     """"Publish dist/*.whl"""
     print(f"[bold] Publishing program to PyPi ... [/]")
@@ -296,7 +418,7 @@ def publish_whl(c):
     print(f"[bold] Publishing program to PyPi ... [/][bold green]OK[/]")
 
 
-@task(pre=[build_choco])
+@task(pre=[build_choco, publish_github,])
 def publish_choco(c):
     """"Publish Chocolatey package"""
     print(f"[bold] Publishing program to Chocolatey ... [/]")
@@ -304,23 +426,7 @@ def publish_choco(c):
     print(f"[bold] Publishing program to Chocolatey ... [/][bold green]OK[/]")
 
 
-@task(pre=[gen_checksum_file, build_setup])
-def publish_github(c):
-    """"Publish GitHub Release (using CI/CD Git Actions with ``git tag``)"""
-    release_name = f"v{get_pyproject_version()}"
-    changelog = f"Release {release_name}"
-
-    print(f"[bold] Creating Git Tag '{release_name}' ... [/]")
-    c.run(f"git tag {release_name}")
-    c.run(f"git push --tags")
-    print(f"[bold] Creating Git Tag '{release_name}' ... [/][bold green]OK[/]")
-
-    print(f"[bold] Publishing Git Release '{release_name}' ... [/]")
-    c.run(f"gh release create '{release_name}' dist/*_setup.exe dist/*.whl --title '{release_name}' --notes '{changelog}'")
-    print(f"[bold] Publishing Git Release '{release_name}' ... [/][bold green]OK[/]")
-
-
-@task(pre=[publish_choco, publish_github, publish_whl,])
+@task(pre=[publish_whl, publish_choco, publish_github,])
 def publish(c):
     """Publish packages (choco, Github Release, PyPi)"""
     pass
