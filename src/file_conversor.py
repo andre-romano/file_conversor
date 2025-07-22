@@ -10,8 +10,8 @@ from typing import Annotated
 # user-provided imports
 from cli import config_cmd, audio_video_cmd, pdf_cmd
 
-from config import get_translation
 from config import Configuration, State
+from config.locale import get_translation
 
 # Get app config
 _ = get_translation()

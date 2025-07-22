@@ -9,8 +9,8 @@ from rich import print
 from rich.pretty import Pretty
 
 # user-provided modules
-from config import get_translation
 from config import Configuration, State
+from config.locale import get_translation
 
 from utils.validators import check_positive_integer
 

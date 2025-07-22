@@ -18,13 +18,13 @@ from rich.console import Group
 # user-provided modules
 from backend import FFmpegBackend
 
-from config import get_translation
 from config import Configuration, State
+from config.locale import get_translation
 
 from utils import File
+from utils.rich import get_progress_bar
 from utils.validators import check_positive_integer, check_format
 from utils.formatters import format_bitrate, format_bytes
-from utils.rich import get_progress_bar
 
 # get app config
 _ = get_translation()

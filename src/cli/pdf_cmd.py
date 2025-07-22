@@ -11,8 +11,8 @@ from rich import print
 # user-provided modules
 from backend import PyPDFBackend
 
-from config import get_translation
 from config import Configuration, State
+from config.locale import get_translation
 
 from utils.rich import get_progress_bar
 from utils.validators import check_pdf_exists, check_pdf_ext
