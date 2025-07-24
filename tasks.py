@@ -72,17 +72,17 @@ def remove_path(path_pattern):
 
 @task
 def clean_choco(c):
-    remove_path("choco/*")
+    remove_path(f"choco/*")
 
 
 @task
 def clean_build(c):
-    remove_path("build/*")
+    remove_path(f"build/*")
 
 
 @task
 def clean_dist(c):
-    remove_path("dist/*")
+    remove_path(f"dist/*")
 
 
 @task
@@ -97,17 +97,17 @@ def clean_dist_binary(c):
 
 @task
 def clean_htmlcov(c):
-    remove_path("htmlcov/*")
+    remove_path(f"htmlcov/*")
 
 
 @task
 def clean_docs(c):
-    remove_path("docs/*")
+    remove_path(f"docs/*")
 
 
 @task
 def clean_uml(c):
-    remove_path("uml/*")
+    remove_path(f"uml/*")
 
 
 @task(pre=[clean_build, clean_dist, clean_choco, clean_htmlcov, clean_docs, clean_uml, ])
@@ -159,6 +159,9 @@ def tests(c, args: str = ""):
 
 @task(pre=[clean_uml,])
 def uml(c):
+    UML_PATH = Path(f"uml")
+    UML_PATH.mkdir(parents=True, exist_ok=True)
+
     print("[bold] Generating uml/ ... [/]")
     c.run("pdm run pyreverse -A --filter-mode=ALL --colorized -d uml/ -o jpg src/")
     c.run("pdm run pydeps src/ --noshow --reverse -Tpng -o uml/dependencies.png")
@@ -263,6 +266,9 @@ def copy_include_folders(c):
 
 @task(pre=[clean_dist_choco, create_choco_files,])
 def build_choco(c):
+    dest_base = Path("dist")
+    dest_base.mkdir(parents=True, exist_ok=True)
+
     print(f"[bold] Building choco package ... [/]")
     c.run(f"choco pack -y --outdir dist/ {CHOCO_PATH}")
     print(f"[bold] Building choco package ... [/][bold green]OK[/]")
@@ -280,6 +286,9 @@ def gen_checksum_file(c):
     """
     Generate checksum.sha256 file
     """
+    dest_base = Path("dist")
+    dest_base.mkdir(parents=True, exist_ok=True)
+
     checksum_path = Path("dist/checksums.sha256")
     print("[bold] Generating SHA256 checksums ... [/]", end="")
     files = Path("dist").glob("*")  # Change to your target directory
