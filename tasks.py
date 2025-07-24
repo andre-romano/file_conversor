@@ -170,9 +170,11 @@ def create_choco_files(c):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Chocolatey manifest files ... [/]", end="")
+    CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
+    CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
 
     # chocolateyInstall.ps1
-    install_ps1_path = Path(f"{CHOCO_PATH}/tools/chocolateyInstall.ps1")
+    install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
     install_ps1_path.write_text(f"""
 $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
@@ -196,7 +198,7 @@ Install-BinFile -Name $packageName -Path $exePath
 """, encoding="utf-8")
 
     # chocolateyUninstall.ps1
-    uninstall_ps1_path = Path(f"{CHOCO_PATH}/tools/chocolateyUninstall.ps1")
+    uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
     uninstall_ps1_path.write_text(f"""
 $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
@@ -232,7 +234,7 @@ Remove-Item -Recurse -Force (Join-Path $toolsDir $packageName)
     <file src="tools\\**" target="tools" />
   </files>
   <dependencies>
-    {"\n".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
+    {"\n    ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
   </dependencies>
 </package>
 """, encoding="utf-8")
