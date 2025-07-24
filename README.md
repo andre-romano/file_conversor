@@ -9,8 +9,7 @@ Python program to convert and compress audio/video/text/etc files to other forma
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
       - [Option 2. Portable EXE](#option-2-portable-exe)
     - [For Linux](#for-linux)
-      - [Option 1. Using ``pip``](#option-1-using-pip)
-      - [Option 2. Building and installing .WHL](#option-2-building-and-installing-whl)
+      - [Option 1. Portable Binary](#option-1-portable-binary)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
@@ -41,24 +40,10 @@ This project requires the following external dependencies to work properly:
 
 ### For Linux
 
-#### Option 1. Using ``pip`` 
+#### Option 1. Portable Binary
 
-1. Run the following commands:
-```bash
-pip install file_conversor
-```
-
-#### Option 2. Building and installing .WHL
-
-1. Install `python` in your distro
-2. Install external dependencies in your distro
-3. Build and install `.whl` file
-  ```bash
-  pip install pdm invoke
-  invoke install-deps
-  invoke build-whl
-  invoke install-whl
-  ```
+1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
+2. Extract ZIP file
 
 ## Usage
 
@@ -69,8 +54,7 @@ file_conversor COMMANDS [OPTIONS]
 ```
 
 For more information about the usage:
-- Issue `--help` command in the program
-- Read the [docs/](docs/) folder
+- Issue `--help` option in the program
 
 ### GUI - Graphical user interface
 

@@ -1,0 +1,194 @@
+name: Release CLI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  PROJECT_NAME: file_conversor # Update with your project name
+  CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para o git-chglog ver todo o histórico
+
+      # Adicione esta etapa ANTES do build
+      - name: Generate CHANGELOG.md
+        uses: git-chglog/git-chglog-action@v0.3.0
+        with:
+          config: .chglog/config.yml # Arquivo de configuração do chglog
+          output: CHANGELOG.md # Arquivo de saída
+          template: .chglog/CHANGELOG.tpl.md # Template personalizado
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip          
+          pip install pdm
+          pdm install
+
+      - name: Get version from tag
+        id: get-version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build with PyInstaller
+        run: |
+          mkdir -p build dist
+          pdm run invoke build-binary
+
+      - name: Verify binary exists
+        run: |
+          if [ ! -f "dist/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.exe" ]; then
+            echo "Binary not found!"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Compress output
+        run: |
+          cd dist
+          zip -r ${{ env.PROJECT_NAME }}-${{ matrix.os }}.zip ${{ env.PROJECT_NAME }}
+          rm -rf ${{ env.PROJECT_NAME }}/
+        shell: bash
+
+      - name: Upload zipped binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}
+          path: dist/${{ env.PROJECT_NAME }}-${{ matrix.os }}.zip
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download CHANGELOG.md artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: .
+
+      - name: Download dist/ artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p flat
+          find dist -type f -name "*.zip" -exec mv {} flat/ \;
+          mv flat dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip          
+          pip install pdm
+          pdm install
+
+      - name: Get version from tag
+        id: get-version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Read CHANGELOG.md into variable
+        id: changelog
+        run: |
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate checksums
+        run: |
+          pdm run invoke gen_checksum_file
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            dist/*.zip
+            dist/checksums.sha256
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}
+
+  deploy-chocolatey:
+    needs: release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ env.VERSION }}
+
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco --version
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pdm
+          pdm install
+
+      - name: Get version from tag
+        id: get-version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build Chocolatey package
+        run: |
+          mkdir -p build dist
+          pdm run invoke build-choco
+
+      - name: Check if package was created
+        run: |
+          if (!(Test-Path "dist/${{ env.PROJECT_NAME }}.${{ env.VERSION }}.nupkg")) {
+            Write-Error "Package not found"
+            exit 1
+          }
+
+      - name: Push to Chocolatey
+        run: |
+          choco apikey --key "${{ env.CHOCO_API_KEY }}" --source https://push.chocolatey.org/
+          choco push "dist/${{ env.PROJECT_NAME }}.${{ env.VERSION }}.nupkg" --source https://push.chocolatey.org/
+        continue-on-error: false

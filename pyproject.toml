@@ -108,10 +108,8 @@ exclude = [
 dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
-    "pdoc>=15.0.4",
     "pyinstaller>=6.14.2",
     "pydeps>=3.0.1",
     "pylint>=3.3.7",
     "invoke>=2.2.0",
-    "twine>=6.1.0",
 ]
