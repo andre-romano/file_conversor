@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run in dry mode?"
+        required: false
+        default: "true"
 
 env:
   PROJECT_NAME: file_conversor # Update with your project name
@@ -49,16 +55,8 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          mkdir -p build dist
           pdm run invoke build-binary
-
-      - name: Verify binary exists
-        run: |
-          if [ ! -f "dist/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.exe" ]; then
-            echo "Binary not found!"
-            exit 1
-          fi
-        shell: bash
+          cp CHANGELOG.md dist/${{ env.PROJECT_NAME }}/
 
       - name: Compress output
         run: |
@@ -131,6 +129,7 @@ jobs:
           pdm run invoke gen_checksum_file
 
       - name: Publish GitHub Release
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
         uses: softprops/action-gh-release@v2
         with:
           name: v${{ env.VERSION }}
@@ -140,9 +139,10 @@ jobs:
             dist/*.zip
             dist/checksums.sha256
           draft: false
-          prerelease: ${{ contains(github.ref, '-') }}
+          prerelease: ${{ contains(github.ref, '-') }} # ignore versions with v*.*.*-*
 
   deploy-chocolatey:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
     needs: release
     runs-on: windows-latest
     steps:
