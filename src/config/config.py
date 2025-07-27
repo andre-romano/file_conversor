@@ -3,6 +3,7 @@
 import json
 
 from pathlib import Path
+from typing import Any
 
 
 class Configuration:
@@ -23,6 +24,7 @@ class Configuration:
         self.__data = {
             "audio-bitrate": 192,    # Default audio bitrate in kbps
             "video-bitrate": 10000,  # Default video bitrate in kbps
+            "install-deps": None,    # Default: ask user to confirm dependency installation
         }
 
         self.load()
@@ -33,7 +35,7 @@ class Configuration:
     def __str__(self) -> str:
         return str(self.__data)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Any:
         return self.__data[key]
 
     def __setitem__(self, key, value):

@@ -66,10 +66,12 @@ def info(
 ):
 
     formatted = []
+    metadata: dict
     with get_progress_bar() as progress:
         progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
 
-        metadata = FFmpegBackend.get_file_info(filename)
+        ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+        metadata = ffmpeg_backend.get_file_info(filename)
     # 📁 Informações gerais do arquivo
     if "format" in metadata:
         format_info: dict = metadata["format"]
@@ -176,20 +178,22 @@ def convert(
         out_options.extend(["-b:v", f"{video_bitrate}k"])
 
     # execute ffmpeg
-    ffmpeg_backend = FFmpegBackend(
+    ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+    input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
+    process = ffmpeg_backend.convert(
         input_file,
         output_file,
         verbose=STATE["verbose"],
         in_options=in_options,
         out_options=out_options,
     )
-    process = ffmpeg_backend.execute()
 
     # display current progress
     with get_progress_bar() as progress:
         ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
         while process.poll() is None:
-            progress.update(ffmpeg_task, completed=ffmpeg_backend.get_progress())
+            ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
+            progress.update(ffmpeg_task, completed=ffmpeg_completed)
             time.sleep(0.25)
 
     process.wait()

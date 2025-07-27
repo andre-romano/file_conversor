@@ -12,8 +12,11 @@ from pypdf.constants import UserAccessPermissions
 
 from typing import Iterable
 
+# user-provided imports
+from backend.abstract_backend import AbstractBackend
 
-class PyPDFBackend:
+
+class PyPDFBackend(AbstractBackend):
     """
     A class that provides an interface for handling PDF files using ``pypdf``.
     """

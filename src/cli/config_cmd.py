@@ -12,7 +12,7 @@ from rich.pretty import Pretty
 from config import Configuration, State
 from config.locale import get_translation
 
-from utils.validators import check_positive_integer
+from utils.validators import check_is_bool_or_none, check_positive_integer
 
 # app configuration
 _ = get_translation()
@@ -48,11 +48,17 @@ def set(
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
+
+    install_deps: Annotated[str | None, typer.Option("--install-deps", "-id",
+                                                     help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),
+                                                     callback=check_is_bool_or_none,
+                                                     )] = CONFIG["install-deps"],
 ):
     # update the configuration dictionary
     CONFIG.update({
         "audio-bitrate": audio_bitrate,
         "video-bitrate": video_bitrate,
+        "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
     })
     CONFIG.save()
     show()

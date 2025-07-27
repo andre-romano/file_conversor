@@ -7,5 +7,6 @@ This module imports all functionalities from backend wrappers,
 making them available when importing the backend package.
 """
 
+from backend.abstract_backend import AbstractBackend
 from backend.ffmpeg_backend import FFmpegBackend
 from backend.pypdf_backend import PyPDFBackend
