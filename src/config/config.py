@@ -24,7 +24,8 @@ class Configuration:
         self.__data = {
             "audio-bitrate": 192,    # Default audio bitrate in kbps
             "video-bitrate": 10000,  # Default video bitrate in kbps
-            "install-deps": None,    # Default: ask user to confirm dependency installation
+            "image-quality": 90,     # Default image quality 90%
+            "install-deps": True,    # Default: ask user to confirm dependency installation
         }
 
         self.load()
@@ -49,6 +50,9 @@ class Configuration:
 
     def __len__(self):
         return len(self.__data)
+
+    def to_dict(self):
+        return self.__data.copy()
 
     def clear(self):
         self.__data.clear()

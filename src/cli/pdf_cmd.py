@@ -39,7 +39,7 @@ def check_encrypt_algorithm(algorithm: str | None):
 # pdf repair
 @pdf_cmd.command(
     help=f"""
-        {_('Repair (lightly) corrupted PDF files.')}        
+        {_('Repair (lightly) corrupted PDF files (requires QPDF external library).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 

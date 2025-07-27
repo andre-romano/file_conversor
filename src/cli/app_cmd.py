@@ -7,7 +7,7 @@ from rich import print
 from typing import Annotated
 
 # user-provided imports
-from cli import config_cmd, audio_video_cmd, pdf_cmd
+from cli import config_cmd, audio_video_cmd, pdf_cmd, image_cmd
 
 from config import Configuration, State
 from config.locale import get_translation
@@ -30,7 +30,12 @@ MULTIMEDIA_PANEL = _("Multimedia files")
 # REGISTER SUBCOMMANDS
 app_cmd.add_typer(audio_video_cmd,
                   name="audio_video",
-                  help=_("Audio / Video file manipulation"),
+                  help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
+                  rich_help_panel=MULTIMEDIA_PANEL)
+
+app_cmd.add_typer(image_cmd,
+                  name="image",
+                  help=_("Image file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
 app_cmd.add_typer(pdf_cmd,
@@ -42,9 +47,6 @@ app_cmd.add_typer(config_cmd,
                   name="config",
                   help=_("Configure default options"),
                   rich_help_panel=CONFIG_PANEL)
-
-# confirmacoes
-# typer.confirm(f"Deletar {arquivo}?"):
 
 
 # help
@@ -65,13 +67,13 @@ def help():
 
         **{_('Features')}:**
 
-        - {_('Compress image / audio / video / doc / spreadsheet files')}
+        - {_('Compress image / audio / video / pdf files')}
 
-        - {_('Convert image / audio / video / doc / spreadsheet files')}
+        - {_('Convert image / audio / video / pdf files')}
 
         - {_('Configure default options for conversion / compression')}
 
-        - {_('Supports various input and output formats')} (mp3, mp4, jpg, png, pdf, docx, xlsx, csv, etc)
+        - {_('Supports various input and output formats')} (mp3, mp4, mkv, jpg, png, webp, pdf, etc)
     """,
     epilog=f"""
         {_('For more information, visit')} [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)

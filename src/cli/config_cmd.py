@@ -28,7 +28,7 @@ config_cmd = typer.Typer()
     {_('Show the current configuration of the application')}.
 """)
 def show():
-    print(f"{_('Configuration')}:", Pretty(CONFIG, expand_all=True))
+    print(f"{_('Configuration')}:", Pretty(CONFIG.to_dict(), expand_all=True))
 
 
 # config set
@@ -49,6 +49,11 @@ def set(
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 
+    image_quality: Annotated[str | None, typer.Option("--image-quality", "-iq",
+                                                      help=_("Image quality. Valid values are between 1-100."),
+                                                      min=1, max=100,
+                                                      )] = CONFIG["image-quality"],
+
     install_deps: Annotated[str | None, typer.Option("--install-deps", "-id",
                                                      help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),
                                                      callback=check_is_bool_or_none,
@@ -58,6 +63,7 @@ def set(
     CONFIG.update({
         "audio-bitrate": audio_bitrate,
         "video-bitrate": video_bitrate,
+        "image-quality": image_quality,
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
     })
     CONFIG.save()

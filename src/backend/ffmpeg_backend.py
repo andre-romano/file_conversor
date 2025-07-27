@@ -5,7 +5,6 @@ This module provides functionalities for handling audio and video files using FF
 """
 
 import json
-import os
 import shutil
 import subprocess
 import re
@@ -122,12 +121,12 @@ class FFmpegBackend(AbstractBackend):
 
     def __init__(
         self,
-        install_deps: bool | None = None
+        install_deps: bool | None,
     ):
         """
         Initialize the FFMpeg backend.
 
-        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. Defaults to None.      
+        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
 
         :raises FileNotFoundError: If the input file does not exist, or output directory could not be created.
         """

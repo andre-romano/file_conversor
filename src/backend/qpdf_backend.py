@@ -8,9 +8,6 @@ import os
 import shutil
 import subprocess
 
-
-from typing import Iterable
-
 # user-provided imports
 from backend.abstract_backend import AbstractBackend
 from dependency import BrewPackageManager, ScoopPackageManager
@@ -33,13 +30,13 @@ class QPDFBackend(AbstractBackend):
 
     def __init__(
         self,
-        install_deps: bool | None = None,
+        install_deps: bool | None,
         verbose: bool = False,
     ):
         """
         Initialize the ``qpdf`` backend
 
-        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. Defaults to None.      
+        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action.
 
         :param verbose: Verbose logging. Defaults to False.      
         """

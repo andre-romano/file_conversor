@@ -5,7 +5,7 @@ import subprocess
 import time
 import typer
 
-from typing import Annotated, Optional
+from typing import Annotated
 from datetime import timedelta
 
 from rich import print
