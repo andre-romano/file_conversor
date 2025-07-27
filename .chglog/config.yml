@@ -11,7 +11,8 @@ options:
     title_maps:
       feat: "New Features"
       fix: "Bug Fixes"
-      perf: "Performance Improvements"
+      improve: "Improvements"
+      perf: "Performance Tweaks"
       refactor: "Code Refactoring"
   header:
     pattern: "^(\w*)(?:\((.*)\))?\:\s(.*)$"
