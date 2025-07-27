@@ -51,9 +51,7 @@ app_cmd.add_typer(config_cmd,
 
 # help
 @app_cmd.command(
-    help=f"""
-    {_('Show the application help')}
-    """,
+    help=f"{_('Show the application help')}",
     rich_help_panel=CONFIG_PANEL)
 def help():
     ctx = typer.Context(typer.main.get_command(app_cmd))
@@ -84,7 +82,15 @@ def main_callback(
             help=_("Enable verbose output"),
             is_flag=True,
         )] = False,
+        debug: Annotated[bool, typer.Option(
+            "--debug", "-d",
+            help=_("Enable debug mode"),
+            is_flag=True,
+        )] = False,
 ):
     if verbose:
-        print(f"{_('Verbose output')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
+        print(f"{_('Verbose mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
         STATE["verbose"] = True
+    if debug:
+        print(f"{_('Debug mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
+        STATE["debug"] = True

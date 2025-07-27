@@ -3,9 +3,20 @@
 import os
 import typer
 
+# user provided imports
 from config.locale import get_translation
 
+from utils.file import File
+
 _ = get_translation()
+
+
+def check_axis(axis: str) -> str:
+    """"Check if axis in ('x', 'y')"""
+    axis = axis.lower()
+    if axis in ('x', 'y'):
+        return axis
+    raise ValueError(f"{_('Invalid axis value')} '{axis}'. {_('Valid values are "x" or "y".')}")
 
 
 def check_is_bool_or_none(data: str | bool | None) -> bool | None:
@@ -33,25 +44,26 @@ def check_positive_integer(bitrate: int | float):
     return bitrate
 
 
-def check_format(format: str, format_dict: dict | list):
+def check_file_format(filename: str | None, format_dict: dict | list, exists: bool = False):
     """
     Checks if the provided format is supported.
+
+    :param filename: Filename
+    :param format_dict: Format {format:options} or [format]
+    :param exists: Check if file exists. Default False (do not check).
     """
-    if format not in format_dict:
-        raise typer.BadParameter(f"\n{_('Unsupported format')} '{format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
-    return format
+    if filename is None:
+        return filename
+    file = File(filename)
+    file_format = file.get_extension().lower()
+    if file_format not in format_dict:
+        raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
+    if exists and not file.is_file():
+        raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")
+    return filename
 
 
-def check_pdf_ext(filepath: str | None) -> str | None:
-    if not filepath:
-        return filepath
-    ext = os.path.splitext(filepath)[1].lower()
-    if ext != ".pdf":
-        raise ValueError(f"{_('File')} '{filepath}' {_('is not a PDF file')}!")
-    return filepath
-
-
-def check_pdf_exists(filepath: str):
-    if not os.path.isfile(filepath):
-        raise FileNotFoundError(f"{_('File')} '{filepath}' {_('does not exist')}!")
-    return filepath
+def check_pdf_encrypt_algorithm(algorithm: str | None):
+    if algorithm not in (None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"):
+        raise typer.BadParameter(f"Encryption algorithm '{algorithm}' is invalid.  Valid options are 'RC4-40', 'RC4-128', 'AES-128', 'AES-256-R5', or 'AES-256'.")
+    return algorithm

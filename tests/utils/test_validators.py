@@ -29,20 +29,20 @@ def test_check_positive_integer_float():
 
 def test_check_format_valid_dict():
     formats = {"mp3": {}, "wav": {}}
-    assert check_format("mp3", formats) == "mp3"
-    assert check_format("wav", formats) == "wav"
+    assert check_file_format("mp3", formats) == "mp3"
+    assert check_file_format("wav", formats) == "wav"
 
 
 def test_check_format_valid_list():
     formats = ["mp3", "wav", "flac"]
-    assert check_format("mp3", formats) == "mp3"
-    assert check_format("flac", formats) == "flac"
+    assert check_file_format("mp3", formats) == "mp3"
+    assert check_file_format("flac", formats) == "flac"
 
 
 def test_check_format_invalid_dict():
     formats = {"mp3": {}, "wav": {}}
     with pytest.raises(typer.BadParameter) as excinfo:
-        check_format("aac", formats)
+        check_file_format("aac", formats)
     assert "Unsupported format 'aac'" in str(excinfo.value)
     assert "mp3" in str(excinfo.value)
     assert "wav" in str(excinfo.value)
@@ -51,7 +51,7 @@ def test_check_format_invalid_dict():
 def test_check_format_invalid_list():
     formats = ["mp3", "wav"]
     with pytest.raises(typer.BadParameter) as excinfo:
-        check_format("ogg", formats)
+        check_file_format("ogg", formats)
     assert "Unsupported format 'ogg'" in str(excinfo.value)
     assert "mp3" in str(excinfo.value)
     assert "wav" in str(excinfo.value)

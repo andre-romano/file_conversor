@@ -5,7 +5,6 @@ This module provides functionalities for handling PDF files using ``pypdf`` back
 """
 
 import math
-import os
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.constants import UserAccessPermissions
@@ -20,16 +19,6 @@ class PyPDFBackend(AbstractBackend):
     """
     A class that provides an interface for handling PDF files using ``pypdf``.
     """
-
-    @staticmethod
-    def check_file_exists(filename: str):
-        """
-        Check if `filename` exists
-
-        :raises FileNotFoundError: if file not found
-        """
-        if not os.path.isfile(filename):
-            raise FileNotFoundError(f"File '{filename}' not found")
 
     def __init__(
         self,
@@ -64,6 +53,7 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found.
         """
         output_file = output_file.replace(".pdf", "")
+
         with PdfWriter() as writer:
             for in_file, decrypt_password in input_files.items():
                 self.check_file_exists(in_file)
@@ -89,8 +79,9 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        output_file = output_file.replace(".pdf", "")
         self.check_file_exists(input_file)
+        output_file = output_file.replace(".pdf", "")
+
         with PdfReader(input_file) as reader:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
@@ -116,8 +107,9 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        output_file = output_file.replace(".pdf", "")
         self.check_file_exists(input_file)
+        output_file = output_file.replace(".pdf", "")
+
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
@@ -144,8 +136,9 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if rotation degree is invalid (valid values are 0 or multiples of 90 degrees - positive or negative).        
         """
-        output_file = output_file.replace(".pdf", "")
         self.check_file_exists(input_file)
+        output_file = output_file.replace(".pdf", "")
+
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
@@ -228,8 +221,9 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        output_file = output_file.replace(".pdf", "")
         self.check_file_exists(input_file)
+        output_file = output_file.replace(".pdf", "")
+
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
@@ -289,8 +283,9 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        output_file = output_file.replace(".pdf", "")
         self.check_file_exists(input_file)
+        output_file = output_file.replace(".pdf", "")
+
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             # decrypt file
             if reader.is_encrypted:

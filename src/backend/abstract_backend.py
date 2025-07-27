@@ -4,6 +4,7 @@
 This module provides functionalities for handling external backends.
 """
 
+import os
 import platform
 import subprocess
 import typer
@@ -22,6 +23,16 @@ class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.
     """
+
+    @staticmethod
+    def check_file_exists(filename: str):
+        """
+        Check if `filename` exists
+
+        :raises FileNotFoundError: if file not found
+        """
+        if not os.path.isfile(filename):
+            raise FileNotFoundError(f"{_("File")} '{filename}' {_("not found")}")
 
     @staticmethod
     def dump_streams(process: subprocess.Popen | None, stdout=True, stderr=True) -> str:
@@ -84,8 +95,7 @@ class AbstractBackend:
                     result = pkg_mgr.install_pkg_manager()
                     if result:
                         print(f"Package manager installed in '{result}'")
-                    print_result = f"[green]{_("SUCCESS")}[/]" if result else f"[red]{_("FAILED")}[/]"
-                    print(f"[bold]{_("Package Manager Installation")}[/]: {print_result}")
+                    print(f"[bold]{_("Package Manager Installation")}[/]: [green]{_("SUCCESS")}[/]")
 
             # install missing dependencies
             if install_answer is None:
@@ -96,6 +106,5 @@ class AbstractBackend:
             else:
                 user_prompt = install_answer
             if user_prompt:
-                result = pkg_mgr.install_dependencies(missing_deps)
-                print_result = f"[green]{_("SUCCESS")}[/]" if result else f"[red]{_("FAILED")}[/]"
-                print(f"[bold]{_("External Dependencies Installation")}[/]: {print_result}")
+                pkg_mgr.install_dependencies(missing_deps)
+                print(f"[bold]{_("External Dependencies Installation")}[/]: [green]{_("SUCCESS")}[/]")

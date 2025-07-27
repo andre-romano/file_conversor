@@ -4,10 +4,10 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-import math
 import os
 
 from typing import Iterable
+
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
@@ -52,16 +52,6 @@ class PillowBackend(AbstractBackend):
         "tif": {"format": "TIFF"},
         "webp": {"format": "WEBP"},
     }
-
-    @staticmethod
-    def check_file_exists(filename: str):
-        """
-        Check if `filename` exists
-
-        :raises FileNotFoundError: if file not found
-        """
-        if not os.path.isfile(filename):
-            raise FileNotFoundError(f"_{("File")} '{filename}' {_("not found")}")
 
     def __init__(self, verbose: bool = False,):
         """

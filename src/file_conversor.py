@@ -1,33 +1,27 @@
 
 # src/file_conversor.py
 
-import os
-import platform
+import sys
 
-from cli.app_cmd import app_cmd
+from rich import print
+from cli.app_cmd import app_cmd, STATE
 
-# Import winreg only on Windows to avoid ImportError on other OSes
-system = platform.system()
-if system == "Windows":
-    import winreg
-else:
-    winreg = None  # Placeholder so the name exists
-
-
-def reload_user_path_win():
-    """Reload user PATH in current process."""
-    if winreg is None:
-        return
-    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment") as key:
-        user_path, _ = winreg.QueryValueEx(key, "PATH")
-        os.environ["PATH"] = user_path + os.pathsep + os.environ["PATH"]
+from system import reload_user_path
 
 
 # Entry point of the app
 def main():
-    if system == "Windows":
-        reload_user_path_win()
-    app_cmd()
+    try:
+        reload_user_path()
+        app_cmd()
+    except Exception as e:
+        if STATE["debug"]:
+            raise
+        else:
+            error_type = str(type(e)).split("'")[1]
+            print(f"[red bold]ERROR[/]: {error_type}")
+            print(f"{str(e)}")
+        sys.exit(1)
 
 
 # Start the application

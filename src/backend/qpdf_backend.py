@@ -18,16 +18,6 @@ class QPDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``qpdf``.
     """
 
-    @staticmethod
-    def check_file_exists(filename: str):
-        """
-        Check if `filename` exists
-
-        :raises FileNotFoundError: if file not found
-        """
-        if not os.path.isfile(filename):
-            raise FileNotFoundError(f"File '{filename}' not found")
-
     def __init__(
         self,
         install_deps: bool | None,

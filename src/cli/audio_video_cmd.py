@@ -23,7 +23,7 @@ from config.locale import get_translation
 
 from utils import File
 from utils.rich import get_progress_bar
-from utils.validators import check_positive_integer, check_format
+from utils.validators import check_positive_integer, check_file_format
 from utils.formatters import format_bitrate, format_bytes
 
 # get app config
@@ -59,9 +59,7 @@ audio_video_cmd = typer.Typer()
 def info(
     filename: Annotated[str, typer.Argument(
         help=_("File path"),
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), FFmpegBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
 
@@ -150,15 +148,11 @@ def info(
 def convert(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file path')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), FFmpegBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
     output_file: Annotated[str, typer.Argument(
         help=f"{_('Output file path')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), FFmpegBackend.SUPPORTED_OUT_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
     )],
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
@@ -170,45 +164,39 @@ def convert(
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 ):
-    try:
-        process: subprocess.Popen | None = None
-        in_options = []
-        out_options = []
+    process: subprocess.Popen | None = None
+    in_options = []
+    out_options = []
 
-        # configure out options
-        out_options.extend(["-b:a", f"{audio_bitrate}k"])
-        if File(output_file).get_extension() in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-            out_options.extend(["-b:v", f"{video_bitrate}k"])
+    # configure out options
+    out_options.extend(["-b:a", f"{audio_bitrate}k"])
+    if File(output_file).get_extension() in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
+        out_options.extend(["-b:v", f"{video_bitrate}k"])
 
-        # execute ffmpeg
-        ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
-        input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
-        process = ffmpeg_backend.convert(
-            input_file,
-            output_file,
-            verbose=STATE["verbose"],
-            in_options=in_options,
-            out_options=out_options,
-        )
+    # execute ffmpeg
+    ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+    input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
+    process = ffmpeg_backend.convert(
+        input_file,
+        output_file,
+        verbose=STATE["verbose"],
+        in_options=in_options,
+        out_options=out_options,
+    )
 
-        # display current progress
-        with get_progress_bar() as progress:
-            ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
-            while process.poll() is None:
-                ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
-                progress.update(ffmpeg_task, completed=ffmpeg_completed)
-                time.sleep(0.25)
-            progress.update(ffmpeg_task, completed=100)
+    # display current progress
+    with get_progress_bar() as progress:
+        ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
+        while process.poll() is None:
+            ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
+            progress.update(ffmpeg_task, completed=ffmpeg_completed)
+            time.sleep(0.25)
+        progress.update(ffmpeg_task, completed=100)
 
-        process.wait()
-        if process.returncode != 0:
-            raise RuntimeError(ffmpeg_backend.dump_streams(process))
+    process.wait()
+    if process.returncode != 0:
+        raise RuntimeError(ffmpeg_backend.dump_streams(process))
 
-        print(f"--------------------------------")
-        print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
-        print(f"--------------------------------")
-    except Exception as e:
-        print(f"\n--------------------------------")
-        print(f"[bold red]ERROR[/]: {repr(e)}")
-        print(f"{_('FFMpeg convertion')}: [red][bold]{_('FAILED')}[/bold][/red] ({process.returncode if process else "?"})")
-        print(f"--------------------------------")
+    print(f"--------------------------------")
+    print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
+    print(f"--------------------------------")

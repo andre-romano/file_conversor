@@ -3,7 +3,6 @@
 
 import os
 import shutil
-import subprocess
 
 # user-provided imports
 from config.locale import get_translation

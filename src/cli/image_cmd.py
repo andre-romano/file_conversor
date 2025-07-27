@@ -1,31 +1,24 @@
 
 # src\cli\image_cmd.py
 
-from gc import callbacks
-import subprocess
-import time
 import typer
 
 from typing import Annotated
-from datetime import timedelta
 
 from rich import print
 from rich.text import Text
 from rich.panel import Panel
 from rich.console import Group
-# from rich.markdown import Markdown
-# from rich.pretty import Pretty
 
 # user-provided modules
-from backend import PillowBackend, pillow_backend
+from backend import PillowBackend
 
 from config import Configuration, State
 from config.locale import get_translation
 
 from utils import File
 from utils.rich import get_progress_bar
-from utils.validators import check_positive_integer, check_format
-from utils.formatters import format_bytes
+from utils.validators import check_file_format, check_axis
 
 # get app config
 _ = get_translation()
@@ -33,13 +26,6 @@ CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
 
 image_cmd = typer.Typer()
-
-
-def check_axis(axis: str) -> str:
-    axis = axis.lower()
-    if axis in ('x', 'y'):
-        return axis
-    raise ValueError(f"{_('Invalid axis value')} '{axis}'. {_('Valid values are "x" or "y".')}")
 
 
 # image info
@@ -59,9 +45,7 @@ def check_axis(axis: str) -> str:
 def info(
     filename: Annotated[str, typer.Argument(
         help=_("File path"),
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
 
@@ -102,16 +86,12 @@ def info(
 def convert(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
         help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_OUT_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
     quality: Annotated[int, typer.Option("--quality", "-q",
@@ -149,16 +129,12 @@ def convert(
 def rotate(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
         help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_OUT_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
     rotation: Annotated[int, typer.Option("--rotation", "-r",
@@ -176,7 +152,9 @@ def rotate(
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
+    print(f"--------------------------------")
     print(f"{_('Image rotation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+    print(f"--------------------------------")
 
 
 # image mirror
@@ -194,16 +172,12 @@ def rotate(
 def mirror(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_IN_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
         help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: x if check_format(
-            File(x).get_extension(), PillowBackend.SUPPORTED_OUT_FORMATS
-        ) else x,
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
     axis: Annotated[int, typer.Option("--axis", "-a",
@@ -221,4 +195,6 @@ def mirror(
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)
+    print(f"--------------------------------")
     print(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+    print(f"--------------------------------")

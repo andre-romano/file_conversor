@@ -16,8 +16,8 @@ from config import Configuration, State
 from config.locale import get_translation
 
 from utils.rich import get_progress_bar
-from utils.validators import check_pdf_exists, check_pdf_ext
-from utils.formatters import YES_ICON, NO_ICON
+from utils.validators import check_file_format, check_pdf_encrypt_algorithm
+from utils.formatters import YES_ICON
 
 # get app config
 _ = get_translation()
@@ -28,12 +28,6 @@ STATE = State.get_instance()
 SECURITY_PANEL = _(f"Security commands")
 
 pdf_cmd = typer.Typer()
-
-
-def check_encrypt_algorithm(algorithm: str | None):
-    if algorithm not in (None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"):
-        raise ValueError(f"Encryption algorithm '{algorithm}' is invalid.  Valid options are 'RC4-40', 'RC4-128', 'AES-128', 'AES-256-R5', or 'AES-256'.")
-    return algorithm
 
 
 # pdf repair
@@ -48,40 +42,38 @@ def check_encrypt_algorithm(algorithm: str | None):
 """)
 def repair(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')}. Defaults to None (use the same input file as output name).",
-                                                      callback=check_pdf_ext,
+                                                      callback=lambda x: check_file_format(x, ['pdf']),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 ):
-    try:
-        qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
-        with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Repairing PDF')} ...", total=None,)
+    qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
+    with get_progress_bar() as progress:
+        task1 = progress.add_task(f"{_('Repairing PDF')} ...", total=None,)
 
-            process = qpdf_backend.repair(
-                # files
-                input_file=input_file,
-                output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
+        process = qpdf_backend.repair(
+            # files
+            input_file=input_file,
+            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
 
-                # passwords
-                decrypt_password=decrypt_password,
-            )
-            while process.poll() is None:
-                time.sleep(0.25)
-            progress.update(task1, total=100, completed=100)
+            # passwords
+            decrypt_password=decrypt_password,
+        )
+        while process.poll() is None:
+            time.sleep(0.25)
+        progress.update(task1, total=100, completed=100)
 
-        process.wait()
-        if process.returncode != 0:
-            raise RuntimeError(qpdf_backend.dump_streams(process))
+    process.wait()
+    if process.returncode != 0:
+        raise RuntimeError(qpdf_backend.dump_streams(process))
 
-        print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Repair PDF')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf merge
@@ -108,40 +100,38 @@ def merge(
     input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file path')}. {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
                                                      )],
     output_file: Annotated[str, typer.Argument(help=_("Output file path"),
-                                               callback=check_pdf_ext,
+                                               callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            merge_task = progress.add_task(f"{_('Merging PDFs')} ...", total=None,)
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        merge_task = progress.add_task(f"{_('Merging PDFs')} ...", total=None,)
 
-            # get dict in format {filepath: password}
-            filepath_dict = {}
-            FILEPATH_RE = re.compile(r'^(.+?)(::(.+))?$')
-            for arg in input_files:
-                match = FILEPATH_RE.search(arg)
-                if not match:
-                    raise RuntimeError(f"{_('Invalid filepath format')} '{arg}'. {_("Valid format is 'filepath:password' or 'filepath'")}.")
+        # get dict in format {filepath: password}
+        filepath_dict = {}
+        FILEPATH_RE = re.compile(r'^(.+?)(::(.+))?$')
+        for arg in input_files:
+            match = FILEPATH_RE.search(arg)
+            if not match:
+                raise RuntimeError(f"{_('Invalid filepath format')} '{arg}'. {_("Valid format is 'filepath:password' or 'filepath'")}.")
 
-                # check user input
-                filepath = check_pdf_exists(match.group(1))
-                password = match.group(3) if match.group(3) else None
+            # check user input
+            filepath = check_file_format(match.group(1), ['pdf'], exists=True)
+            password = match.group(3) if match.group(3) else None
 
-                # create filepath_dict
-                filepath_dict[filepath] = password
+            # create filepath_dict
+            filepath_dict[filepath] = password
 
-            pypdf_backend.merge(
-                # files
-                input_files=filepath_dict,
-                output_file=output_file,
-            )
-            progress.update(merge_task, total=100, completed=100)
+        pypdf_backend.merge(
+            # files
+            input_files=filepath_dict,
+            output_file=output_file,
+        )
+        progress.update(merge_task, total=100, completed=100)
 
-        print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Merge pages')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf split
@@ -168,34 +158,32 @@ def merge(
 """)
 def split(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')}. Defaults to None (use the same input file as output name).",
-                                                      callback=check_pdf_ext,
+                                                      callback=lambda x: check_file_format(x, ['pdf']),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            split_task = progress.add_task(f"{_('Splitting pages')} ...", total=None,)
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        split_task = progress.add_task(f"{_('Splitting pages')} ...", total=None,)
 
-            pypdf_backend.split(
-                # files
-                input_file=input_file,
-                output_file=output_file if output_file else input_file,
+        pypdf_backend.split(
+            # files
+            input_file=input_file,
+            output_file=output_file if output_file else input_file,
 
-                # passwords
-                decrypt_password=decrypt_password,
-            )
-            progress.update(split_task, total=100, completed=100)
+            # passwords
+            decrypt_password=decrypt_password,
+        )
+        progress.update(split_task, total=100, completed=100)
 
-        print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Split pages')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf extract
@@ -214,10 +202,10 @@ def split(
     """)
 def extract(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str, typer.Argument(help=_("Output file path"),
-                                               callback=check_pdf_ext,
+                                               callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
     pages: Annotated[List[str], typer.Argument(help=_("List of pages to extract. Format page_num1 page_num2 ..."),
                                                )],
@@ -225,46 +213,44 @@ def extract(
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            extract_task = progress.add_task(f"{_('Extracting pages')} ...", total=None,)
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        extract_task = progress.add_task(f"{_('Extracting pages')} ...", total=None,)
 
-            # parse user input
-            pages_list = []
-            PAGES_RE = re.compile(r'(\d+)(-(\d+)){0,1}')
-            for arg in pages:
-                match = PAGES_RE.search(arg)
-                if not match:
-                    raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end' or 'page_num'")}.")
+        # parse user input
+        pages_list = []
+        PAGES_RE = re.compile(r'(\d+)(-(\d+)){0,1}')
+        for arg in pages:
+            match = PAGES_RE.search(arg)
+            if not match:
+                raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end' or 'page_num'")}.")
 
-                # check user input
-                begin = int(match.group(1)) - 1
-                end = int(match.group(3)) - 1 if match.group(3) else begin
-                if end < begin:
-                    raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
+            # check user input
+            begin = int(match.group(1)) - 1
+            end = int(match.group(3)) - 1 if match.group(3) else begin
+            if end < begin:
+                raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
 
-                # create rotation_dict
-                for page_num in range(begin, end + 1):
-                    pages_list.append(page_num)
+            # create rotation_dict
+            for page_num in range(begin, end + 1):
+                pages_list.append(page_num)
 
-            pypdf_backend.extract(
-                # files
-                input_file=input_file,
-                output_file=output_file,
+        pypdf_backend.extract(
+            # files
+            input_file=input_file,
+            output_file=output_file,
 
-                # passwords
-                decrypt_password=decrypt_password,
+            # passwords
+            decrypt_password=decrypt_password,
 
-                # other args
-                pages=pages_list
-            )
-            progress.update(extract_task, total=100, completed=100)
+            # other args
+            pages=pages_list
+        )
+        progress.update(extract_task, total=100, completed=100)
 
-        print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Extract pages')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf rotate
@@ -289,10 +275,10 @@ def extract(
     """)
 def rotate(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str, typer.Argument(help=_("Output file path"),
-                                               callback=check_pdf_ext,
+                                               callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
     rotation: Annotated[List[str], typer.Argument(help=_("List of pages to rotate. Format ``\"page1:rotation1\"`` ``\"page2:rotation2\"`` ..."),
                                                   )],
@@ -300,47 +286,45 @@ def rotate(
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            rotate_task = progress.add_task(f"{_('Rotating pages')} ...", total=None,)
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        rotate_task = progress.add_task(f"{_('Rotating pages')} ...", total=None,)
 
-            # get rotation dict in format {page: rotation}
-            rotation_dict = {}
-            ROTATION_RE = re.compile(r'(\d+)(-(\d+)){0,1}:([-]{0,1}\d+)')
-            for arg in rotation:
-                match = ROTATION_RE.search(arg)
-                if not match:
-                    raise RuntimeError(f"{_('Invalid rotation instruction')} '{arg}'. {_("Valid format is 'begin-end:degree' or 'page:degree'")}.")
+        # get rotation dict in format {page: rotation}
+        rotation_dict = {}
+        ROTATION_RE = re.compile(r'(\d+)(-(\d+)){0,1}:([-]{0,1}\d+)')
+        for arg in rotation:
+            match = ROTATION_RE.search(arg)
+            if not match:
+                raise RuntimeError(f"{_('Invalid rotation instruction')} '{arg}'. {_("Valid format is 'begin-end:degree' or 'page:degree'")}.")
 
-                # check user input
-                begin = int(match.group(1)) - 1
-                end = int(match.group(3)) - 1 if match.group(3) else begin
-                degree = int(match.group(4))
-                if end < begin:
-                    raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
+            # check user input
+            begin = int(match.group(1)) - 1
+            end = int(match.group(3)) - 1 if match.group(3) else begin
+            degree = int(match.group(4))
+            if end < begin:
+                raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
 
-                # create rotation_dict
-                for page_num in range(begin, end + 1):
-                    rotation_dict[page_num] = degree
+            # create rotation_dict
+            for page_num in range(begin, end + 1):
+                rotation_dict[page_num] = degree
 
-            pypdf_backend.rotate(
-                # files
-                input_file=input_file,
-                output_file=output_file,
+        pypdf_backend.rotate(
+            # files
+            input_file=input_file,
+            output_file=output_file,
 
-                # passwords
-                decrypt_password=decrypt_password,
+            # passwords
+            decrypt_password=decrypt_password,
 
-                # other args
-                rotations=rotation_dict,
-            )
-            progress.update(rotate_task, total=100, completed=100)
+            # other args
+            rotations=rotation_dict,
+        )
+        progress.update(rotate_task, total=100, completed=100)
 
-        print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Rotate pages')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf encrypt
@@ -358,10 +342,10 @@ def rotate(
     """)
 def encrypt(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str, typer.Argument(help=_("Output file path"),
-                                               callback=check_pdf_ext,
+                                               callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
@@ -412,41 +396,39 @@ def encrypt(
                                             )] = False,
     encrypt_algo: Annotated[str, typer.Option("--encryption", "-enc",
                                               help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
-                                              callback=check_encrypt_algorithm
+                                              callback=check_pdf_encrypt_algorithm
                                               )] = "AES-256",
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            encrypt_task = progress.add_task(f"{_('Encripting file')} ...", total=None,)
-            pypdf_backend.encrypt(
-                # files
-                input_file=input_file,
-                output_file=output_file,
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        encrypt_task = progress.add_task(f"{_('Encripting file')} ...", total=None,)
+        pypdf_backend.encrypt(
+            # files
+            input_file=input_file,
+            output_file=output_file,
 
-                # passwords
-                owner_password=owner_password,
-                user_password=user_password,
-                decrypt_password=decrypt_password,
+            # passwords
+            owner_password=owner_password,
+            user_password=user_password,
+            decrypt_password=decrypt_password,
 
-                # permissions
-                permission_annotate=allow_annotate,
-                permission_fill_forms=allow_fill_forms,
-                permission_modify=allow_modify,
-                permission_modify_pages=allow_modify_pages,
-                permission_copy=allow_copy,
-                permission_accessibility=allow_accessibility,
-                permission_print_low_quality=allow_print_lq,
-                permission_print_high_quality=allow_print_hq,
-                permission_all=allow_all,
-                encryption_algorithm=encrypt_algo,
-            )
-            progress.update(encrypt_task, total=100, completed=100)
+            # permissions
+            permission_annotate=allow_annotate,
+            permission_fill_forms=allow_fill_forms,
+            permission_modify=allow_modify,
+            permission_modify_pages=allow_modify_pages,
+            permission_copy=allow_copy,
+            permission_accessibility=allow_accessibility,
+            permission_print_low_quality=allow_print_lq,
+            permission_print_high_quality=allow_print_hq,
+            permission_all=allow_all,
+            encryption_algorithm=encrypt_algo,
+        )
+        progress.update(encrypt_task, total=100, completed=100)
 
-        print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Encryption')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")
 
 
 # pdf decrypt
@@ -464,28 +446,26 @@ def encrypt(
     """)
 def decrypt(
     input_file: Annotated[str, typer.Argument(help=_("Input file path"),
-                                              callback=check_pdf_exists,
+                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
     output_file: Annotated[str, typer.Argument(help=_("Output file path"),
-                                               callback=check_pdf_ext,
+                                               callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 
     password: Annotated[str, typer.Option("--password", "-p",
                                           help=_("Password used for decryption."),
                                           )],
 ):
-    try:
-        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-        with get_progress_bar() as progress:
-            decrypt_task = progress.add_task(f"{_('Decripting file')} ...", total=None,)
-            pypdf_backend.decrypt(
-                input_file=input_file,
-                output_file=output_file,
-                password=password,
-            )
-            progress.update(decrypt_task, total=100, completed=100)
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        decrypt_task = progress.add_task(f"{_('Decripting file')} ...", total=None,)
+        pypdf_backend.decrypt(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+        )
+        progress.update(decrypt_task, total=100, completed=100)
 
-        print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
-    except Exception as e:
-        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
-        print(f"{_('Decryption')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
+    print(f"--------------------------------")
+    print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"--------------------------------")

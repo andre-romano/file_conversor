@@ -8,7 +8,7 @@ import platform
 import shutil
 
 import subprocess
-from typing import Any, Iterable
+from typing import Iterable
 from rich import print
 
 # user-provided imports
@@ -76,38 +76,29 @@ class AbstractPackageManager:
 
         :raises RuntimeError: if package manager not supported in the OS.
         :raises RuntimeError: package manager already installed in system.
+        :raises subprocess.CalledProcessError: package manager could not be installed in system.
         """
         if self.get_pkg_manager_installed():
             raise RuntimeError("Package manager already installed in system.")
-        try:
-            print(f"{_('Installing package manager')} ...")
-            subprocess.run(self._get_cmd_install_pkg_manager(), check=True)
-            self._post_install_pkg_manager()
-            return self.get_pkg_manager_installed()
-        except subprocess.CalledProcessError as e:
-            print(f"[bold red]{_('Failed to install package manager')}[/]: {e}")
-            return None
+        print(f"{_('Installing package manager')} ...")
+        subprocess.run(self._get_cmd_install_pkg_manager(), check=True)
+        self._post_install_pkg_manager()
+        return self.get_pkg_manager_installed()
 
-    def install_dependencies(self, dependencies: Iterable[str]) -> bool:
+    def install_dependencies(self, dependencies: Iterable[str]):
         """
         Installs dependencies with package manager.
 
         :param dependencies: External dependencies to install. Format [``dependency``, ...].
 
-        :return:  True if installation success.
-
         :raises RuntimeError: package manager NOT installed in system.
+        :raises subprocess.CalledProcessError: dependency could not be installed in system.
         """
         res = True
         if not self.get_pkg_manager_installed():
             raise RuntimeError("Package manager NOT installed in system.")
         for dep in dependencies:
-            try:
-                subprocess.run(self._get_cmd_install_dep(dep), check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"[bold red]{_('Failed to install dependency')} '{dep}': {e}")
-                res = False
-        return res
+            subprocess.run(self._get_cmd_install_dep(dep), check=True)
 
     def _get_pkg_manager_installed(self) -> str | None:
         raise NotImplementedError("Method not overloaded.")
