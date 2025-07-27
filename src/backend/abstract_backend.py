@@ -5,6 +5,7 @@ This module provides functionalities for handling external backends.
 """
 
 import platform
+import subprocess
 import typer
 
 from typing import Iterable
@@ -21,6 +22,20 @@ class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.
     """
+
+    @staticmethod
+    def dump_streams(process: subprocess.Popen | None, stdout=True, stderr=True) -> str:
+        """Dumps stdout and/or stderr into a string"""
+        res = ""
+        if not process:
+            return res
+        if process.stderr:
+            for line in process.stderr:
+                res += line
+        if process.stdout:
+            for line in process.stdout:
+                res += line
+        return res
 
     def __init__(
         self,

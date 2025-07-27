@@ -2,6 +2,7 @@
 # src\cli\pdf_cmd.py
 
 import re
+import time
 import typer
 
 from typing import Annotated, List
@@ -9,7 +10,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from backend import PyPDFBackend
+from backend import PyPDFBackend, QPDFBackend
 
 from config import Configuration, State
 from config.locale import get_translation
@@ -28,13 +29,59 @@ SECURITY_PANEL = _(f"Security commands")
 
 pdf_cmd = typer.Typer()
 
-pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-
 
 def check_encrypt_algorithm(algorithm: str | None):
     if algorithm not in (None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"):
         raise ValueError(f"Encryption algorithm '{algorithm}' is invalid.  Valid options are 'RC4-40', 'RC4-128', 'AES-128', 'AES-256-R5', or 'AES-256'.")
     return algorithm
+
+
+# pdf repair
+@pdf_cmd.command(
+    help=f"""
+        {_('Repair (lightly) corrupted PDF files.')}        
+    """,
+    epilog=f"""
+**{_('Examples')}:** 
+
+- `file_conversor pdf repair input_file.pdf output_file.pdf` 
+""")
+def repair(
+    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+                                              callback=check_pdf_exists,
+                                              )],
+    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')}. Defaults to None (use the same input file as output name).",
+                                                      callback=check_pdf_ext,
+                                                      )] = None,
+    decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
+                                                         help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
+                                                         )] = None,
+):
+    try:
+        qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
+        with get_progress_bar() as progress:
+            task1 = progress.add_task(f"{_('Repairing PDF')} ...", total=None,)
+
+            process = qpdf_backend.repair(
+                # files
+                input_file=input_file,
+                output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
+
+                # passwords
+                decrypt_password=decrypt_password,
+            )
+            while process.poll() is None:
+                time.sleep(0.25)
+            progress.update(task1, total=100, completed=100)
+
+        process.wait()
+        if process.returncode != 0:
+            raise RuntimeError(qpdf_backend.dump_streams(process))
+
+        print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    except Exception as e:
+        print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
+        print(f"{_('Repair PDF')}: [bold red]{_('FAILED')}[/] {NO_ICON}.")
 
 
 # pdf merge
@@ -65,8 +112,9 @@ def merge(
                                                )],
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Merging PDFs')} ...", total=None,)
+            merge_task = progress.add_task(f"{_('Merging PDFs')} ...", total=None,)
 
             # get dict in format {filepath: password}
             filepath_dict = {}
@@ -88,6 +136,8 @@ def merge(
                 input_files=filepath_dict,
                 output_file=output_file,
             )
+            progress.update(merge_task, total=100, completed=100)
+
         print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
@@ -128,8 +178,9 @@ def split(
                                                          )] = None,
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Splitting pages')} ...", total=None,)
+            split_task = progress.add_task(f"{_('Splitting pages')} ...", total=None,)
 
             pypdf_backend.split(
                 # files
@@ -139,6 +190,8 @@ def split(
                 # passwords
                 decrypt_password=decrypt_password,
             )
+            progress.update(split_task, total=100, completed=100)
+
         print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
@@ -173,8 +226,9 @@ def extract(
                                                          )] = None,
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Extracting pages')} ...", total=None,)
+            extract_task = progress.add_task(f"{_('Extracting pages')} ...", total=None,)
 
             # parse user input
             pages_list = []
@@ -205,6 +259,8 @@ def extract(
                 # other args
                 pages=pages_list
             )
+            progress.update(extract_task, total=100, completed=100)
+
         print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
@@ -245,8 +301,9 @@ def rotate(
                                                          )] = None,
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Rotating pages')} ...", total=None,)
+            rotate_task = progress.add_task(f"{_('Rotating pages')} ...", total=None,)
 
             # get rotation dict in format {page: rotation}
             rotation_dict = {}
@@ -278,6 +335,8 @@ def rotate(
                 # other args
                 rotations=rotation_dict,
             )
+            progress.update(rotate_task, total=100, completed=100)
+
         print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
@@ -357,8 +416,9 @@ def encrypt(
                                               )] = "AES-256",
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Encripting file')} ...", total=None,)
+            encrypt_task = progress.add_task(f"{_('Encripting file')} ...", total=None,)
             pypdf_backend.encrypt(
                 # files
                 input_file=input_file,
@@ -381,6 +441,8 @@ def encrypt(
                 permission_all=allow_all,
                 encryption_algorithm=encrypt_algo,
             )
+            progress.update(encrypt_task, total=100, completed=100)
+
         print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")
@@ -413,13 +475,16 @@ def decrypt(
                                           )],
 ):
     try:
+        pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
         with get_progress_bar() as progress:
-            task1 = progress.add_task(f"{_('Decripting file')} ...", total=None,)
+            decrypt_task = progress.add_task(f"{_('Decripting file')} ...", total=None,)
             pypdf_backend.decrypt(
                 input_file=input_file,
                 output_file=output_file,
                 password=password,
             )
+            progress.update(decrypt_task, total=100, completed=100)
+
         print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     except Exception as e:
         print(f"[bold red]{_('ERROR')}[/]: {repr(e)}.")

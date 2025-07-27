@@ -68,10 +68,12 @@ def info(
     formatted = []
     metadata: dict
     with get_progress_bar() as progress:
-        progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
+        ffprobe_task = progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
 
         ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
         metadata = ffmpeg_backend.get_file_info(filename)
+        progress.update(ffprobe_task, total=100, completed=100)
+
     # 📁 Informações gerais do arquivo
     if "format" in metadata:
         format_info: dict = metadata["format"]
@@ -168,49 +170,45 @@ def convert(
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 ):
-    process: subprocess.Popen | None = None
-    in_options = []
-    out_options = []
+    try:
+        process: subprocess.Popen | None = None
+        in_options = []
+        out_options = []
 
-    # configure out options
-    out_options.extend(["-b:a", f"{audio_bitrate}k"])
-    if File(output_file).get_extension() in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-        out_options.extend(["-b:v", f"{video_bitrate}k"])
+        # configure out options
+        out_options.extend(["-b:a", f"{audio_bitrate}k"])
+        if File(output_file).get_extension() in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
+            out_options.extend(["-b:v", f"{video_bitrate}k"])
 
-    # execute ffmpeg
-    ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
-    input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
-    process = ffmpeg_backend.convert(
-        input_file,
-        output_file,
-        verbose=STATE["verbose"],
-        in_options=in_options,
-        out_options=out_options,
-    )
+        # execute ffmpeg
+        ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+        input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
+        process = ffmpeg_backend.convert(
+            input_file,
+            output_file,
+            verbose=STATE["verbose"],
+            in_options=in_options,
+            out_options=out_options,
+        )
 
-    # display current progress
-    with get_progress_bar() as progress:
-        ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
-        while process.poll() is None:
-            ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
-            progress.update(ffmpeg_task, completed=ffmpeg_completed)
-            time.sleep(0.25)
+        # display current progress
+        with get_progress_bar() as progress:
+            ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
+            while process.poll() is None:
+                ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
+                progress.update(ffmpeg_task, completed=ffmpeg_completed)
+                time.sleep(0.25)
+            progress.update(ffmpeg_task, completed=100)
 
-    process.wait()
-    progress.update(ffmpeg_task, completed=100)
+        process.wait()
+        if process.returncode != 0:
+            raise RuntimeError(ffmpeg_backend.dump_streams(process))
 
-    if process.returncode == 0:
         print(f"--------------------------------")
         print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
         print(f"--------------------------------")
-    else:
-        # print output
-        if process.stderr:
-            for line in process.stderr:
-                print(line)
-        if process.stdout:
-            for line in process.stdout:
-                print(line)
+    except Exception as e:
         print(f"\n--------------------------------")
+        print(f"[bold red]ERROR[/]: {repr(e)}")
         print(f"{_('FFMpeg convertion')}: [red][bold]{_('FAILED')}[/bold][/red] ({process.returncode if process else "?"})")
         print(f"--------------------------------")
