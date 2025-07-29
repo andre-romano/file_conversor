@@ -118,7 +118,7 @@ def to_pdf(
                                                   )] = CONFIG["image-page-size"],
 
     set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
-                                               help=_("Set PDF metadata flag. Defaults to True (set creator, producer, modification date, etc)."),
+                                               help=_("Set PDF metadata. Defaults to True (set creator, producer, modification date, etc)."),
                                                callback=check_is_bool_or_none,
                                                is_flag=True,
                                                )] = CONFIG["image-set-metadata"],

@@ -1,11 +1,5 @@
 # src\utils\formatters.py
 
-from typer import colors
-
-YES_ICON = f"[green]✔[/]"  # Verde
-NO_ICON = f"[red]✘[/]"    # Vermelho
-
-
 def format_bytes(size: float) -> str:
     # Tamanho em bytes para string legível
     for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:

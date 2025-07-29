@@ -71,7 +71,7 @@ def repair(
     if process.returncode != 0:
         raise RuntimeError(qpdf_backend.dump_streams(process))
 
-    print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -129,7 +129,7 @@ def merge(
         )
         progress.update(merge_task, total=100, completed=100)
 
-    print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -180,7 +180,7 @@ def split(
         )
         progress.update(split_task, total=100, completed=100)
 
-    print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -246,7 +246,7 @@ def extract(
         )
         progress.update(extract_task, total=100, completed=100)
 
-    print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -319,7 +319,7 @@ def rotate(
         )
         progress.update(rotate_task, total=100, completed=100)
 
-    print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -422,7 +422,7 @@ def encrypt(
         )
         progress.update(encrypt_task, total=100, completed=100)
 
-    print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
 
 
@@ -461,5 +461,5 @@ def decrypt(
         )
         progress.update(decrypt_task, total=100, completed=100)
 
-    print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
+    print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")
     print(f"--------------------------------")
