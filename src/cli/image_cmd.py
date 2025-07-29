@@ -3,7 +3,7 @@
 
 import typer
 
-from typing import Annotated
+from typing import Annotated, List
 
 from rich import print
 from rich.text import Text
@@ -11,14 +11,14 @@ from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from backend import PillowBackend
+from backend import PillowBackend, Img2PDFBackend
 
 from config import Configuration, State
 from config.locale import get_translation
 
 from utils import File
 from utils.rich import get_progress_bar
-from utils.validators import check_file_format, check_axis
+from utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
 
 # get app config
 _ = get_translation()
@@ -69,6 +69,93 @@ def info(
     # Agrupar e exibir tudo com Rich
     group = Group(*formatted)
     print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
+
+
+# image to-pdf
+@image_cmd.command(
+    help=f"""
+        {_('Convert a list of image files to one PDF file, one image per page.')}
+
+        Fit = {_('Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure size.')}
+
+        - 'into': {_('Figure adjusted to fit in PDF size')}.
+
+        - 'fill': {_('Figure adjusted to fit in PDF size')}, {_('without any empty borders (cut figure if needed)')}.
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor image to-pdf input_file.jpg output_file.pdf --dpi 96`
+
+        - `file_conversor image to-pdf input_file1.bmp input_file2.png output_file.pdf`
+
+        - `file_conversor image to-pdf input_file.jpg output_file.pdf -ps a4_landscape`
+
+        - `file_conversor image to-pdf input_file1.bmp input_file2.png output_file.pdf --page-size (21.00,29.70)`
+    """)
+def to_pdf(
+    input_file: Annotated[List[str], typer.Argument(help=f"{_('Input files')} ({', '.join(Img2PDFBackend.SUPPORTED_IN_FORMATS)})",
+                                                    callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+                                                    )],
+
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(Img2PDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                               callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_OUT_FORMATS),
+                                               )],
+
+    dpi: Annotated[int, typer.Option("--dpi", "-d",
+                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
+                                     min=40, max=3600,
+                                     )] = CONFIG["image-dpi"],
+
+    fit: Annotated[str, typer.Option("--fit", "-f",
+                                     help=_("Image fit. Valid only if ``--page-size`` is defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "),
+                                     callback=lambda x: check_valid_options(x.lower(), ['into', 'fill']),
+                                     )] = CONFIG["image-fit"],
+
+    page_size: Annotated[str | None, typer.Option("--page-size", "-ps",
+                                                  help=_("Page size. Format '(width, height)'. Other valid values are: 'a4', 'a4_landscape'. Defaults to None (PDF size = image size)."),
+                                                  callback=lambda x: check_valid_options(x.lower() if x else None, [None, 'a4', 'a4_landscape']),
+                                                  )] = CONFIG["image-page-size"],
+
+    set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
+                                               help=_("Set PDF metadata flag. Defaults to True (set creator, producer, modification date, etc)."),
+                                               callback=check_is_bool_or_none,
+                                               is_flag=True,
+                                               )] = CONFIG["image-set-metadata"],
+):
+    img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
+    # display current progress
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{output_file}':", total=None)
+
+        # parse user input
+        image_fit: Img2PDFBackend.FIT_MODE
+        if fit == 'into':
+            image_fit = Img2PDFBackend.FIT_INTO
+        elif fit == 'fill':
+            image_fit = Img2PDFBackend.FIT_FILL
+
+        page_sz: tuple | None
+        if page_size is None:
+            page_sz = Img2PDFBackend.LAYOUT_NONE
+        elif page_size == 'a4':
+            page_sz = Img2PDFBackend.LAYOUT_A4_PORTRAIT_CM
+        elif page_size == 'a4_landscape':
+            page_sz = Img2PDFBackend.LAYOUT_A4_LANDSCAPE_CM
+        else:
+            page_sz = tuple(page_size)
+
+        img2pdf_backend.to_pdf(
+            input_files=input_file,
+            output_file=output_file,
+            dpi=dpi,
+            image_fit=image_fit,
+            page_size=page_sz,
+            include_metadata=set_metadata,
+        )
+        progress.update(task, total=100, completed=100)
+    print(f"{_('PDF generation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+    print(f"--------------------------------")
 
 
 # image convert
@@ -180,7 +267,7 @@ def mirror(
 
     axis: Annotated[int, typer.Option("--axis", "-a",
                                       help=_("Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
-                                      callback=check_axis,
+                                      callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
                                       )],
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])

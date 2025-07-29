@@ -22,10 +22,14 @@ class Configuration:
         self.__config_path = Path(f".config.json")
         # Define configuration dictionary
         self.__data = {
+            "install-deps": True,    # Default: ask user to confirm dependency installation
             "audio-bitrate": 192,    # Default audio bitrate in kbps
             "video-bitrate": 10000,  # Default video bitrate in kbps
             "image-quality": 90,     # Default image quality 90%
-            "install-deps": True,    # Default: ask user to confirm dependency installation
+            "image-dpi": 200,        # Default image => PDF dpi
+            "image-fit": 'into',     # Default image => PDF fit mode
+            "image-page-size": None,  # Default image => PDF page size
+            "image-set-metadata": True,  # Default image => PDF set metadata
         }
 
         self.load()

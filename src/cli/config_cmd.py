@@ -12,7 +12,7 @@ from rich.pretty import Pretty
 from config import Configuration, State
 from config.locale import get_translation
 
-from utils.validators import check_is_bool_or_none, check_positive_integer
+from utils.validators import check_is_bool_or_none, check_positive_integer, check_valid_options
 
 # app configuration
 _ = get_translation()
@@ -39,6 +39,11 @@ def show():
     **{_('Example')}:** `file_conversor configure --audio-bitrate 128`
 """)
 def set(
+    install_deps: Annotated[str | None, typer.Option("--install-deps", "-install",
+                                                     help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),
+                                                     callback=check_is_bool_or_none,
+                                                     )] = CONFIG["install-deps"],
+
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
@@ -49,22 +54,42 @@ def set(
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 
-    image_quality: Annotated[str | None, typer.Option("--image-quality", "-iq",
-                                                      help=_("Image quality. Valid values are between 1-100."),
-                                                      min=1, max=100,
-                                                      )] = CONFIG["image-quality"],
+    image_quality: Annotated[int, typer.Option("--image-quality", "-iq",
+                                               help=_("Image quality (for ``image convert`` command). Valid values are between 1-100."),
+                                               min=1, max=100,
+                                               )] = CONFIG["image-quality"],
 
-    install_deps: Annotated[str | None, typer.Option("--install-deps", "-id",
-                                                     help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),
+    image_dpi: Annotated[int, typer.Option("--image-dpi", "-id",
+                                           help=_("Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid values are between 40-3600."),
+                                           min=40, max=3600,
+                                           )] = CONFIG["image-dpi"],
+
+    image_fit: Annotated[str, typer.Option("--image-fit", "-if",
+                                           help=_("Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "),
+                                           callback=lambda x: check_valid_options(x.lower(), ['into', 'fill']),
+                                           )] = CONFIG["image-fit"],
+
+    image_page_size: Annotated[str | None, typer.Option("--image-page-size", "-ip",
+                                                        help=_("Page size (for ``image to_pdf`` command). Format (width, height). Other valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size = image size)."),
+                                                        callback=lambda x: check_valid_options(x.lower() if x else None, [None, 'a4', 'a4_landscape']),
+                                                        )] = CONFIG["image-page-size"],
+
+    image_set_metadata: Annotated[bool, typer.Option("--image-set-metadata", "-is",
+                                                     help=_("Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set creator, producer, modification date, etc)."),
                                                      callback=check_is_bool_or_none,
-                                                     )] = CONFIG["install-deps"],
+                                                     is_flag=True,
+                                                     )] = CONFIG["image-set-metadata"],
 ):
     # update the configuration dictionary
     CONFIG.update({
+        "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
         "audio-bitrate": audio_bitrate,
         "video-bitrate": video_bitrate,
         "image-quality": image_quality,
-        "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
+        "image-dpi": image_dpi,
+        "image-fit": image_fit,
+        "image-page-size": image_page_size,
+        "image-set-metadata": image_set_metadata,
     })
     CONFIG.save()
     show()

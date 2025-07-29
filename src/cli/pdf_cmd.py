@@ -16,7 +16,7 @@ from config import Configuration, State
 from config.locale import get_translation
 
 from utils.rich import get_progress_bar
-from utils.validators import check_file_format, check_pdf_encrypt_algorithm
+from utils.validators import check_file_format, check_valid_options
 from utils.formatters import YES_ICON
 
 # get app config
@@ -392,7 +392,7 @@ def encrypt(
                                             )] = False,
     encrypt_algo: Annotated[str, typer.Option("--encryption", "-enc",
                                               help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
-                                              callback=check_pdf_encrypt_algorithm
+                                              callback=lambda x: check_valid_options(x, valid_options=[None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"])
                                               )] = "AES-256",
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])

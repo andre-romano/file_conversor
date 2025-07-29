@@ -1,8 +1,7 @@
 # src/utils/validators.py
 
+from typing import Any, Iterable
 import typer
-
-from typing import Iterable
 
 # user provided imports
 from config.locale import get_translation
@@ -10,14 +9,6 @@ from config.locale import get_translation
 from utils.file import File
 
 _ = get_translation()
-
-
-def check_axis(axis: str) -> str:
-    """"Check if axis in ('x', 'y')"""
-    axis = axis.lower()
-    if axis in ('x', 'y'):
-        return axis
-    raise ValueError(f"{_('Invalid axis value')} '{axis}'. {_('Valid values are "x" or "y".')}")
 
 
 def check_is_bool_or_none(data: str | bool | None) -> bool | None:
@@ -41,7 +32,7 @@ def check_positive_integer(bitrate: int | float):
     Checks if the provided number is a positive integer.
     """
     if bitrate <= 0:
-        raise typer.BadParameter(_("Bitrate must be a positive integer."))
+        raise typer.BadParameter(_("Must be a positive integer."))
     return bitrate
 
 
@@ -75,7 +66,7 @@ def check_file_format(filename_or_iter: list | dict | set | str | None, format_d
     return filename_or_iter
 
 
-def check_pdf_encrypt_algorithm(algorithm: str | None):
-    if algorithm not in (None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"):
-        raise typer.BadParameter(f"Encryption algorithm '{algorithm}' is invalid.  Valid options are 'RC4-40', 'RC4-128', 'AES-128', 'AES-256-R5', or 'AES-256'.")
-    return algorithm
+def check_valid_options(data: Any | None, valid_options: Iterable):
+    if data not in valid_options:
+        raise typer.BadParameter(f"'{data}' is invalid.  Valid options are {', '.join(valid_options)}.")
+    return data
