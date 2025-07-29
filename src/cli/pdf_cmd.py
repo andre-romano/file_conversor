@@ -41,10 +41,10 @@ pdf_cmd = typer.Typer()
 - `file_conversor pdf repair input_file.pdf output_file.pdf` 
 """)
 def repair(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')}. Defaults to None (use the same input file as output name).",
+    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file')} (pdf). Defaults to None (use the same input file as output name).",
                                                       callback=lambda x: check_file_format(x, ['pdf']),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
@@ -53,7 +53,7 @@ def repair(
 ):
     qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
     with get_progress_bar() as progress:
-        task1 = progress.add_task(f"{_('Repairing PDF')} ...", total=None,)
+        task1 = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
 
         process = qpdf_backend.repair(
             # files
@@ -71,7 +71,6 @@ def repair(
     if process.returncode != 0:
         raise RuntimeError(qpdf_backend.dump_streams(process))
 
-    print(f"--------------------------------")
     print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -97,15 +96,15 @@ def repair(
 - `file_conversor pdf merge "input_file1.pdf:unlock_password" "input_file2.pdf" output_file.pdf` 
     """)
 def merge(
-    input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file path')}. {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
+    input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file')} (pdf). {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
                                                      )],
-    output_file: Annotated[str, typer.Argument(help=_("Output file path"),
+    output_file: Annotated[str, typer.Argument(help=f"{_("Output file")} (pdf)",
                                                callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        merge_task = progress.add_task(f"{_('Merging PDFs')} ...", total=None,)
+        merge_task = progress.add_task(f"{_('Processing file')} '{output_file}':", total=None,)
 
         # get dict in format {filepath: password}
         filepath_dict = {}
@@ -129,7 +128,6 @@ def merge(
         )
         progress.update(merge_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -157,10 +155,10 @@ def merge(
 - `file_conversor pdf split input_file.pdf` 
 """)
 def split(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')}. Defaults to None (use the same input file as output name).",
+    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')} (pdf). Defaults to None (use the same input file as output name).",
                                                       callback=lambda x: check_file_format(x, ['pdf']),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
@@ -169,7 +167,7 @@ def split(
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        split_task = progress.add_task(f"{_('Splitting pages')} ...", total=None,)
+        split_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
 
         pypdf_backend.split(
             # files
@@ -181,7 +179,6 @@ def split(
         )
         progress.update(split_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -201,10 +198,10 @@ def split(
 - `file_conversor pdf extract input_file.pdf output_file.pdf 1-2 3` 
     """)
 def extract(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=_("Output file path"),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
                                                callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
     pages: Annotated[List[str], typer.Argument(help=_("List of pages to extract. Format page_num1 page_num2 ..."),
@@ -215,7 +212,7 @@ def extract(
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        extract_task = progress.add_task(f"{_('Extracting pages')} ...", total=None,)
+        extract_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
 
         # parse user input
         pages_list = []
@@ -274,10 +271,10 @@ def extract(
 - `file_conversor pdf rotate input_file.pdf output_file.pdf "5-7:90" "9:-90" "10-15:180"`
     """)
 def rotate(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=_("Output file path"),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
                                                callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
     rotation: Annotated[List[str], typer.Argument(help=_("List of pages to rotate. Format ``\"page1:rotation1\"`` ``\"page2:rotation2\"`` ..."),
@@ -288,7 +285,7 @@ def rotate(
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        rotate_task = progress.add_task(f"{_('Rotating pages')} ...", total=None,)
+        rotate_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
 
         # get rotation dict in format {page: rotation}
         rotation_dict = {}
@@ -322,7 +319,6 @@ def rotate(
         )
         progress.update(rotate_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -341,10 +337,10 @@ def rotate(
         - `file_conversor pdf encrypt input_file.pdf output_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=_("Output file path"),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
                                                callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 
@@ -401,7 +397,7 @@ def encrypt(
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        encrypt_task = progress.add_task(f"{_('Encripting file')} ...", total=None,)
+        encrypt_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
         pypdf_backend.encrypt(
             # files
             input_file=input_file,
@@ -426,7 +422,6 @@ def encrypt(
         )
         progress.update(encrypt_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -445,10 +440,10 @@ def encrypt(
         - `file_conversor pdf decrypt input_file.pdf output_file.pdf -p 1234`
     """)
 def decrypt(
-    input_file: Annotated[str, typer.Argument(help=_("Input file path"),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
                                               callback=lambda x: check_file_format(x, ['pdf'], exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=_("Output file path"),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
                                                callback=lambda x: check_file_format(x, ['pdf']),
                                                )],
 
@@ -458,7 +453,7 @@ def decrypt(
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        decrypt_task = progress.add_task(f"{_('Decripting file')} ...", total=None,)
+        decrypt_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
         pypdf_backend.decrypt(
             input_file=input_file,
             output_file=output_file,
@@ -466,6 +461,5 @@ def decrypt(
         )
         progress.update(decrypt_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")

@@ -328,14 +328,8 @@ class FFmpegBackend(AbstractBackend):
         # remove empty strings
         ffmpeg_command = [arg for arg in ffmpeg_command if arg != ""]
 
-        print(f"--------------------")
         print(f"Executing FFmpeg:")
-        print(f" IN: {in_file}")
-        print(f"OUT: {out_file}")
-        print(f"OPT: {in_opts}")
-        print(f" ")
         print(f"{" ".join(ffmpeg_command)}")
-        print(f"--------------------")
 
         # Execute the FFmpeg command
         _convert_process = subprocess.Popen(

@@ -44,7 +44,7 @@ image_cmd = typer.Typer()
     """)
 def info(
     filename: Annotated[str, typer.Argument(
-        help=_("File path"),
+        help=f"{_('File')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
@@ -85,12 +85,12 @@ def info(
     """)
 def convert(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
+        help=f"{_('Input file')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
+        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
@@ -102,14 +102,13 @@ def convert(
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} ...", total=None)
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.convert(
             input_file=input_file,
             output_file=output_file,
             quality=quality,
         )
         progress.update(task, total=100, completed=100)
-    print(f"--------------------------------")
     print(f"{_('Image convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
     print(f"--------------------------------")
 
@@ -128,12 +127,12 @@ def convert(
     """)
 def rotate(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
+        help=f"{_('Input file')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
+        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
@@ -145,14 +144,13 @@ def rotate(
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} ...", total=None)
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.rotate(
             input_file=input_file,
             output_file=output_file,
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
-    print(f"--------------------------------")
     print(f"{_('Image rotation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
     print(f"--------------------------------")
 
@@ -171,12 +169,12 @@ def rotate(
     """)
 def mirror(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file path')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
+        help=f"{_('Input file')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file path')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
+        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
     )],
 
@@ -188,13 +186,12 @@ def mirror(
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} ...", total=None)
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.mirror(
             input_file=input_file,
             output_file=output_file,
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)
-    print(f"--------------------------------")
     print(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
     print(f"--------------------------------")

@@ -58,7 +58,7 @@ audio_video_cmd = typer.Typer()
     """)
 def info(
     filename: Annotated[str, typer.Argument(
-        help=_("File path"),
+        help=f"{_('File')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
@@ -147,11 +147,11 @@ def info(
     """)
 def convert(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file path')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
+        help=f"{_('Input file')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
     output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file path')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
+        help=f"{_('Output file')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
     )],
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
@@ -186,7 +186,7 @@ def convert(
 
     # display current progress
     with get_progress_bar() as progress:
-        ffmpeg_task = progress.add_task(f"{_('Processing file')} ...", total=100)
+        ffmpeg_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100)
         while process.poll() is None:
             ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
             progress.update(ffmpeg_task, completed=ffmpeg_completed)
@@ -197,6 +197,5 @@ def convert(
     if process.returncode != 0:
         raise RuntimeError(ffmpeg_backend.dump_streams(process))
 
-    print(f"--------------------------------")
     print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
     print(f"--------------------------------")
