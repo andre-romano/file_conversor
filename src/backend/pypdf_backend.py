@@ -20,6 +20,13 @@ class PyPDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``pypdf``.
     """
 
+    SUPPORTED_IN_FORMATS = {
+        "pdf": {},
+    }
+    SUPPORTED_OUT_FORMATS = {
+        "pdf": {},
+    }
+
     def __init__(
         self,
         verbose: bool = False,

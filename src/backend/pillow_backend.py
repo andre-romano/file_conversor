@@ -4,17 +4,13 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-import os
-
-from typing import Iterable
-
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
 # user-provided imports
 from config.locale import get_translation
-from utils.file import File
 from backend.abstract_backend import AbstractBackend
+from utils.file import File
 
 _ = get_translation()
 

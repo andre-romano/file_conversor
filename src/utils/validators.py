@@ -1,7 +1,8 @@
 # src/utils/validators.py
 
-import os
 import typer
+
+from typing import Iterable
 
 # user provided imports
 from config.locale import get_translation
@@ -44,23 +45,34 @@ def check_positive_integer(bitrate: int | float):
     return bitrate
 
 
-def check_file_format(filename: str | None, format_dict: dict | list, exists: bool = False):
+def check_file_format(filename_or_iter: list | dict | set | str | None, format_dict: dict | list, exists: bool = False):
     """
     Checks if the provided format is supported.
 
-    :param filename: Filename
+    :param filename_or_iter: Filename or iterable list
     :param format_dict: Format {format:options} or [format]
     :param exists: Check if file exists. Default False (do not check).
+
+    :raises typer.BadParameter: Unsupported format, or file not found.
+    :raises TypeError: Invalid parameter type.
     """
-    if filename is None:
-        return filename
-    file = File(filename)
-    file_format = file.get_extension().lower()
-    if file_format not in format_dict:
-        raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
-    if exists and not file.is_file():
-        raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")
-    return filename
+    file_list = []
+    if isinstance(filename_or_iter, (list, dict, set)):
+        file_list = list(filename_or_iter)
+    elif isinstance(filename_or_iter, str):
+        file_list.append(filename_or_iter)
+    elif filename_or_iter is None:
+        return filename_or_iter
+    else:
+        raise TypeError(f"{_('Invalid type')} '{type(filename_or_iter)}' {_('for')} filename_or_iter. {_('Valid values are Iterable | str | None')}.")
+    for filename in file_list:
+        file = File(filename)
+        file_format = file.get_extension().lower()
+        if file_format not in format_dict:
+            raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
+        if exists and not file.is_file():
+            raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")
+    return filename_or_iter
 
 
 def check_pdf_encrypt_algorithm(algorithm: str | None):

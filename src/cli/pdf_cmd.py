@@ -41,11 +41,11 @@ pdf_cmd = typer.Typer()
 - `file_conversor pdf repair input_file.pdf output_file.pdf` 
 """)
 def repair(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(QPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, QPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file')} (pdf). Defaults to None (use the same input file as output name).",
-                                                      callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file')} ({', '.join(QPDFBackend.SUPPORTED_IN_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _repaired.pdf at the end)')}.",
+                                                      callback=lambda x: check_file_format(x, QPDFBackend.SUPPORTED_OUT_FORMATS),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
@@ -96,10 +96,11 @@ def repair(
 - `file_conversor pdf merge "input_file1.pdf:unlock_password" "input_file2.pdf" output_file.pdf` 
     """)
 def merge(
-    input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file')} (pdf). {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
+    input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)}). {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
+                                                     callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                                      )],
-    output_file: Annotated[str, typer.Argument(help=f"{_("Output file")} (pdf)",
-                                               callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str, typer.Argument(help=f"{_("Output file")} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}).",
+                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                )],
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
@@ -115,7 +116,7 @@ def merge(
                 raise RuntimeError(f"{_('Invalid filepath format')} '{arg}'. {_("Valid format is 'filepath:password' or 'filepath'")}.")
 
             # check user input
-            filepath = check_file_format(match.group(1), ['pdf'], exists=True)
+            filepath = match.group(1)
             password = match.group(3) if match.group(3) else None
 
             # create filepath_dict
@@ -155,11 +156,11 @@ def merge(
 - `file_conversor pdf split input_file.pdf` 
 """)
 def split(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')} (pdf). Defaults to None (use the same input file as output name).",
-                                                      callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str | None, typer.Argument(help=f"{_('Output file path')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}). Defaults to None (use the same input file as output name).",
+                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                       )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
@@ -198,11 +199,11 @@ def split(
 - `file_conversor pdf extract input_file.pdf output_file.pdf 1-2 3` 
     """)
 def extract(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
-                                               callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                )],
     pages: Annotated[List[str], typer.Argument(help=_("List of pages to extract. Format page_num1 page_num2 ..."),
                                                )],
@@ -245,7 +246,6 @@ def extract(
         )
         progress.update(extract_task, total=100, completed=100)
 
-    print(f"--------------------------------")
     print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/] {YES_ICON}.")
     print(f"--------------------------------")
 
@@ -271,11 +271,11 @@ def extract(
 - `file_conversor pdf rotate input_file.pdf output_file.pdf "5-7:90" "9:-90" "10-15:180"`
     """)
 def rotate(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
-                                               callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                )],
     rotation: Annotated[List[str], typer.Argument(help=_("List of pages to rotate. Format ``\"page1:rotation1\"`` ``\"page2:rotation2\"`` ..."),
                                                   )],
@@ -337,11 +337,11 @@ def rotate(
         - `file_conversor pdf encrypt input_file.pdf output_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
-                                               callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                )],
 
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
@@ -440,11 +440,11 @@ def encrypt(
         - `file_conversor pdf decrypt input_file.pdf output_file.pdf -p 1234`
     """)
 def decrypt(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} (pdf)",
-                                              callback=lambda x: check_file_format(x, ['pdf'], exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} (pdf)",
-                                               callback=lambda x: check_file_format(x, ['pdf']),
+    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
                                                )],
 
     password: Annotated[str, typer.Option("--password", "-p",

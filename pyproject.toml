@@ -12,6 +12,7 @@ dependencies = [
     "pypdf>=5.8.0",
     "cryptography>=45.0.5",
     "pillow>=11.3.0",
+    "img2pdf>=0.6.1",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"

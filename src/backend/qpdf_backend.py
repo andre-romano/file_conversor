@@ -18,6 +18,13 @@ class QPDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``qpdf``.
     """
 
+    SUPPORTED_IN_FORMATS = {
+        "pdf": {},
+    }
+    SUPPORTED_OUT_FORMATS = {
+        "pdf": {},
+    }
+
     def __init__(
         self,
         install_deps: bool | None,
