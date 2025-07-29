@@ -17,7 +17,6 @@ from config.locale import get_translation
 
 from utils.rich import get_progress_bar
 from utils.validators import check_file_format, check_valid_options
-from utils.formatters import YES_ICON
 
 # get app config
 _ = get_translation()
