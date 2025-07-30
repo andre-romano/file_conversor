@@ -8,6 +8,7 @@ making them available when importing the backend package.
 """
 
 from backend.abstract_backend import AbstractBackend
+from backend.batch_backend import BatchBackend
 from backend.ffmpeg_backend import FFmpegBackend
 from backend.pillow_backend import PillowBackend
 from backend.img2pdf_backend import Img2PDFBackend
