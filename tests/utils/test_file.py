@@ -43,7 +43,7 @@ def test_create_dir_creates_directory(tmp_path):
     new_dir = tmp_path / "newdir"
     f = File(str(new_dir))
     assert not new_dir.exists()
-    f.create_dir()
+    f.mkdir()
     assert new_dir.exists()
     assert new_dir.is_dir()
 
@@ -53,7 +53,7 @@ def test_create_dir_raises_if_path_is_file(tmp_path):
     file_path.write_text("abc")
     f = File(str(file_path))
     with pytest.raises(FileExistsError):
-        f.create_dir()
+        f.mkdir()
 
 
 def test_create_dir_existing_dir(tmp_path):
@@ -61,7 +61,7 @@ def test_create_dir_existing_dir(tmp_path):
     dir_path.mkdir()
     f = File(str(dir_path))
     # Should not raise
-    f.create_dir()
+    f.mkdir()
     assert dir_path.exists()
 
 
@@ -145,5 +145,5 @@ def test_create_dir_raises_if_cannot_create(monkeypatch, tmp_path):
     # Ensure the directory does not exist before
     assert not dir_path.exists()
     with pytest.raises(FileNotFoundError) as excinfo:
-        f.create_dir()
+        f.mkdir()
     assert "could not be created" in str(excinfo.value)

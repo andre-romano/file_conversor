@@ -1,7 +1,9 @@
 # src/utils/validators.py
 
-from typing import Any, Iterable
 import typer
+
+from pathlib import Path
+from typing import Any, Iterable
 
 # user provided imports
 from config.locale import get_translation

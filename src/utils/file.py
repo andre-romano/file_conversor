@@ -36,7 +36,7 @@ class File:
         """
         return os.path.isdir(self.path)
 
-    def create_dir(self) -> None:
+    def mkdir(self) -> None:
         """
         Create a directory if it does not exist.
 

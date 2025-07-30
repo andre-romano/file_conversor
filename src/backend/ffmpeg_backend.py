@@ -263,7 +263,7 @@ class FFmpegBackend(AbstractBackend):
 
         # create out dir (if it does not exists)
         out_dir = File(out_file.get_full_dirname())
-        out_dir.create_dir()
+        out_dir.mkdir()
 
         # check if the output file has a supported format
         File(output_file).check_supported_format(self.SUPPORTED_OUT_FORMATS)

@@ -1,6 +1,9 @@
 # src\config\state.py
 
 
+from typing import Any
+
+
 class State:
 
     __instance = None
@@ -26,7 +29,7 @@ class State:
     def __str__(self) -> str:
         return str(self.__data)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Any:
         return self.__data[key]
 
     def __setitem__(self, key, value):
@@ -35,10 +38,10 @@ class State:
     def __delitem__(self, key):
         del self.__data[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         return key in self.__data
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__data)
 
     def clear(self):
