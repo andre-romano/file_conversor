@@ -18,15 +18,18 @@ from rich.progress import Progress
 # user-provided imports
 from backend.abstract_backend import AbstractBackend
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils import File
 
 # get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class BatchBackend(AbstractBackend):
@@ -68,12 +71,12 @@ class BatchBackend(AbstractBackend):
         })
         self._stage_num += 1
         self._stage_prev = stage_path
-        print(f"Pipeline stage created at '{stage_path}'")
+        logger.info(f"{_('Pipeline stage created at')} '{stage_path}'")
 
     def save_config(self,):
         self._pipeline_path.mkdir(parents=True, exist_ok=True)
         self._config_file.write_text(json.dumps(self._config_data, indent=2, sort_keys=True))
-        print(f"Config file saved at '{self._config_file}'")
+        logger.info(f"{_('Config file saved at')} '{self._config_file}'")
 
     def load_config(self,):
         """
@@ -83,11 +86,11 @@ class BatchBackend(AbstractBackend):
         """
         if not self._config_file.exists():
             raise RuntimeError(f"{_('Config file')} '{self._pipeline_path}' {_('does not exist')}")
-        print(f"{_('Loading')} '{self._config_file}' ...")
+        logger.info(f"{_('Loading')} '{self._config_file}' ...")
         with open(self._config_file, "r") as f:
             self._config_data = json.load(f)
         self._stage_len = len(self._config_data)
-        print(f"{_('Found')} {self._stage_len} {_('stages')}")
+        logger.info(f"{_('Found')} {self._stage_len} {_('stages')}")
 
     def execute(self, progress: Progress):
         """
@@ -111,6 +114,7 @@ class BatchBackend(AbstractBackend):
         output_path = Path(out_dir)
         cmd_template = str(command)
 
+        logger.info(f"{_('Executing batch stage')} '{out_dir}' ...")
         total_files = sum(1 for _ in input_path.glob("*"))
         task = progress.add_task(f"{_('Stage')} '{output_path.name}' - {_('Processing files')}", total=total_files)
         for i, in_path in enumerate(input_path.glob("*")):
@@ -120,19 +124,19 @@ class BatchBackend(AbstractBackend):
             # execute cmd
             try:
                 cmd_list = self._gen_cmd_list(in_path, in_path=in_path, out_path=output_path, cmd_template=cmd_template)
-                # print(cmd_list)
+                logger.debug(f"Command list: '{cmd_list}'")
                 process = subprocess.run(cmd_list,
                                          cwd=self.SCRIPT_WORKDIR,
                                          capture_output=True,
                                          check=True,
                                          )
-                print(f"Processing file '{in_path}': [bold green]{_('SUCCESS')}[/] ({process.returncode})")
+                logger.debug(f"Processing file '{in_path}': [bold green]{_('SUCCESS')}[/] ({process.returncode})")
             except Exception as e:
-                print(f"Processing file '{in_path}': [bold red]{_('FAILED')}[/]")
-                print(f"[bold red]{_('ERROR')}[/]: {str(e)}")
+                logger.error(f"Processing file '{in_path}': [bold red]{_('FAILED')}[/]")
+                logger.error(f"{str(e)}")
                 if isinstance(e, subprocess.CalledProcessError):
-                    print(f"Stdout:\n{e.stdout}")
-                    print(f"Stderr:\n{e.stderr}")
+                    logger.error(f"Stdout:\n{e.stdout}")
+                    logger.error(f"Stderr:\n{e.stderr}")
                 self._clean_stage(output_path)
                 raise
             finally:
@@ -140,10 +144,11 @@ class BatchBackend(AbstractBackend):
         # success, clean input_path
         self._clean_stage(input_path)
         progress.update(task, total=100, completed=100)
+        logger.info(f"{_('Finished batch stage')} '{out_dir}'")
 
     def _clean_stage(self, dir_path: Path):
         """Clean files inside folder"""
-        # print(f"Cleaning files from folder '{dir_path}' ...")
+        logger.debug(f"Cleaning files from folder '{dir_path}' ...")
         for path in dir_path.glob("*"):
             if path.is_file() and path.name != self.CONFIG_FILENAME:
                 path.unlink()

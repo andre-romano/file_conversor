@@ -12,7 +12,13 @@ from pypdf.constants import UserAccessPermissions
 from typing import Iterable
 
 # user-provided imports
+from config import Log
+
 from backend.abstract_backend import AbstractBackend
+
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
 
 
 class PyPDFBackend(AbstractBackend):
@@ -162,7 +168,7 @@ class PyPDFBackend(AbstractBackend):
                     raise ValueError(f"Page '{i}' rotation {rotation} is invalid. Rotation must be 0, 90, 180 or 270 degrees.")
 
                 # execute page rotation
-                print("Instruction:", i, rotation)
+                logger.debug(f"Instruction: {i} {rotation}")
                 if rotation > 0:
                     page.rotate(rotation)  # clockwise: 90, 180, 270
                 writer.add_page(page)

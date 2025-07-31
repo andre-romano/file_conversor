@@ -12,13 +12,11 @@ from rich import print
 from rich.text import Text
 from rich.panel import Panel
 from rich.console import Group
-# from rich.markdown import Markdown
-# from rich.pretty import Pretty
 
 # user-provided modules
 from backend import FFmpegBackend
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils import File
@@ -27,9 +25,12 @@ from utils.validators import check_positive_integer, check_file_format
 from utils.formatters import format_bitrate, format_bytes
 
 # get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 audio_video_cmd = typer.Typer()
 
@@ -197,5 +198,4 @@ def convert(
     if process.returncode != 0:
         raise RuntimeError(ffmpeg_backend.dump_streams(process))
 
-    print(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
-    print(f"--------------------------------")
+    logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")

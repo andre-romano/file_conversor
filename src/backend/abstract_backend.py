@@ -6,23 +6,45 @@ This module provides functionalities for handling external backends.
 
 import os
 import platform
+import shutil
 import subprocess
 import typer
 
-from typing import Iterable
+from pathlib import Path
 from rich import print
 
 # user-provided imports
 from dependency import AbstractPackageManager
+
+from config import Log
 from config.locale import get_translation
 
+LOG = Log.get_instance()
+
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.
     """
+
+    @staticmethod
+    def find_in_path(name: str | Path) -> Path:
+        """
+        Finds name path in PATH env
+
+        :return: Path for name
+
+        :raises FileNotFoundError: if name not found
+        """
+        path_str = shutil.which(name)
+        if not path_str:
+            raise FileNotFoundError(f"'{name}' {_('not found in PATH environment')}")
+        path = Path(path_str).resolve()
+        logger.info(f"'{name}' {_('found')}: {path}")
+        return path
 
     @staticmethod
     def check_file_exists(filename: str):
@@ -76,12 +98,12 @@ class AbstractBackend:
             if not missing_deps:
                 # no dependencies missing, skip
                 break
-            print(f"[bold]{_("Missing dependencies detected")}[/]: {", ".join(missing_deps)}")
+            logger.warning(f"[bold]{_("Missing dependencies detected")}[/]: {", ".join(missing_deps)}")
 
             # install package manager, if not present already
             pkg_mgr_bin = pkg_mgr.get_pkg_manager_installed()
             if pkg_mgr_bin:
-                print(f"Package manager found in '{pkg_mgr_bin}'")
+                logger.info(f"Package manager found in '{pkg_mgr_bin}'")
             else:
                 user_prompt: bool
                 if install_answer is None:
@@ -94,8 +116,8 @@ class AbstractBackend:
                 if user_prompt:
                     result = pkg_mgr.install_pkg_manager()
                     if result:
-                        print(f"Package manager installed in '{result}'")
-                    print(f"[bold]{_("Package Manager Installation")}[/]: [green]{_("SUCCESS")}[/]")
+                        logger.info(f"Package manager installed in '{result}'")
+                    logger.info(f"[bold]{_("Package Manager Installation")}[/]: [green]{_("SUCCESS")}[/]")
 
             # install missing dependencies
             if install_answer is None:
@@ -107,4 +129,4 @@ class AbstractBackend:
                 user_prompt = install_answer
             if user_prompt:
                 pkg_mgr.install_dependencies(missing_deps)
-                print(f"[bold]{_("External Dependencies Installation")}[/]: [green]{_("SUCCESS")}[/]")
+                logger.info(f"[bold]{_("External Dependencies Installation")}[/]: [green]{_("SUCCESS")}[/]")

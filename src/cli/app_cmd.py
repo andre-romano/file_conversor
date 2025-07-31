@@ -13,13 +13,16 @@ from cli import config_cmd
 from cli import image_cmd
 from cli import pdf_cmd
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 # Get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger()
 
 # Create a Typer CLI application
 app_cmd = typer.Typer(
@@ -109,8 +112,10 @@ def main_callback(
         )] = False,
 ):
     if verbose:
-        print(f"{_('Verbose mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
+        logger.info(f"{_('Verbose mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
         STATE["verbose"] = True
+        LOG.set_level(Log.LEVEL_INFO)
     if debug:
-        print(f"{_('Debug mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
+        logger.info(f"{_('Debug mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
         STATE["debug"] = True
+        LOG.set_level(Log.LEVEL_DEBUG)

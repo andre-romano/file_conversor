@@ -12,10 +12,13 @@ from typing import Iterable
 from rich import print
 
 # user-provided imports
+from config import Log
 from config.locale import get_translation
-from utils.rich import get_progress_bar
+
+LOG = Log.get_instance()
 
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class AbstractPackageManager:
@@ -42,7 +45,7 @@ class AbstractPackageManager:
         for executable, dependency in self._dependencies.items():
             found_exe = shutil.which(executable)
             if not found_exe:
-                print(f"[bold white]ABSTRACT PKG MANAGER[/]: {_('Executable')} '{executable}' {_('not found')}. {_('Marking dependency')} '{dependency}' {_('for installation')}.")
+                logger.warning(f"ABSTRACT PKG MANAGER - {_('Executable')} '{executable}' {_('not found')}. {_('Marking dependency')} '{dependency}' {_('for installation')}.")
                 missing_dependencies.add(dependency)
 
         # missing dependencies
@@ -80,7 +83,8 @@ class AbstractPackageManager:
         """
         if self.get_pkg_manager_installed():
             raise RuntimeError("Package manager already installed in system.")
-        print(f"{_('Installing package manager')} ...")
+        logger.info(f"{_('Installing package manager')} ...")
+        logger.debug(f"{self._get_cmd_install_pkg_manager()}")
         subprocess.run(self._get_cmd_install_pkg_manager(), check=True)
         self._post_install_pkg_manager()
         return self.get_pkg_manager_installed()
@@ -97,6 +101,7 @@ class AbstractPackageManager:
         res = True
         if not self.get_pkg_manager_installed():
             raise RuntimeError("Package manager NOT installed in system.")
+        logger.info(f"{_('Installing missing dependencies')} {list(dependencies)} ...")
         for dep in dependencies:
             subprocess.run(self._get_cmd_install_dep(dep), check=True)
 

@@ -4,13 +4,18 @@
 This module provides functionalities for handling PDF files using ``qpdf`` backend.
 """
 
-import os
 import shutil
 import subprocess
 
 # user-provided imports
-from backend.abstract_backend import AbstractBackend
+from config.log import Log
+
 from dependency import BrewPackageManager, ScoopPackageManager
+from backend.abstract_backend import AbstractBackend
+
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
 
 
 class QPDFBackend(AbstractBackend):
@@ -50,8 +55,7 @@ class QPDFBackend(AbstractBackend):
         )
         self._verbose = verbose
 
-        qpdf_bin = shutil.which("qpdf")
-        self._qpdf_bin = qpdf_bin if qpdf_bin else "QPDF_NOT_FOUND"
+        self._qpdf_bin = self.find_in_path("qpdf")
 
     def repair(
         self,
@@ -72,14 +76,14 @@ class QPDFBackend(AbstractBackend):
 
         # build command
         command = []
-        command.extend([self._qpdf_bin])
+        command.extend([str(self._qpdf_bin)])
         if decrypt_password:
             command.extend([f"--password={decrypt_password}", "--decrypt"])
         command.extend(["--linearize", input_file, output_file])
 
         # Execute command
-        print("Executing QPDF:")
-        print(" ".join(command))
+        logger.info("Executing QPDF ...")
+        logger.debug(" ".join(command))
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,

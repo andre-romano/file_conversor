@@ -1,31 +1,27 @@
 
 # src\cli\batch_cmd.py
 
-import shlex
-import os
-import subprocess
-import json
 import typer
 
-from pathlib import Path
 from typing import Annotated
 
 from rich import print
-from rich.progress import Progress
 
 # user-provided modules
 from backend.batch_backend import BatchBackend
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
-from utils.file import File
 from utils.rich import get_progress_bar
 
 # get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 batch_cmd = typer.Typer()
 
@@ -65,6 +61,7 @@ batch_cmd = typer.Typer()
 - `file_conversor batch create` 
 """)
 def create():
+    logger.info(f"{_('Creating batch pipeline')} ...")
     pipeline_folder: str = typer.prompt(f"{_('Name of the batch pipeline folder (e.g., %USERPROFILE%/Desktop/pipeline_name_here)')}")
     batch_backend = BatchBackend(pipeline_folder)
 
@@ -82,11 +79,10 @@ def create():
             terminate = True
             raise
         except Exception as e:
-            print(f"[bold red]{_('ERROR')}[/]: {str(e)}")
+            logger.error(f"{str(e)}")
 
     batch_backend.save_config()
-    print(f"{_('Batch creation')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Batch creation')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # batch execute
@@ -104,10 +100,11 @@ def execute(
         help=f"{_('Pipeline folder')}",
     )],
 ):
+    logger.info("Executing batch pipeline ...")
     with get_progress_bar() as progress:
         batch_backend = BatchBackend(pipeline_folder)
         batch_backend.load_config()
         batch_backend.execute(progress)
 
-    print(f"{_('Batch execution')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Batch execution')}: [bold green]{_('SUCCESS')}[/].")
+    logger.info(f"--------------------------------")

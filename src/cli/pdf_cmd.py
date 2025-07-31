@@ -12,16 +12,19 @@ from rich import print
 # user-provided modules
 from backend import PyPDFBackend, QPDFBackend
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils.rich import get_progress_bar
 from utils.validators import check_file_format, check_valid_options
 
 # get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 # typer PANELS
 SECURITY_PANEL = _(f"Security commands")
@@ -70,8 +73,7 @@ def repair(
     if process.returncode != 0:
         raise RuntimeError(qpdf_backend.dump_streams(process))
 
-    print(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf merge
@@ -128,8 +130,7 @@ def merge(
         )
         progress.update(merge_task, total=100, completed=100)
 
-    print(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf split
@@ -179,8 +180,7 @@ def split(
         )
         progress.update(split_task, total=100, completed=100)
 
-    print(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf extract
@@ -245,8 +245,7 @@ def extract(
         )
         progress.update(extract_task, total=100, completed=100)
 
-    print(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf rotate
@@ -318,8 +317,7 @@ def rotate(
         )
         progress.update(rotate_task, total=100, completed=100)
 
-    print(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf encrypt
@@ -421,8 +419,7 @@ def encrypt(
         )
         progress.update(encrypt_task, total=100, completed=100)
 
-    print(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf decrypt
@@ -460,5 +457,4 @@ def decrypt(
         )
         progress.update(decrypt_task, total=100, completed=100)
 
-    print(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")
-    print(f"--------------------------------")
+    logger.info(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")

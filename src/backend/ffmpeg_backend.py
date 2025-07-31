@@ -13,10 +13,18 @@ from datetime import timedelta
 from typing import Iterable
 
 # user-provided imports
+from config import Log
+from config.locale import get_translation
+
 from utils import File
 
 from dependency import BrewPackageManager, ScoopPackageManager
 from backend.abstract_backend import AbstractBackend
+
+_ = get_translation()
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
 
 
 class FFmpegBackend(AbstractBackend):
@@ -128,7 +136,7 @@ class FFmpegBackend(AbstractBackend):
 
         :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
 
-        :raises FileNotFoundError: If the input file does not exist, or output directory could not be created.
+        :raises RuntimeError: if ffmpeg dependency is not found
         """
         super().__init__(
             pkg_managers={
@@ -142,11 +150,9 @@ class FFmpegBackend(AbstractBackend):
             install_answer=install_deps,
         )
 
-        ffprobe_bin = shutil.which("ffprobe")
-        self._ffprobe_bin = ffprobe_bin if ffprobe_bin else "FFPROBE_NOT_FOUND"
-
-        ffmpeg_bin = shutil.which("ffmpeg")
-        self._ffmpeg_bin = ffmpeg_bin if ffmpeg_bin else "FFMPEG_NOT_FOUND"
+        # check ffprobe / ffmpeg
+        self._ffprobe_bin = self.find_in_path("ffprobe")
+        self._ffmpeg_bin = self.find_in_path("ffmpeg")
 
     def calculate_file_total_duration(self, file_path: str) -> float:
         """
@@ -155,7 +161,7 @@ class FFmpegBackend(AbstractBackend):
         :return: Total duration in seconds.
         """
         result = subprocess.run(
-            [self._ffprobe_bin, '-v', 'error', '-show_entries',
+            [str(self._ffprobe_bin), '-v', 'error', '-show_entries',
              'format=duration', '-of',
              'default=noprint_wrappers=1:nokey=1', file_path],
             stdout=subprocess.PIPE,
@@ -207,7 +213,7 @@ class FFmpegBackend(AbstractBackend):
         :return: JSON object
         """
         command = [
-            self._ffprobe_bin,
+            str(self._ffprobe_bin),
             "-v", "quiet",
             "-print_format", "json",
             "-show_format",
@@ -318,7 +324,7 @@ class FFmpegBackend(AbstractBackend):
 
         # build ffmpeg command
         ffmpeg_command = []
-        ffmpeg_command.extend([self._ffmpeg_bin])  # ffmpeg CLI
+        ffmpeg_command.extend([str(self._ffmpeg_bin)])  # ffmpeg CLI
         ffmpeg_command.extend(global_options)    # set global options
         ffmpeg_command.extend(in_opts)           # set in options
         ffmpeg_command.extend(["-i", in_file])   # set input
@@ -328,8 +334,8 @@ class FFmpegBackend(AbstractBackend):
         # remove empty strings
         ffmpeg_command = [arg for arg in ffmpeg_command if arg != ""]
 
-        print(f"Executing FFmpeg:")
-        print(f"{" ".join(ffmpeg_command)}")
+        logger.info(f"Executing FFmpeg ...")
+        logger.debug(f"{" ".join(ffmpeg_command)}")
 
         # Execute the FFmpeg command
         _convert_process = subprocess.Popen(

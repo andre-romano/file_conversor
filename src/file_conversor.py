@@ -2,12 +2,13 @@
 # src/file_conversor.py
 
 import sys
+
 from pathlib import Path
 
 from rich import print
 
 # user provided imports
-from cli.app_cmd import app_cmd, STATE, CONFIG, _
+from cli.app_cmd import app_cmd, STATE, CONFIG, logger, _
 from system import reload_user_path
 
 
@@ -49,12 +50,11 @@ def main():
         reload_user_path()
         app_cmd()
     except Exception as e:
+        error_type = str(type(e)).split("'")[1]
         if STATE["debug"]:
+            logger.error(f"{error_type} ({e})", exc_info=True)
             raise
-        else:
-            error_type = str(type(e)).split("'")[1]
-            print(f"[red bold]{_('ERROR')}[/]: {error_type}")
-            print(f"{str(e)}")
+        logger.error(f"{error_type} ({e})")
         sys.exit(1)
 
 

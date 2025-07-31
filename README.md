@@ -7,7 +7,8 @@ Python program to convert and compress audio/video/text/etc files to other forma
   - [Installing](#installing)
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
-      - [Option 2. Portable EXE](#option-2-portable-exe)
+      - [Option 2. Scoop Package Manager](#option-2-scoop-package-manager)
+      - [Option 3. Portable EXE](#option-3-portable-exe)
     - [For Linux](#for-linux)
       - [Option 1. Portable Binary](#option-1-portable-binary)
   - [Usage](#usage)
@@ -20,6 +21,9 @@ Python program to convert and compress audio/video/text/etc files to other forma
 This project requires the following external dependencies to work properly:
 - FFmpeg
 - Ghostscript
+- qpdf
+
+The app will prompt for download of the external dependencies, if needed.
 
 ## Installing
 
@@ -32,7 +36,14 @@ This project requires the following external dependencies to work properly:
   choco install file_conversor
   ```
 
-#### Option 2. Portable EXE
+#### Option 2. Scoop Package Manager
+
+1. Open PowerShell (no admin priviledges needed) and run:
+  ```bash
+  scoop install file_conversor
+  ```
+
+#### Option 3. Portable EXE
 
 1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
 2. Extract ZIP file

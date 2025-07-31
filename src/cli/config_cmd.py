@@ -9,15 +9,18 @@ from rich import print
 from rich.pretty import Pretty
 
 # user-provided modules
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils.validators import check_is_bool_or_none, check_positive_integer, check_valid_options
 
 # app configuration
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 # create command
 config_cmd = typer.Typer()
@@ -93,4 +96,4 @@ def set(
     })
     CONFIG.save()
     show()
-    print(f"{_('Configuration file')} {_('updated')}.")
+    logger.info(f"{_('Configuration file')} {_('updated')}.")

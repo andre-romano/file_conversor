@@ -13,7 +13,7 @@ from rich.console import Group
 # user-provided modules
 from backend import PillowBackend, Img2PDFBackend
 
-from config import Configuration, State
+from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils import File
@@ -21,9 +21,12 @@ from utils.rich import get_progress_bar
 from utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
 
 # get app config
-_ = get_translation()
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
 
 image_cmd = typer.Typer()
 
@@ -154,8 +157,7 @@ def to_pdf(
             include_metadata=set_metadata,
         )
         progress.update(task, total=100, completed=100)
-    print(f"{_('PDF generation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-    print(f"--------------------------------")
+    logger.info(f"{_('PDF generation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # image convert
@@ -196,8 +198,7 @@ def convert(
             quality=quality,
         )
         progress.update(task, total=100, completed=100)
-    print(f"{_('Image convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-    print(f"--------------------------------")
+    logger.info(f"{_('Image convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # image rotate
@@ -238,8 +239,7 @@ def rotate(
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
-    print(f"{_('Image rotation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-    print(f"--------------------------------")
+    logger.info(f"{_('Image rotation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # image mirror
@@ -280,5 +280,4 @@ def mirror(
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)
-    print(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-    print(f"--------------------------------")
+    logger.info(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
