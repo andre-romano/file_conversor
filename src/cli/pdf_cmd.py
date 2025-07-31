@@ -52,6 +52,10 @@ def repair(
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
+    compress: Annotated[bool, typer.Option("--compress", "-c",
+                                           help=_("Compress output PDF file (losslessly). Defaults to True (compress)."),
+                                           is_flag=True,
+                                           )] = True,
 ):
     qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
     with get_progress_bar() as progress:
@@ -62,8 +66,9 @@ def repair(
             input_file=input_file,
             output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
 
-            # passwords
+            # options
             decrypt_password=decrypt_password,
+            compress=compress,
         )
         while process.poll() is None:
             time.sleep(0.25)

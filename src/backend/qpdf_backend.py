@@ -62,6 +62,7 @@ class QPDFBackend(AbstractBackend):
         input_file: str,
         output_file: str,
         decrypt_password: str | None = None,
+        compress: bool = True,
     ) -> subprocess.Popen:
         """
         Repair input PDF file.
@@ -69,6 +70,7 @@ class QPDFBackend(AbstractBackend):
         :param input_files: Input PDF file. 
         :param output_files: Output PDF file.
         :param decryption_password: Decryption password for input PDF file. Defaults to None (do not decrypt).
+        :param compress: Compress PDF output file structures. Defaults to True (compress structures, losslessly).
 
         :raises FileNotFoundError: if input file not found.
         """
@@ -77,6 +79,8 @@ class QPDFBackend(AbstractBackend):
         # build command
         command = []
         command.extend([str(self._qpdf_bin)])
+        if compress:
+            command.extend(["--object-streams=generate", "--compress-streams=y", "--stream-data=compress"])
         if decrypt_password:
             command.extend([f"--password={decrypt_password}", "--decrypt"])
         command.extend(["--linearize", input_file, output_file])
