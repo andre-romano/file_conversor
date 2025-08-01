@@ -92,14 +92,31 @@ def help():
 
         - {_('Batch file processing, for task automation using scripts')}
         
-        - {_('Configure default options for conversion / compression')}
-
         - {_('Supports various input and output formats')} (mp3, mp4, mkv, jpg, png, webp, pdf, etc)
+        
+        - {_('Configure default options for conversion / compression')}
+        
+        - {_('Installs external dependencies automatically')}
     """,
     epilog=f"""
         {_('For more information, visit')} [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)
     """)
 def main_callback(
+        no_log: Annotated[bool, typer.Option(
+            "--no-log", "-nl",
+            help=_("Disable file logs"),
+            is_flag=True,
+        )] = False,
+        no_progress: Annotated[bool, typer.Option(
+            "--no-progress", "-np",
+            help=f"{_('Disable progress bars')}",
+            is_flag=True,
+        )] = False,
+        quiet: Annotated[bool, typer.Option(
+            "--quiet", "-q",
+            help=f"{_('Enable quiet mode (only display errors and progress bars)')}",
+            is_flag=True,
+        )] = False,
         verbose: Annotated[bool, typer.Option(
             "--verbose", "-v",
             help=_("Enable verbose mode"),
@@ -111,11 +128,27 @@ def main_callback(
             is_flag=True,
         )] = False,
 ):
+    STATE.update({
+        "no-log": no_log,
+        "no-progress": no_progress,
+        "quiet": quiet,
+        "verbose": verbose,
+        "debug": debug,
+    })
+
+    if no_log:
+        logger.info(f"{_('File logging')}: [blue red]{_('DISABLED')}[/]")
+        LOG.set_dest_folder(None)
+
+    if no_progress:
+        logger.info(f"{_('Progress bars')}: [blue red]{_('DISABLED')}[/]")
+
+    if quiet:
+        logger.info(f"{_('Quiet mode')}: [blue bold]{_('ENABLED')}[/]")
+        LOG.set_level(Log.LEVEL_ERROR)
     if verbose:
-        logger.info(f"{_('Verbose mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
-        STATE["verbose"] = True
+        logger.info(f"{_('Verbose mode')}: [blue bold]{_('ENABLED')}[/]")
         LOG.set_level(Log.LEVEL_INFO)
     if debug:
-        logger.info(f"{_('Debug mode')}: [blue][bold]{_('ENABLED')}[/bold][/blue]")
-        STATE["debug"] = True
+        logger.info(f"{_('Debug mode')}: [blue bold]{_('ENABLED')}[/]")
         LOG.set_level(Log.LEVEL_DEBUG)

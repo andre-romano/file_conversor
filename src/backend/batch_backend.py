@@ -22,6 +22,7 @@ from config import Configuration, State, Log
 from config.locale import get_translation
 
 from utils import File
+from utils.rich import DummyProgress
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -92,7 +93,7 @@ class BatchBackend(AbstractBackend):
         self._stage_len = len(self._config_data)
         logger.info(f"{_('Found')} {self._stage_len} {_('stages')}")
 
-    def execute(self, progress: Progress):
+    def execute(self, progress: Progress | DummyProgress):
         """
         Executes the batch pipeline
 
@@ -104,7 +105,7 @@ class BatchBackend(AbstractBackend):
             self._execute_stage(progress=progress, **stage)
             progress.update(task, completed=i + 1)
 
-    def _execute_stage(self, progress: Progress, in_dir: str, out_dir: str, command: str):
+    def _execute_stage(self, progress: Progress | DummyProgress, in_dir: str, out_dir: str, command: str):
         """
         Process a pipeline stage
 

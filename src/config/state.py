@@ -19,7 +19,6 @@ class State:
 
         # Define state dictionary
         self.__data = {
-            "verbose": False,
             "debug": False,
         }
 
