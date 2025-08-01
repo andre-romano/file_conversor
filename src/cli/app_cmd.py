@@ -28,6 +28,9 @@ logger = LOG.getLogger()
 app_cmd = typer.Typer(
     rich_markup_mode="markdown",
     no_args_is_help=True,
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+    }
 )
 
 # PANELS
@@ -96,7 +99,7 @@ def help():
         
         - {_('Configure default options for conversion / compression')}
         
-        - {_('Installs external dependencies automatically')}
+        - {_('Installs external dependencies automatically (using package managers)')}
     """,
     epilog=f"""
         {_('For more information, visit')} [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)
@@ -135,20 +138,3 @@ def main_callback(
         "verbose": verbose,
         "debug": debug,
     })
-
-    if no_log:
-        logger.info(f"{_('File logging')}: [blue red]{_('DISABLED')}[/]")
-        LOG.set_dest_folder(None)
-
-    if no_progress:
-        logger.info(f"{_('Progress bars')}: [blue red]{_('DISABLED')}[/]")
-
-    if quiet:
-        logger.info(f"{_('Quiet mode')}: [blue bold]{_('ENABLED')}[/]")
-        LOG.set_level(Log.LEVEL_ERROR)
-    if verbose:
-        logger.info(f"{_('Verbose mode')}: [blue bold]{_('ENABLED')}[/]")
-        LOG.set_level(Log.LEVEL_INFO)
-    if debug:
-        logger.info(f"{_('Debug mode')}: [blue bold]{_('ENABLED')}[/]")
-        LOG.set_level(Log.LEVEL_DEBUG)
