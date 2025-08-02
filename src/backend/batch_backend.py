@@ -49,7 +49,6 @@ class BatchBackend(AbstractBackend):
         """
         super().__init__()
         self.SCRIPT_EXECUTABLE: str = STATE['script_executable']
-        self.SCRIPT_WORKDIR: str = STATE['script_workdir']
 
         self._pipeline_path = Path(os.path.expandvars(pipeline_folder)).resolve()
         self._config_file = self._pipeline_path / self.CONFIG_FILENAME
@@ -127,7 +126,7 @@ class BatchBackend(AbstractBackend):
                 cmd_list = self._gen_cmd_list(in_path, in_path=in_path, out_path=output_path, cmd_template=cmd_template)
                 logger.debug(f"Command list: '{cmd_list}'")
                 process = subprocess.run(cmd_list,
-                                         cwd=self.SCRIPT_WORKDIR,
+                                         #  cwd=self.SCRIPT_WORKDIR,
                                          capture_output=True,
                                          check=True,
                                          )

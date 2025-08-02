@@ -5,6 +5,8 @@ import os
 import shutil
 
 # user-provided imports
+from system import PLATFORM_WINDOWS
+
 from config.locale import get_translation
 
 from dependency.abstract_pkg_manager import AbstractPackageManager
@@ -20,7 +22,7 @@ class ScoopPackageManager(AbstractPackageManager):
         return shutil.which("scoop")
 
     def _get_supported_oses(self) -> set[str]:
-        return {"Windows"}
+        return {PLATFORM_WINDOWS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return [

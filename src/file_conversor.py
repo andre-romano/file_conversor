@@ -34,18 +34,19 @@ def get_script_path() -> Path:
     return Path(__file__).resolve()
 
 
-def get_executable() -> tuple[str, str]:
+def get_executable() -> str:
     path = get_script_path()
     if path.suffix == ".py":
-        return f"pdm run python '{path}'", str(path.parent.parent)
-    return str(path), str(path.parent)
+        python_bin = (path.parent.parent / ".venv/Scripts/python").resolve()
+        return f"'{python_bin}' '{path}'"
+    return str(path)
 
 
 # Entry point of the app
 def main():
     try:
         # set script executable
-        STATE['script_executable'], STATE['script_workdir'] = get_executable()
+        STATE['script_executable'] = get_executable()
         # begin app
         reload_user_path()
         app_cmd()

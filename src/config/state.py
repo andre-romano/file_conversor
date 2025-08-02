@@ -68,7 +68,6 @@ class State:
         self.__data = {
             # app EXE binary
             "script_executable": "NOT_SET",
-            "script_workdir": "NOT_SET",
 
             # app options
             "no-log": False,

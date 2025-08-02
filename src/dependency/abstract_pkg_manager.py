@@ -67,7 +67,7 @@ class AbstractPackageManager:
         """
         Gets the package manager supported OSes.
 
-        :return: Set(["Windows", "Linux", "Darwin", ...])
+        :return: Set([PLATFORM_WINDOWS, PLATFORM_LINUX, PLATFORM_MACOS, ...])
         """
         return self._get_supported_oses()
 

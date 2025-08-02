@@ -5,6 +5,8 @@ import os
 import shutil
 
 # user-provided imports
+from system import PLATFORM_LINUX, PLATFORM_MACOS
+
 from config.locale import get_translation
 from dependency.abstract_pkg_manager import AbstractPackageManager
 
@@ -19,7 +21,7 @@ class BrewPackageManager(AbstractPackageManager):
         return shutil.which("brew")
 
     def _get_supported_oses(self) -> set[str]:
-        return {"Linux", "Darwin"}
+        return {PLATFORM_LINUX, PLATFORM_MACOS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ['/bin/bash', '-c', '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)']
