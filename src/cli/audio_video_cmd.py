@@ -24,6 +24,8 @@ from utils.rich import get_progress_bar
 from utils.validators import check_positive_integer, check_file_format
 from utils.formatters import format_bitrate, format_bytes
 
+from system.win.ctx_menu import WinContextCommand, WinContextMenu
+
 # get app config
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
@@ -33,6 +35,48 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 audio_video_cmd = typer.Typer()
+
+
+def register_ctx_menu(ctx_menu: WinContextMenu):
+    # FFMPEG commands
+    for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="info",
+                description="Get Info",
+                command=f'cmd /k "{STATE['script_executable']} audio-video info "%1""'
+            ),
+            WinContextCommand(
+                name="to_avi",
+                description="To AVI",
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.avi"'
+            ),
+            WinContextCommand(
+                name="to_mp4",
+                description="To MP4",
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp4"'
+            ),
+            WinContextCommand(
+                name="to_mkv",
+                description="To MKV",
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mkv"'
+            ),
+            WinContextCommand(
+                name="to_mp3",
+                description="To MP3",
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp3"'
+            ),
+            WinContextCommand(
+                name="to_m4a",
+                description="To M4A",
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.m4a"'
+            ),
+        ])
+
+
+# register commands in windows context menu
+ctx_menu = WinContextMenu.get_instance(CONFIG['install-context-menu-all-users'])
+ctx_menu.register_callback(register_ctx_menu)
 
 
 # audio_video info
@@ -53,9 +97,9 @@ audio_video_cmd = typer.Typer()
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor audio_video info filename.webm`
+        - `file_conversor audio-video info filename.webm`
 
-        - `file_conversor audio_video info other_filename.mp3`
+        - `file_conversor audio-video info other_filename.mp3`
     """)
 def info(
     filename: Annotated[str, typer.Argument(
@@ -142,19 +186,19 @@ def info(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor audio_video convert input_file.webm output_file.mp4 --audio-bitrate 192`
+        - `file_conversor audio-video convert input_file.webm -o output_file.mp4 --audio-bitrate 192`
 
-        - `file_conversor audio_video convert input_file.mp4 output_file.mp3`
+        - `file_conversor audio-video convert input_file.mp4 -o output_file.mp3`
     """)
 def convert(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
-    output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
-    )],
+    output_file: Annotated[str, typer.Option("--output", "-o",
+                                             help=f"{_('Output file')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
+                                             callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
+                                             )],
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,

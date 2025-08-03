@@ -20,6 +20,8 @@ from utils import File
 from utils.rich import get_progress_bar
 from utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
 
+from system.win.ctx_menu import WinContextCommand, WinContextMenu
+
 # get app config
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
@@ -29,6 +31,62 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 image_cmd = typer.Typer()
+
+
+def register_ctx_menu(ctx_menu: WinContextMenu):
+    # IMG2PDF commands
+    for ext in Img2PDFBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="to_pdf",
+                description="To PDF",
+                command=f'{STATE['script_executable']} image to-pdf "%1"'
+            ),
+        ])
+    # Pillow commands
+    for ext in PillowBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="to_jpg",
+                description="To JPG",
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.jpg" -q 95'
+            ),
+            WinContextCommand(
+                name="to_png",
+                description="To PNG",
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.png" -q 95'
+            ),
+            WinContextCommand(
+                name="to_webp",
+                description="To WEBP",
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.webp" -q 95'
+            ),
+            WinContextCommand(
+                name="rotate_clock_95",
+                description="Rotate 95 deg",
+                command=f'{STATE['script_executable']} image rotate "%1" -r 95'
+            ),
+            WinContextCommand(
+                name="rotate_anticlock_95",
+                description="Rotate -95 deg",
+                command=f'{STATE['script_executable']} image rotate "%1" -r -95'
+            ),
+            WinContextCommand(
+                name="mirror_x",
+                description="Mirror X axis",
+                command=f'{STATE['script_executable']} image mirror "%1" -a x'
+            ),
+            WinContextCommand(
+                name="mirror_y",
+                description="Mirror Y axis",
+                command=f'{STATE['script_executable']} image mirror "%1" -a y'
+            ),
+        ])
+
+
+# register commands in windows context menu
+ctx_menu = WinContextMenu.get_instance(CONFIG['install-context-menu-all-users'])
+ctx_menu.register_callback(register_ctx_menu)
 
 
 # image info
@@ -88,22 +146,23 @@ def info(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor image to-pdf input_file.jpg output_file.pdf --dpi 96`
+        - `file_conversor image to-pdf input_file.jpg -o output_file.pdf --dpi 96`
 
-        - `file_conversor image to-pdf input_file1.bmp input_file2.png output_file.pdf`
+        - `file_conversor image to-pdf input_file1.bmp input_file2.png -o output_file.pdf`
 
-        - `file_conversor image to-pdf input_file.jpg output_file.pdf -ps a4_landscape`
+        - `file_conversor image to-pdf input_file.jpg -o output_file.pdf -ps a4_landscape`
 
-        - `file_conversor image to-pdf input_file1.bmp input_file2.png output_file.pdf --page-size (21.00,29.70)`
+        - `file_conversor image to-pdf input_file1.bmp input_file2.png -o output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
-    input_file: Annotated[List[str], typer.Argument(help=f"{_('Input files')} ({', '.join(Img2PDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                    callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                    )],
+    input_files: Annotated[List[str], typer.Argument(help=f"{_('Input files')} ({', '.join(Img2PDFBackend.SUPPORTED_IN_FORMATS)})",
+                                                     callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+                                                     )],
 
-    output_file: Annotated[str, typer.Argument(help=f"{_('Output file')} ({', '.join(Img2PDFBackend.SUPPORTED_OUT_FORMATS)})",
-                                               callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_OUT_FORMATS),
-                                               )],
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(Img2PDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same 1st input file as output name')}).",
+                                                    callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
 
     dpi: Annotated[int, typer.Option("--dpi", "-d",
                                      help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
@@ -149,8 +208,8 @@ def to_pdf(
             page_sz = tuple(page_size)
 
         img2pdf_backend.to_pdf(
-            input_files=input_file,
-            output_file=output_file,
+            input_files=input_files,
+            output_file=output_file if output_file else f"{input_files[0].replace(".pdf", "")}.pdf",
             dpi=dpi,
             image_fit=image_fit,
             page_size=page_sz,
@@ -168,9 +227,9 @@ def to_pdf(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor image convert input_file.webp output_file.jpg --quality 85`
+        - `file_conversor image convert input_file.webp -o output_file.jpg --quality 85`
 
-        - `file_conversor image convert input_file.bmp output_file.png`
+        - `file_conversor image convert input_file.bmp -o output_file.png`
     """)
 def convert(
     input_file: Annotated[str, typer.Argument(
@@ -178,10 +237,10 @@ def convert(
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
-    output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
-    )],
+    output_file: Annotated[str, typer.Option("--output", "-o",
+                                             help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
+                                             callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
+                                             )],
 
     quality: Annotated[int, typer.Option("--quality", "-q",
                                          help=_("Image quality. Valid values are between 1-100."),
@@ -209,9 +268,9 @@ def convert(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf rotate input_file.jpg output_file.jpg 90` 
+        - `file_conversor pdf rotate input_file.jpg -o output_file.jpg -r 90` 
         
-        - `file_conversor pdf rotate input_file.jpg output_file.jpg -180` 
+        - `file_conversor pdf rotate input_file.jpg -o output_file.jpg -r -180` 
     """)
 def rotate(
     input_file: Annotated[str, typer.Argument(
@@ -219,23 +278,24 @@ def rotate(
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
-    output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
-    )],
-
     rotation: Annotated[int, typer.Option("--rotation", "-r",
                                           help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise rotation) and 360 (clockwise rotation)."),
                                           min=-360, max=360,
                                           )],
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _rotated at the end)')}",
+                                                    callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
+        in_file = File(input_file)
+
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.rotate(
             input_file=input_file,
-            output_file=output_file,
+            output_file=output_file if output_file else f"{in_file.get_filename()}_rotated.{in_file.get_extension()}",
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
@@ -250,9 +310,9 @@ def rotate(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf mirror input_file.jpg output_file.jpg -a x` 
+        - `file_conversor pdf mirror input_file.jpg -o output_file.jpg -a x` 
         
-        - `file_conversor pdf mirror input_file.jpg output_file.jpg -a y` 
+        - `file_conversor pdf mirror input_file.jpg -o output_file.jpg -a y` 
     """)
 def mirror(
     input_file: Annotated[str, typer.Argument(
@@ -260,23 +320,24 @@ def mirror(
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
-    output_file: Annotated[str, typer.Argument(
-        help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
-    )],
-
-    axis: Annotated[int, typer.Option("--axis", "-a",
+    axis: Annotated[str, typer.Option("--axis", "-a",
                                       help=_("Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
                                       callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
                                       )],
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _mirrored at the end)')}",
+                                                    callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
+        in_file = File(input_file)
+
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.mirror(
             input_file=input_file,
-            output_file=output_file,
+            output_file=output_file if output_file else f"{in_file.get_filename()}_mirrored.{in_file.get_extension()}",
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)

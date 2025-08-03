@@ -1,0 +1,115 @@
+# src/backend/win_reg_backend.py
+
+"""
+This module provides functionalities for handling Windows Registry using ``reg`` backend.
+"""
+
+import subprocess
+import tempfile
+
+from pathlib import Path
+
+# user-provided imports
+from config.log import Log
+
+from system.win import WinRegFile
+from backend.abstract_backend import AbstractBackend
+
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+
+
+class WinRegBackend(AbstractBackend):
+    """
+    A class that provides an interface for handling .REG files using ``reg``.
+    """
+
+    SUPPORTED_IN_FORMATS = {
+        "reg": {},
+    }
+    SUPPORTED_OUT_FORMATS = {
+        "reg": {},
+    }
+
+    def __init__(self, verbose: bool = False):
+        """
+        Initialize the ``reg`` backend
+
+        :param verbose: Verbose logging. Defaults to False.      
+        """
+        super().__init__()
+        self._verbose = verbose
+
+        self._reg_bin = self.find_in_path("reg")
+
+    def import_file(
+        self,
+        input_file_or_winreg: str | Path | WinRegFile,
+    ):
+        """
+        Import registry info from input .REG file.
+
+        :param input_file_or_winreg: Input REG file, or WinRegFile.        
+
+        :raises subprocess.CalledProcessError: if reg cannot import registry file
+        """
+        temp_file = ".out.reg"
+        winregfile: WinRegFile
+        if isinstance(input_file_or_winreg, WinRegFile):
+            winregfile = input_file_or_winreg
+        else:
+            winregfile = WinRegFile(input_file_or_winreg)
+        winregfile.dump(temp_file)
+
+        # build command
+        command = [str(self._reg_bin), "import", temp_file]
+
+        # Execute command
+        logger.info(f"Importing .REG file ...")
+        logger.debug(" ".join(command))
+
+        subprocess.run(command,
+                       capture_output=True,
+                       check=True,
+                       )
+
+        Path(temp_file).unlink()
+
+    def delete_keys(
+        self,
+        input_file_or_winreg: str | Path | WinRegFile,
+    ):
+        """
+        Loads registry keys from input .REG file, and deletes them from windows registry.
+
+        :param input_file_or_winreg: Input .REG file.        
+
+        :raises subprocess.CalledProcessError: if reg cannot delete registry keys
+        """
+        winregfile: WinRegFile
+        if isinstance(input_file_or_winreg, WinRegFile):
+            winregfile = input_file_or_winreg
+        else:
+            winregfile = WinRegFile(input_file_or_winreg)
+
+        logger.info(f"Deleting reg keys ...")
+        for _, key in winregfile.items():
+            # Execute command
+            try:
+                subprocess.run([str(self._reg_bin), "query", key.path],
+                               stdin=subprocess.DEVNULL,
+                               stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL,
+                               check=True,
+                               )
+            except subprocess.CalledProcessError:
+                logger.debug(f"SKIP - key '{key.path}' not found ...")
+                continue
+
+            subprocess.run([str(self._reg_bin), "delete", key.path, "/f"],
+                           capture_output=True,
+                           check=True,
+                           )
+
+            logger.debug(f"'{key.path}' deleted")

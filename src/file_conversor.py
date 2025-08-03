@@ -1,9 +1,8 @@
 
 # src/file_conversor.py
 
+import subprocess
 import sys
-
-from pathlib import Path
 
 from rich import print
 
@@ -12,50 +11,21 @@ from cli.app_cmd import app_cmd, STATE, CONFIG, logger, _
 from system import reload_user_path
 
 
-def get_script_path() -> Path:
-    """Get the absolute path of the currently running script."""
-    # 1. Check for frozen executables (PyInstaller)
-    if getattr(sys, 'frozen', False):
-        return Path(sys.executable).resolve()
-
-    # 2. Try __file__ attribute (works for normal scripts/modules)
-    try:
-        return Path(__file__).resolve()
-    except NameError:
-        pass
-
-    # 3. Check sys.argv[0] (works when run directly)
-    if len(sys.argv) > 0 and sys.argv[0]:
-        script_path = Path(sys.argv[0]).resolve()
-        if script_path.exists():
-            return script_path
-
-    # fallback
-    return Path(__file__).resolve()
-
-
-def get_executable() -> str:
-    path = get_script_path()
-    if path.suffix == ".py":
-        python_bin = (path.parent.parent / ".venv/Scripts/python").resolve()
-        return f"'{python_bin}' '{path}'"
-    return str(path)
-
-
 # Entry point of the app
 def main():
     try:
-        # set script executable
-        STATE['script_executable'] = get_executable()
         # begin app
         reload_user_path()
         app_cmd()
     except Exception as e:
         error_type = str(type(e)).split("'")[1]
+        logger.error(f"{error_type} ({e})", exc_info=True if STATE["debug"] else None)
+        if isinstance(e, subprocess.CalledProcessError):
+            logger.error(f"CMD: {e.cmd} ({e.returncode})")
+            logger.error(f"STDERR: {e.stderr}")
+            logger.error(f"STDOUT: {e.stdout}")
         if STATE["debug"]:
-            logger.error(f"{error_type} ({e})", exc_info=True)
             raise
-        logger.error(f"{error_type} ({e})")
         sys.exit(1)
 
 

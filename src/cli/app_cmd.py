@@ -1,5 +1,6 @@
 # src\cli\app_cmd.py
 
+import sys
 import typer
 
 from rich import print
@@ -12,6 +13,9 @@ from cli import batch_cmd
 from cli import config_cmd
 from cli import image_cmd
 from cli import pdf_cmd
+from cli import win_cmd
+
+from system import CURR_PLATFORM, PLATFORM_WINDOWS
 
 from config import Configuration, State, Log
 from config.locale import get_translation
@@ -39,7 +43,7 @@ MULTIMEDIA_PANEL = _("Multimedia files")
 
 # REGISTER SUBCOMMANDS
 app_cmd.add_typer(audio_video_cmd,
-                  name="audio_video",
+                  name="audio-video",
                   help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
@@ -52,6 +56,14 @@ app_cmd.add_typer(pdf_cmd,
                   name="pdf",
                   help=_("PDF file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
+
+
+# -- OS-SPECIFIC
+if CURR_PLATFORM == PLATFORM_WINDOWS:
+    app_cmd.add_typer(win_cmd,
+                      name="win",
+                      help=_("Windows OS commands (for Windows ONLY)"),
+                      rich_help_panel=UTILS_CONFIG_PANEL)
 
 app_cmd.add_typer(batch_cmd,
                   name="batch",
@@ -138,3 +150,4 @@ def main_callback(
         "verbose": verbose,
         "debug": debug,
     })
+    logger.debug(f"{_('Command')}: {sys.argv}")

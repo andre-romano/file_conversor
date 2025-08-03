@@ -1,4 +1,4 @@
-# src\platform\lin.py
+# src\platform\lin\__init__.py
 
 import platform
 

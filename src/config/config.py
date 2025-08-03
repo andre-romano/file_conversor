@@ -30,6 +30,7 @@ class Configuration:
             "image-fit": 'into',     # Default image => PDF fit mode
             "image-page-size": None,  # Default image => PDF page size
             "image-set-metadata": True,  # Default image => PDF set metadata
+            "install-context-menu-all-users": False,  # Default install only for current user
         }
 
         self.load()
@@ -72,4 +73,4 @@ class Configuration:
 
     def save(self):
         """Save app configuration file"""
-        self.__config_path.write_text(json.dumps(self.__data))
+        self.__config_path.write_text(json.dumps(self.__data, indent=2))

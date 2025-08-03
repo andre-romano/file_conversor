@@ -14,3 +14,4 @@ from backend.pillow_backend import PillowBackend
 from backend.img2pdf_backend import Img2PDFBackend
 from backend.pypdf_backend import PyPDFBackend
 from backend.qpdf_backend import QPDFBackend
+from backend.win_reg_backend import WinRegBackend

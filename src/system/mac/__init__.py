@@ -1,4 +1,4 @@
-# src\platform\mac.py
+# src\platform\mac\__init__.py
 
 import platform
 

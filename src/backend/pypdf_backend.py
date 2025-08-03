@@ -168,7 +168,7 @@ class PyPDFBackend(AbstractBackend):
                     raise ValueError(f"Page '{i}' rotation {rotation} is invalid. Rotation must be 0, 90, 180 or 270 degrees.")
 
                 # execute page rotation
-                logger.debug(f"Instruction: {i} {rotation}")
+                logger.debug(f"Rotating page {i} by {rotation} deg")
                 if rotation > 0:
                     page.rotate(rotation)  # clockwise: 90, 180, 270
                 writer.add_page(page)
