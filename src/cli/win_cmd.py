@@ -46,22 +46,19 @@ CONTEXT_MENU_PANEL = _("Context menu")
 """)
 def install_menu():
     winreg_backend = WinRegBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        all_users = CONFIG['install-context-menu-all-users']
+    all_users = CONFIG['install-context-menu-all-users']
 
-        logger.info(f"{_('Installing app context menu in Windows Explorer')}  {_('(for all users)') if all_users else _('for current_user ONLY')} ...")
-        task = progress.add_task(f"{_('Processing')}:", total=None,)
+    logger.info(f"{_('Installing app context menu in Windows Explorer')}  ({_('for all users') if all_users else _('for current_user ONLY')}) ...")
 
-        # Define registry path
-        ctx_menu = WinContextMenu.get_instance(for_all_users=all_users)
-        # logger.debug("---- .REG file contents ----")
-        # logger.debug(repr(ctx_menu.get_reg_file()))
+    # Define registry path
+    ctx_menu = WinContextMenu.get_instance(for_all_users=all_users)
+    # logger.debug("---- .REG file contents ----")
+    # logger.debug(repr(ctx_menu.get_reg_file()))
 
-        winreg_backend.import_file(ctx_menu.get_reg_file())
+    winreg_backend.import_file(ctx_menu.get_reg_file())
 
-        logger.info(f"{_('Restarting explorer.exe')} ...")
-        restart_explorer()
-        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('Restarting explorer.exe')} ...")
+    restart_explorer()
     logger.info(f"{_('Context Menu Install')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -78,18 +75,15 @@ def install_menu():
 """)
 def uninstall_menu():
     winreg_backend = WinRegBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        all_users = CONFIG['install-context-menu-all-users']
+    all_users = CONFIG['install-context-menu-all-users']
 
-        logger.info(f"{_('Removing app context menu from Windows Explorer')} {_('(for all users)') if all_users else _('for current_user ONLY')} ...")
-        task = progress.add_task(f"{_('Processing')}:", total=None,)
+    logger.info(f"{_('Removing app context menu from Windows Explorer')} ({_('for all users') if all_users else _('for current_user ONLY')}) ...")
 
-        # Define registry path
-        ctx_menu = WinContextMenu.get_instance(for_all_users=all_users)
-        # logger.debug("---- .REG file contents ----")
-        # logger.debug(repr(ctx_menu.get_reg_file()))
+    # Define registry path
+    ctx_menu = WinContextMenu.get_instance(for_all_users=all_users)
+    # logger.debug("---- .REG file contents ----")
+    # logger.debug(repr(ctx_menu.get_reg_file()))
 
-        winreg_backend.delete_keys(ctx_menu.get_reg_file())
+    winreg_backend.delete_keys(ctx_menu.get_reg_file())
 
-        progress.update(task, total=100, completed=100)
     logger.info(f"{_('Context Menu Uninstall')}: [bold green]{_('SUCCESS')}[/].")

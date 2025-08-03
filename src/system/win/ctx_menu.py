@@ -100,4 +100,4 @@ class WinContextMenu:
                     "@": cmd.command,
                 }),
             ])
-            logger.debug(f"Added command '{cmd.name}' => {cmd.command}")
+        logger.debug(f"Added commands for '{root_key}'")

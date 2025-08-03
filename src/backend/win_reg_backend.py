@@ -54,27 +54,27 @@ class WinRegBackend(AbstractBackend):
 
         :raises subprocess.CalledProcessError: if reg cannot import registry file
         """
-        temp_file = ".out.reg"
-        winregfile: WinRegFile
-        if isinstance(input_file_or_winreg, WinRegFile):
-            winregfile = input_file_or_winreg
-        else:
-            winregfile = WinRegFile(input_file_or_winreg)
-        winregfile.dump(temp_file)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file = (Path(temp_dir) / ".out.reg").resolve().__str__()
 
-        # build command
-        command = [str(self._reg_bin), "import", temp_file]
+            winregfile: WinRegFile
+            if isinstance(input_file_or_winreg, WinRegFile):
+                winregfile = input_file_or_winreg
+            else:
+                winregfile = WinRegFile(input_file_or_winreg)
+            winregfile.dump(temp_file)
 
-        # Execute command
-        logger.info(f"Importing .REG file ...")
-        logger.debug(" ".join(command))
+            # build command
+            command = [str(self._reg_bin), "import", temp_file]
 
-        subprocess.run(command,
-                       capture_output=True,
-                       check=True,
-                       )
+            # Execute command
+            logger.info(f"Importing .REG file ...")
+            logger.debug(" ".join(command))
 
-        Path(temp_file).unlink()
+            subprocess.run(command,
+                           capture_output=True,
+                           check=True,
+                           )
 
     def delete_keys(
         self,
@@ -104,7 +104,7 @@ class WinRegBackend(AbstractBackend):
                                check=True,
                                )
             except subprocess.CalledProcessError:
-                logger.debug(f"SKIP - key '{key.path}' not found ...")
+                # logger.debug(f"SKIP - key '{key.path}' not found ...")
                 continue
 
             subprocess.run([str(self._reg_bin), "delete", key.path, "/f"],
