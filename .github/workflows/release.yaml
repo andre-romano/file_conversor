@@ -16,12 +16,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
+  changelog:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,11 +26,34 @@ jobs:
       - name: Install git-chglog
         run: |
           curl -sSL https://github.com/git-chglog/git-chglog/releases/download/v0.15.1/git-chglog_0.15.1_linux_amd64.tar.gz | tar xz
+          chmod +rx git-chglog
           sudo mv git-chglog /usr/local/bin/
 
       - name: Generate CHANGELOG.md
         run: |
           git-chglog --config .chglog/config.yml --template .chglog/CHANGELOG.tpl.md -o CHANGELOG.md
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
+  build:
+    needs: changelog
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download CHANGELOG.md artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: .
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -70,12 +89,6 @@ jobs:
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.os }}
           path: dist/${{ env.PROJECT_NAME }}-${{ matrix.os }}.zip
-
-      - name: Upload changelog
-        uses: actions/upload-artifact@v4
-        with:
-          name: changelog
-          path: CHANGELOG.md
 
   release:
     needs: build
@@ -149,7 +162,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: v${{ env.VERSION }}
+          ref: ${{ github.ref }}
 
       - name: Install Chocolatey
         run: |
