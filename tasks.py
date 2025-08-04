@@ -185,7 +185,7 @@ $exeName = "$packageName.exe"
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $url = "https://github.com/andre-romano/file_conversor/releases/download/{GIT_RELEASE}/{CHOCO_ZIP_FILENAME}"
 $zipFile = Join-Path $toolsDir '{CHOCO_ZIP_FILENAME}'
-$exePath = Join-Path $toolsDir $packageName $exeName
+$exePath = Join-Path $toolsDir "$packageName" "$exeName"
 
 # Download the zip file
 Get-ChocolateyWebFile -PackageName $packageName -FileFullPath $zipFile -Url $url
@@ -196,8 +196,12 @@ Get-ChocolateyUnzip -FileFullPath $zipFile -Destination $toolsDir
 # Remove the zip
 Remove-Item -Force $zipFile
 
-# Register executable with Chocolatey shim (not needed, due to $toolsDir destination)
+# Register executable manually
 Install-BinFile -Name $packageName -Path $exePath
+
+# Run post-install configuration
+& $exePath config set --install-context-menu-all-users --install-deps True
+& $exePath win install-menu
 """, encoding="utf-8")
 
     # chocolateyUninstall.ps1
@@ -207,7 +211,10 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $exeName = "$packageName.exe"
-$exePath = Join-Path $toolsDir $packageName $exeName
+$exePath = Join-Path $toolsDir "$packageName" "$exeName"
+
+# Run pre-uninstall configuration
+& $exePath win uninstall-menu
 
 # Remove the executable shim
 Uninstall-BinFile -Name $packageName
