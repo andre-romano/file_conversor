@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, List
 
 # user provided imports
 from config.locale import get_translation

@@ -3,6 +3,7 @@
 
 import typer
 
+from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
@@ -34,52 +35,67 @@ image_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
+    icons_folder_path = Path(STATE['icons_folder'])
     # IMG2PDF commands
     for ext in Img2PDFBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="to_pdf",
                 description="To PDF",
-                command=f'{STATE['script_executable']} image to-pdf "%1"'
+                command=f'{STATE['script_executable']} image to-pdf "%1"',
+                icon=str(icons_folder_path / "pdf.ico"),
             ),
         ])
     # Pillow commands
     for ext in PillowBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
+                name="info",
+                description="Get Info",
+                command=f'cmd /k "{STATE['script_executable']} image info "%1""',
+                icon=str(icons_folder_path / "info.ico"),
+            ),
+            WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{STATE['script_executable']} image convert "%1" -o "%1.jpg" -q 95'
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.jpg" -q 95',
+                icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{STATE['script_executable']} image convert "%1" -o "%1.png" -q 95'
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.png" -q 95',
+                icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_webp",
                 description="To WEBP",
-                command=f'{STATE['script_executable']} image convert "%1" -o "%1.webp" -q 95'
+                command=f'{STATE['script_executable']} image convert "%1" -o "%1.webp" -q 95',
+                icon=str(icons_folder_path / 'webp.ico'),
             ),
             WinContextCommand(
-                name="rotate_clock_95",
-                description="Rotate 95 deg",
-                command=f'{STATE['script_executable']} image rotate "%1" -r 95'
+                name="rotate_clock_90",
+                description="Rotate Left",
+                command=f'{STATE['script_executable']} image rotate "%1" -r 90',
+                icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
-                name="rotate_anticlock_95",
-                description="Rotate -95 deg",
-                command=f'{STATE['script_executable']} image rotate "%1" -r -95'
+                name="rotate_anticlock_90",
+                description="Rotate Right",
+                command=f'{STATE['script_executable']} image rotate "%1" -r -90',
+                icon=str(icons_folder_path / "rotate_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_x",
                 description="Mirror X axis",
-                command=f'{STATE['script_executable']} image mirror "%1" -a x'
+                command=f'{STATE['script_executable']} image mirror "%1" -a x',
+                icon=str(icons_folder_path / "left_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_y",
                 description="Mirror Y axis",
-                command=f'{STATE['script_executable']} image mirror "%1" -a y'
+                command=f'{STATE['script_executable']} image mirror "%1" -a y',
+                icon=str(icons_folder_path / "up_down.ico"),
             ),
         ])
 

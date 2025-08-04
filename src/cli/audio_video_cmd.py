@@ -7,6 +7,7 @@ import typer
 
 from typing import Annotated
 from datetime import timedelta
+from pathlib import Path
 
 from rich import print
 from rich.text import Text
@@ -39,37 +40,44 @@ audio_video_cmd = typer.Typer()
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
+    icons_folder_path = Path(STATE['icons_folder'])
     for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{STATE['script_executable']} audio-video info "%1""'
+                command=f'cmd /k "{STATE['script_executable']} audio-video info "%1""',
+                icon=str(icons_folder_path / 'info.ico'),
             ),
             WinContextCommand(
                 name="to_avi",
                 description="To AVI",
-                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.avi"'
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.avi"',
+                icon=str(icons_folder_path / 'avi.ico'),
             ),
             WinContextCommand(
                 name="to_mp4",
                 description="To MP4",
-                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp4"'
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp4"',
+                icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
-                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mkv"'
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mkv"',
+                icon=str(icons_folder_path / 'mkv.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
                 description="To MP3",
-                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp3"'
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.mp3"',
+                icon=str(icons_folder_path / 'mp3.ico'),
             ),
             WinContextCommand(
                 name="to_m4a",
                 description="To M4A",
-                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.m4a"'
+                command=f'{STATE['script_executable']} audio-video convert "%1" -o "%1.m4a"',
+                icon=str(icons_folder_path / 'm4a.ico'),
             ),
         ])
 

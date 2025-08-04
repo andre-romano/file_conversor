@@ -5,6 +5,7 @@ import re
 import time
 import typer
 
+from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
@@ -35,16 +36,49 @@ pdf_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
+    icons_folder_path = Path(STATE['icons_folder'])
     ctx_menu.add_extension(".pdf", [
         WinContextCommand(
             name="repair",
-            description="Repair PDF",
-            command=f'{STATE['script_executable']} pdf repair "%1"'
+            description="Repair",
+            command=f'{STATE['script_executable']} pdf repair "%1"',
+            icon=str(icons_folder_path / 'repair.ico'),
         ),
         WinContextCommand(
             name="split",
-            description="Split PDF",
-            command=f'{STATE['script_executable']} pdf split "%1"'
+            description="Split",
+            command=f'{STATE['script_executable']} pdf split "%1"',
+            icon=str(icons_folder_path / 'split.ico'),
+        ),
+        WinContextCommand(
+            name="extract",
+            description="Extract",
+            command=f'cmd /k "{STATE['script_executable']} pdf extract "%1""',
+            icon=str(icons_folder_path / 'extract.ico'),
+        ),
+        WinContextCommand(
+            name="rotate_clock_90",
+            description="Rotate Left",
+            command=f'{STATE['script_executable']} pdf rotate "%1" -r "1-:90"',
+            icon=str(icons_folder_path / "rotate_left.ico"),
+        ),
+        WinContextCommand(
+            name="rotate_anticlock_90",
+            description="Rotate Right",
+            command=f'{STATE['script_executable']} pdf rotate "%1" -r "1-:-90"',
+            icon=str(icons_folder_path / "rotate_right.ico"),
+        ),
+        WinContextCommand(
+            name="encrypt",
+            description="Encrypt",
+            command=f'cmd /k "{STATE['script_executable']} pdf encrypt "%1""',
+            icon=str(icons_folder_path / "padlock_locked.ico"),
+        ),
+        WinContextCommand(
+            name="decrypt",
+            description="Decrypt",
+            command=f'cmd /k "{STATE['script_executable']} pdf decrypt "%1""',
+            icon=str(icons_folder_path / "padlock_unlocked.ico"),
         ),
     ])
 
@@ -126,7 +160,6 @@ def repair(
     """)
 def merge(
     input_files: Annotated[List[str], typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)}). {_('If file is protected, provide its password using the format `"filepath:password"`')}.",
-                                                     callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                                      )],
     output_file: Annotated[str | None, typer.Option("--output", "-o",
                                                     help=f"{_("Output file")} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file of 1st file as output name')}, {_('with _merged.pdf at the end)')}",
@@ -231,36 +264,45 @@ def extract(
     input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
-    pages: Annotated[List[str], typer.Option("--pages", "-pg",
-                                             help=_("List of pages to extract. Format page_num or start-end."),
-                                             )],
     output_file: Annotated[str | None, typer.Option("--output", "-o",
                                                     help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}) {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _extracted.pdf at the end)')}",
                                                     callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
+    pages: Annotated[List[str] | None, typer.Option("--pages", "-pg",
+                                                    help=_('Pages to extract (comma-separated list). Format "page_num" or "start-end".'),
                                                     )] = None,
     decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
                                                          help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 ):
+    if not pages:
+        pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7)')}")
+        pages = [p.strip() for p in str(pages_str).split(",")]
+
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
         extract_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
 
         # parse user input
         pages_list = []
-        PAGES_RE = re.compile(r'(\d+)(-(\d+)){0,1}')
+        PAGES_RE = re.compile(r'(\d+)(-(\d*)){0,1}')
         for arg in pages:
             match = PAGES_RE.search(arg)
             if not match:
-                raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end' or 'page_num'")}.")
+                raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-', 'begin-end', 'page_num'")}.")
 
             # check user input
             begin = int(match.group(1)) - 1
-            end = int(match.group(3)) - 1 if match.group(3) else begin
+            end = begin
+            if match.group(3):
+                end = int(match.group(3)) - 1
+            elif match.group(2):
+                end = pypdf_backend.len(input_file)
+
             if end < begin:
                 raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
 
-            # create rotation_dict
+            # create pages list
             for page_num in range(begin, end + 1):
                 pages_list.append(page_num)
 
@@ -292,7 +334,7 @@ def extract(
 
 *{_('Rotate page 1 by 180 degress')}*:
 
-- `file_conversor pdf rotate input_file.pdf output_file.pdf "1:180"` 
+- `file_conversor pdf rotate input_file.pdf -o output_file.pdf -r "1:180"` 
 
 
 
@@ -305,7 +347,7 @@ def rotate(
                                               callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
     rotation: Annotated[List[str], typer.Option("--rotation", "-r",
-                                                help=_("List of pages to rotate. Format ``\"page1:rotation1\"`` ``\"page2:rotation2\"`` ..."),
+                                                help=_("List of pages to rotate. Format ``\"page:rotation\"`` or ``\"start-end:rotation\"`` or ``\"start-:rotation\"`` ..."),
                                                 )],
     output_file: Annotated[str | None, typer.Option("--output", "-o",
                                                     help=f"{_('Output file')} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _rotated.pdf at the end)')}",
@@ -321,7 +363,7 @@ def rotate(
 
         # get rotation dict in format {page: rotation}
         rotation_dict = {}
-        ROTATION_RE = re.compile(r'(\d+)(-(\d+)){0,1}:([-]{0,1}\d+)')
+        ROTATION_RE = re.compile(r'(\d+)(-(\d*)){0,1}:([-]{0,1}\d+)')
         for arg in rotation:
             match = ROTATION_RE.search(arg)
             if not match:
@@ -329,7 +371,11 @@ def rotate(
 
             # check user input
             begin = int(match.group(1)) - 1
-            end = int(match.group(3)) - 1 if match.group(3) else begin
+            end = begin
+            if match.group(3):
+                end = int(match.group(3)) - 1
+            elif match.group(2):
+                end = pypdf_backend.len(input_file)
             degree = int(match.group(4))
             if end < begin:
                 raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
@@ -373,6 +419,8 @@ def encrypt(
                                               )],
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
                                                 help=_("Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF file."),
+                                                prompt=f"{_('Owner password for encryption (password will not be displayed, for your safety)')}",
+                                                hide_input=True,
                                                 )],
 
     output_file: Annotated[str | None, typer.Option("--output", "-o",
@@ -476,6 +524,8 @@ def decrypt(
                                               )],
     password: Annotated[str, typer.Option("--password", "-p",
                                           help=_("Password used for decryption."),
+                                          prompt=f"{_('Password for decryption (password will not be displayed, for your safety)')}",
+                                          hide_input=True,
                                           )],
 
     output_file: Annotated[str | None, typer.Option("--output", "-o",

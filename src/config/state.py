@@ -98,6 +98,7 @@ class State:
             # app EXE binary
             "script_executable": executable,
             "script_folder": folder,
+            "icons_folder": str(Path(folder) / 'icons'),
 
             # app options
             "no-log": False,

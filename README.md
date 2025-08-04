@@ -14,6 +14,7 @@ Python program to convert and compress audio/video/text/etc files to other forma
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
+  - [Acknowledgements](#acknowledgements)
   - [License and Copyright](#license-and-copyright)
 
 ## External dependencies
@@ -70,6 +71,15 @@ For more information about the usage:
 ### GUI - Graphical user interface
 
 *TODO*
+
+## Acknowledgements
+
+- Icons:
+  - [Freepik](https://www.flaticon.com/authors/freepik)
+  - [atomicicon](https://www.flaticon.com/authors/atomicicon)
+  - [swifticons](https://www.flaticon.com/authors/swifticons)
+  - [iconir](https://www.flaticon.com/authors/iconir)
+  - [iconjam](https://www.flaticon.com/authors/iconjam)
 
 ## License and Copyright
 
