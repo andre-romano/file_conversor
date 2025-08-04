@@ -32,6 +32,7 @@ jobs:
       - name: Generate CHANGELOG.md
         run: |
           git-chglog --config .chglog/config.yml --template .chglog/CHANGELOG.tpl.md -o CHANGELOG.md
+          cat CHANGELOG.md
 
       - name: Upload changelog
         uses: actions/upload-artifact@v4
@@ -86,8 +87,10 @@ jobs:
           elif [ "$RUNNER_OS" = "macOS" ]; then
             zip -r "${{ env.PROJECT_NAME }}-macos-latest.zip" "${{ env.PROJECT_NAME }}"
           else
-            zip -r "${{ env.PROJECT_NAME }}-linux-latest.zip" "${{ env.PROJECT_NAME }}"
+            zip -r "${{ env.PROJECT_NAME }}-ubuntu-latest.zip" "${{ env.PROJECT_NAME }}"
           fi
+          pwd
+          ls -l
         shell: bash
 
       - name: Upload zipped binary
@@ -118,6 +121,7 @@ jobs:
           mkdir -p flat
           find dist -type f -name "*.zip" -exec mv {} flat/ \;
           mv flat dist
+          ls -l dist
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -146,6 +150,7 @@ jobs:
       - name: Generate checksums
         run: |
           pdm run invoke gen-checksum-file
+          cat dist/checksums.sha256
 
       - name: Publish GitHub Release
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
@@ -187,19 +192,19 @@ jobs:
           pip install pdm
           pdm install
 
+      - name: Build Chocolatey package
+        run: |
+          pdm run invoke build-choco
+
       - name: Get version from tag
         id: get-version
         run: |
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
           echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Build Chocolatey package
-        run: |
-          pdm run invoke build-choco
-
       - name: Check if package was created
         run: |
-          if (!(Test-Path "dist/${{ env.PROJECT_NAME }}.${{ env.VERSION }}.nupkg")) {
+          if (!(Test-Path "dist/${{ env.PROJECT_NAME }}.${{ steps.get-version.outputs.version }}.nupkg")) {
             Write-Error "Package not found"
             exit 1
           }
