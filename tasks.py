@@ -144,7 +144,7 @@ def locales_update(c):
     print(f"[bold] Updating locales based on template .pot file ... [/][bold green]OK[/]")
 
 
-@task(pre=[locales_update])
+@task
 def locales_build(c):
     """ Build locales' .MO files based on .PO files ..."""
     print(f"[bold] Building locales .mo files ... [/]", end="")
@@ -271,7 +271,7 @@ def copy_include_folders(c):
     print(f"[bold] Copying [tool.pdm] includes into dist/ ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_dist_choco, create_choco_files,])
+@task(pre=[clean_dist_choco, create_choco_files, locales_build])
 def build_choco(c):
     dest_base = Path("dist")
     dest_base.mkdir(parents=True, exist_ok=True)
@@ -284,7 +284,7 @@ def build_choco(c):
     print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_build, clean_dist_binary,], post=[copy_include_folders,])
+@task(pre=[clean_build, clean_dist_binary, locales_build], post=[copy_include_folders,])
 def build_binary(c):
     print(f"[bold] Building EXE (pyinstaller) ... [/]")
     c.run(f"pdm run pyinstaller src/file_conversor.py --name {PROJECT_NAME} -i {ICON_FILE} --onedir")
