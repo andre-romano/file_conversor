@@ -77,11 +77,17 @@ jobs:
           pdm run invoke build-binary
           cp CHANGELOG.md dist/${{ env.PROJECT_NAME }}/
 
-      - name: Compress output
+      - name: Compress executable by OS
         run: |
+          echo "Compressing binary for $RUNNER_OS"
           cd dist
-          zip -r ${{ env.PROJECT_NAME }}-${{ matrix.os }}.zip ${{ env.PROJECT_NAME }}
-          rm -rf ${{ env.PROJECT_NAME }}/
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            powershell -Command "Compress-Archive -Path ${{ env.PROJECT_NAME }} -DestinationPath ${{ env.PROJECT_NAME }}-windows.zip"
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            zip -r "${{ env.PROJECT_NAME }}-macos.zip" "${{ env.PROJECT_NAME }}"
+          else
+            zip -r "${{ env.PROJECT_NAME }}-linux.zip" "${{ env.PROJECT_NAME }}"
+          fi
         shell: bash
 
       - name: Upload zipped binary
@@ -190,7 +196,6 @@ jobs:
 
       - name: Build Chocolatey package
         run: |
-          mkdir -p build dist
           pdm run invoke build-choco
 
       - name: Check if package was created
