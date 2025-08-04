@@ -27,13 +27,14 @@ jobs:
         with:
           fetch-depth: 0 # Necessário para o git-chglog ver todo o histórico
 
-      # Adicione esta etapa ANTES do build
+      - name: Install git-chglog
+        run: |
+          curl -sSL https://github.com/git-chglog/git-chglog/releases/download/v0.15.1/git-chglog_0.15.1_linux_amd64.tar.gz | tar xz
+          sudo mv git-chglog /usr/local/bin/
+
       - name: Generate CHANGELOG.md
-        uses: git-chglog/git-chglog-action@v0.3.0
-        with:
-          config: .chglog/config.yml # Arquivo de configuração do chglog
-          output: CHANGELOG.md # Arquivo de saída
-          template: .chglog/CHANGELOG.tpl.md # Template personalizado
+        run: |
+          git-chglog --config .chglog/config.yml --template .chglog/CHANGELOG.tpl.md -o CHANGELOG.md
 
       - name: Set up Python
         uses: actions/setup-python@v5
