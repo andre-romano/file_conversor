@@ -82,11 +82,11 @@ jobs:
           echo "Compressing binary for $RUNNER_OS"
           cd dist
           if [ "$RUNNER_OS" = "Windows" ]; then
-            powershell -Command "Compress-Archive -Path ${{ env.PROJECT_NAME }} -DestinationPath ${{ env.PROJECT_NAME }}-windows.zip"
+            powershell -Command "Compress-Archive -Path ${{ env.PROJECT_NAME }} -DestinationPath ${{ env.PROJECT_NAME }}-windows-latest.zip"
           elif [ "$RUNNER_OS" = "macOS" ]; then
-            zip -r "${{ env.PROJECT_NAME }}-macos.zip" "${{ env.PROJECT_NAME }}"
+            zip -r "${{ env.PROJECT_NAME }}-macos-latest.zip" "${{ env.PROJECT_NAME }}"
           else
-            zip -r "${{ env.PROJECT_NAME }}-linux.zip" "${{ env.PROJECT_NAME }}"
+            zip -r "${{ env.PROJECT_NAME }}-linux-latest.zip" "${{ env.PROJECT_NAME }}"
           fi
         shell: bash
 
@@ -145,7 +145,7 @@ jobs:
 
       - name: Generate checksums
         run: |
-          pdm run invoke gen_checksum_file
+          pdm run invoke gen-checksum-file
 
       - name: Publish GitHub Release
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
@@ -161,7 +161,6 @@ jobs:
           prerelease: ${{ contains(github.ref, '-') }} # ignore versions with v*.*.*-*
 
   deploy-chocolatey:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
     needs: release
     runs-on: windows-latest
     steps:
@@ -206,6 +205,7 @@ jobs:
           }
 
       - name: Push to Chocolatey
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run == 'false' }}
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
         run: |
