@@ -37,6 +37,7 @@ GIT_RELEASE = f"v{PROJECT_VERSION}"
 CHOCO_ZIP_FILENAME = f"{PROJECT_NAME}-windows-latest.zip"
 
 CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
+CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
 CHOCO_DEPS = {}
 for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
@@ -224,8 +225,7 @@ Remove-Item -Recurse -Force (Join-Path $toolsDir $packageName)
 """, encoding="utf-8")
 
     # PACKAGE.nuspec
-    nuspec_path_new = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
-    nuspec_path_new.write_text(f"""<?xml version='1.0' encoding='utf-8'?>
+    CHOCO_NUSPEC.write_text(f"""<?xml version='1.0' encoding='utf-8'?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>{PROJECT_NAME}</id>
@@ -239,13 +239,13 @@ Remove-Item -Recurse -Force (Join-Path $toolsDir $packageName)
     <projectSourceUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectSourceUrl>
     <licenseUrl>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+        {"\n        ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
+    </dependencies>
   </metadata>
   <files>
     <file src="tools\\**" target="tools" />
-  </files>
-  <dependencies>
-    {"\n    ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
-  </dependencies>
+  </files>  
 </package>
 """, encoding="utf-8")
     print("[bold green]OK[/]")
@@ -276,8 +276,11 @@ def build_choco(c):
     dest_base = Path("dist")
     dest_base.mkdir(parents=True, exist_ok=True)
 
+    if not CHOCO_NUSPEC.exists():
+        raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
+
     print(f"[bold] Building choco package ... [/]")
-    c.run(f"choco pack -y --outdir dist/ {CHOCO_PATH}")
+    c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
     print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 

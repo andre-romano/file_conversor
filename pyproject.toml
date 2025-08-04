@@ -46,6 +46,10 @@ includes = [ # include files into .whl package
     "locales/**", 
     "data/**",  
     "icons/**",  
+    "LICENSE",
+    "AUTHORS.md",
+    "README.md",
+    "pyproject.toml",
 ]
 distribution = true
 
