@@ -15,7 +15,7 @@ options:
       perf: "Performance Tweaks"
       refactor: "Code Refactoring"
   header:
-    pattern: "^(\w*)(?:\((.*)\))?\:\s(.*)$"
+    pattern: '^(\w*)(?:\((.*)\))?:\s(.*)$'
     pattern_maps:
       - Type
       - Scope
