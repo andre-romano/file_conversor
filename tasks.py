@@ -2,7 +2,6 @@
 
 import re
 import shutil
-import hashlib
 import tomllib
 
 from typing import Any
@@ -49,15 +48,6 @@ for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
     CHOCO_DEPS[package] = version
 
 
-def generate_sha256(file_path: str) -> str:
-    sha256_hash = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        # Read file in chunks to handle large files
-        for chunk in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(chunk)
-    return sha256_hash.hexdigest()
-
-
 def remove_path(path_pattern):
     """Remove dir or file, using globs / wildcards"""
     for path in Path('.').glob(path_pattern):
@@ -68,45 +58,77 @@ def remove_path(path_pattern):
             shutil.rmtree(path)
         else:
             path.unlink()  # Remove single file
+        if path.exists():
+            raise RuntimeError(f"Cannot remove dir / file '{path}'")
         print("[bold green]OK[/]")
 
 
 @task
+def install_choco(c):
+    INSTALL_CHOCO = Path('scripts/install_choco.ps1')
+    c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
+    if not shutil.which("choco"):
+        raise RuntimeError("'choco' not found in PATH")
+
+
+@task
+def mkdirs(c):
+    dirs = [
+        "build",
+        "dist",
+        "choco",
+        "docs",
+        "htmlcov",
+        "uml",
+    ]
+    for dir in dirs:
+        Path(dir).mkdir(parents=True, exist_ok=True)
+        if not Path(dir).exists():
+            raise RuntimeError(f"Cannot create dir '{dir}'")
+
+
+@task(pre=[mkdirs])
 def clean_choco(c):
     remove_path(f"choco/*")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_build(c):
     remove_path(f"build/*")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_dist(c):
     remove_path(f"dist/*")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_dist_choco(c):
     remove_path("dist/*.nupkg")
 
 
-@task
+@task(pre=[mkdirs])
+def clean_dist_whl(c):
+    remove_path("dist/*.whl")
+    remove_path("dist/*.tar.gz")
+
+
+@task(pre=[mkdirs])
 def clean_dist_binary(c):
     remove_path(f"dist/{PROJECT_NAME}")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_htmlcov(c):
     remove_path(f"htmlcov/*")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_docs(c):
     remove_path(f"docs/*")
 
 
-@task
+@task(pre=[mkdirs])
 def clean_uml(c):
     remove_path(f"uml/*")
 
@@ -160,12 +182,13 @@ def tests(c, args: str = ""):
 
 @task(pre=[clean_uml,])
 def uml(c):
-    UML_PATH = Path(f"uml")
-    UML_PATH.mkdir(parents=True, exist_ok=True)
-
     print("[bold] Generating uml/ ... [/]")
     c.run("pdm run pyreverse -A --filter-mode=ALL --colorized -d uml/ -o jpg src/")
+    if not Path("uml/classes.jpg").exists():
+        raise RuntimeError("UML PyReverse - Empty dist/classes.jpg")
     c.run("pdm run pydeps src/ --noshow --reverse -Tpng -o uml/dependencies.png")
+    if not Path("uml/dependencies.png").exists():
+        raise RuntimeError("UML PyDeps - Empty dist/dependencies.png")
     print("[bold] Generating uml/ ... [/][bold green]OK[/]")
 
 
@@ -182,27 +205,19 @@ def create_choco_files(c):
     install_ps1_path.write_text(f"""
 $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
-$exeName = "$packageName.exe"
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$url = "https://github.com/andre-romano/file_conversor/releases/download/{GIT_RELEASE}/{CHOCO_ZIP_FILENAME}"
-$zipFile = Join-Path $toolsDir '{CHOCO_ZIP_FILENAME}'
-$exePath = Join-Path $toolsDir "$packageName" "$exeName"
 
-# Download the zip file
-Get-ChocolateyWebFile -PackageName $packageName -FileFullPath $zipFile -Url $url
+# Install deps
+& python -m pip install --upgrade pip
+& pip install pipx
 
-# Unzip to tools directory
-Get-ChocolateyUnzip -FileFullPath $zipFile -Destination $toolsDir
-
-# Remove the zip
-Remove-Item -Force $zipFile
-
-# Register executable manually
-Install-BinFile -Name $packageName -Path $exePath
+# Install app
+& python -m pipx ensurepath
+& pipx install "$packageName"@{PROJECT_VERSION}
 
 # Run post-install configuration
-& $exePath config set --install-context-menu-all-users --install-deps True
-& $exePath win install-menu
+& $packageName config set --install-context-menu-all-users
+& $packageName win install-menu
 """, encoding="utf-8")
 
     # chocolateyUninstall.ps1
@@ -211,17 +226,12 @@ Install-BinFile -Name $packageName -Path $exePath
 $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$exeName = "$packageName.exe"
-$exePath = Join-Path $toolsDir "$packageName" "$exeName"
 
 # Run pre-uninstall configuration
-& $exePath win uninstall-menu
+& $packageName win uninstall-menu
 
-# Remove the executable shim
-Uninstall-BinFile -Name $packageName
-
-# Remove the installation directory
-Remove-Item -Recurse -Force (Join-Path $toolsDir $packageName)
+# Uninstall app
+& pipx uninstall $packageName
 """, encoding="utf-8")
 
     # PACKAGE.nuspec
@@ -252,90 +262,64 @@ Remove-Item -Recurse -Force (Join-Path $toolsDir $packageName)
 
 
 @task
-def copy_include_folders(c):
-    # create package folder
-    print(f"[bold] Copying [tool.pdm] includes into dist/ ... [/]")
-    dest_base = Path("dist") / PROJECT_NAME
-    dest_base.mkdir(parents=True, exist_ok=True)
-
-    pdm: dict = PYPROJECT["tool"]["pdm"]
-    for path_glob_str in pdm.get("includes", []):
-        for src_path in Path(".").glob(path_glob_str):
-            dest_path = dest_base / src_path
-            print(f"Copying '{src_path}' to '{dest_path}' ...")
-            if src_path.is_dir():
-                dest_path.mkdir(parents=True, exist_ok=True)
-            else:
-                dest_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src_path, dest_path)
-    print(f"[bold] Copying [tool.pdm] includes into dist/ ... [/][bold green]OK[/]")
-
-
-@task(pre=[clean_dist_choco, create_choco_files, locales_build])
-def build_choco(c):
-    dest_base = Path("dist")
-    dest_base.mkdir(parents=True, exist_ok=True)
-
-    if not CHOCO_NUSPEC.exists():
-        raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
-
-    print(f"[bold] Building choco package ... [/]")
-    c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
-    print(f"[bold] Building choco package ... [/][bold green]OK[/]")
-
-
-@task(pre=[clean_build, clean_dist_binary, locales_build], post=[copy_include_folders,])
-def build_binary(c):
-    print(f"[bold] Building EXE (pyinstaller) ... [/]")
-    c.run(f"pdm run pyinstaller src/file_conversor.py --name {PROJECT_NAME} -i {ICON_FILE} --onedir")
-    print(f"[bold] Building EXE (pyinstaller) ... [/][bold green]OK[/]")
-
-
-@task
-def gen_changelog(c):
+def changelog(c):
     """
     Generate CHANGELOG.md file
     """
     print(f"[bold] Generating CHANGELOG.md ... [/]", end="")
     c.run(f"pdm run git-changelog")
+    if not Path("CHANGELOG.md").exists():
+        raise RuntimeError("CHANGELOG.md does not exist")
     c.run(f"git add CHANGELOG.md")
     c.run(f"git commit -m \"CHANGELOG.md for {PROJECT_VERSION}\"")
     print(f"[bold green]OK[/]")
 
 
-@task
-def gen_checksum_file(c):
-    """
-    Generate checksum.sha256 file
-    """
-    dest_base = Path("dist")
-    dest_base.mkdir(parents=True, exist_ok=True)
+@task(pre=[clean_dist_choco, create_choco_files,])
+def build_choco(c):
+    if not CHOCO_NUSPEC.exists():
+        raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
 
-    checksum_path = Path("dist/checksums.sha256")
-    print("[bold] Generating SHA256 checksums ... [/]", end="")
-    files = Path("dist").glob("*")  # Change to your target directory
-    with open(checksum_path, "w") as f:
-        for file in files:
-            if file.is_file() and not file.name == checksum_path.name:
-                checksum = generate_sha256(str(file))
-                f.write(f"{checksum}  {file.name}\n")
-    print("[bold green]OK[/]")
+    print(f"[bold] Building choco package ... [/]")
+    c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
+    if not list(Path("dist").glob("*.nupkg")):
+        raise RuntimeError("Build CHOCO - Empty dist/*.nupkg")
+    print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 
-@task(pre=[build_choco])
-def install_choco(c):
-    """
-    Install program (using choco)
-    """
-    print(f"[bold] Installing program using `choco` ... [/]")
-    c.run(f"choco install {PROJECT_NAME} -y -s dist/")
-    print(f"[bold] Installing program using `choco` ... [/][bold green]OK[/]")
+@task(pre=[clean_dist_whl, locales_build, ])
+def build_whl(c):
+    print(f"[bold] Building PyPi package ... [/]")
+    c.run(f"pdm build")
+    if not list(Path("dist").glob("*.whl")):
+        raise RuntimeError("Build WHL - Empty dist/*.whl")
+    print(f"[bold] Building PyPi package ... [/][bold green]OK[/]")
 
 
-@task(pre=[gen_changelog])
+@task(pre=[build_whl, ])
+def test_pypi(c):
+    if not list(Path("dist").glob("*.whl")):
+        raise RuntimeError("Test PyPi - Empty dist/*.whl")
+    print(f"[bold] Testing PyPi ... [/]")
+    c.run(f"pdm run twine check dist/*.whl dist/*.tar.gz")
+    c.run(f"pdm run twine upload --repository testpypi dist/*.whl dist/*.tar.gz")
+    print(f"[bold] Testing PyPi ... [/][bold green]OK[/]")
+
+
+@task(pre=[build_whl, ])
+def publish_pypi(c):
+    if not list(Path("dist").glob("*.whl")):
+        raise RuntimeError("Publish PyPi - Empty dist/*.whl")
+    print(f"[bold] Publishing to PyPi ... [/]")
+    c.run(f"pdm run twine check dist/*.whl dist/*.tar.gz")
+    c.run(f"pdm run twine upload dist/*.whl dist/*.tar.gz")
+    print(f"[bold] Publishing to PyPi ... [/][bold green]OK[/]")
+
+
+@task(pre=[changelog, publish_pypi])
 def publish(c):
     """"Publish Git"""
-    print(f"[bold] Publishing program to GitHub ... [/]")
+    print(f"[bold] Publishing to GitHub ... [/]")
     c.run(f"git tag {GIT_RELEASE}")
     c.run(f"git push --tags")
-    print(f"[bold] Publishing program to GitHub ... [/][bold green]OK[/]")
+    print(f"[bold] Publishing to GitHub ... [/][bold green]OK[/]")
