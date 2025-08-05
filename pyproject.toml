@@ -16,7 +16,7 @@ dependencies = [
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
-license-files = ["LICEN[CS]E*", "AUTHORS.md"]
+license-files = ["LICEN[CS]E*", "AUTHORS.md","README.md"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
@@ -38,6 +38,7 @@ choco_path = "choco"
 choco_deps = [  # dependencies to include in choco package
     "ffmpeg", 
     "ghostscript",
+    "qpdf",
 ]
 
 [tool.pdm] 
@@ -45,13 +46,30 @@ package-dir = { "" = "src" }
 includes = [ # include files into .whl package
     "locales/**", 
     "data/**",  
-    "icons/**",  
-    "LICENSE",
-    "AUTHORS.md",
-    "README.md",
+    "icons/**",      
     "pyproject.toml",
 ]
 distribution = true
+
+[tool.git-changelog]
+# bump = "auto"
+template = "keepachangelog"
+versioning = "semver"
+zerover = true
+output = "CHANGELOG.md"
+provider = "github"
+# commit sections
+sections = [
+  { title = "✨ New Features", grep = "^feat" },
+  { title = "🐛 Bug Fixes", grep = "^fix" },
+  { title = "🔧 Internal Chores", grep = "^chore" },
+  { title = " Continuous Integration", grep = "^ci" },
+  { title = " Dependencies", grep = "^deps" },
+  { title = "📚 Documentation", grep = "^docs" },
+  { title = "🏗️ Code Refactor", grep = "^ref" },
+  { title = "🚀 Performance", grep = "^perf" },
+  { title = "🧪 Tests", grep = "^test" },
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -118,4 +136,6 @@ dev = [
     "pydeps>=3.0.1",
     "pylint>=3.3.7",
     "invoke>=2.2.0",
+    "git-changelog>=2.5.3",
+    "twine>=6.1.0",
 ]

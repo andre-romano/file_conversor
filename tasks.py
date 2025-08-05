@@ -292,6 +292,18 @@ def build_binary(c):
 
 
 @task
+def gen_changelog(c):
+    """
+    Generate CHANGELOG.md file
+    """
+    print(f"[bold] Generating CHANGELOG.md ... [/]", end="")
+    c.run(f"pdm run git-changelog")
+    c.run(f"git add CHANGELOG.md")
+    c.run(f"git commit -m \"CHANGELOG.md for {PROJECT_VERSION}\"")
+    print(f"[bold green]OK[/]")
+
+
+@task
 def gen_checksum_file(c):
     """
     Generate checksum.sha256 file
@@ -320,7 +332,7 @@ def install_choco(c):
     print(f"[bold] Installing program using `choco` ... [/][bold green]OK[/]")
 
 
-@task
+@task(pre=[gen_changelog])
 def publish(c):
     """"Publish Git"""
     print(f"[bold] Publishing program to GitHub ... [/]")
