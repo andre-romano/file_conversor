@@ -10,12 +10,16 @@
     ],
     "architecture": {
         "64bit": {
+            "url": "https://github.com/andre-romano/file_conversor/archive/refs/tags/v0.1.1.zip",
+            "hash": "skip",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
             "bin": "Scripts\\file_conversor.exe"
         },
         "32bit": {
+            "url": "https://github.com/andre-romano/file_conversor/archive/refs/tags/v0.1.1.zip",
+            "hash": "skip",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
