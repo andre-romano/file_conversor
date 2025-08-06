@@ -269,23 +269,33 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
     exit 1
 }}                                
                                 
-# Install deps
+Write-Output "Updating Python pip ..."
 & python -m pip install --upgrade pip
+
+Write-Output "Installing app "{PROJECT_NAME}=={PROJECT_VERSION}" ..."
 & python -m pip install "{PROJECT_NAME}=={PROJECT_VERSION}"
 
-# Ensure PATH is correct
+Write-Output "Finding binPath for python scripts ..."
 $binPath = & python -c "import sys; from pathlib import Path ; print(Path(sys.executable).parent / 'Scripts')"
+Write-Output $binPath
 
-# Add permanently to system PATH
+Write-Output "Checking system PATH ..."
 $existingPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
 if (-not ($existingPath.Split(';') -contains $binPath)) {{
+    Write-Output "Modifying system PATH ..."
     [Environment]::SetEnvironmentVariable("Path", "$existingPath;$binPath", [System.EnvironmentVariableTarget]::Machine)
 }}
 
 # Update current PATH env
+Write-Output "Modifying current PS env PATH ..."
 $env:PATH += ";$binPath"
 
 # Run post-install configuration
+if (-not (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue)) {{
+    Write-Error "{PROJECT_NAME} is not installed or not in PATH."
+    exit 1
+}}              
+Write-Output "Configuring windows context menu ..."
 & {PROJECT_NAME} config set --install-context-menu-all-users
 & {PROJECT_NAME} win install-menu
 ''', encoding="utf-8")
@@ -295,8 +305,11 @@ $env:PATH += ";$binPath"
     before_modify_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
                            
-# Run pre-uninstall configuration
-& {PROJECT_NAME} win uninstall-menu       
+if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
+    # Run pre-uninstall configuration
+    Write-Output "Uninstalling windows context menu ..."
+    & {PROJECT_NAME} win uninstall-menu       
+}}                                      
 """, encoding="utf-8")
 
     # chocolateyUninstall.ps1
@@ -305,7 +318,11 @@ $ErrorActionPreference = 'Stop'
 $ErrorActionPreference = 'Stop'
 
 # Uninstall app
-& python -m pip uninstall -y {PROJECT_NAME}
+if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
+    Write-Output "Uninstalling app using PIP ..."
+    & python -m pip uninstall -y {PROJECT_NAME}
+}}
+Write-Output "App uninstalled"
 """, encoding="utf-8")
 
     # PACKAGE.nuspec
@@ -345,7 +362,7 @@ def changelog(c):
     c.run(f"pdm run git-changelog")
     if not Path("CHANGELOG.md").exists():
         raise RuntimeError("CHANGELOG.md does not exist")
-    c.run(f"git add CHANGELOG.md")
+    c.run(f"git add CHANGELOG.md pyproject.toml")
     c.run(f"git commit -m \"=> CHANGELOG.md for {PROJECT_VERSION}\"")
     print(f"[bold green]OK[/]")
 
