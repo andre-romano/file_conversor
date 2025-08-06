@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- fix: add MANIFEST.in file ; fix non-python folders convention as .folder_name ; ([651715d](https://github.com/andre-romano/file_conversor/commit/651715d7acd034ef9330b21ec84609ec756eff56) by Andre).
+- fix: fix python package structure, add importlib.resources ([a9c94a0](https://github.com/andre-romano/file_conversor/commit/a9c94a09afb1d1263de32218c18ee1b9f3b4aaac) by Andre).
 - fix: git actions ci/cd pipeline ([34e4bbc](https://github.com/andre-romano/file_conversor/commit/34e4bbc221be32666ae748147a6798280efe74af) by Andre).
 - fix: git actions ([2b756ec](https://github.com/andre-romano/file_conversor/commit/2b756ecafe76c70ce62fdccd19fa7e74f4724de7) by Andre).
 - fix:git actions ([3acd3a0](https://github.com/andre-romano/file_conversor/commit/3acd3a0fd3af8c507e436cad43b91a3c2b39f983) by Andre).
@@ -36,6 +38,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- CHANGELOG.md for 0.1.0 ([cee9ce4](https://github.com/andre-romano/file_conversor/commit/cee9ce4d1687dec1c7b121df20c0142344674c6e) by Andre).
+- CHANGELOG.md for 0.1.0 ([ad8c587](https://github.com/andre-romano/file_conversor/commit/ad8c58724ca28d413c8fbf15d62a1144c417968a) by Andre).
 
 <!-- insertion marker -->
