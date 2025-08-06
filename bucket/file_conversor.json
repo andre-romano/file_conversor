@@ -8,8 +8,18 @@
         "ffmpeg",
         "qpdf"
     ],
-    "pre_install": [
-        "pip install file_conversor==0.1.1"
-    ],
-    "bin": "Scripts\\file_conversor.exe"
+    "architecture": {
+        "64bit": {
+            "pre_install": [
+                "pip install file_conversor==0.1.1"
+            ],
+            "bin": "Scripts\\file_conversor.exe"
+        },
+        "32bit": {
+            "pre_install": [
+                "pip install file_conversor==0.1.1"
+            ],
+            "bin": "Scripts\\file_conversor.exe"
+        }
+    }
 }
