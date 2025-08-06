@@ -325,7 +325,7 @@ def changelog(c):
     if not Path("CHANGELOG.md").exists():
         raise RuntimeError("CHANGELOG.md does not exist")
     c.run(f"git add CHANGELOG.md")
-    c.run(f"git commit -m \"CHANGELOG.md for {PROJECT_VERSION}\"")
+    c.run(f"git commit -m \"=> CHANGELOG.md for {PROJECT_VERSION}\"")
     print(f"[bold green]OK[/]")
 
 

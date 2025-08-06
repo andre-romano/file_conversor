@@ -3,7 +3,7 @@ name: Publish Chocolatey
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
   workflow_dispatch:
 
 env:
@@ -32,11 +32,12 @@ jobs:
       - name: Build with Chocolatey
         run: |
           pdm run invoke build-choco
+          ls dist/*.nupkg || exit 1
 
       - name: Push to Chocolatey
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
         run: |
           choco apikey --key "${{ env.CHOCO_API_KEY }}" --source https://push.chocolatey.org/
-          choco push "dist/${{ env.PROJECT_NAME }}*.nupkg" --source https://push.chocolatey.org/
+          choco push dist/*.nupkg --source https://push.chocolatey.org/
         continue-on-error: false
