@@ -290,13 +290,19 @@ $env:PATH += ";$binPath"
 & {PROJECT_NAME} win install-menu
 ''', encoding="utf-8")
 
+    # chocolateyBeforeModify.ps1
+    before_modify_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyBeforeModify.ps1")
+    before_modify_ps1_path.write_text(rf"""
+$ErrorActionPreference = 'Stop'
+                           
+# Run pre-uninstall configuration
+& {PROJECT_NAME} win uninstall-menu       
+""", encoding="utf-8")
+
     # chocolateyUninstall.ps1
     uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
     uninstall_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
-
-# Run pre-uninstall configuration
-& {PROJECT_NAME} win uninstall-menu
 
 # Uninstall app
 & python -m pip uninstall -y {PROJECT_NAME}
@@ -316,6 +322,7 @@ $ErrorActionPreference = 'Stop'
     <projectUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectUrl>
     <projectSourceUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectSourceUrl>
     <licenseUrl>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/CHANGELOG.md</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
         {"\n        ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}

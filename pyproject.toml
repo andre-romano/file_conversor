@@ -42,6 +42,7 @@ locales_path = "src/file_conversor/.locales"
 inno_path = "inno"
 choco_path = "choco"
 choco_deps = [  # dependencies to include in choco package
+    "python", 
     "ffmpeg", 
     "qpdf",
 ]
