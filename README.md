@@ -8,12 +8,13 @@ Python program to convert and compress audio/video/text/etc files to other forma
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
       - [Option 2. Scoop Package Manager](#option-2-scoop-package-manager)
-      - [Option 3. Portable EXE](#option-3-portable-exe)
-    - [For Linux](#for-linux)
-      - [Option 1. Portable Binary](#option-1-portable-binary)
+      - [Option 3. Installer (EXE)](#option-3-installer-exe)
+    - [For Linux / MacOS](#for-linux--macos)
+      - [Option 1. Homebrew (brew)](#option-1-homebrew-brew)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
+    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
   - [Acknowledgements](#acknowledgements)
   - [License and Copyright](#license-and-copyright)
 
@@ -44,18 +45,19 @@ The app will prompt for download of the external dependencies, if needed.
   scoop install file_conversor
   ```
 
-#### Option 3. Portable EXE
+#### Option 3. Installer (EXE)
 
 1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-2. Extract ZIP file
+2. Execute installer (.exe file)
 
 
-### For Linux
+### For Linux / MacOS
 
-#### Option 1. Portable Binary
+#### Option 1. Homebrew (brew)
 
-1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-2. Extract ZIP file
+```bash
+brew install file_conversor
+```
 
 ## Usage
 
@@ -66,11 +68,20 @@ file_conversor COMMANDS [OPTIONS]
 ```
 
 For more information about the usage:
-- Issue `--help` option in the program
+- Issue `-h` for help
 
 ### GUI - Graphical user interface
 
 *TODO*
+
+### Windows Context Menu (Windows OS only)
+
+1. Open Powershell and execute command below
+  ```bash
+  file_conversor win install-menu
+  ```
+2. Right click a file in Windows Explorer
+3. Choose an action from "File Conversor" menu
 
 ## Acknowledgements
 
