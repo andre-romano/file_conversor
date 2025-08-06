@@ -38,6 +38,8 @@ jobs:
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
         run: |
+          ls dist/*.nupkg || exit 1
           choco apikey --key "${{ env.CHOCO_API_KEY }}" --source https://push.chocolatey.org/
           choco push dist/*.nupkg --source https://push.chocolatey.org/
+        shell: bash
         continue-on-error: false
