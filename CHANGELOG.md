@@ -6,9 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
-## Unreleased
+## [v0.1.1](https://github.com/andre-romano/file_conversor/releases/tag/v0.1.1) - 2025-08-06
 
-<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/be0a5b8d08cfe742e966f0b1b5b4211c6fe0bd15...HEAD)</small>
+<small>[Compare with first commit](https://github.com/andre-romano/file_conversor/compare/be0a5b8d08cfe742e966f0b1b5b4211c6fe0bd15...v0.1.1)</small>
 
 ### Added
 
@@ -40,4 +40,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - CHANGELOG.md for 0.1.0 ([ad8c587](https://github.com/andre-romano/file_conversor/commit/ad8c58724ca28d413c8fbf15d62a1144c417968a) by Andre).
 
-<!-- insertion marker -->
