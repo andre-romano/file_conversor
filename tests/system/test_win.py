@@ -2,7 +2,7 @@
 
 import pytest
 
-from system.win import WinRegFile, WinRegKey
+from file_conversor.system.win import WinRegFile, WinRegKey
 
 
 def test_winregkey_add_and_del_value():

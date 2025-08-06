@@ -5,7 +5,7 @@ import os
 import pytest
 
 
-from utils.file import File
+from file_conversor.utils.file import File
 
 
 def test_init_with_invalid_path():

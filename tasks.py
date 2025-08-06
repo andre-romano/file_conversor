@@ -26,7 +26,7 @@ PROJECT_VERSION = str(PYPROJECT["project"]["version"])
 PROJECT_DESCRIPTION = str(PYPROJECT["project"]["description"])
 
 PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
-ICON_FILE = str(PYPROJECT["tool"]["myproject"]["icon"])
+ICONS_PATH = str(PYPROJECT["tool"]["myproject"]["icons_path"])
 
 I18N_PATH = str(PYPROJECT["tool"]["myproject"]["locales_path"])
 I18N_TEMPLATE = f"{I18N_PATH}/messages.pot"
@@ -298,7 +298,7 @@ $ErrorActionPreference = 'Stop'
     <authors>{", ".join(PROJECT_AUTHORS)}</authors>
     <description>{PROJECT_DESCRIPTION}</description>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
-    <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/icons/icon.png</iconUrl>
+    <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
     <projectUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectUrl>
     <projectSourceUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectSourceUrl>
     <licenseUrl>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/LICENSE</licenseUrl>
@@ -408,3 +408,11 @@ def publish(c):
     c.run(f"git tag {GIT_RELEASE}")
     c.run(f"git push --tags")
     print(f"[bold] Publishing to GitHub ... [/][bold green]OK[/]")
+
+
+@task
+def unpublish(c):
+    print(f"[bold] Removing tag {GIT_RELEASE} from GitHub ... [/]")
+    c.run(f"git tag -d {GIT_RELEASE}")
+    c.run(f"git push origin --delete {GIT_RELEASE}")
+    print(f"[bold] Removing tag {GIT_RELEASE} from GitHub ... [/][bold green]OK[/]")

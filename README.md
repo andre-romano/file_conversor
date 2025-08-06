@@ -8,9 +8,11 @@ Python program to convert and compress audio/video/text/etc files to other forma
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
       - [Option 2. Scoop Package Manager](#option-2-scoop-package-manager)
-      - [Option 3. Installer (EXE)](#option-3-installer-exe)
+      - [Option 3. PyPi](#option-3-pypi)
+      - [Option 4. Installer (EXE)](#option-4-installer-exe)
     - [For Linux / MacOS](#for-linux--macos)
       - [Option 1. Homebrew (brew)](#option-1-homebrew-brew)
+      - [Option 2. PyPi](#option-2-pypi)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
@@ -45,7 +47,15 @@ The app will prompt for download of the external dependencies, if needed.
   scoop install file_conversor
   ```
 
-#### Option 3. Installer (EXE)
+#### Option 3. PyPi
+
+```bash
+pip install pipx
+python -m pipx ensurepath
+python -m pipx install file_conversor
+```
+
+#### Option 4. Installer (EXE)
 
 1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
 2. Execute installer (.exe file)
@@ -57,6 +67,14 @@ The app will prompt for download of the external dependencies, if needed.
 
 ```bash
 brew install file_conversor
+```
+
+#### Option 2. PyPi
+
+```bash
+pip install pipx
+python -m pipx ensurepath
+python -m pipx install file_conversor
 ```
 
 ## Usage

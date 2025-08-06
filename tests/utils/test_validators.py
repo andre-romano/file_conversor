@@ -2,7 +2,7 @@
 import pytest
 import typer
 
-from utils.validators import *
+from file_conversor.utils.validators import *
 
 
 def test_check_positive_integer_valid():

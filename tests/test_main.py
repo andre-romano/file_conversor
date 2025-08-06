@@ -6,7 +6,7 @@ import typer
 
 from typer.testing import CliRunner
 
-from file_conversor import app_cmd as app_cmd
+from file_conversor.cli.app_cmd import app_cmd
 
 runner = CliRunner()
 
