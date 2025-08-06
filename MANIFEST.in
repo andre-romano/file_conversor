@@ -1,3 +1,13 @@
+include LICENSE AUTHORS.md README.md CHANGELOG.md pyproject.toml
+
 recursive-include src/file_conversor/.data *
 recursive-include src/file_conversor/.icons *
 recursive-include src/file_conversor/.locales *
+
+recursive-exclude choco *
+recursive-exclude dist *
+recursive-exclude docs *
+recursive-exclude inno *
+recursive-exclude scripts *
+recursive-exclude tests *
+recursive-exclude uml *
