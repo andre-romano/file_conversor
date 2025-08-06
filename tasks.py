@@ -39,7 +39,7 @@ INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
-INSTALL_CHOCO = Path(f'{CHOCO_PATH}/install_choco.ps1')
+INSTALL_CHOCO = Path(f'scripts/install_choco.ps1')
 
 CHOCO_DEPS = {}
 for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
@@ -199,22 +199,15 @@ def uml(c):
     print("[bold] Generating uml/ ... [/][bold green]OK[/]")
 
 
-@task
-def create_install_choco_ps1(c):
-    print("[bold] Creating install_choco.ps1 ... [/]", end="")
-    INSTALL_CHOCO.write_text(f"""
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-choco --version
-""", encoding="utf-8")
-    print("[bold]OK[/]")
-
-
-@task(pre=[clean_inno, create_install_choco_ps1])
+@task(pre=[clean_inno,])
 def create_inno_files(c):
     """Update inno files, based on pyproject.toml"""
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
+
+    if not INSTALL_CHOCO.exists():
+        raise RuntimeError(f"Create Inno Files - Script {INSTALL_CHOCO} does not exist")
+
     # chocolateyInstall.ps1
     setup_path = Path(f"{INNO_ISS}")
     setup_path.write_text(rf'''
@@ -336,11 +329,13 @@ def changelog(c):
     print(f"[bold green]OK[/]")
 
 
-@task(pre=[clean_choco, create_install_choco_ps1])
+@task(pre=[clean_choco,])
 def install_choco(c):
     print("[bold] Installing Chocolatey ... [/]")
     if shutil.which("choco"):
         return
+    if not INSTALL_CHOCO.exists():
+        raise RuntimeError(f"Install Choco - Script {INSTALL_CHOCO} does not exist")
     c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
     if not shutil.which("choco"):
         raise RuntimeError("'choco' not found in PATH")
