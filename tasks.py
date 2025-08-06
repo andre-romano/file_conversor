@@ -83,6 +83,11 @@ def mkdirs(c):
             raise RuntimeError(f"Cannot create dir '{dir}'")
 
 
+def clean_logs(c):
+    remove_path(f"*.log")
+    remove_path(f"*.log.*")
+
+
 @task(pre=[mkdirs])
 def clean_choco(c):
     remove_path(f"{CHOCO_PATH}/*")
@@ -134,7 +139,8 @@ def clean_uml(c):
     remove_path(f"uml/*")
 
 
-@task(pre=[clean_build,
+@task(pre=[clean_logs,
+           clean_build,
            clean_dist,
            clean_choco,
            clean_inno,
@@ -265,11 +271,19 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
                                 
 # Install deps
 & python -m pip install --upgrade pip
-& pip install pipx
-& python -m pipx ensurepath 
+& python -m pip install "{PROJECT_NAME}=={PROJECT_VERSION}"
 
-# Install app
-& python -m pipx install "{PROJECT_NAME}=={PROJECT_VERSION}"
+# Ensure PATH is correct
+$binPath = & python -c "import sys; from pathlib import Path ; print(Path(sys.executable).parent / 'Scripts')"
+
+# Add permanently to system PATH
+$existingPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+if (-not ($existingPath.Split(';') -contains $binPath)) {{
+    [Environment]::SetEnvironmentVariable("Path", "$existingPath;$binPath", [System.EnvironmentVariableTarget]::Machine)
+}}
+
+# Update current PATH env
+$env:PATH += ";$binPath"
 
 # Run post-install configuration
 & {PROJECT_NAME} config set --install-context-menu-all-users
@@ -278,14 +292,14 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
 
     # chocolateyUninstall.ps1
     uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
-    uninstall_ps1_path.write_text(f"""
+    uninstall_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
 
 # Run pre-uninstall configuration
 & {PROJECT_NAME} win uninstall-menu
 
 # Uninstall app
-& pipx uninstall {PROJECT_NAME}
+& python -m pip uninstall -y {PROJECT_NAME}
 """, encoding="utf-8")
 
     # PACKAGE.nuspec

@@ -61,6 +61,7 @@ sections = [
   { title = " Continuous Integration", grep = "^ci" },
   { title = " Dependencies", grep = "^deps" },
   { title = "📚 Documentation", grep = "^docs" },
+  { title = " Improve", grep = "^improv" },
   { title = "🏗️ Code Refactor", grep = "^ref" },
   { title = "🚀 Performance", grep = "^perf" },
   { title = "🧪 Tests", grep = "^test" },
