@@ -34,6 +34,7 @@ Homepage = "https://github.com/andre-romano/file_conversor"
 title = "File Conversor"
 icon = "icons/icon.ico"
 locales_path = "locales"
+inno_path = "inno"
 choco_path = "choco"
 choco_deps = [  # dependencies to include in choco package
     "ffmpeg", 

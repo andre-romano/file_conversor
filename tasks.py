@@ -33,10 +33,13 @@ I18N_TEMPLATE = f"{I18N_PATH}/messages.pot"
 
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
-CHOCO_ZIP_FILENAME = f"{PROJECT_NAME}-windows-latest.zip"
+INNO_PATH = str(PYPROJECT["tool"]["myproject"]["inno_path"])
+INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 
 CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
+
+INSTALL_CHOCO = Path(f'{CHOCO_PATH}/install_choco.ps1')
 
 CHOCO_DEPS = {}
 for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
@@ -64,19 +67,12 @@ def remove_path(path_pattern):
 
 
 @task
-def install_choco(c):
-    INSTALL_CHOCO = Path('scripts/install_choco.ps1')
-    c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
-    if not shutil.which("choco"):
-        raise RuntimeError("'choco' not found in PATH")
-
-
-@task
 def mkdirs(c):
     dirs = [
         "build",
         "dist",
-        "choco",
+        CHOCO_PATH,
+        INNO_PATH,
         "docs",
         "htmlcov",
         "uml",
@@ -89,7 +85,12 @@ def mkdirs(c):
 
 @task(pre=[mkdirs])
 def clean_choco(c):
-    remove_path(f"choco/*")
+    remove_path(f"{CHOCO_PATH}/*")
+
+
+@task(pre=[mkdirs])
+def clean_inno(c):
+    remove_path(f"{INNO_PATH}/*")
 
 
 @task(pre=[mkdirs])
@@ -114,8 +115,8 @@ def clean_dist_whl(c):
 
 
 @task(pre=[mkdirs])
-def clean_dist_binary(c):
-    remove_path(f"dist/{PROJECT_NAME}")
+def clean_dist_exe(c):
+    remove_path(f"dist/*.exe")
 
 
 @task(pre=[mkdirs])
@@ -133,7 +134,13 @@ def clean_uml(c):
     remove_path(f"uml/*")
 
 
-@task(pre=[clean_build, clean_dist, clean_choco, clean_htmlcov, clean_docs, clean_uml, ])
+@task(pre=[clean_build,
+           clean_dist,
+           clean_choco,
+           clean_inno,
+           clean_htmlcov,
+           clean_docs,
+           clean_uml, ])
 def clean(c):
     pass
 
@@ -192,7 +199,59 @@ def uml(c):
     print("[bold] Generating uml/ ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_choco,])
+@task
+def create_install_choco_ps1(c):
+    print("[bold] Creating install_choco.ps1 ... [/]", end="")
+    INSTALL_CHOCO.write_text(f"""
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco --version
+""", encoding="utf-8")
+    print("[bold]OK[/]")
+
+
+@task(pre=[clean_inno, create_install_choco_ps1])
+def create_inno_files(c):
+    """Update inno files, based on pyproject.toml"""
+
+    print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
+    # chocolateyInstall.ps1
+    setup_path = Path(f"{INNO_ISS}")
+    setup_path.write_text(rf'''
+; Copywright(c) -- Andre Luiz Romano Madureira
+
+; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+
+[Setup]
+AppName={PROJECT_NAME}
+AppVersion={PROJECT_VERSION}
+DefaultDirName={{tmp}}  
+DisableWelcomePage=yes  
+DisableDirPage=yes
+DisableReadyPage=yes  
+DisableFinishedPage=yes 
+DisableProgramGroupPage=yes 
+DisableReadyMemo=yes 
+DisableStartupPrompt=yes
+Compression=LZMA2
+ShowLanguageDialog=yes
+PrivilegesRequired=admin
+SourceDir={Path(".").resolve()}
+OutputDir={Path("./dist").resolve()}
+OutputBaseFilename={PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer
+
+[Files]
+Source: "{INSTALL_CHOCO.resolve()}"; DestDir: "{{tmp}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+
+[Run]
+; Install chocolatey
+StatusMsg: "Installing Chocolatey ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{tmp}}\{INSTALL_CHOCO.name}"""; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing App ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""choco install {PROJECT_NAME} --version {PROJECT_VERSION} -y"""; Flags: runascurrentuser waituntilterminated
+''', encoding="utf-8")
+    print("[bold green]OK[/]")
+
+
+@task(pre=[clean_choco, ])
 def create_choco_files(c):
     """Update choco files, based on pyproject.toml"""
 
@@ -202,36 +261,38 @@ def create_choco_files(c):
 
     # chocolateyInstall.ps1
     install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
-    install_ps1_path.write_text(f"""
+    install_ps1_path.write_text(rf'''
 $ErrorActionPreference = 'Stop'
-$packageName = "{PROJECT_NAME}"
-$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 
+# Ensure Python is available
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
+    Write-Error "Python is not installed or not in PATH."
+    exit 1
+}}                                
+                                
 # Install deps
 & python -m pip install --upgrade pip
 & pip install pipx
+& python -m pipx ensurepath 
 
 # Install app
-& python -m pipx ensurepath
-& pipx install "$packageName"@{PROJECT_VERSION}
+& python -m pipx install "{PROJECT_NAME}=={PROJECT_VERSION}"
 
 # Run post-install configuration
-& $packageName config set --install-context-menu-all-users
-& $packageName win install-menu
-""", encoding="utf-8")
+& {PROJECT_NAME} config set --install-context-menu-all-users
+& {PROJECT_NAME} win install-menu
+''', encoding="utf-8")
 
     # chocolateyUninstall.ps1
     uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
     uninstall_ps1_path.write_text(f"""
 $ErrorActionPreference = 'Stop'
-$packageName = "{PROJECT_NAME}"
-$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 
 # Run pre-uninstall configuration
-& $packageName win uninstall-menu
+& {PROJECT_NAME} win uninstall-menu
 
 # Uninstall app
-& pipx uninstall $packageName
+& pipx uninstall {PROJECT_NAME}
 """, encoding="utf-8")
 
     # PACKAGE.nuspec
@@ -275,7 +336,27 @@ def changelog(c):
     print(f"[bold green]OK[/]")
 
 
-@task(pre=[clean_dist_choco, create_choco_files,])
+@task(pre=[clean_choco, create_install_choco_ps1])
+def install_choco(c):
+    print("[bold] Installing Chocolatey ... [/]")
+    if shutil.which("choco"):
+        return
+    c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
+    if not shutil.which("choco"):
+        raise RuntimeError("'choco' not found in PATH")
+
+
+@task(pre=[install_choco,])
+def install_inno(c):
+    print("[bold] Installing InnoSetup ... [/]")
+    if shutil.which("iscc"):
+        return
+    c.run(f'powershell.exe -ExecutionPolicy Bypass -Command "choco install -y innosetup"')
+    if not shutil.which("iscc"):
+        raise RuntimeError("'iscc' not found in PATH")
+
+
+@task(pre=[clean_dist_choco, create_choco_files, install_choco,])
 def build_choco(c):
     if not CHOCO_NUSPEC.exists():
         raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
@@ -294,6 +375,15 @@ def build_whl(c):
     if not list(Path("dist").glob("*.whl")):
         raise RuntimeError("Build WHL - Empty dist/*.whl")
     print(f"[bold] Building PyPi package ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_dist_exe, create_inno_files, install_inno,])
+def build_exe(c):
+    print(f"[bold] Building Installer (EXE) ... [/]")
+    c.run(f"iscc /Qp \"{INNO_ISS}\"")
+    if not list(Path("dist").glob("*.exe")):
+        raise RuntimeError("Build EXE - Empty dist/*.exe")
+    print(f"[bold] Building Installer (EXE) ... [/][bold green]OK[/]")
 
 
 @task(pre=[build_whl, ])
