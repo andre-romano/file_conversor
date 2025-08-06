@@ -1,5 +1,5 @@
 
-# src/config/__init__.py
+# src\file_conversor\config\__init__.py
 
 """
 This module initializes the app configuration modules.

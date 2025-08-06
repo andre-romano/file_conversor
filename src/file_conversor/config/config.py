@@ -1,4 +1,4 @@
-# src\config\config.py
+# src\file_conversor\config\config.py
 
 import json
 

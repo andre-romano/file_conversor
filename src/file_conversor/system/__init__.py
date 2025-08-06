@@ -1,4 +1,4 @@
-# src\platform\__init__.py
+# src\file_conversor\platform\__init__.py
 
 """Stores platform specific methods"""
 

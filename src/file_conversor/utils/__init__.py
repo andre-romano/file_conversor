@@ -1,5 +1,5 @@
 
-# src/utils/__init__.py
+# src/file_conversor/utils/__init__.py
 
 """
 This module initializes the utils package.

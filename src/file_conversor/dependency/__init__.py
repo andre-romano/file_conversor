@@ -1,4 +1,4 @@
-# src\dependency\__init__.py
+# src\file_conversor\dependency\__init__.py
 
 """Module for package managers that provide external dependencies"""
 

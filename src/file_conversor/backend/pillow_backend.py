@@ -1,4 +1,4 @@
-# src/backend/pillow_backend.py
+# src\file_conversor\backend\pillow_backend.py
 
 """
 This module provides functionalities for handling image files using ``pillow`` backend.

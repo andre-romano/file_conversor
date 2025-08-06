@@ -1,5 +1,5 @@
 
-# src/file_conversor/__init__.py
+# src\file_conversor\__init__.py
 
 """
 This is the root of the package.

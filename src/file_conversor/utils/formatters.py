@@ -1,4 +1,4 @@
-# src\utils\formatters.py
+# src\file_conversor\utils\formatters.py
 
 def format_bytes(size: float) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""

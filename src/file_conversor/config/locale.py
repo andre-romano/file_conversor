@@ -1,14 +1,10 @@
 
-# src\config\locale.py
+# src\file_conversor\config\locale.py
 
 import gettext  # app translations / locales
 import locale
 
-from pathlib import Path  # current sys locale
-
 from file_conversor.config.state import State
-
-STATE = State.get_instance()
 
 
 # Get translations
@@ -26,7 +22,7 @@ def get_translation(lang: str = ""):
     """
     sys_lang = get_system_locale()
     translation = gettext.translation(
-        'messages', State.get_resources_folder() / "locales",
+        'messages', State.get_locales_folder(),
         languages=[
             lang,
             sys_lang if sys_lang else "en_US",

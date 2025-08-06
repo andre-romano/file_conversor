@@ -1,5 +1,5 @@
 
-# src/file_conversor.py
+# src\file_conversor\__main__.py
 
 import subprocess
 import sys

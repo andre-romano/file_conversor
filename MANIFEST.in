@@ -1,0 +1,3 @@
+recursive-include src/file_conversor/.data *
+recursive-include src/file_conversor/.icons *
+recursive-include src/file_conversor/.locales *

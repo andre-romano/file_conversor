@@ -1,4 +1,4 @@
-# src\platform\lin\__init__.py
+# src\file_conversor\platform\lin\__init__.py
 
 import platform
 

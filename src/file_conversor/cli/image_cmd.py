@@ -1,5 +1,5 @@
 
-# src\cli\image_cmd.py
+# src\file_conversor\cli\image_cmd.py
 
 import typer
 

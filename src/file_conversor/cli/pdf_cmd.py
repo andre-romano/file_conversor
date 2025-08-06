@@ -1,5 +1,5 @@
 
-# src\cli\pdf_cmd.py
+# src\file_conversor\cli\pdf_cmd.py
 
 import re
 import time

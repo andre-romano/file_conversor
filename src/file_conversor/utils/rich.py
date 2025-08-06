@@ -1,4 +1,4 @@
-# src\utils\rich.py
+# src\file_conversor\utils\rich.py
 
 
 from types import TracebackType

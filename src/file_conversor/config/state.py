@@ -1,4 +1,4 @@
-# src\config\state.py
+# src\file_conversor\config\state.py
 
 import shutil
 import sys
@@ -76,15 +76,20 @@ class State:
     def get_resources_folder() -> Path:
         """Get the absolute path of the included folders in pip."""
         res_path = Path(str(files("file_conversor"))).resolve()
-        logger.debug(f"Resources path: {res_path}")
         return res_path
 
     @staticmethod
     def get_icons_folder() -> Path:
         """Get the absolute path of the included folders in pip."""
-        icons_path = Path(f"{State.get_resources_folder()}/icons")
+        icons_path = State.get_resources_folder() / ".icons"
         logger.debug(f"Icons path: {icons_path}")
         return icons_path
+
+    @staticmethod
+    def get_locales_folder() -> Path:
+        locales_path = State.get_resources_folder() / ".locales"
+        logger.debug(f"Locales path: {locales_path}")
+        return locales_path
 
     @staticmethod
     def get_instance():
@@ -113,6 +118,13 @@ class State:
             "verbose": enable_verbose_mode,
             "debug": enable_debug_mode,
         }
+        # run callbacks
+        for key, value in self.__data.items():
+            self._run_callbacks(key=key, value=value)
+
+    def _run_callbacks(self, key: str, value):
+        if key in self.__callbacks:
+            self.__callbacks[key](value)
 
     def __repr__(self) -> str:
         return repr(self.__data)
@@ -131,8 +143,7 @@ class State:
         self.__data[key] = value
 
         # run callback
-        if key in self.__callbacks:
-            self.__callbacks[key](value)
+        self._run_callbacks(key=key, value=value)
 
     def __contains__(self, key) -> bool:
         return key in self.__data

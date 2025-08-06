@@ -1,4 +1,4 @@
-# src/backend/win_reg_backend.py
+# src\file_conversor\backend\win_reg_backend.py
 
 """
 This module provides functionalities for handling Windows Registry using ``reg`` backend.

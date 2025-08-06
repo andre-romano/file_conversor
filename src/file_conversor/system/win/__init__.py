@@ -1,4 +1,4 @@
-# src\platform\win\__init__.py
+# src\file_conversor\platform\win\__init__.py
 
 import os
 import platform

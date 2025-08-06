@@ -1,4 +1,4 @@
-# src\system\win\reg.py
+# src\file_conversor\system\win\reg.py
 
 import json
 import re

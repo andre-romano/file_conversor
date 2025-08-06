@@ -1,4 +1,4 @@
-# src/backend/pypdf_backend.py
+# src\file_conversor\backend\pypdf_backend.py
 
 """
 This module provides functionalities for handling PDF files using ``pypdf`` backend.

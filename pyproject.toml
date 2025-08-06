@@ -33,16 +33,12 @@ file_conversor = "file_conversor.__main__:main"
 
 [tool.pdm] 
 package-dir = { "" = "src" }
-includes = [ # include files into .whl package
-    "src/file_conversor/**",     
-    "pyproject.toml",
-]
 distribution = true
 
 [tool.myproject]
 title = "File Conversor"
-icons_path = "src/file_conversor/icons"
-locales_path = "src/file_conversor/locales"
+icons_path = "src/file_conversor/.icons"
+locales_path = "src/file_conversor/.locales"
 inno_path = "inno"
 choco_path = "choco"
 choco_deps = [  # dependencies to include in choco package

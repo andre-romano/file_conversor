@@ -1,4 +1,4 @@
-# src\platform\mac\__init__.py
+# src\file_conversor\platform\mac\__init__.py
 
 import platform
 

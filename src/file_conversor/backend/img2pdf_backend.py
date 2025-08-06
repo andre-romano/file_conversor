@@ -1,4 +1,4 @@
-# src/backend/img2pdf_backend.py
+# src\file_conversor\backend\img2pdf_backend.py
 
 """
 This module provides functionalities for handling PDF files using ``img2pdf`` backend.

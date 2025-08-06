@@ -1,4 +1,4 @@
-# src\cli\app_cmd.py
+# src\file_conversor\cli\app_cmd.py
 
 import sys
 import typer
@@ -67,7 +67,7 @@ if CURR_PLATFORM == PLATFORM_WINDOWS:
 
 app_cmd.add_typer(batch_cmd,
                   name="batch",
-                  help=f"""Batch file processing (task automation)
+                  help=f"""{_('Batch file processing (task automation)')}
 
 {_('The batch processing pipeline works by monitoring an input folder, passing those files to the next pipeline stage, and processing them inside that stage. This process continues (output of the current stage is the input of the next stage), until those files reach the end of the pipeline.')}
 

@@ -1,4 +1,4 @@
-# src/backend/qpdf_backend.py
+# src\file_conversor\backend\qpdf_backend.py
 
 """
 This module provides functionalities for handling PDF files using ``qpdf`` backend.
