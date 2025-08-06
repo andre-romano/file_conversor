@@ -31,7 +31,7 @@ jobs:
 
       - name: Build Installer .EXE
         run: |
-          pdm run invoke build-exe
+          pdm run invoke inno.build
 
       - name: Upload installer EXE
         uses: actions/upload-artifact@v4

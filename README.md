@@ -7,12 +7,10 @@ Python program to convert and compress audio/video/text/etc files to other forma
   - [Installing](#installing)
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
-      - [Option 2. Scoop Package Manager](#option-2-scoop-package-manager)
-      - [Option 3. PyPi](#option-3-pypi)
-      - [Option 4. Installer (EXE)](#option-4-installer-exe)
-    - [For Linux / MacOS](#for-linux--macos)
-      - [Option 1. Homebrew (brew)](#option-1-homebrew-brew)
       - [Option 2. PyPi](#option-2-pypi)
+      - [Option 3. Installer (EXE)](#option-3-installer-exe)
+    - [For Linux / MacOS](#for-linux--macos)
+      - [Option 1. PyPi](#option-1-pypi)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
@@ -23,6 +21,7 @@ Python program to convert and compress audio/video/text/etc files to other forma
 ## External dependencies
 
 This project requires the following external dependencies to work properly:
+- Python 3
 - FFmpeg
 - Ghostscript
 - qpdf
@@ -40,22 +39,13 @@ The app will prompt for download of the external dependencies, if needed.
   choco install file_conversor
   ```
 
-#### Option 2. Scoop Package Manager
-
-1. Open PowerShell (no admin priviledges needed) and run:
-  ```bash
-  scoop install file_conversor
-  ```
-
-#### Option 3. PyPi
+#### Option 2. PyPi
 
 ```bash
-pip install pipx
-python -m pipx ensurepath
-python -m pipx install file_conversor
+pip install file_conversor
 ```
 
-#### Option 4. Installer (EXE)
+#### Option 3. Installer (EXE)
 
 1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
 2. Execute installer (.exe file)
@@ -63,18 +53,10 @@ python -m pipx install file_conversor
 
 ### For Linux / MacOS
 
-#### Option 1. Homebrew (brew)
+#### Option 1. PyPi
 
 ```bash
-brew install file_conversor
-```
-
-#### Option 2. PyPi
-
-```bash
-pip install pipx
-python -m pipx ensurepath
-python -m pipx install file_conversor
+pip install file_conversor
 ```
 
 ## Usage

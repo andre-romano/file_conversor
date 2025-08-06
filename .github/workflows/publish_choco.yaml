@@ -31,7 +31,7 @@ jobs:
 
       - name: Build with Chocolatey
         run: |
-          pdm run invoke build-choco
+          pdm run invoke choco.build
           ls dist/*.nupkg || exit 1
 
       - name: Push to Chocolatey

@@ -1,0 +1,179 @@
+
+# tasks_modules\choco.py
+
+import re
+from pathlib import Path
+from invoke.tasks import task
+
+# user provided
+from tasks_modules import _config
+from tasks_modules._config import *
+
+CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
+CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
+
+
+CHOCO_DEPS = {}
+for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
+    re_pattern = re.compile(r"^(.+?)([@](.+))?$")
+    match = re_pattern.search(dependency)
+    if not match:
+        raise RuntimeError(f"Invalid dependency '{dependency}' format. Valid format is 'package@version' or 'package'.")
+    package, version = match.group(1), match.group(3)
+    CHOCO_DEPS[package] = version
+
+
+@task
+def mkdirs(c):
+    _config.mkdir([
+        CHOCO_PATH,
+        "dist",
+    ])
+
+
+@task(pre=[mkdirs])
+def clean_choco(c):
+    remove_path(f"{CHOCO_PATH}/*")
+
+
+@task(pre=[mkdirs])
+def clean_nupkg(c):
+    remove_path("dist/*.nupkg")
+
+
+@task(pre=[clean_choco, ])
+def create_manifest(c):
+    """Update choco files, based on pyproject.toml"""
+
+    print("[bold] Updating Chocolatey manifest files ... [/]", end="")
+    CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
+    CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
+
+    # chocolateyInstall.ps1
+    install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
+    install_ps1_path.write_text(rf'''
+$ErrorActionPreference = 'Stop'
+
+# Ensure Python is available
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
+    Write-Error "Python is not installed or not in PATH."
+    exit 1
+}}                                
+                                
+Write-Output "Updating Python pip ..."
+& python -m pip install --upgrade pip
+
+Write-Output "Installing app "{PROJECT_NAME}=={PROJECT_VERSION}" ..."
+& python -m pip install "{PROJECT_NAME}=={PROJECT_VERSION}"
+
+Write-Output "Finding binPath for python scripts ..."
+$binPath = & python -c "import sys; from pathlib import Path ; print(Path(sys.executable).parent / 'Scripts')"
+Write-Output $binPath
+
+Write-Output "Checking system PATH ..."
+$existingPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+if (-not ($existingPath.Split(';') -contains $binPath)) {{
+    Write-Output "Modifying system PATH ..."
+    [Environment]::SetEnvironmentVariable("Path", "$existingPath;$binPath", [System.EnvironmentVariableTarget]::Machine)
+}}
+
+# Update current PATH env
+Write-Output "Modifying current PS env PATH ..."
+$env:PATH += ";$binPath"
+
+# Run post-install configuration
+if (-not (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue)) {{
+    Write-Error "{PROJECT_NAME} is not installed or not in PATH."
+    exit 1
+}}              
+Write-Output "Configuring windows context menu ..."
+& {PROJECT_NAME} config set --install-context-menu-all-users
+& {PROJECT_NAME} win install-menu
+''', encoding="utf-8")
+
+    # chocolateyBeforeModify.ps1
+    before_modify_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyBeforeModify.ps1")
+    before_modify_ps1_path.write_text(rf"""
+$ErrorActionPreference = 'Stop'
+                           
+if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
+    # Run pre-uninstall configuration
+    Write-Output "Uninstalling windows context menu ..."
+    & {PROJECT_NAME} win uninstall-menu       
+}}                                      
+""", encoding="utf-8")
+
+    # chocolateyUninstall.ps1
+    uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
+    uninstall_ps1_path.write_text(rf"""
+$ErrorActionPreference = 'Stop'
+
+# Uninstall app
+if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
+    Write-Output "Uninstalling app using PIP ..."
+    & python -m pip uninstall -y {PROJECT_NAME}
+}}
+Write-Output "App uninstalled"
+""", encoding="utf-8")
+
+    # PACKAGE.nuspec
+    CHOCO_NUSPEC.write_text(f"""<?xml version='1.0' encoding='utf-8'?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>{PROJECT_NAME}</id>
+    <version>{PROJECT_VERSION}</version>
+    <title>{PROJECT_TITLE}</title>
+    <authors>{", ".join(PROJECT_AUTHORS)}</authors>
+    <description>{PROJECT_DESCRIPTION}</description>
+    <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
+    <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
+    <projectUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectUrl>
+    <projectSourceUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectSourceUrl>
+    <licenseUrl>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/CHANGELOG.md</releaseNotes>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+        {"\n        ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\\**" target="tools" />
+  </files>  
+</package>
+""", encoding="utf-8")
+    print("[bold green]OK[/]")
+
+
+@task
+def install(c):
+    print("[bold] Installing Chocolatey ... [/]")
+    if shutil.which("choco"):
+        return
+    if not INSTALL_CHOCO.exists():
+        raise RuntimeError(f"Install Choco - Script {INSTALL_CHOCO} does not exist")
+    c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
+    if not shutil.which("choco"):
+        raise RuntimeError("'choco' not found in PATH")
+
+
+@task(pre=[clean_nupkg, create_manifest, install,])
+def build(c):
+    if not CHOCO_NUSPEC.exists():
+        raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
+
+    print(f"[bold] Building choco package ... [/]")
+    c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
+    if not list(Path("dist").glob("*.nupkg")):
+        raise RuntimeError("Build CHOCO - Empty dist/*.nupkg")
+    print(f"[bold] Building choco package ... [/][bold green]OK[/]")
+
+
+@task(pre=[build,])
+def check(c):
+    print(f"[bold] Test choco package ... [/]")
+    c.run(f"choco install -y {PROJECT_NAME} --source-dir=./dist")
+    print(f"[bold] Test choco package ... [/][bold green]OK[/]")
+
+    print(f"[bold] Cleaning choco tests ... [/]")
+    c.run(f"choco uninstall -y {PROJECT_NAME} --source-dir=./dist")
+    print(f"[bold] Cleaning choco tests ... [/][bold green]OK[/]")
