@@ -1,0 +1,15 @@
+{
+    "version": "0.1.1",
+    "description": "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)",
+    "homepage": "https://github.com/andre-romano/file_conversor",
+    "license": "APACHE",
+    "depends": [
+        "python",
+        "ffmpeg",
+        "qpdf"
+    ],
+    "pre_install": [
+        "pip install file_conversor==0.1.1"
+    ],
+    "bin": "Scripts\\file_conversor.exe"
+}
