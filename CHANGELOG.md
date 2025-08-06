@@ -8,20 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- insertion marker -->
 ## Unreleased
 
-<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/v1.0.0...HEAD)</small>
-
-### Fixed
-
-- fix: git actions ci/cd pipeline ([34e4bbc](https://github.com/andre-romano/file_conversor/commit/34e4bbc221be32666ae748147a6798280efe74af) by Andre).
-- fix: git actions ([2b756ec](https://github.com/andre-romano/file_conversor/commit/2b756ecafe76c70ce62fdccd19fa7e74f4724de7) by Andre).
-- fix:git actions ([3acd3a0](https://github.com/andre-romano/file_conversor/commit/3acd3a0fd3af8c507e436cad43b91a3c2b39f983) by Andre).
-- fix: changelog ([566a3ed](https://github.com/andre-romano/file_conversor/commit/566a3ed1a27f643046ce99f11eca66404b0fd264) by Andre).
-- fix: gitactions ([7b8f2ca](https://github.com/andre-romano/file_conversor/commit/7b8f2caa5e4b5b3579b1821187d0b0cb2f08dcdd) by Andre).
-
-<!-- insertion marker -->
-## [v1.0.0](https://github.com/andre-romano/file_conversor/releases/tag/v1.0.0) - 2025-08-04
-
-<small>[Compare with first commit](https://github.com/andre-romano/file_conversor/compare/be0a5b8d08cfe742e966f0b1b5b4211c6fe0bd15...v1.0.0)</small>
+<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/be0a5b8d08cfe742e966f0b1b5b4211c6fe0bd15...HEAD)</small>
 
 ### Added
 
@@ -36,9 +23,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- fix: git actions ci/cd pipeline ([34e4bbc](https://github.com/andre-romano/file_conversor/commit/34e4bbc221be32666ae748147a6798280efe74af) by Andre).
+- fix: git actions ([2b756ec](https://github.com/andre-romano/file_conversor/commit/2b756ecafe76c70ce62fdccd19fa7e74f4724de7) by Andre).
+- fix:git actions ([3acd3a0](https://github.com/andre-romano/file_conversor/commit/3acd3a0fd3af8c507e436cad43b91a3c2b39f983) by Andre).
+- fix: changelog ([566a3ed](https://github.com/andre-romano/file_conversor/commit/566a3ed1a27f643046ce99f11eca66404b0fd264) by Andre).
+- fix: gitactions ([7b8f2ca](https://github.com/andre-romano/file_conversor/commit/7b8f2caa5e4b5b3579b1821187d0b0cb2f08dcdd) by Andre).
 - fix: choco nuspec structure fix: CHOCO_API env location in git actions improve: add AUTHORS.md, LICENSE, pyproject.toml to dist/ files ([86f45d9](https://github.com/andre-romano/file_conversor/commit/86f45d9094681bd8a948379584c80ecdc6714b12) by Andre).
 - fix: modify choco config to allow for ctx menu auto install ([20adb32](https://github.com/andre-romano/file_conversor/commit/20adb32bb0ef0f6ed06c26a8b4355f14d9d1e625) by Andre).
 - fix: mkdir paths before using them ([0f5f2cc](https://github.com/andre-romano/file_conversor/commit/0f5f2ccbda3e922fa0c3007944e37a8ea66d98c4) by Andre).
 - fix: choco create files syntax ([b805b5a](https://github.com/andre-romano/file_conversor/commit/b805b5ada2343a5b2ff182a47839e481b0dbf4d4) by Andre).
 - fix babel translations in command help for typer code refactor (separated subcommands config, audio_video) code refactor (separated CONFIG, STATE and LOCALE in separate files) ([8dcfdcc](https://github.com/andre-romano/file_conversor/commit/8dcfdccd91bfb073dadd739ad2b005e85d264650) by Andre).
 
+### Changed
+
+- CHANGELOG.md for 0.1.0 ([cee9ce4](https://github.com/andre-romano/file_conversor/commit/cee9ce4d1687dec1c7b121df20c0142344674c6e) by Andre).
+
+<!-- insertion marker -->
