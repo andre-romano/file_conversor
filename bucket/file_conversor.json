@@ -19,11 +19,7 @@
         ]
     },
     "bin": [
-        [
-            "python",
-            "-m",
-            "file_conversor"
-        ]
+        "python -m \"file_conversor\""
     ],
     "checkver": {
         "github": "https://github.com/andre-romano/file_conversor"

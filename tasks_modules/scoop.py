@@ -59,7 +59,7 @@ def create_manifest(c):
             ]
         },
         "bin": [
-            ["python", "-m", PROJECT_NAME]
+            f'python -m "{PROJECT_NAME}"'
         ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
