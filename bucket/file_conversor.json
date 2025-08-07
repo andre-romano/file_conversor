@@ -6,7 +6,7 @@
     "depends": [
         "python"
     ],
-    "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/heads/master/scripts/install_app.py",
+    "url": "https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/scripts/install_app.py",
     "hash": "8e6f0e31c3c93c63c67f540cfba17c50c96a665372c4615ce152f61f75ddd8d4",
     "installer": {
         "script": [
@@ -23,6 +23,6 @@
         "github": "https://github.com/andre-romano/file_conversor"
     },
     "autoupdate": {
-        "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/heads/master/scripts/install_app.py"
+        "url": "https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/scripts/install_app.py"
     }
 }
