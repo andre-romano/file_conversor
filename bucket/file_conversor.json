@@ -15,7 +15,7 @@
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
-            "bin": "Scripts\\\\file_conversor.exe"
+            "bin": "file_conversor.exe"
         },
         "32bit": {
             "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/pyproject.toml",
@@ -23,7 +23,7 @@
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
-            "bin": "Scripts\\\\file_conversor.exe"
+            "bin": "file_conversor.exe"
         }
     },
     "checkver": {
@@ -36,14 +36,14 @@
                 "pre_install": [
                     "pip install file_conversor==$version"
                 ],
-                "bin": "Scripts\\\\file_conversor.exe"
+                "bin": "file_conversor.exe"
             },
             "32bit": {
                 "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/$version/CHANGELOG.md",
                 "pre_install": [
                     "pip install file_conversor==$version"
                 ],
-                "bin": "Scripts\\\\file_conversor.exe"
+                "bin": "file_conversor.exe"
             }
         }
     }
