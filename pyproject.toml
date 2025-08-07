@@ -100,7 +100,7 @@ reportPropertyTypeMismatch = "error" # Property type mismatch
 
 # Exclude files from analysis
 ignore = ["**/*.bak"]
-  
+   
 # Exclude directories from analysis
 exclude = [
     "**/.venv/**",
