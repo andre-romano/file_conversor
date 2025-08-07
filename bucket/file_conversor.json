@@ -10,16 +10,16 @@
     ],
     "architecture": {
         "64bit": {
-            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/CHANGELOG.md",
-            "hash": "50b20f085f1a55e3c1e3cac887b093d3a648d746d8285e01f11cd3278d904e70",
+            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/pyproject.toml",
+            "hash": "99391127e1d3cd6f6de019e741a6e2c8b19285edf1e2604e5dacb101c9b49579",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
             "bin": "Scripts\\\\file_conversor.exe"
         },
         "32bit": {
-            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/CHANGELOG.md",
-            "hash": "50b20f085f1a55e3c1e3cac887b093d3a648d746d8285e01f11cd3278d904e70",
+            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/pyproject.toml",
+            "hash": "99391127e1d3cd6f6de019e741a6e2c8b19285edf1e2604e5dacb101c9b49579",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
