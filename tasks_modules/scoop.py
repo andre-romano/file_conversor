@@ -50,7 +50,7 @@ def create_manifest(c):
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "installer": {
             "script": [
-                "python3 \"$dir\\$fname\" -i --version $version"
+                "python3 \"$dir\\$fname\" -i --version $version",
             ]
         },
         "uninstaller": {
@@ -58,9 +58,6 @@ def create_manifest(c):
                 "python3 \"$dir\\$fname\" -u --version $version"
             ]
         },
-        "bin": [
-            f'python -m "{PROJECT_NAME}"'
-        ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
         },

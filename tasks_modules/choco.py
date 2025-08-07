@@ -62,7 +62,7 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
                       -ChecksumType "sha256"
 
 Write-Output "Installing app ..."
-& python "$installer" -i --version "$version"                                     
+& python "$installer" -i --version "$version"  
 ''', encoding="utf-8")
 
     # chocolateyUninstall.ps1
