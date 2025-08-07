@@ -15,14 +15,20 @@ def changelog(c):
     """
     Generate CHANGELOG.md file
     """
-    print(f"[bold] Generating CHANGELOG.md ... [/]", end="")
+    print(f"[bold] Generating CHANGELOG.md ... [/]")
     c.run(f"pdm run git-changelog")
     if not Path("CHANGELOG.md").exists():
         raise RuntimeError("CHANGELOG.md does not exist")
-    c.run(f"git add CHANGELOG.md pyproject.toml")
-    c.run(f"git commit -m \"=> CHANGELOG.md for {PROJECT_VERSION}\"")
+
+    result = c.run(f"git status", hide=True)
+    if all(f not in result.stdout for f in ["CHANGELOG.md", "pyproject.toml"]):
+        print(f"[bold] Skipping commit: no changes in CHANGELOG.md  [/]")
+        return
+
+    c.run(f"git add CHANGELOG.md pyproject.toml", hide=True)
+    c.run(f"git commit -m \"=> CHANGELOG.md for {PROJECT_VERSION}\"", hide=True)
     c.run(f"git push")
-    print(f"[bold green]OK[/]")
+    print(f"[bold] Generating CHANGELOG.md ... OK [/]")
 
 
 @task(pre=[changelog, pypi.publish, scoop.publish,])

@@ -8,6 +8,8 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
+from tasks_modules import base
+
 SCOOP_PATH = str("bucket")
 SCOOP_JSON = Path(f"{SCOOP_PATH}/{PROJECT_NAME}.json")
 
@@ -28,7 +30,7 @@ def clean_scoop(c):
     remove_path(f"{SCOOP_PATH}/*")
 
 
-@task(pre=[clean_scoop, ])
+@task(pre=[clean_scoop, base.publish_install_script, ])
 def create_manifest(c):
     """Update choco files, based on pyproject.toml"""
 
@@ -45,7 +47,7 @@ def create_manifest(c):
         "license": "Apache-2.0",
         "depends": list(SCOOP_DEPS.keys()),
         "url": INSTALL_APP_URL,
-        "hash": f"{_config.gen_sha256(INSTALL_APP_PY)}",
+        "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "installer": {
             "script": [
                 "python3 \"$dir\\$fname\" -i --version $version"
@@ -90,8 +92,12 @@ def build(c):
 @task(pre=[build,])
 def publish(c):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
-    c.run(f'git add "{SCOOP_PATH}"')
-    c.run(f'git commit -m "ci: scoop bucket {GIT_RELEASE}"')
+    result = c.run(f'git status', hide=True)
+    if Path(SCOOP_PATH).name not in result.stdout:
+        print(f"[bold] Skipping publish: no changes in bucket file. [/]")
+        return
+    c.run(f'git add "{SCOOP_PATH}"', hide=True)
+    c.run(f'git commit -m "ci: scoop bucket {GIT_RELEASE}"', hide=True)
     c.run(f'git push')
     print(f"[bold] Publishing to Scoop (using GitHub) ... OK [/]")
 

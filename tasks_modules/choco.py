@@ -53,7 +53,7 @@ $version     = "{PROJECT_VERSION}"
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $installer   = "$toolsDir\{INSTALL_APP_PY.name}"
 $url         = "{INSTALL_APP_URL}"
-$checksum    = "{_config.gen_sha256(INSTALL_APP_PY)}"  # SHA256
+$checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
 
 Get-ChocolateyWebFile -PackageName "$packageName" `
                       -FileFullPath "$installer" `
@@ -75,7 +75,7 @@ $version     = "{PROJECT_VERSION}"
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $installer   = "$toolsDir\{INSTALL_APP_PY.name}"
 $url         = "{INSTALL_APP_URL}"
-$checksum    = "{_config.gen_sha256(INSTALL_APP_PY)}"  # SHA256
+$checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
 
 Get-ChocolateyWebFile -PackageName "$packageName" `
                       -FileFullPath "$installer" `

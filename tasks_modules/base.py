@@ -116,3 +116,16 @@ def locales_build(c):
     print(f"[bold] Building locales .mo files ... [/]")
     c.run(f"pdm run pybabel compile -d {I18N_PATH}")
     print(f"[bold] Building locales .mo files ... [/][bold green]OK[/]")
+
+
+@task
+def publish_install_script(c):
+    print(f"[bold] Publishing install script ... [/]")
+    result = c.run(f"git status", hide=True)
+    if INSTALL_APP_PY.name not in result.stdout:
+        print(f"[bold] Skipping publish: no changes in install script.  [/]")
+        return
+    c.run(f"git add {INSTALL_APP_PY}", hide=True)
+    c.run(f"git commit -m \"ci: install script update\"", hide=True)
+    c.run(f"git push")
+    print(f"[bold] Publishing install script ... OK [/]")

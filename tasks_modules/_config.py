@@ -3,6 +3,7 @@
 import hashlib
 import shutil
 import tomllib
+import requests
 
 from typing import Any, Iterable
 from pathlib import Path
@@ -63,10 +64,6 @@ def mkdir(dirs: Iterable):
             raise RuntimeError(f"Cannot create dir '{dir}'")
 
 
-def gen_sha256(filepath: str | Path):
-    """Return the digest value as a string of hexadecimal digits"""
-    sha256_hash = hashlib.sha256()
-    with open(filepath, "rb") as f:
-        for block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(block)
-    return sha256_hash.hexdigest()
+def get_remote_hash(url):
+    response = requests.get(url)
+    return hashlib.sha256(response.content).hexdigest()
