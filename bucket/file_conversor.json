@@ -2,7 +2,7 @@
     "version": "0.1.1",
     "description": "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)",
     "homepage": "https://github.com/andre-romano/file_conversor",
-    "license": "APACHE",
+    "license": "Apache-2.0",
     "depends": [
         "python",
         "ffmpeg",
@@ -10,20 +10,41 @@
     ],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/andre-romano/file_conversor/archive/refs/tags/v0.1.1.zip",
-            "hash": "skip",
+            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/CHANGELOG.md",
+            "hash": "50b20f085f1a55e3c1e3cac887b093d3a648d746d8285e01f11cd3278d904e70",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
-            "bin": "Scripts\\file_conversor.exe"
+            "bin": "Scripts\\\\file_conversor.exe"
         },
         "32bit": {
-            "url": "https://github.com/andre-romano/file_conversor/archive/refs/tags/v0.1.1.zip",
-            "hash": "skip",
+            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/CHANGELOG.md",
+            "hash": "50b20f085f1a55e3c1e3cac887b093d3a648d746d8285e01f11cd3278d904e70",
             "pre_install": [
                 "pip install file_conversor==0.1.1"
             ],
-            "bin": "Scripts\\file_conversor.exe"
+            "bin": "Scripts\\\\file_conversor.exe"
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/andre-romano/file_conversor"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/$version/CHANGELOG.md",
+                "pre_install": [
+                    "pip install file_conversor==$version"
+                ],
+                "bin": "Scripts\\\\file_conversor.exe"
+            },
+            "32bit": {
+                "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/$version/CHANGELOG.md",
+                "pre_install": [
+                    "pip install file_conversor==$version"
+                ],
+                "bin": "Scripts\\\\file_conversor.exe"
+            }
         }
     }
 }
