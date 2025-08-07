@@ -1,4 +1,6 @@
 
+# scripts\install_app.py
+
 import argparse
 import platform
 import shutil
