@@ -6,9 +6,9 @@ Python program to convert and compress audio/video/text/etc files to other forma
   - [External dependencies](#external-dependencies)
   - [Installing](#installing)
     - [For Windows](#for-windows)
-      - [Option 1. Installer (EXE)](#option-1-installer-exe)
+      - [Option 1. Scoop Package Manager (recommended)](#option-1-scoop-package-manager-recommended)
       - [Option 2. PyPi](#option-2-pypi)
-      - [Option 3. Scoop Package Manager](#option-3-scoop-package-manager)
+      - [Option 3. Installer (EXE)](#option-3-installer-exe)
     - [For Linux / MacOS](#for-linux--macos)
       - [Option 1. PyPi](#option-1-pypi)
   - [Usage](#usage)
@@ -32,10 +32,13 @@ The app will prompt for download of the external dependencies, if needed.
 
 ### For Windows
 
-#### Option 1. Installer (EXE)
+#### Option 1. Scoop Package Manager (recommended)
 
-1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-2. Execute installer (.exe file)
+1. Open PowerShell (no admin priviledges needed) and run:
+  ```bash
+  scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
+  scoop install file_conversor
+  ```
 
 #### Option 2. PyPi
 
@@ -43,13 +46,10 @@ The app will prompt for download of the external dependencies, if needed.
 pip install file_conversor
 ```
 
-#### Option 3. Scoop Package Manager
+#### Option 3. Installer (EXE)
 
-1. Open PowerShell (no admin priviledges needed) and run:
-  ```bash
-  scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
-  scoop install file_conversor
-  ```
+1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
+2. Execute installer (.exe file)
 
 ### For Linux / MacOS
 
