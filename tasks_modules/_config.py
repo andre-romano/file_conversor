@@ -38,7 +38,7 @@ INSTALL_CHOCO = Path(f'{SCRIPTS_PATH}/install_choco.ps1')
 INSTALL_SCOOP = Path(f'{SCRIPTS_PATH}/install_scoop.ps1')
 
 INSTALL_APP_PY = Path(f"{SCRIPTS_PATH}/install_app.py")
-INSTALL_APP_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/heads/master/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
+INSTALL_APP_URL = f"https://cdn.jsdelivr.net/gh/andre-romano/{PROJECT_NAME}@master/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 
 
 def remove_path(path_pattern: str):
