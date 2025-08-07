@@ -18,7 +18,7 @@
             "python3 \"$dir\\$fname\" -u --version $version"
         ]
     },
-    "bin": "venv\\Scripts\\file_conversor.exe",
+    "bin": "Scripts\\file_conversor.exe",
     "checkver": {
         "github": "https://github.com/andre-romano/file_conversor"
     },
