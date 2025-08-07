@@ -2,18 +2,12 @@
 # scripts\install_app.py
 
 import argparse
-import platform
-import shutil
 import subprocess
 import sys
 import tempfile
 
 from pathlib import Path
 from typing import Optional
-
-WINDOWS = platform.system().startswith("Windows")
-LINUX = platform.system().startswith("Linux")
-MACOS = platform.system().startswith("Darwin")
 
 
 class InstallationError(RuntimeError):
@@ -27,11 +21,9 @@ class Environment:
     def __init__(self) -> None:
         super().__init__()
         # str is for compatibility with subprocess.run on CPython <= 3.7 on Windows
-        self._python = shutil.which("python.exe" if WINDOWS else "python") or (
-            shutil.which("python3.exe" if WINDOWS else "python3")
-        )
-        if not self._python:
-            raise InstallationError(return_code=1, log="Python binary not found in PATH")
+        self._python = sys.executable
+        if not Path(self._python).exists():
+            raise InstallationError(return_code=1, log="Python binary not found")
         print(f"Python bin: {self._python}")
 
     @staticmethod
