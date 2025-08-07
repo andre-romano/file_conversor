@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## Unreleased
+
+<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/v0.1.1...HEAD)</small>
+
+### Added
+
+- add: scoop manifest ([ba23bfd](https://github.com/andre-romano/file_conversor/commit/ba23bfdd1abca0d8a7b7a6b42b59847757d80c08) by Andre).
+
+### Fixed
+
+- fix: LF ends for .py ([4ad6f8f](https://github.com/andre-romano/file_conversor/commit/4ad6f8fc6432462e4db42db5b532c7fcab821917) by Andre).
+- fix: readme ([cbc090a](https://github.com/andre-romano/file_conversor/commit/cbc090a6eb2ca82aeee83309d38c79ad6dac6873) by Andre).
+
+<!-- insertion marker -->
 ## [v0.1.1](https://github.com/andre-romano/file_conversor/releases/tag/v0.1.1) - 2025-08-06
 
 <small>[Compare with first commit](https://github.com/andre-romano/file_conversor/compare/be0a5b8d08cfe742e966f0b1b5b4211c6fe0bd15...v0.1.1)</small>
