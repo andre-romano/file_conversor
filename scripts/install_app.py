@@ -32,12 +32,13 @@ class Environment:
         self._set_env_path()
 
     def _set_env_path(self):
-        scripts_dir = Path(sys.executable).parent / "bin"
+        self._scripts_dir = Path(sys.executable).parent / "bin"
         if WINDOWS:
-            scripts_dir = Path(sys.executable).parent / "Scripts"
-        os.environ["PATH"] = str(scripts_dir) + os.pathsep + os.environ["PATH"]
+            self._scripts_dir = Path(sys.executable).parent / "Scripts"
+        os.environ["PATH"] = str(self._scripts_dir) + os.pathsep + os.environ["PATH"]
+        print(f"env:PATH = {os.environ["PATH"]}")
         if WINDOWS:
-            self._save_path_win(str(scripts_dir))
+            self._save_path_win(str(self._scripts_dir))
 
     def _save_path_win(self, scripts_dir: str):
         # Read current PATH from user environment
@@ -57,6 +58,7 @@ class Environment:
             print("You need to restart your shell or log off/on for changes to take effect.")
         else:
             print("Scripts path already in PATH.")
+        print(f"PATH = {os.environ["PATH"]}")
 
     @staticmethod
     def run(*args, **kwargs) -> subprocess.CompletedProcess:
