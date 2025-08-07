@@ -1,7 +1,6 @@
 # tasks\_config.py
 
 import hashlib
-import re
 import shutil
 import tomllib
 
@@ -34,8 +33,12 @@ I18N_TEMPLATE = f"{I18N_PATH}/messages.pot"
 
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
-INSTALL_CHOCO = Path(f'scripts/install_choco.ps1')
-INSTALL_SCOOP = Path(f'scripts/install_scoop.ps1')
+SCRIPTS_PATH = str(f'scripts')
+INSTALL_CHOCO = Path(f'{SCRIPTS_PATH}/install_choco.ps1')
+INSTALL_SCOOP = Path(f'{SCRIPTS_PATH}/install_scoop.ps1')
+
+INSTALL_APP_PY = Path(f"{SCRIPTS_PATH}/install_app.py")
+INSTALL_APP_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/heads/master/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 
 
 def remove_path(path_pattern: str):
@@ -58,19 +61,6 @@ def mkdir(dirs: Iterable):
         Path(dir).mkdir(parents=True, exist_ok=True)
         if not Path(dir).exists():
             raise RuntimeError(f"Cannot create dir '{dir}'")
-
-
-def get_dependency(deps: Iterable) -> dict[str, str]:
-    """"Gets the dependency in format { dependency: version }"""
-    res = {}
-    for dependency in PYPROJECT["tool"]["myproject"]["scoop_deps"]:
-        re_pattern = re.compile(r"^(.+?)([@](.+))?$")
-        match = re_pattern.search(dependency)
-        if not match:
-            raise RuntimeError(f"Invalid dependency '{dependency}' format. Valid format is 'package@version' or 'package'.")
-        package, version = match.group(1), match.group(3)
-        res[package] = version
-    return res
 
 
 def gen_sha256(filepath: str | Path):

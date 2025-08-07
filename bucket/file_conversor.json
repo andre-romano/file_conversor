@@ -4,71 +4,25 @@
     "homepage": "https://github.com/andre-romano/file_conversor",
     "license": "Apache-2.0",
     "depends": [
-        "python",
-        "ffmpeg",
-        "qpdf"
+        "python"
     ],
-    "architecture": {
-        "64bit": {
-            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/pyproject.toml",
-            "hash": "99391127e1d3cd6f6de019e741a6e2c8b19285edf1e2604e5dacb101c9b49579",
-            "pre_install": [
-                "pip install file_conversor==0.1.1"
-            ],
-            "bin": "file_conversor.exe",
-            "uninstaller": {
-                "script": [
-                    "Write-Host 'Uninstalling Python package...'",
-                    "pip uninstall -y file_conversor"
-                ]
-            }
-        },
-        "32bit": {
-            "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/v0.1.1/pyproject.toml",
-            "hash": "99391127e1d3cd6f6de019e741a6e2c8b19285edf1e2604e5dacb101c9b49579",
-            "pre_install": [
-                "pip install file_conversor==0.1.1"
-            ],
-            "bin": "file_conversor.exe",
-            "uninstaller": {
-                "script": [
-                    "Write-Host 'Uninstalling Python package...'",
-                    "pip uninstall -y file_conversor"
-                ]
-            }
-        }
+    "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/heads/master/scripts/install_app.py",
+    "hash": "8e6f0e31c3c93c63c67f540cfba17c50c96a665372c4615ce152f61f75ddd8d4",
+    "installer": {
+        "script": [
+            "python3 \"$dir\\$fname\" -i --version $version"
+        ]
     },
+    "uninstaller": {
+        "script": [
+            "python3 \"$dir\\$fname\" -u --version $version"
+        ]
+    },
+    "bin": "venv\\Scripts\\file_conversor.exe",
     "checkver": {
         "github": "https://github.com/andre-romano/file_conversor"
     },
     "autoupdate": {
-        "architecture": {
-            "64bit": {
-                "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/$version/CHANGELOG.md",
-                "pre_install": [
-                    "pip install file_conversor==$version"
-                ],
-                "bin": "file_conversor.exe",
-                "uninstaller": {
-                    "script": [
-                        "Write-Host 'Uninstalling Python package...'",
-                        "pip uninstall -y file_conversor"
-                    ]
-                }
-            },
-            "32bit": {
-                "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/tags/$version/CHANGELOG.md",
-                "pre_install": [
-                    "pip install file_conversor==$version"
-                ],
-                "bin": "file_conversor.exe",
-                "uninstaller": {
-                    "script": [
-                        "Write-Host 'Uninstalling Python package...'",
-                        "pip uninstall -y file_conversor"
-                    ]
-                }
-            }
-        }
+        "url": "https://raw.githubusercontent.com/andre-romano/file_conversor/refs/heads/master/scripts/install_app.py"
     }
 }

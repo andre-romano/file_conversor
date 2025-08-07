@@ -8,10 +8,12 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-SCOOP_PATH = str(PYPROJECT["tool"]["myproject"]["scoop_path"])
+SCOOP_PATH = str("bucket")
 SCOOP_JSON = Path(f"{SCOOP_PATH}/{PROJECT_NAME}.json")
 
-SCOOP_DEPS = _config.get_dependency(PYPROJECT["tool"]["myproject"]["scoop_deps"])
+SCOOP_DEPS = {
+    "python": ""
+}
 
 
 @task
@@ -32,37 +34,8 @@ def create_manifest(c):
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
 
-    # use changelog for scoop hashing
-    DOWNLOAD_FILE = Path("./pyproject.toml")
-
-    # gen scoop config for archs
-    install_config = {
-        "url": f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/{DOWNLOAD_FILE.name}",
-        "hash": f"{_config.gen_sha256(DOWNLOAD_FILE)}",
-        "pre_install": [
-            rf"pip install {PROJECT_NAME}=={PROJECT_VERSION}"
-        ],
-        "bin": rf"{PROJECT_NAME}.exe",
-        "uninstaller": {
-            "script": [
-                "Write-Host 'Uninstalling Python package...'",
-                f"pip uninstall -y {PROJECT_NAME}"
-            ]
-        },
-    }
-    update_config = {
-        "url": f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/$version/{DOWNLOAD_FILE.name}",
-        "pre_install": [
-            rf"pip install {PROJECT_NAME}==$version"
-        ],
-        "bin": rf"{PROJECT_NAME}.exe",
-        "uninstaller": {
-            "script": [
-                "Write-Host 'Uninstalling Python package...'",
-                f"pip uninstall -y {PROJECT_NAME}"
-            ]
-        },
-    }
+    if not INSTALL_APP_PY.exists():
+        raise RuntimeError(f"File '{INSTALL_APP_PY}' not found!")
 
     # bucket/file_conersor.json
     SCOOP_JSON.write_text(json.dumps({
@@ -71,25 +44,28 @@ def create_manifest(c):
         "homepage": PROJECT_HOMEPAGE,
         "license": "Apache-2.0",
         "depends": list(SCOOP_DEPS.keys()),
-        "architecture": {
-            "64bit": install_config,
-            "32bit": install_config,
+        "url": INSTALL_APP_URL,
+        "hash": f"{_config.gen_sha256(INSTALL_APP_PY)}",
+        "installer": {
+            "script": [
+                "python3 \"$dir\\$fname\" -i --version $version"
+            ]
         },
+        "uninstaller": {
+            "script": [
+                "python3 \"$dir\\$fname\" -u --version $version"
+            ]
+        },
+        "bin": f"venv\\Scripts\\{PROJECT_NAME}.exe",
         "checkver": {
             "github": PROJECT_HOMEPAGE,
         },
         "autoupdate": {
-            "architecture": {
-                "64bit": update_config,
-                "32bit": update_config,
-            }
+            "url": INSTALL_APP_URL,
         }
     }, indent=4), encoding="utf-8")
-
-    if not DOWNLOAD_FILE.exists():
-        raise RuntimeError(f"File '{DOWNLOAD_FILE}' not found!")
     if not SCOOP_JSON.exists():
-        raise RuntimeError(f"JSON file '{SCOOP_JSON}' not found!")
+        raise FileNotFoundError(f"File '{SCOOP_JSON}' not found!")
 
     print("[bold green] OK [/]",)
 

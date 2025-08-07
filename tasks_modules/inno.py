@@ -9,7 +9,7 @@ from tasks_modules._config import *
 
 from tasks_modules import choco
 
-INNO_PATH = str(PYPROJECT["tool"]["myproject"]["inno_path"])
+INNO_PATH = str("inno")
 INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 
 
@@ -48,30 +48,30 @@ def create_manifest(c):
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 
 [Setup]
-AppName={PROJECT_NAME}
+AppName={PROJECT_TITLE}
 AppVersion={PROJECT_VERSION}
-DefaultDirName={{tmp}}  
-DisableWelcomePage=yes  
+DefaultDirName={{autopf}}/{PROJECT_TITLE}
 DisableDirPage=yes
-DisableReadyPage=yes  
-DisableFinishedPage=yes 
-DisableProgramGroupPage=yes 
-DisableReadyMemo=yes 
-DisableStartupPrompt=yes
 Compression=LZMA2
 ShowLanguageDialog=yes
-PrivilegesRequired=admin
+PrivilegesRequiredOverridesAllowed=dialog
 SourceDir={Path(".").resolve()}
 OutputDir={Path("./dist").resolve()}
 OutputBaseFilename={PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer
 
 [Files]
-Source: "{INSTALL_CHOCO.resolve()}"; DestDir: "{{tmp}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{Path(SCRIPTS_PATH).resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
 
 [Run]
-; Install chocolatey
-StatusMsg: "Installing Chocolatey ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{tmp}}\{INSTALL_CHOCO.name}"""; Flags: runascurrentuser waituntilterminated
-StatusMsg: "Installing App ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""choco install {PROJECT_NAME} --version {PROJECT_VERSION} -y"""; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing Scoop ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{tmp}}\{INSTALL_SCOOP.name}"""; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} (for ALL USERS) ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""scoop install {PROJECT_NAME}@{PROJECT_VERSION} -k -g"""; Flags: runascurrentuser waituntilterminated; Check: IsAdmin
+StatusMsg: "Installing {PROJECT_NAME} (for current user) ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""scoop install {PROJECT_NAME}@{PROJECT_VERSION} -k"""; Flags: runascurrentuser waituntilterminated; Check: not IsAdmin
+
+[Code]
+function IsAdmin: Boolean;
+begin
+  Result := IsAdminLoggedOn;
+end;
 ''', encoding="utf-8")
     print("[bold green]OK[/]")
 

@@ -9,11 +9,12 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
+CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
-
-CHOCO_DEPS = _config.get_dependency(PYPROJECT["tool"]["myproject"]["choco_deps"])
+CHOCO_DEPS = {
+    "python": ""
+}
 
 
 @task
@@ -47,66 +48,43 @@ def create_manifest(c):
     install_ps1_path.write_text(rf'''
 $ErrorActionPreference = 'Stop'
 
-# Ensure Python is available
-if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
-    Write-Error "Python is not installed or not in PATH."
-    exit 1
-}}                                
-                                
-Write-Output "Updating Python pip ..."
-& python -m pip install --upgrade pip
+$packageName = "{PROJECT_NAME}"
+$version     = "{PROJECT_VERSION}" 
+$toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$installer   = "$toolsDir\{INSTALL_APP_PY.name}"
+$url         = "{INSTALL_APP_URL}"
+$checksum    = "{_config.gen_sha256(INSTALL_APP_PY)}"  # SHA256
 
-Write-Output "Installing app \"{PROJECT_NAME}=={PROJECT_VERSION}\" ..."
-& python -m pip install "{PROJECT_NAME}=={PROJECT_VERSION}"
+Get-ChocolateyWebFile -PackageName "$packageName" `
+                      -FileFullPath "$installer" `
+                      -Url "$url" `
+                      -Checksum "$checksum" `
+                      -ChecksumType "sha256"
 
-Write-Output "Finding binPath for python scripts ..."
-$binPath = & python -c "import sys; from pathlib import Path ; print(Path(sys.executable).parent / 'Scripts')"
-Write-Output $binPath
-
-Write-Output "Checking system PATH ..."
-$existingPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
-if (-not ($existingPath.Split(';') -contains $binPath)) {{
-    Write-Output "Modifying system PATH ..."
-    [Environment]::SetEnvironmentVariable("Path", "$existingPath;$binPath", [System.EnvironmentVariableTarget]::Machine)
-}}
-
-# Update current PATH env
-Write-Output "Modifying current PS env PATH ..."
-$env:PATH += ";$binPath"
-
-# Run post-install configuration
-if (-not (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue)) {{
-    Write-Error "{PROJECT_NAME} is not installed or not in PATH."
-    exit 1
-}}              
-Write-Output "Configuring windows context menu ..."
-& {PROJECT_NAME} config set --install-context-menu-all-users
-& {PROJECT_NAME} win install-menu
+Write-Output "Installing app ..."
+& python "$installer" -i --version "$version"                                     
 ''', encoding="utf-8")
-
-    # chocolateyBeforeModify.ps1
-    before_modify_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyBeforeModify.ps1")
-    before_modify_ps1_path.write_text(rf"""
-$ErrorActionPreference = 'Stop'
-                           
-if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
-    # Run pre-uninstall configuration
-    Write-Output "Uninstalling windows context menu ..."
-    & {PROJECT_NAME} win uninstall-menu       
-}}                                      
-""", encoding="utf-8")
 
     # chocolateyUninstall.ps1
     uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
     uninstall_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
 
-# Uninstall app
-if (Get-Command {PROJECT_NAME} -ErrorAction SilentlyContinue) {{
-    Write-Output "Uninstalling app using PIP ..."
-    & python -m pip uninstall -y {PROJECT_NAME}
-}}
-Write-Output "App uninstalled"
+$packageName = "{PROJECT_NAME}"
+$version     = "{PROJECT_VERSION}" 
+$toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$installer   = "$toolsDir\{INSTALL_APP_PY.name}"
+$url         = "{INSTALL_APP_URL}"
+$checksum    = "{_config.gen_sha256(INSTALL_APP_PY)}"  # SHA256
+
+Get-ChocolateyWebFile -PackageName "$packageName" `
+                      -FileFullPath "$installer" `
+                      -Url "$url" `
+                      -Checksum "$checksum" `
+                      -ChecksumType "sha256"
+
+Write-Output "Uninstalling app ..."
+& python "$installer" -u --version "$version"
 """, encoding="utf-8")
 
     # PACKAGE.nuspec
