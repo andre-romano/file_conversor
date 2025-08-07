@@ -7,7 +7,7 @@
         "python"
     ],
     "url": "https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/scripts/install_app.py",
-    "hash": "8e6f0e31c3c93c63c67f540cfba17c50c96a665372c4615ce152f61f75ddd8d4",
+    "hash": "275e15c2db4e4f328178dc1d3f508379e279edf5a19d327f81032d17cdebd6f7",
     "installer": {
         "script": [
             "python3 \"$dir\\$fname\" -i --version $version"
