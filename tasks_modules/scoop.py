@@ -42,14 +42,26 @@ def create_manifest(c):
         "pre_install": [
             rf"pip install {PROJECT_NAME}=={PROJECT_VERSION}"
         ],
-        "bin": rf"{PROJECT_NAME}.exe"
+        "bin": rf"{PROJECT_NAME}.exe",
+        "uninstaller": {
+            "script": [
+                "Write-Host 'Uninstalling Python package...'",
+                f"pip uninstall -y {PROJECT_NAME}"
+            ]
+        },
     }
     update_config = {
         "url": f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/$version/{DOWNLOAD_FILE.name}",
         "pre_install": [
             rf"pip install {PROJECT_NAME}==$version"
         ],
-        "bin": rf"{PROJECT_NAME}.exe"
+        "bin": rf"{PROJECT_NAME}.exe",
+        "uninstaller": {
+            "script": [
+                "Write-Host 'Uninstalling Python package...'",
+                f"pip uninstall -y {PROJECT_NAME}"
+            ]
+        },
     }
 
     # bucket/file_conersor.json
