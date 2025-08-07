@@ -2,12 +2,16 @@
 # scripts\install_app.py
 
 import argparse
+import os
+import platform
 import subprocess
 import sys
 import tempfile
 
 from pathlib import Path
 from typing import Optional
+
+WINDOWS = (platform.system() == "Windows")
 
 
 class InstallationError(RuntimeError):
@@ -25,6 +29,34 @@ class Environment:
         if not Path(self._python).exists():
             raise InstallationError(return_code=1, log="Python binary not found")
         print(f"Python bin: {self._python}")
+        self._set_env_path()
+
+    def _set_env_path(self):
+        scripts_dir = Path(sys.executable).parent / "bin"
+        if WINDOWS:
+            scripts_dir = Path(sys.executable).parent / "Scripts"
+        os.environ["PATH"] = str(scripts_dir) + os.pathsep + os.environ["PATH"]
+        if WINDOWS:
+            self._save_path_win(str(scripts_dir))
+
+    def _save_path_win(self, scripts_dir: str):
+        # Read current PATH from user environment
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_READ) as key:
+            try:
+                current_path, _ = winreg.QueryValueEx(key, "PATH")
+            except FileNotFoundError:
+                current_path = ""
+
+        # Only add if missing
+        if scripts_dir.lower() not in current_path.lower():
+            new_path = scripts_dir + os.pathsep + current_path
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_SET_VALUE) as key:
+                winreg.SetValueEx(key, "PATH", 0, winreg.REG_EXPAND_SZ, new_path)
+            print(f"Added to PATH: {scripts_dir}")
+            print("You need to restart your shell or log off/on for changes to take effect.")
+        else:
+            print("Scripts path already in PATH.")
 
     @staticmethod
     def run(*args, **kwargs) -> subprocess.CompletedProcess:
