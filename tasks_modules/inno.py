@@ -78,9 +78,9 @@ StatusMsg: "Installing App ..." ; Filename: "powershell.exe"; Parameters: "-Exec
 
 @task(pre=[choco.install])
 def install(c):
-    print("[bold] Installing InnoSetup ... [/]")
     if shutil.which("iscc"):
         return
+    print("[bold] Installing InnoSetup ... [/]")
     c.run(f'powershell.exe -ExecutionPolicy Bypass -Command "choco install -y innosetup"')
     if not shutil.which("iscc"):
         raise RuntimeError("'iscc' not found in PATH")

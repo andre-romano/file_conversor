@@ -7,8 +7,9 @@ Python program to convert and compress audio/video/text/etc files to other forma
   - [Installing](#installing)
     - [For Windows](#for-windows)
       - [Option 1. Chocolatey Package Manager](#option-1-chocolatey-package-manager)
-      - [Option 2. PyPi](#option-2-pypi)
-      - [Option 3. Installer (EXE)](#option-3-installer-exe)
+      - [Option 2. Scoop Package Manager](#option-2-scoop-package-manager)
+      - [Option 3. PyPi](#option-3-pypi)
+      - [Option 4. Installer (EXE)](#option-4-installer-exe)
     - [For Linux / MacOS](#for-linux--macos)
       - [Option 1. PyPi](#option-1-pypi)
   - [Usage](#usage)
@@ -39,13 +40,21 @@ The app will prompt for download of the external dependencies, if needed.
   choco install file_conversor
   ```
 
-#### Option 2. PyPi
+#### Option 2. Scoop Package Manager
+
+1. Open PowerShell (no admin priviledges needed) and run:
+  ```bash
+  scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
+  scoop install file_conversor
+  ```
+
+#### Option 3. PyPi
 
 ```bash
 pip install file_conversor
 ```
 
-#### Option 3. Installer (EXE)
+#### Option 4. Installer (EXE)
 
 1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
 2. Execute installer (.exe file)

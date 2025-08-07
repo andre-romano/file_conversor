@@ -4,6 +4,7 @@ recursive-include src/file_conversor/.data *
 recursive-include src/file_conversor/.icons *
 recursive-include src/file_conversor/.locales *
 
+recursive-exclude bucket *
 recursive-exclude choco *
 recursive-exclude dist *
 recursive-exclude docs *

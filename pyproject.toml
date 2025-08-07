@@ -40,6 +40,12 @@ title = "File Conversor"
 icons_path = "src/file_conversor/.icons"
 locales_path = "src/file_conversor/.locales"
 inno_path = "inno"
+scoop_path = "bucket"
+scoop_deps = [  # dependencies to include in scoop package
+    "python", 
+    "ffmpeg", 
+    "qpdf",
+]
 choco_path = "choco"
 choco_deps = [  # dependencies to include in choco package
     "python", 

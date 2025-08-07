@@ -13,14 +13,7 @@ CHOCO_PATH = str(PYPROJECT["tool"]["myproject"]["choco_path"])
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
 
-CHOCO_DEPS = {}
-for dependency in PYPROJECT["tool"]["myproject"]["choco_deps"]:
-    re_pattern = re.compile(r"^(.+?)([@](.+))?$")
-    match = re_pattern.search(dependency)
-    if not match:
-        raise RuntimeError(f"Invalid dependency '{dependency}' format. Valid format is 'package@version' or 'package'.")
-    package, version = match.group(1), match.group(3)
-    CHOCO_DEPS[package] = version
+CHOCO_DEPS = _config.get_dependency(PYPROJECT["tool"]["myproject"]["choco_deps"])
 
 
 @task
@@ -63,7 +56,7 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {{
 Write-Output "Updating Python pip ..."
 & python -m pip install --upgrade pip
 
-Write-Output "Installing app "{PROJECT_NAME}=={PROJECT_VERSION}" ..."
+Write-Output "Installing app \"{PROJECT_NAME}=={PROJECT_VERSION}\" ..."
 & python -m pip install "{PROJECT_NAME}=={PROJECT_VERSION}"
 
 Write-Output "Finding binPath for python scripts ..."
@@ -127,10 +120,10 @@ Write-Output "App uninstalled"
     <description>{PROJECT_DESCRIPTION}</description>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
     <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
-    <projectUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectUrl>
-    <projectSourceUrl>https://github.com/andre-romano/{PROJECT_NAME}</projectSourceUrl>
-    <licenseUrl>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/LICENSE</licenseUrl>
-    <releaseNotes>https://github.com/andre-romano/{PROJECT_NAME}/blob/master/CHANGELOG.md</releaseNotes>
+    <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
+    <projectSourceUrl>{PROJECT_HOMEPAGE}</projectSourceUrl>
+    <licenseUrl>{PROJECT_HOMEPAGE}/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>{PROJECT_HOMEPAGE}/blob/master/CHANGELOG.md</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
         {"\n        ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
@@ -146,9 +139,9 @@ Write-Output "App uninstalled"
 
 @task
 def install(c):
-    print("[bold] Installing Chocolatey ... [/]")
     if shutil.which("choco"):
         return
+    print("[bold] Installing Chocolatey ... [/]")
     if not INSTALL_CHOCO.exists():
         raise RuntimeError(f"Install Choco - Script {INSTALL_CHOCO} does not exist")
     c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')

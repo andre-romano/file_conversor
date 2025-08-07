@@ -7,7 +7,7 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import pypi
+from tasks_modules import pypi, scoop
 
 
 @task
@@ -25,7 +25,7 @@ def changelog(c):
     print(f"[bold green]OK[/]")
 
 
-@task(pre=[changelog, pypi.publish,])
+@task(pre=[changelog, pypi.publish, scoop.publish,])
 def publish(c):
     """"Publish Git"""
     print(f"[bold] Publishing to GitHub ... [/]")
