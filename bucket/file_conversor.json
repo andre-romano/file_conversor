@@ -18,7 +18,13 @@
             "python3 \"$dir\\$fname\" -u --version $version"
         ]
     },
-    "bin": "Scripts\\file_conversor.exe",
+    "bin": [
+        [
+            "python",
+            "-m",
+            "file_conversor"
+        ]
+    ],
     "checkver": {
         "github": "https://github.com/andre-romano/file_conversor"
     },

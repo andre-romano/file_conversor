@@ -58,7 +58,9 @@ def create_manifest(c):
                 "python3 \"$dir\\$fname\" -u --version $version"
             ]
         },
-        "bin": f"Scripts\\{PROJECT_NAME}.exe",
+        "bin": [
+            ["python", "-m", PROJECT_NAME]
+        ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
         },
