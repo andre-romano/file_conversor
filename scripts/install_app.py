@@ -1,6 +1,7 @@
 
 # scripts\install_app.py
 
+import sysconfig
 import argparse
 import os
 import platform
@@ -12,6 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 WINDOWS = (platform.system() == "Windows")
+print(f"PLATFORM: {platform.system()}")
 
 
 class InstallationError(RuntimeError):
@@ -21,6 +23,77 @@ class InstallationError(RuntimeError):
         self.log = log
 
 
+class OSEnvPath:
+
+    @staticmethod
+    def set_path_process(*paths: Path):
+        for path in paths:
+            if not path.exists():
+                raise InstallationError(return_code=1, log=f"Folder '{path}' not exists.")
+            os.environ["PATH"] = str(path) + os.pathsep + os.environ["PATH"]
+
+    @staticmethod
+    def set_path_persistent(*paths: Path, scope: str):
+        if WINDOWS:
+            OSEnvPath.__set_path_persistent_nt(*paths, scope=scope)
+        else:
+            OSEnvPath.__set_path_persistent_posix(*paths, scope=scope)
+
+    @staticmethod
+    def __set_path_persistent_nt(*paths: Path, scope: str):
+        # Read current PATH from user environment
+        import winreg
+
+        if scope == "machine":
+            hive = winreg.HKEY_LOCAL_MACHINE
+            key = r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
+        elif scope == "user":
+            hive = winreg.HKEY_CURRENT_USER
+            key = r"Environment"
+        else:
+            raise InstallationError(return_code=1, log=f"Scope '{scope}' not valid")
+
+        with winreg.OpenKey(hive, key, 0, winreg.KEY_READ) as k:
+            try:
+                current_path, _ = winreg.QueryValueEx(k, "PATH")
+            except FileNotFoundError:
+                current_path = ""
+
+        # Only add if missing
+        modified = False
+        for path in paths:
+            if str(path).lower() not in current_path.lower():
+                current_path = str(path) + os.pathsep + current_path
+                print(f"Added to PATH: {path}")
+                modified = True
+            else:
+                print(f"Skipping '{path}'. Already in PATH.")
+
+        # save
+        if modified:
+            with winreg.OpenKey(hive, key, 0, winreg.KEY_SET_VALUE) as k:
+                winreg.SetValueEx(k, "PATH", 0, winreg.REG_EXPAND_SZ, current_path)
+                print(f"PATH saved")
+
+    @staticmethod
+    def __set_path_persistent_posix(*paths: Path, scope: str):
+        pass
+
+    def __init__(self) -> None:
+        super().__init__()
+        os_prefix = 'nt' if WINDOWS else 'posix'
+        self._paths = [
+            Path(sysconfig.get_path('scripts', scheme=f"{os_prefix}")),
+            Path(sysconfig.get_path('scripts', scheme=f"{os_prefix}_user")),
+        ]
+
+    def run(self):
+        print(f"--- Setting Python scripts PATH ----")
+        self.set_path_process(*self._paths)
+        self.set_path_persistent(*self._paths, scope="user")
+        print(f"--- END ----")
+
+
 class Environment:
     def __init__(self) -> None:
         super().__init__()
@@ -28,37 +101,9 @@ class Environment:
         self._python = sys.executable
         if not Path(self._python).exists():
             raise InstallationError(return_code=1, log="Python binary not found")
-        print(f"Python bin: {self._python}")
-        self._set_env_path()
-
-    def _set_env_path(self):
-        self._scripts_dir = Path(sys.executable).parent / "bin"
-        if WINDOWS:
-            self._scripts_dir = Path(sys.executable).parent / "Scripts"
-        os.environ["PATH"] = str(self._scripts_dir) + os.pathsep + os.environ["PATH"]
-        print(f"env:PATH = {os.environ["PATH"]}")
-        if WINDOWS:
-            self._save_path_win(str(self._scripts_dir))
-
-    def _save_path_win(self, scripts_dir: str):
-        # Read current PATH from user environment
-        import winreg
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_READ) as key:
-            try:
-                current_path, _ = winreg.QueryValueEx(key, "PATH")
-            except FileNotFoundError:
-                current_path = ""
-
-        # Only add if missing
-        if scripts_dir.lower() not in current_path.lower():
-            new_path = scripts_dir + os.pathsep + current_path
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_SET_VALUE) as key:
-                winreg.SetValueEx(key, "PATH", 0, winreg.REG_EXPAND_SZ, new_path)
-            print(f"Added to PATH: {scripts_dir}")
-            print("You need to restart your shell or log off/on for changes to take effect.")
-        else:
-            print("Scripts path already in PATH.")
-        print(f"PATH = {os.environ["PATH"]}")
+        print(f"Python bin: {self._python}\n")
+        osenv = OSEnvPath()
+        osenv.run()
 
     @staticmethod
     def run(*args, **kwargs) -> subprocess.CompletedProcess:
@@ -106,7 +151,7 @@ class Installer:
 
     def _ensure_pip(self) -> None:
         try:
-            self._env.pip("--version")
+            self._env.pip("--version", stdout=subprocess.DEVNULL)
         except:
             print("Attempting to fix 'pip' (ensurepip) ...")
             self._env.python("-m", "ensurepip", "--upgrade")
