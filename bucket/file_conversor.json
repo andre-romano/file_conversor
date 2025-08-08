@@ -10,12 +10,12 @@
     "hash": "6e4a208ab8fc4b7c0b87c597a78ad185d2af172281b5ee2abf837dcab42c15ce",
     "installer": {
         "script": [
-            "python3 \"$dir\\$fname\" -i --version $version"
+            "python3 \"$dir\\install_app.py\" -i --version $version"
         ]
     },
     "uninstaller": {
         "script": [
-            "python3 \"$dir\\$fname\" -u --version $version"
+            "python3 \"$dir\\install_app.py\" -u --version $version"
         ]
     },
     "checkver": {
