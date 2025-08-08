@@ -1,9 +1,12 @@
 # src\file_conversor\config\config.py
 
 import json
+import locale
 
 from pathlib import Path
 from typing import Any
+
+from file_conversor.config.state import State
 
 
 class Configuration:
@@ -19,9 +22,13 @@ class Configuration:
     def __init__(self) -> None:
         super().__init__()
 
-        self.__config_path = Path(f".config.json")
+        self.__config_path = State.get_resources_folder() / ".config.json"
         # Define configuration dictionary
+        language = "en_US"
+        if locale.getlocale() and locale.getlocale()[0]:
+            language = locale.getlocale()[0]
         self.__data = {
+            "language": language,    # Default: system language or "en_US"
             "install-deps": True,    # Default: ask user to confirm dependency installation
             "audio-bitrate": 192,    # Default audio bitrate in kbps
             "video-bitrate": 10000,  # Default video bitrate in kbps

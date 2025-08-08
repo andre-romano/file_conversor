@@ -42,6 +42,10 @@ def show():
     **{_('Example')}:** `file_conversor configure --audio-bitrate 128`
 """)
 def set(
+    language: Annotated[str, typer.Option("--language", "-l",
+                                          help=_("Set preferred language for app (if available). Format lang_COUNTRY. Defaults to system preffered language or 'en_US' (English - United States)."),
+                                          )] = CONFIG["language"],
+
     install_deps: Annotated[str | None, typer.Option("--install-deps", "-install",
                                                      help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),
                                                      callback=check_is_bool_or_none,
@@ -85,6 +89,7 @@ def set(
 ):
     # update the configuration dictionary
     CONFIG.update({
+        "language": language,
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
         "audio-bitrate": audio_bitrate,
         "video-bitrate": video_bitrate,
