@@ -3,4 +3,4 @@
 # invoke locales-build
 
 Write-Host "Running CLI ..."
-pdm run python src/file_conversor.py @args
+pdm run python src/file_conversor/__main__.py @args
