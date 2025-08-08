@@ -6,10 +6,10 @@ This module provides functionalities for handling external backends.
 
 import platform
 import shutil
-
 import subprocess
-from typing import Iterable
+
 from rich import print
+from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.config import Log
@@ -27,11 +27,13 @@ class AbstractPackageManager:
         """
         Initializes package manager.
 
-        :param dependencies: External dependencies to check. Format {``executable: dependency``}.
+        :param dependencies: External dependencies to check. Format {``executable: dependency``}.        
         """
         super().__init__()
-        self._dependencies = dependencies
         self._os_type = platform.system()
+        self._dependencies = dependencies
+        self._pre_install_dep_callbacks: list[Callable[[], Any]] = []
+        self._post_install_dep_callbacks: list[Callable[[], Any]] = []
 
     def check_dependencies(self) -> set[str]:
         """
@@ -98,12 +100,25 @@ class AbstractPackageManager:
         :raises RuntimeError: package manager NOT installed in system.
         :raises subprocess.CalledProcessError: dependency could not be installed in system.
         """
-        res = True
         if not self.get_pkg_manager_installed():
             raise RuntimeError("Package manager NOT installed in system.")
+        logger.info(f"{_('Running pre-install dependency commands')} ...")
+        for callback in self._pre_install_dep_callbacks:
+            callback()
         logger.info(f"{_('Installing missing dependencies')} {list(dependencies)} ...")
         for dep in dependencies:
             subprocess.run(self._get_cmd_install_dep(dep), check=True)
+        logger.info(f"{_('Running post-install dependency commands')} ...")
+        for callback in self._post_install_dep_callbacks:
+            callback()
+
+    def add_pre_install_callback(self, callback: Callable[[], Any]):
+        """ Adds a pre-install callback to run before installing dependencies. """
+        self._pre_install_dep_callbacks.append(callback)
+
+    def add_post_install_callback(self, callback: Callable[[], Any]):
+        """ Adds a post-install callback to run after installing dependencies. """
+        self._post_install_dep_callbacks.append(callback)
 
     def _get_pkg_manager_installed(self) -> str | None:
         raise NotImplementedError("Method not overloaded.")

@@ -3,20 +3,39 @@
 
 import os
 import shutil
+import subprocess
+
+from typing import Callable, Any, Iterable
 
 # user-provided imports
 from file_conversor.system import PLATFORM_WINDOWS
 
+from file_conversor.config.log import Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
 
 _ = get_translation()
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
 
 
 class ScoopPackageManager(AbstractPackageManager):
-    def __init__(self, dependencies: dict[str, str]) -> None:
+    def __init__(self,
+                 dependencies: dict[str, str],
+                 buckets: list[str] | None = None,
+                 ) -> None:
+        """
+        Inits Scoop pkg manager.
+
+        :param dependencies: Format {executable: dependency}
+        :param buckets: Buckets to add, to allow dependency install.
+        """
         super().__init__(dependencies)
+        self._buckets = buckets if buckets else []
+
+        self.add_pre_install_callback(self._ensure_buckets)
 
     def _get_pkg_manager_installed(self) -> str | None:
         return shutil.which("scoop")
@@ -42,3 +61,18 @@ class ScoopPackageManager(AbstractPackageManager):
         pkg_mgr_bin = self._get_pkg_manager_installed()
         pkg_mgr_bin = pkg_mgr_bin if pkg_mgr_bin else "SCOOP_NOT_FOUND"
         return [pkg_mgr_bin, "install", dependency, "-k"]
+
+    def _ensure_buckets(self):
+        scoop_bin = self._get_pkg_manager_installed() or "SCOOP_NOT_FOUND"
+        process = subprocess.run([scoop_bin, "bucket", "list"],
+                                 capture_output=True,
+                                 text=True, check=True)
+        for bucket in self._buckets:
+            if bucket in process.stdout:
+                logger.info(f"{_('Skipping bucket')} '{bucket}'. {_('Already added in scoop')}.")
+                continue
+            logger.info(f"{_('Adding bucket')} '{bucket}' {_('to scoop')}.")
+            subprocess.run([scoop_bin, "bucket", "add", bucket],
+                           capture_output=True,
+                           text=True, check=True)
+            logger.info(f"{_('Bucket')} '{bucket}' {_('added to scoop')}.")
