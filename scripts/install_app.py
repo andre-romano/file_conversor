@@ -77,7 +77,50 @@ class OSEnvPath:
 
     @staticmethod
     def __set_path_persistent_posix(*paths: Path, scope: str):
-        pass
+        # Determine which files to modify based on scope
+        if scope == "user":
+            config_files = [
+                Path.home() / ".bashrc",
+                Path.home() / ".profile",
+                Path.home() / ".bash_profile",
+                Path.home() / ".zshrc"  # For zsh users
+            ]
+        elif scope == "machine":  # machine
+            config_files = [Path("/etc/environment")]
+        else:
+            raise InstallationError(return_code=1, log=f"Scope '{scope}' not valid")
+
+        # Get current PATH
+        current_path = os.environ.get("PATH", "")
+        path_list = current_path.split(os.pathsep)
+
+        # Check which paths need to be added
+        paths_to_add = [str(p.resolve()) for p in paths
+                        if str(p.resolve()) not in path_list]
+
+        if not paths_to_add:
+            print("All paths already in PATH.")
+            return
+
+        # Prepare PATH modification line
+        export_line = f'\nexport PATH="{"".join(f"{p}:" for p in paths_to_add)}$PATH"\n'
+
+        # Check if export already exists
+        for config_file in config_files:
+            if not config_file.exists():
+                continue
+
+            with open(config_file, "r") as f:
+                content = f.read()
+
+            if any(p in content for p in paths_to_add):
+                print(f"Skipping {config_file} - PATH already modified")
+                continue
+
+            # Append the export
+            with open(config_file, "a") as f:
+                f.write(export_line)
+            print(f"Added PATH to {config_file}")
 
     def __init__(self) -> None:
         super().__init__()
