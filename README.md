@@ -35,10 +35,11 @@ The app will prompt for download of the external dependencies, if needed.
 #### Option 1. Scoop Package Manager (recommended)
 
 1. Open PowerShell (no admin priviledges needed) and run:
-  ```bash
-  scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
-  scoop install file_conversor
-  ```
+
+```bash
+scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
+scoop install file_conversor -k
+```
 
 #### Option 2. PyPi
 

@@ -74,15 +74,15 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 icon=str(icons_folder_path / 'webp.ico'),
             ),
             WinContextCommand(
-                name="rotate_clock_90",
+                name="rotate_anticlock_90",
                 description="Rotate Left",
-                command=f'{State.get_executable()} image rotate "%1" -r 90',
+                command=f'{State.get_executable()} image rotate "%1" -r -90',
                 icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
-                name="rotate_anticlock_90",
+                name="rotate_clock_90",
                 description="Rotate Right",
-                command=f'{State.get_executable()} image rotate "%1" -r -90',
+                command=f'{State.get_executable()} image rotate "%1" -r 90',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
             WinContextCommand(
