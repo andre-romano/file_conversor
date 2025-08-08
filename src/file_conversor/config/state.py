@@ -62,7 +62,7 @@ class State:
         res = ""
 
         exe = shutil.which(sys.argv[0]) if sys.argv else None
-        if exe:
+        if exe and not exe.endswith(".py"):
             res = rf'"{exe}"'
         else:
             python_exe = sys.executable
