@@ -37,12 +37,46 @@ def create_manifest(c):
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
 
-    if not INSTALL_CHOCO.exists():
-        raise RuntimeError(f"Create Inno Files - Script {INSTALL_CHOCO} does not exist")
+    if not INSTALL_SCOOP.exists():
+        raise RuntimeError(f"File {INSTALL_SCOOP} does not exist")
 
-    # chocolateyInstall.ps1
-    setup_path = Path(f"{INNO_ISS}")
-    setup_path.write_text(rf'''
+    install_ps1_path = Path(f"{INNO_PATH}/install.ps1")
+    install_ps1_path.write_text(rf'''
+$ErrorActionPreference = 'Stop'
+$log_file = "{PROJECT_NAME}-install.log"
+
+Write-Output "Add {PROJECT_NAME} bucket ..."
+& scoop bucket add "{PROJECT_NAME}" "{PROJECT_HOMEPAGE}" | Tee-Object -FilePath "$log_file"
+
+Write-Output "Installing {PROJECT_NAME} ..."
+& scoop install "{PROJECT_NAME}@{PROJECT_VERSION}" -s -k @args | Tee-Object -FilePath "$log_file" -Append
+
+if (-not (Get-Command "{PROJECT_NAME}" -ErrorAction SilentlyContinue)) {{
+    Write-Error "'{PROJECT_NAME}' not found in PATH" | Tee-Object -FilePath "$log_file" -Append
+    exit 1
+}}
+''', encoding='utf-8')
+
+    uninstall_ps1_path = Path(f"{INNO_PATH}/uninstall.ps1")
+    uninstall_ps1_path.write_text(rf'''
+$ErrorActionPreference = 'Stop'
+$log_file = "{PROJECT_NAME}-uninstall.log"
+
+Write-Output "Uninstalling {PROJECT_NAME} ..."
+& scoop uninstall "{PROJECT_NAME}" @args | Tee-Object -FilePath "$log_file"
+
+Write-Output "Remove {PROJECT_NAME} bucket ..."
+& scoop bucket rm "{PROJECT_NAME}" | Tee-Object -FilePath "$log_file" -Append
+
+if (Get-Command "{PROJECT_NAME}" -ErrorAction SilentlyContinue) {{
+    Write-Error "'{PROJECT_NAME}' STILL installed in PATH" | Tee-Object -FilePath "$log_file" -Append
+    exit 1
+}}
+''', encoding='utf-8')
+
+    # setup.iss
+    setup_iss_path = Path(f"{INNO_ISS}")
+    setup_iss_path.write_text(rf'''
 ; Copywright(c) -- Andre Luiz Romano Madureira
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
@@ -61,11 +95,17 @@ OutputBaseFilename={PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer
 
 [Files]
 Source: "{Path(SCRIPTS_PATH).resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{Path(install_ps1_path).resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{Path(uninstall_ps1_path).resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
 
 [Run]
-StatusMsg: "Installing Scoop ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{tmp}}\{INSTALL_SCOOP.name}"""; Flags: runascurrentuser waituntilterminated
-StatusMsg: "Installing {PROJECT_NAME} (for ALL USERS) ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""scoop install {PROJECT_NAME}@{PROJECT_VERSION} -k -g"""; Flags: runascurrentuser waituntilterminated; Check: IsAdmin
-StatusMsg: "Installing {PROJECT_NAME} (for current user) ..." ; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command ""scoop install {PROJECT_NAME}@{PROJECT_VERSION} -k"""; Flags: runascurrentuser waituntilterminated; Check: not IsAdmin
+StatusMsg: "Installing Scoop ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\{INSTALL_SCOOP.name}"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} (for ALL USERS) ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\{install_ps1_path.name}"" ""-g"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated; Check: IsAdmin
+StatusMsg: "Installing {PROJECT_NAME} (for current user) ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\{install_ps1_path.name}"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated; Check: not IsAdmin
+
+[UninstallRun]
+StatusMsg: "Uninstalling {PROJECT_NAME} (for ALL USERS) ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\{uninstall_ps1_path.name}"" ""-g"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated; Check: IsAdmin
+StatusMsg: "Uninstalling {PROJECT_NAME} (for current user) ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{app}}\{uninstall_ps1_path.name}"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated; Check: not IsAdmin
 
 [Code]
 function IsAdmin: Boolean;

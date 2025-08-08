@@ -25,8 +25,8 @@ def mkdirs(c):
 
 @task
 def clean_logs(c):
-    remove_path(f"*.log")
-    remove_path(f"*.log.*")
+    remove_path(f"**/*.log")
+    remove_path(f"**/*.log.*")
 
 
 @task(pre=[mkdirs])
