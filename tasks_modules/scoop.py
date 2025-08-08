@@ -50,12 +50,12 @@ def create_manifest(c):
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "installer": {
             "script": [
-                "python3 \"$dir\\$fname\" -i --version $version",
+                f"python3 \"$dir\\{INSTALL_APP_PY.name}\" -i --version $version",
             ]
         },
         "uninstaller": {
             "script": [
-                "python3 \"$dir\\$fname\" -u --version $version"
+                f"python3 \"$dir\\{INSTALL_APP_PY.name}\" -u --version $version"
             ]
         },
         "checkver": {
