@@ -11,6 +11,7 @@ from typing import Annotated
 from file_conversor.cli import audio_video_cmd
 from file_conversor.cli import batch_cmd
 from file_conversor.cli import config_cmd
+from file_conversor.cli import doc_cmd
 from file_conversor.cli import image_cmd
 from file_conversor.cli import pdf_cmd
 from file_conversor.cli import win_cmd
@@ -57,6 +58,10 @@ app_cmd.add_typer(pdf_cmd,
                   help=_("PDF file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
+app_cmd.add_typer(doc_cmd,
+                  name="doc",
+                  help=_("DOC file manipulation"),
+                  rich_help_panel=MULTIMEDIA_PANEL)
 
 # -- OS-SPECIFIC
 if CURR_PLATFORM == PLATFORM_WINDOWS:
