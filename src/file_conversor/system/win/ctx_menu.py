@@ -7,6 +7,7 @@ from rich import print
 
 # user-provided modules
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
+from file_conversor.system.win.utils import is_admin
 
 from file_conversor.config import State, Log
 from file_conversor.config.locale import get_translation
@@ -48,12 +49,12 @@ class WinContextMenu:
     _instance = None
 
     @staticmethod
-    def get_instance(for_all_users: bool):
+    def get_instance():
         if not WinContextMenu._instance:
-            WinContextMenu._instance = WinContextMenu(for_all_users)
+            WinContextMenu._instance = WinContextMenu()
         return WinContextMenu._instance
 
-    def __init__(self, for_all_users: bool) -> None:
+    def __init__(self) -> None:
         """Set context menu for all users, or for current user ONLY"""
         super().__init__()
 
@@ -63,7 +64,7 @@ class WinContextMenu:
         self.ROOT_KEY_USER = rf"HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
         self.ROOT_KEY_MACHINE = rf"HKEY_LOCAL_MACHINE\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
 
-        self._root_key_template = self.ROOT_KEY_MACHINE if for_all_users else self.ROOT_KEY_USER
+        self._root_key_template = self.ROOT_KEY_MACHINE if is_admin() else self.ROOT_KEY_USER
         self._reg_file = WinRegFile()
         self._register_callbacks: list[Callable[[Self], None]] = []
 

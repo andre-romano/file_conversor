@@ -1,16 +1,3 @@
-# src\file_conversor\platform\mac\__init__.py
+# src\file_conversor\system\mac\__init__.py
 
-import platform
-
-# Import only on Darwin to avoid ImportError on other OSes
-if platform.system() == "Darwin":
-    # do nothing
-    pass
-else:
-    pass  # Placeholder so the name exists
-
-
-def reload_user_path():
-    """Reload user PATH in current process."""
-    # dummy method (not needed in mac)
-    pass
+from file_conversor.system.mac.utils import is_admin, reload_user_path

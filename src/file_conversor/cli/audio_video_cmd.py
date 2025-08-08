@@ -83,7 +83,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 
 
 # register commands in windows context menu
-ctx_menu = WinContextMenu.get_instance(CONFIG['install-context-menu-all-users'])
+ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 

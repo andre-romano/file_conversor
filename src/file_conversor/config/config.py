@@ -30,7 +30,6 @@ class Configuration:
             "image-fit": 'into',     # Default image => PDF fit mode
             "image-page-size": None,  # Default image => PDF page size
             "image-set-metadata": True,  # Default image => PDF set metadata
-            "install-context-menu-all-users": False,  # Default install only for current user
         }
 
         self.load()

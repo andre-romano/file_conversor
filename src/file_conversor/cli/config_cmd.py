@@ -82,11 +82,6 @@ def set(
                                                      callback=check_is_bool_or_none,
                                                      is_flag=True,
                                                      )] = CONFIG["image-set-metadata"],
-    install_context_menu_all_users: Annotated[bool, typer.Option("--install-context-menu-all-users", "-icmau",
-                                                                 help=_("Installs context menu for all users. Defaults to False (install only for current user)."),
-                                                                 callback=check_is_bool_or_none,
-                                                                 is_flag=True,
-                                                                 )] = CONFIG["install-context-menu-all-users"],
 ):
     # update the configuration dictionary
     CONFIG.update({
@@ -98,7 +93,6 @@ def set(
         "image-fit": image_fit,
         "image-page-size": image_page_size,
         "image-set-metadata": image_set_metadata,
-        "install-context-menu-all-users": install_context_menu_all_users,
     })
     CONFIG.save()
     show()

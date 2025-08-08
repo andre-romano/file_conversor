@@ -1,15 +1,3 @@
-# src\file_conversor\platform\lin\__init__.py
+# src\file_conversor\system\lin\__init__.py
 
-import platform
-
-# Import only on Linux to avoid ImportError on other OSes
-if platform.system() == "Linux":
-    pass  # dummy, do nothing
-else:
-    pass  # Placeholder so the name exists
-
-
-def reload_user_path():
-    """Reload user PATH in current process."""
-    # dummy, not needed in Linux
-    pass
+from file_conversor.system.lin.utils import is_admin, reload_user_path
