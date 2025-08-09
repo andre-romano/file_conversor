@@ -45,10 +45,10 @@ class Docx2PDFBackend(AbstractBackend):
         input_file: str,
     ):
         """
-        Convert input file into an output PDF file.
+        Convert input DOCX file into an output PDF file.
 
-        :param output_file: Output image file.
-        :param input_file: Input image file.        
+        :param output_file: Output PDF file.
+        :param input_file: Input docx file.        
 
         :raises FileNotFoundError: if input file not found.
         """

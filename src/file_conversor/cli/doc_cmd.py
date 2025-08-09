@@ -78,7 +78,7 @@ def to_pdf(
 
     logger.info(f"{_('Processing file')} '{input_file}' ...")
 
-    output_file = output_file if output_file else f"{input_file.replace(".pdf", "")}.pdf"
+    output_file = output_file if output_file else f"{input_file.replace(".docx", "")}.pdf"
     docx2pdf_backend.to_pdf(
         input_file=input_file,
         output_file=output_file,
