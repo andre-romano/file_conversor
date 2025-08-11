@@ -60,7 +60,7 @@ app_cmd.add_typer(pdf_cmd,
 
 app_cmd.add_typer(doc_cmd,
                   name="doc",
-                  help=_("DOC file manipulation"),
+                  help=_("DOC(X) / ODT file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
 # -- OS-SPECIFIC

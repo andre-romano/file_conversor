@@ -11,7 +11,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import PyPDFBackend, QPDFBackend, Pdf2DocxBackend
+from file_conversor.backend import PyPDFBackend, QPDFBackend, WordBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -38,12 +38,6 @@ pdf_cmd = typer.Typer()
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = State.get_icons_folder()
     ctx_menu.add_extension(".pdf", [
-        WinContextCommand(
-            name="to_docx",
-            description="To DOCX",
-            command=f'{State.get_executable()} pdf to-docx "%1"',
-            icon=str(icons_folder_path / 'docx.ico'),
-        ),
         WinContextCommand(
             name="repair",
             description="Repair",
@@ -92,40 +86,6 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 # register commands in windows context menu
 ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
-
-
-# pdf to-docx
-@pdf_cmd.command(
-    help=f"""
-        {_('Convert PDF file to DOCX (requires Microsft Word / LibreOffice).')}        
-    """,
-    epilog=f"""
-**{_('Examples')}:** 
-
-- `file_conversor pdf to-docx input_file.pdf` 
-
-- `file_conversor pdf to-docx input_file.pdf -o output_file.docx` 
-""")
-def to_docx(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(Pdf2DocxBackend.SUPPORTED_IN_FORMATS)})",
-                                              callback=lambda x: check_file_format(x, Pdf2DocxBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                              )],
-    output_file: Annotated[str | None, typer.Option("--output", "-o",
-                                                    help=f"{_('Output file')} ({', '.join(Pdf2DocxBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _repaired.pdf at the end)')}.",
-                                                    callback=lambda x: check_file_format(x, Pdf2DocxBackend.SUPPORTED_OUT_FORMATS),
-                                                    )] = None,
-):
-    pdf2docx_backend = Pdf2DocxBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        task1 = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
-
-        pdf2docx_backend.to_docx(
-            # files
-            input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}.docx",
-        )
-        progress.update(task1, total=100, completed=100)
-    logger.info(f"{_('DOCX generation')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf repair

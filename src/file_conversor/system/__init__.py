@@ -9,22 +9,19 @@ PLATFORM_LINUX = "Linux"
 PLATFORM_MACOS = "Darwin"
 PLATFORM_UNKNOWN = ""
 
-CURR_PLATFORM = PLATFORM_UNKNOWN
+CURR_PLATFORM = platform.system()
 
 # dynamically load modules, as needed
-if platform.system() == PLATFORM_WINDOWS:
+if CURR_PLATFORM == PLATFORM_WINDOWS:
     # WINDOWS OS
-    CURR_PLATFORM = PLATFORM_WINDOWS
     from file_conversor.system.win import reload_user_path, is_admin
 
-elif platform.system() == PLATFORM_LINUX:
+elif CURR_PLATFORM == PLATFORM_LINUX:
     # LINUX OS
-    CURR_PLATFORM = PLATFORM_LINUX
     from file_conversor.system.lin import reload_user_path, is_admin
 
-elif platform.system() == PLATFORM_MACOS:
+elif CURR_PLATFORM == PLATFORM_MACOS:
     # MACOS OS
-    CURR_PLATFORM = PLATFORM_MACOS
     from file_conversor.system.mac import reload_user_path, is_admin
 
 else:
