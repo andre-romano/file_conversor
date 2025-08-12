@@ -54,12 +54,20 @@ def clean_uml(c):
     remove_path(f"uml/*")
 
 
+@task(pre=[mkdirs])
+def clean_changelog(c):
+    remove_path(f"CHANGELOG.md")
+    remove_path(f"RELEASE_NOTES.md")
+
+
 @task(pre=[clean_logs,
            clean_build,
            clean_dist,
            clean_htmlcov,
            clean_docs,
-           clean_uml, ])
+           clean_uml,
+           clean_changelog,
+           ])
 def clean(c):
     pass
 
