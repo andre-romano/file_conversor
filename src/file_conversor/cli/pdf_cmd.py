@@ -11,7 +11,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import PyPDFBackend, QPDFBackend, WordBackend
+from file_conversor.backend import PyPDFBackend, QPDFBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation

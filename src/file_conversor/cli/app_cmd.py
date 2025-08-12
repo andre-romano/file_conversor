@@ -11,10 +11,12 @@ from typing import Annotated
 from file_conversor.cli import audio_video_cmd
 from file_conversor.cli import batch_cmd
 from file_conversor.cli import config_cmd
-from file_conversor.cli import doc_cmd
 from file_conversor.cli import image_cmd
 from file_conversor.cli import pdf_cmd
 from file_conversor.cli import win_cmd
+
+# office CLI
+from file_conversor.cli.office import doc_cmd, ppt_cmd, xls_cmd
 
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
@@ -41,6 +43,7 @@ app_cmd = typer.Typer(
 # PANELS
 UTILS_CONFIG_PANEL = _("Utils and Config")
 MULTIMEDIA_PANEL = _("Multimedia files")
+OFFICE_PANEL = _("Office files")
 
 # REGISTER SUBCOMMANDS
 app_cmd.add_typer(audio_video_cmd,
@@ -58,10 +61,22 @@ app_cmd.add_typer(pdf_cmd,
                   help=_("PDF file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
+# OFFICE CLI
+
 app_cmd.add_typer(doc_cmd,
                   name="doc",
-                  help=_("DOC(X) / ODT file manipulation"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
+                  help=f"{_('Word file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  rich_help_panel=OFFICE_PANEL)
+
+app_cmd.add_typer(xls_cmd,
+                  name="xls",
+                  help=f"{_('Excel file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  rich_help_panel=OFFICE_PANEL)
+
+app_cmd.add_typer(ppt_cmd,
+                  name="ppt",
+                  help=f"{_('PowerPoint file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  rich_help_panel=OFFICE_PANEL)
 
 # -- OS-SPECIFIC
 if CURR_PLATFORM == PLATFORM_WINDOWS:

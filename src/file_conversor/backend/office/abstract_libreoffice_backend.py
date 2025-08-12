@@ -1,4 +1,4 @@
-# src\file_conversor\backend\writer_backend.py
+# src\file_conversor\backend\office\abstract_libreoffice_backend.py
 
 import subprocess
 
@@ -16,23 +16,10 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class WriterBackend(AbstractBackend):
+class AbstractLibreofficeBackend(AbstractBackend):
     """
-    A class that provides an interface for handling doc files using ``writer`` (libreoffice).
+    A class that provides an interface for handling files using ``libreoffice``.
     """
-
-    SUPPORTED_IN_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
-        "pdf": {},
-        "html": {},
-    }
 
     def __init__(
         self,

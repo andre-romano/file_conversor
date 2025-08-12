@@ -1,8 +1,6 @@
 
 # src\file_conversor\cli\doc_cmd.py
 
-import re
-import time
 import typer
 
 from pathlib import Path
@@ -11,7 +9,7 @@ from typing import Annotated, List, Optional
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import WordBackend, WriterBackend
+from file_conversor.backend import DOC_BACKEND
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -33,20 +31,18 @@ logger = LOG.getLogger(__name__)
 # typer PANELS
 doc_cmd = typer.Typer()
 
-OfficeBackend = WordBackend if CURR_PLATFORM == PLATFORM_WINDOWS else WriterBackend
-
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = State.get_icons_folder()
     # WordBackend commands
-    for ext in OfficeBackend.SUPPORTED_IN_FORMATS:
+    for ext in DOC_BACKEND.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name=f"to_{ext}",
                 description=f"To {ext.upper()}",
                 command=f'{State.get_executable()} doc convert "%1" "%1.{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
-            ) for ext in OfficeBackend.SUPPORTED_OUT_FORMATS
+            ) for ext in DOC_BACKEND.SUPPORTED_OUT_FORMATS
         ])
 
 
@@ -68,22 +64,22 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor doc convert input_file.docx -o output_file.pdf`
     """)
 def convert(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(WordBackend.SUPPORTED_IN_FORMATS)})",
-                                              callback=lambda x: check_file_format(x, WordBackend.SUPPORTED_IN_FORMATS, exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(DOC_BACKEND.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, DOC_BACKEND.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
 
     output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(WordBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}).",
-                                             callback=lambda x: check_file_format(x, WordBackend.SUPPORTED_OUT_FORMATS),
+                                             help=f"{_('Output file')} ({', '.join(DOC_BACKEND.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}).",
+                                             callback=lambda x: check_file_format(x, DOC_BACKEND.SUPPORTED_OUT_FORMATS),
                                              )],
 ):
-    office_backend = OfficeBackend()
+    doc_backend = DOC_BACKEND()
 
     logger.info(f"{_('Processing file')} '{input_file}' => '{output_file}' ...")
 
     with get_progress_bar() as progress:
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        office_backend.convert(
+        doc_backend.convert(
             input_file=input_file,
             output_file=output_file,
         )

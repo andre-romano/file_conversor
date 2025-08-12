@@ -1,4 +1,4 @@
-# src\file_conversor\backend\word_backend.py
+# src\file_conversor\backend\office\excel_backend.py
 
 from pathlib import Path
 from typing import Iterable
@@ -21,24 +21,25 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class WordBackend(AbstractBackend):
+class ExcelBackend(AbstractBackend):
     """
-    A class that provides an interface for handling doc files using ``word`` (comtypes).
+    A class that provides an interface for handling doc files using ``excel`` (comtypes).
     """
 
     SUPPORTED_IN_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
+        "xls": {},
+        "xlsx": {},
+        "ods": {},
     }
     SUPPORTED_OUT_FORMATS = {
-        # format = wdFormat VBA code
-        # https://learn.microsoft.com/en-us/office/vba/api/word.wdsaveformat
-        "doc": {'format': 0},
-        "docx": {'format': 16},
-        "odt": {'format': 23},
-        "pdf": {'format': 17},
-        "html": {'format': 8},
+        # format = xlFormat VBA code
+        # https://learn.microsoft.com/en-us/office/vba/api/excel.xlfileformat
+        "xls": {'format': 56},
+        "xlsx": {'format': 51},
+        "ods": {'format': 60},
+        "csv": {'format': 6},
+        "pdf": {'format': 57},
+        "html": {'format': 44},
     }
 
     def __init__(
@@ -74,15 +75,28 @@ class WordBackend(AbstractBackend):
 
         self.check_file_exists(str(input_path))
 
-        out_config = WordBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+        out_config = ExcelBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
 
-        word = client.Dispatch("Word.Application")
-        doc = word.Documents.Open(str(input_path))
-        doc.SaveAs(str(output_path),
-                   FileFormat=out_config['format'],
-                   )
-        doc.Close()
+        excel = client.Dispatch("Excel.Application")
+        excel.Visible = False
+
+        workbook = excel.Workbooks.Open(str(input_path))
+        if output_path.suffix.lower() == ".pdf":
+            workbook.ExportAsFixedFormat(
+                Filename=str(output_path),
+                Type=0,  # 0 = pdf
+                Quality=0,
+                IncludeDocProperties=True,
+                IgnorePrintAreas=False,
+                OpenAfterPublish=False,
+            )
+        else:
+            workbook.SaveAs(
+                str(output_path),
+                FileFormat=out_config['format'],
+            )
+        workbook.Close(SaveChanges=False)
         try:
-            word.Quit()
+            excel.Quit()
         except:
-            logger.warning(f"{_('Failed to close Word properly')}.")
+            logger.warning(f"{_('Failed to close Excel properly')}.")
