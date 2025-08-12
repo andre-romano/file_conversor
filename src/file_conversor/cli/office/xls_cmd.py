@@ -42,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name=f"to_{ext}",
                 description=f"To {ext.upper()}",
-                command=f'{State.get_executable()} xls convert "%1" "%1.{ext}"',
+                command=f'{State.get_executable()} xls convert "%1" -o "%1.{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             ) for ext in XLS_BACKEND.SUPPORTED_OUT_FORMATS
         ])
