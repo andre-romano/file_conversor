@@ -4,15 +4,21 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
+from pathlib import Path
+
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
 # user-provided imports
+from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.utils.file import File
 
+LOG = Log.get_instance()
+
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class PillowBackend(AbstractBackend):
@@ -97,12 +103,14 @@ class PillowBackend(AbstractBackend):
         format = self.SUPPORTED_OUT_FORMATS[out_file.get_extension()]["format"]
 
         img = Image.open(input_file)
-        img.save(output_file,
-                 format=format,
-                 quality=quality,
-                 optimize=optimize,
-                 lossless=True if quality == 100 else False,  # valid only for WEBP
-                 )
+        self._save_fix_errors(
+            img,
+            output_file,
+            format=format,
+            quality=quality,
+            optimize=optimize,
+            lossless=True if quality == 100 else False,  # valid only for WEBP
+        )
 
     def rotate(self, output_file: str, input_file: str, rotate: int):
         """
@@ -121,7 +129,8 @@ class PillowBackend(AbstractBackend):
 
         img = Image.open(input_file)
         img = img.rotate(rotate)
-        img.save(
+        self._save_fix_errors(
+            img,
             output_file,
             format=format,
             quality=90,
@@ -148,9 +157,50 @@ class PillowBackend(AbstractBackend):
             img = ImageOps.mirror(img)
         else:
             img = ImageOps.flip(img)
-        img.save(
+        self._save_fix_errors(
+            img,
             output_file,
             format=format,
             quality=90,
             optimize=True,
         )
+
+    def _save_fix_errors(self, img: Image.Image, output_file: str | Path, format: str, **params):
+        """
+        Corrects common errors in images and saves them.
+
+        :param img: Image to be corrected.
+        :param output_file: File to save img.
+        :param format: Target format to save img.
+        :param params: Additional parameters for saving the image, such as quality and optimize.
+
+        :raises Exception: if image correction fails.
+        """
+        try:
+            format = format.upper()  # ensure uppercase format
+
+            # 0. Preservar EXIF e ICC se existirem
+            if "exif" in img.info:
+                params.setdefault("exif", img.info["exif"])
+            if "icc_profile" in img.info:
+                params.setdefault("icc_profile", img.info["icc_profile"])
+
+            # 1. Transparência -> converter para RGBA
+            if img.mode == "P" and "transparency" in img.info:
+                img = img.convert("RGBA")
+
+            # 2. Converter modos incompatíveis com o formato de destino
+            if format in ("JPEG",) and img.mode not in ("RGB", "L"):
+                img = img.convert("RGB")
+            elif format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):
+                img = img.convert("RGBA")
+            elif format == "TIFF" and img.mode not in ("RGB", "RGBA", "L"):
+                img = img.convert("RGB")
+            elif format == "BMP" and img.mode not in ("RGB",):
+                img = img.convert("RGB")
+        except Exception as e:
+            logger.error(f"{_('Image correction failed')}: {e}")
+            raise
+
+        # save image
+        img.save(output_file, format=format, **params)
