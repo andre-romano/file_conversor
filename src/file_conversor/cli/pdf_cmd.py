@@ -51,12 +51,6 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             icon=str(icons_folder_path / 'jpg.ico'),
         ),
         WinContextCommand(
-            name="to_svg",
-            description="To SVG",
-            command=f'{State.get_executable()} pdf convert "%1" -o "%1.svg"',
-            icon=str(icons_folder_path / 'svg.ico'),
-        ),
-        WinContextCommand(
             name="repair",
             description="Repair",
             command=f'{State.get_executable()} pdf repair "%1"',

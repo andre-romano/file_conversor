@@ -25,7 +25,6 @@ class PyMuPDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "png": {},
         "jpg": {},
-        "svg": {},
     }
 
     def __init__(

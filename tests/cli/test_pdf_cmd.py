@@ -96,6 +96,17 @@ def test_pdf_convert_png(tmp_path):
     assert out_path.with_name("test_1.png").exists()
 
 
+def test_pdf_convert_jpg(tmp_path):
+    in_path = Path("tests/.data/test.pdf").resolve()
+    out_path = tmp_path / "test.jpg"
+
+    result = runner.invoke(
+        app_cmd, ["pdf", "convert", str(in_path), "-o", str(out_path)]
+    )
+    assert result.exit_code == 0
+    assert out_path.with_name("test_1.jpg").exists()
+
+
 def test_pdf():
     result = runner.invoke(app_cmd, ["pdf", "--help"])
     assert "pdf" in result.output
