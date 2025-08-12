@@ -29,9 +29,20 @@ jobs:
           pip install pdm
           pdm install
 
+      - name: Create release notes
+        run: |
+          pdm run invoke git.release-notes
+
       - name: Build Installer .EXE
         run: |
           pdm run invoke inno.build
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_notes
+          path: RELEASE_NOTES.md
+          retention-days: 7
 
       - name: Upload installer EXE
         uses: actions/upload-artifact@v4
@@ -56,14 +67,22 @@ jobs:
           name: exe
           path: ./dist
 
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release_notes
+          path: .
+
       - name: Check artifacts download
         run: |
-          ls dist/*.exe || exit 1
+          ls dist/*.exe || ( echo "dist/*.exe not found" ; exit 1 )
+          ls RELEASE_NOTES.md || ( echo "RELEASE_NOTES.md not found" ; exit 1 )
+        shell: bash
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          body_path: CHANGELOG.md
+          body_path: RELEASE_NOTES.md
           files: |
             dist/*
           draft: false

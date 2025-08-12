@@ -1,6 +1,9 @@
 # config file
 src/file_conversor/.config.json
 
+# release notes
+RELEASE_NOTES.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

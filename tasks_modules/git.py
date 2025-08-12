@@ -10,6 +10,19 @@ from tasks_modules._config import *
 from tasks_modules import pypi, scoop
 
 
+@task
+def release_notes(c):
+    print(f"[bold] Creating release notes ... [/]")
+    release_notes_path = Path("RELEASE_NOTES.md")
+    if release_notes_path.exists():
+        release_notes_path.unlink()
+
+    c.run(f"pdm run git-changelog --release-notes > {release_notes_path}")
+    if not release_notes_path.exists():
+        raise RuntimeError(f"{release_notes_path} does not exist")
+    print(f"[bold] Creating release notes ... OK [/]")
+
+
 @task(pre=[pypi.publish, scoop.publish,])
 def tag(c):
     print(f"[bold] Creating tag {GIT_RELEASE} locally ... [/]")
