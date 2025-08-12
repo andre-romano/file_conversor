@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- fix: bug in converting alpha img => non-alpha (e.g., png => jpg) ([1665bc1](https://github.com/andre-romano/file_conversor/commit/1665bc122b1c98db74c2fb2de7672abf10958078) by Andre).
+- fix: win menu incorrect syntax ([53df78a](https://github.com/andre-romano/file_conversor/commit/53df78a3094ac0c9b2dee3560210f4398f6eccd4) by Andre).
+- fix: get_executable returning .py main script ([54e4fee](https://github.com/andre-romano/file_conversor/commit/54e4fee0dc624ab5e4f0787088f54c3c05e2252f) by Andre).
+- fix: inno setup build ([40bd1ea](https://github.com/andre-romano/file_conversor/commit/40bd1eaee55ef7e63c5d83cde51a4b8c6bfe5c8f) by Andre).
+- fix: entrypoint of run_cli.ps1 ([b55269b](https://github.com/andre-romano/file_conversor/commit/b55269b57a6efc0b101f5bfb7f13333fafe43800) by Andre).
+- fix: rotation left/rigth menus ([b9f2bb6](https://github.com/andre-romano/file_conversor/commit/b9f2bb6455acf05dfd2ca126465c977a95e5ada3) by Andre).
 - fix: LF ends for .py ([4ad6f8f](https://github.com/andre-romano/file_conversor/commit/4ad6f8fc6432462e4db42db5b532c7fcab821917) by Andre).
 - fix: readme ([cbc090a](https://github.com/andre-romano/file_conversor/commit/cbc090a6eb2ca82aeee83309d38c79ad6dac6873) by Andre).
 
