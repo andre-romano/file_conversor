@@ -13,6 +13,7 @@ from file_conversor.cli import batch_cmd
 from file_conversor.cli import config_cmd
 from file_conversor.cli import image_cmd
 from file_conversor.cli import pdf_cmd
+from file_conversor.cli import svg_cmd
 from file_conversor.cli import win_cmd
 
 # office CLI
@@ -54,6 +55,11 @@ app_cmd.add_typer(audio_video_cmd,
 app_cmd.add_typer(image_cmd,
                   name="image",
                   help=_("Image file manipulation"),
+                  rich_help_panel=MULTIMEDIA_PANEL)
+
+app_cmd.add_typer(svg_cmd,
+                  name="svg",
+                  help=_("SVG file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
 app_cmd.add_typer(pdf_cmd,

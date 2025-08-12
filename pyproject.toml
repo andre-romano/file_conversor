@@ -2,7 +2,7 @@
 
 [project]
 name = "file_conversor"
-version = "0.2.0"
+version = "0.3.0"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
@@ -14,6 +14,7 @@ dependencies = [
     "pillow>=11.3.0",
     "img2pdf>=0.6.1",
     "pywin32>=311",
+    "pymupdf>=1.26.3",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
@@ -55,7 +56,11 @@ provider = "github"
 testpaths = ["tests"]
 addopts = "-x --ff --cov=src --cov-report=html"
 filterwarnings = [
-  "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer"
+    "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer",
+    # supress pymupdf warnings
+    "ignore:builtin type SwigPyPacked has no __module__ attribute:DeprecationWarning",
+    "ignore:builtin type swigvarlink has no __module__ attribute",
+    "ignore:builtin type SwigPyObject has no __module__ attribute",
 ]
 
 [tool.pyright]
