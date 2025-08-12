@@ -15,6 +15,7 @@ from file_conversor.backend.batch_backend import BatchBackend
 from file_conversor.backend.ffmpeg_backend import FFmpegBackend
 from file_conversor.backend.img2pdf_backend import Img2PDFBackend
 from file_conversor.backend.pillow_backend import PillowBackend
+from file_conversor.backend.pymupdf_backend import PyMuPDFBackend
 from file_conversor.backend.pymusvg_backend import PyMuSVGBackend
 from file_conversor.backend.pypdf_backend import PyPDFBackend
 from file_conversor.backend.qpdf_backend import QPDFBackend
