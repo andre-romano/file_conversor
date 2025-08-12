@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.3.0](https://github.com/andre-romano/file_conversor/releases/tag/v0.3.0) - 2025-08-12
+
+<small>[Compare with v0.2.0](https://github.com/andre-romano/file_conversor/compare/v0.2.0...v0.3.0)</small>
+
+### Features
+
+- add pdf compression ([285224d](https://github.com/andre-romano/file_conversor/commit/285224d51b74520317b593d746c5aea8a6342438) by Andre).
+- add pdf => png | jpg support ([30e1e5e](https://github.com/andre-romano/file_conversor/commit/30e1e5e85b2102645f4959b9a7a0628a5b1b6384) by Andre).
+- add pdf => png|jpg|svg support ([47116ea](https://github.com/andre-romano/file_conversor/commit/47116ea7faf04e4ca25a133a934ef9cd13e571e6) by Andre).
+- add svg => png|jpg support ([99ad031](https://github.com/andre-romano/file_conversor/commit/99ad031eb2243b5c95db08efd4c61a524b607787) by Andre).
+
+### Bug Fixes
+
+- changelog convention ([62bd319](https://github.com/andre-romano/file_conversor/commit/62bd3199808f99b3e5d17bda083bb3fb3df645fb) by Andre).
+
 ## [v0.2.0](https://github.com/andre-romano/file_conversor/releases/tag/v0.2.0) - 2025-08-12
 
 <small>[Compare with v0.1.1](https://github.com/andre-romano/file_conversor/compare/v0.1.1...v0.2.0)</small>
