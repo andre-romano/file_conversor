@@ -45,7 +45,6 @@ app_cmd = typer.Typer(
 UTILS_CONFIG_PANEL = _("Utils and Config")
 MULTIMEDIA_PANEL = _("Multimedia files")
 OFFICE_PANEL = _("Office files")
-DOCUMENT_PANEL = _("Document files")
 
 ###############
 # MULTIMEDIA PANEL
@@ -66,21 +65,10 @@ app_cmd.add_typer(svg_cmd,
                   help=_("SVG file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
-###############
-# DOCUMENT PANEL
-###############
-
-
 app_cmd.add_typer(pdf_cmd,
                   name="pdf",
                   help=_("PDF file manipulation"),
-                  rich_help_panel=DOCUMENT_PANEL)
-
-# app_cmd.add_typer(xps_cmd,
-#                   name="xps",
-#                   help=_("XPS file manipulation"),
-#                   rich_help_panel=DOCUMENT_PANEL)
-
+                  rich_help_panel=MULTIMEDIA_PANEL)
 
 ###############
 # OFFICE PANEL
