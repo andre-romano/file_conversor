@@ -86,6 +86,16 @@ def set(
                                                      callback=check_is_bool_or_none,
                                                      is_flag=True,
                                                      )] = CONFIG["image-set-metadata"],
+
+    pdf_compression: Annotated[str, typer.Option("--pdf-compression", "-pc",
+                                                 help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                                 callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
+                                                 )] = CONFIG["pdf-compression"],
+
+    pdf_preset: Annotated[str, typer.Option("--pdf-preset", "-pp",
+                                            help=f"{_('Compatibility preset. Valid values are')} '1.3', '1.4', ..., '1.7' . {_('Defaults to')} {CONFIG["pdf-preset"]}.",
+                                            callback=lambda x: check_valid_options(x, ["1.3", "1.4", "1.5", "1.6", "1.7"]),
+                                            )] = CONFIG["pdf-preset"],
 ):
     # update the configuration dictionary
     CONFIG.update({
@@ -98,6 +108,8 @@ def set(
         "image-fit": image_fit,
         "image-page-size": image_page_size,
         "image-set-metadata": image_set_metadata,
+        "pdf-compression": pdf_compression,
+        "pdf-preset": pdf_preset,
     })
     CONFIG.save()
     show()

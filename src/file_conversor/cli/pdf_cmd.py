@@ -11,7 +11,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import PyPDFBackend, QPDFBackend, PyMuPDFBackend
+from file_conversor.backend import PyPDFBackend, QPDFBackend, PyMuPDFBackend, GhostscriptBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -49,6 +49,12 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             description="To JPG",
             command=f'{State.get_executable()} pdf convert "%1" -o "%1.jpg"',
             icon=str(icons_folder_path / 'jpg.ico'),
+        ),
+        WinContextCommand(
+            name="compress",
+            description="Compress",
+            command=f'{State.get_executable()} pdf compress "%1"',
+            icon=str(icons_folder_path / 'compress.ico'),
         ),
         WinContextCommand(
             name="repair",
@@ -100,47 +106,6 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
-# pdf convert
-@pdf_cmd.command(
-    help=f"""
-        {_('Convert a PDF file to a different format.')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:** 
-
-        - `file_conversor pdf convert input_file.pdf -o output_file.jpg --dpi 200`
-
-        - `file_conversor pdf convert input_file.pdf -o output_file.png`
-    """)
-def convert(
-    input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(PyMuPDFBackend.SUPPORTED_OUT_FORMATS)})",
-                                             callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_OUT_FORMATS),
-                                             )],
-
-    dpi: Annotated[int, typer.Option("--dpi", "-d",
-                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
-                                     min=40, max=3600,
-                                     )] = CONFIG["image-dpi"],
-):
-    pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
-    # display current progress
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        pymupdf_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            dpi=dpi,
-        )
-        progress.update(task, total=100, completed=100)
-    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-
-
 # pdf repair
 @pdf_cmd.command(
     help=f"""
@@ -189,6 +154,110 @@ def repair(
         raise RuntimeError(qpdf_backend.dump_streams(process))
 
     logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
+
+
+# pdf compress
+@pdf_cmd.command(
+    help=f"""
+        {_('Compress a PDF file (requires Ghostscript external library).')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor pdf compress input_file.pdf -o output_file.pdf`
+
+        - `file_conversor pdf compress input_file.pdf -o output_file.pdf -c high`
+
+        - `file_conversor pdf compress input_file.pdf`
+    """)
+def compress(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(GhostscriptBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, GhostscriptBackend.SUPPORTED_IN_FORMATS, exists=True),
+    )],
+
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(GhostscriptBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _compressed.pdf at the end)')}",
+                                                    callback=lambda x: check_file_format(x, GhostscriptBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
+
+    compression: Annotated[str, typer.Option("--compression", "-c",
+                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                             callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
+                                             )] = CONFIG["pdf-compression"],
+
+    preset: Annotated[str, typer.Option("--preset", "-p",
+                                        help=f"{_('Compatibility preset. Valid values are')} '1.3', '1.4', ..., '1.7' . {_('Defaults to')} {CONFIG["pdf-preset"]}.",
+                                        callback=lambda x: check_valid_options(x, ["1.3", "1.4", "1.5", "1.6", "1.7"]),
+                                        )] = CONFIG["pdf-preset"],
+):
+    gs_backend = GhostscriptBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE['verbose'],
+    )
+
+    compression_level = "NOT_SET"
+    if compression == "none":
+        compression_level = GhostscriptBackend.COMPRESSION_NONE
+    elif compression == "low":
+        compression_level = GhostscriptBackend.COMPRESSION_LOW
+    elif compression == "medium":
+        compression_level = GhostscriptBackend.COMPRESSION_MEDIUM
+    elif compression == "high":
+        compression_level = GhostscriptBackend.COMPRESSION_HIGH
+
+    # display current progress
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
+        gs_backend.compress(
+            input_file=input_file,
+            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_compressed.pdf",
+            compression_level=compression_level,
+            compatibility_preset=preset,
+        )
+        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+# pdf convert
+@pdf_cmd.command(
+    help=f"""
+        {_('Convert a PDF file to a different format.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor pdf convert input_file.pdf -o output_file.jpg --dpi 200`
+
+        - `file_conversor pdf convert input_file.pdf -o output_file.png`
+    """)
+def convert(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+    )],
+
+    output_file: Annotated[str, typer.Option("--output", "-o",
+                                             help=f"{_('Output file')} ({', '.join(PyMuPDFBackend.SUPPORTED_OUT_FORMATS)})",
+                                             callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_OUT_FORMATS),
+                                             )],
+
+    dpi: Annotated[int, typer.Option("--dpi", "-d",
+                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
+                                     min=40, max=3600,
+                                     )] = CONFIG["image-dpi"],
+):
+    pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
+    # display current progress
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
+        pymupdf_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            dpi=dpi,
+        )
+        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # pdf merge
