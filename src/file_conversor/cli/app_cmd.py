@@ -105,6 +105,11 @@ app_cmd.add_typer(config_cmd,
                   rich_help_panel=UTILS_CONFIG_PANEL)
 
 
+#####################
+# MAIN APP - COMMANDS
+#####################
+
+
 # help
 @app_cmd.command(
     help=f"{_('Show the application help')}",

@@ -65,7 +65,7 @@ sections = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-x --ff --cov=src --cov-report=term-missing --cov-report=html"
+addopts = "-x --ff --cov=src --cov-report=html"
 filterwarnings = [
   "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer"
 ]
