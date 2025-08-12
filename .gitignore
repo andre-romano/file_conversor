@@ -1,9 +1,14 @@
 # config file
 src/file_conversor/.config.json
-*.bak
 
-# release notes
+# BAK / LOG files
+*.bak
+*.log
+*.log.*
+
+# release notes / CHANGELOG
 RELEASE_NOTES.md
+CHANGELOG.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
