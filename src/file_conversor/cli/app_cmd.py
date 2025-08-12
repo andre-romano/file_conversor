@@ -45,8 +45,12 @@ app_cmd = typer.Typer(
 UTILS_CONFIG_PANEL = _("Utils and Config")
 MULTIMEDIA_PANEL = _("Multimedia files")
 OFFICE_PANEL = _("Office files")
+DOCUMENT_PANEL = _("Document files")
 
-# REGISTER SUBCOMMANDS
+###############
+# MULTIMEDIA PANEL
+###############
+
 app_cmd.add_typer(audio_video_cmd,
                   name="audio-video",
                   help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
@@ -62,12 +66,25 @@ app_cmd.add_typer(svg_cmd,
                   help=_("SVG file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
+###############
+# DOCUMENT PANEL
+###############
+
+
 app_cmd.add_typer(pdf_cmd,
                   name="pdf",
                   help=_("PDF file manipulation"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
+                  rich_help_panel=DOCUMENT_PANEL)
 
-# OFFICE CLI
+# app_cmd.add_typer(xps_cmd,
+#                   name="xps",
+#                   help=_("XPS file manipulation"),
+#                   rich_help_panel=DOCUMENT_PANEL)
+
+
+###############
+# OFFICE PANEL
+###############
 
 app_cmd.add_typer(doc_cmd,
                   name="doc",
@@ -84,7 +101,10 @@ app_cmd.add_typer(ppt_cmd,
                   help=f"{_('PowerPoint file manipulation')} {_('(requires MS Office / LibreOffice)')})",
                   rich_help_panel=OFFICE_PANEL)
 
-# -- OS-SPECIFIC
+######################
+# UTILS/CONFIG PANEL
+######################
+
 if CURR_PLATFORM == PLATFORM_WINDOWS:
     app_cmd.add_typer(win_cmd,
                       name="win",
@@ -112,7 +132,7 @@ app_cmd.add_typer(config_cmd,
 
 
 #####################
-# MAIN APP - COMMANDS
+#     APP PANEL
 #####################
 
 

@@ -12,7 +12,7 @@ from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from file_conversor.backend import PyMuPDFBackend
+from file_conversor.backend import PyMuSVGBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -36,20 +36,20 @@ svg_cmd = typer.Typer()
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = State.get_icons_folder()
-    # PyMuPDFBackend commands
-    for ext in PyMuPDFBackend.SUPPORTED_IN_FORMATS:
+    # PyMuSVGBackend commands
+    for ext in PyMuSVGBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="to_jpg",
+                description="To JPG",
+                command=f'{State.get_executable()} svg convert "%1" -o "%1.jpg"',
+                icon=str(icons_folder_path / 'jpg.ico'),
+            ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
                 command=f'{State.get_executable()} svg convert "%1" -o "%1.png"',
                 icon=str(icons_folder_path / 'png.ico'),
-            ),
-            WinContextCommand(
-                name="to_pdf",
-                description="To PDF",
-                command=f'{State.get_executable()} svg convert "%1" -o "%1.pdf"',
-                icon=str(icons_folder_path / 'pdf.ico'),
             ),
         ])
 
@@ -67,19 +67,19 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor svg convert input_file.svg -o output_file.pdf --dpi 300`
+        - `file_conversor svg convert input_file.svg -o output_file.jpg --dpi 300`
 
         - `file_conversor svg convert input_file.svg -o output_file.png`
     """)
 def convert(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+        help=f"{_('Input file')} ({', '.join(PyMuSVGBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, PyMuSVGBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(PyMuPDFBackend.SUPPORTED_OUT_FORMATS)})",
-                                             callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_OUT_FORMATS),
+                                             help=f"{_('Output file')} ({', '.join(PyMuSVGBackend.SUPPORTED_OUT_FORMATS)})",
+                                             callback=lambda x: check_file_format(x, PyMuSVGBackend.SUPPORTED_OUT_FORMATS),
                                              )],
 
     dpi: Annotated[int, typer.Option("--dpi", "-d",
@@ -87,14 +87,14 @@ def convert(
                                      min=40, max=3600,
                                      )] = CONFIG["image-dpi"],
 ):
-    pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
+    pymusvg_backend = PyMuSVGBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        pymupdf_backend.convert(
+        pymusvg_backend.convert(
             input_file=input_file,
             output_file=output_file,
             dpi=dpi,
         )
         progress.update(task, total=100, completed=100)
-    logger.info(f"{_('SVG convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

@@ -1,7 +1,7 @@
-# src\file_conversor\backend\pymupdf_backend.py
+# src\file_conversor\backend\pymusvg_backend.py
 
 """
-This module provides functionalities for handling files using ``pymupdf`` backend.
+This module provides functionalities for handling SVG files using ``pymupdf`` backend.
 """
 
 import fitz  # pymupdf
@@ -14,9 +14,9 @@ from typing import Any, Iterable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 
-class PyMuPDFBackend(AbstractBackend):
+class PyMuSVGBackend(AbstractBackend):
     """
-    A class that provides an interface for handling files using ``pymupdf``.
+    A class that provides an interface for handling SVG files using ``pymupdf``.
     """
 
     SUPPORTED_IN_FORMATS = {
@@ -49,14 +49,19 @@ class PyMuPDFBackend(AbstractBackend):
 
         :param output_file: Output file
         :param input_file: Input file. 
-        :param dpi: DPI for rendering SVG. Defaults to 200.
+        :param dpi: DPI for rendering images. Defaults to 200.
 
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
         """
         self.check_file_exists(input_file)
+        in_path = Path(input_file)
+        out_path = Path(output_file)
 
+        # open file
         doc = fitz.open(input_file)
-        page = doc.load_page(0)
-        pix = page.get_pixmap(dpi=dpi)  # type: ignore
-        pix.save(output_file)
+
+        # => .png, .jpg OUTPUT
+        for page in doc:
+            pix = page.get_pixmap(dpi=dpi)  # type: ignore
+            pix.save(f"{out_path.with_suffix("")}{out_path.suffix}")  # type: ignore
