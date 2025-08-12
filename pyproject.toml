@@ -44,24 +44,12 @@ locales_path = "src/file_conversor/.locales"
 
 [tool.git-changelog]
 # bump = "auto"
+convention = "angular"
 template = "keepachangelog"
 versioning = "semver"
 zerover = true
 output = "CHANGELOG.md"
 provider = "github"
-# commit sections
-sections = [
-  { title = "✨ New Features", grep = "^feat" },
-  { title = "🐛 Bug Fixes", grep = "^fix" },
-  { title = "🔧 Internal Chores", grep = "^chore" },
-  { title = " Continuous Integration", grep = "^ci" },
-  { title = " Dependencies", grep = "^deps" },
-  { title = "📚 Documentation", grep = "^docs" },
-  { title = " Improve", grep = "^improv" },
-  { title = "🏗️ Code Refactor", grep = "^ref" },
-  { title = "🚀 Performance", grep = "^perf" },
-  { title = "🧪 Tests", grep = "^test" },
-]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
