@@ -36,9 +36,8 @@ def changelog(c):
         print(f"[bold] Skipping commit: no changes in {changelog_path}  [/]")
         return
 
-    c.run(f"git add {str(changelog_path)} pyproject.toml", hide=True)
+    c.run(f"git add {changelog_path} pyproject.toml", hide=True)
     c.run(f"git commit -m \"=> {changelog_path} for {PROJECT_VERSION}\"", hide=True)
-    c.run(f"git push")
     print(f"[bold] Generating {changelog_path} ... OK [/]")
 
 
