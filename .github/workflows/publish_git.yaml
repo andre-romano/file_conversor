@@ -13,6 +13,8 @@ env:
 jobs:
   build_exe:
     runs-on: windows-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
