@@ -9,7 +9,7 @@
     "url": "https://cdn.statically.io/gh/andre-romano/file_conversor@master/scripts/install_app.py",
     "hash": "6e4a208ab8fc4b7c0b87c597a78ad185d2af172281b5ee2abf837dcab42c15ce",
     "bin": [
-        "install_app.py.cmd"
+        "file_conversor.cmd"
     ],
     "installer": {
         "script": [
