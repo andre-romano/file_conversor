@@ -18,6 +18,7 @@
     "python.testing.pytestEnabled": true,
     "files.exclude": {
         "**/.coverage/**": true,
+        "**/.coverage*/**": true,
         "**/.pytest_cache/**": true,
         "**/.pdm-python/**": true,
         "**/.git": true,

@@ -4,8 +4,6 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-import pillow_heif
-
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
@@ -21,9 +19,6 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-# register HEIF format
-pillow_heif.register_heif_opener()
-
 
 class PillowBackend(AbstractBackend):
     """
@@ -36,7 +31,6 @@ class PillowBackend(AbstractBackend):
     SUPPORTED_IN_FORMATS = {
         "bmp": {},
         "gif": {},
-        "heif": {},
         "ico": {},
         "jfif": {},
         "jpg": {},
@@ -51,7 +45,6 @@ class PillowBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "bmp": {"format": "BMP"},
         "gif": {"format": "GIF"},
-        "heif": {"format": "HEIF"},
         "ico": {"format": "ICO"},
         "jpg": {"format": "JPEG"},
         "apng": {"format": "PNG"},

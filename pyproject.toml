@@ -15,7 +15,6 @@ dependencies = [
     "img2pdf>=0.6.1",
     "pywin32>=311",
     "pymupdf>=1.26.3",
-    "pillow-heif>=1.1.0",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
@@ -118,7 +117,6 @@ exclude = [
 dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
-    "pyinstaller>=6.14.2",
     "pydeps>=3.0.1",
     "pylint>=3.3.7",
     "invoke>=2.2.0",
