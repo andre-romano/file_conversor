@@ -49,7 +49,7 @@ def create_manifest(c):
         "url": INSTALL_APP_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "bin": [
-            f"{INSTALL_APP_PY.name}.cmd",
+            f"{PROJECT_NAME}.cmd",
         ],
         "installer": {
             "script": [
