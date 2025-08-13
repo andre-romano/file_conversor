@@ -130,11 +130,13 @@ class FFmpegBackend(AbstractBackend):
     def __init__(
         self,
         install_deps: bool | None,
+        verbose: bool = False,
     ):
         """
         Initialize the FFMpeg backend.
 
         :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
+        :param verbose: Verbose logging. Defaults to False.      
 
         :raises RuntimeError: if ffmpeg dependency is not found
         """
@@ -149,6 +151,7 @@ class FFmpegBackend(AbstractBackend):
             },
             install_answer=install_deps,
         )
+        self._verbose = verbose
 
         # check ffprobe / ffmpeg
         self._ffprobe_bin = self.find_in_path("ffprobe")
@@ -285,7 +288,6 @@ class FFmpegBackend(AbstractBackend):
             output_file: str,
             overwrite_output: bool = True,
             stats: bool = False,
-        verbose: bool = False,
             in_options: Iterable | None = None,
             out_options: Iterable | None = None,
     ) -> subprocess.Popen:
@@ -296,7 +298,6 @@ class FFmpegBackend(AbstractBackend):
         :param output_file: Output file path.      
         :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
         :param stats: Show progress stats. Defaults to False.      
-        :param verbose: Verbose logging. Defaults to False.      
         :param in_options: Additional input options. Defaults to None.      
         :param out_options: Additional output options. Defaults to None.    
 
@@ -315,7 +316,7 @@ class FFmpegBackend(AbstractBackend):
         global_options = [
             # overwrite output (no confirm)
             "-y" if overwrite_output else "-n",
-            "-v" if verbose else "",  # verbose output
+            "-v" if self._verbose else "",  # verbose output
             "-stats" if stats else "",  # print progress stats
         ]
 

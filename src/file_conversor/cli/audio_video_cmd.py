@@ -120,7 +120,10 @@ def info(
     with get_progress_bar() as progress:
         ffprobe_task = progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
 
-        ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+        ffmpeg_backend = FFmpegBackend(
+            install_deps=CONFIG['install-deps'],
+            verbose=STATE["verbose"],
+        )
         metadata = ffmpeg_backend.get_file_info(filename)
         progress.update(ffprobe_task, total=100, completed=100)
 
@@ -228,12 +231,14 @@ def convert(
         out_options.extend(["-b:v", f"{video_bitrate}k"])
 
     # execute ffmpeg
-    ffmpeg_backend = FFmpegBackend(install_deps=CONFIG['install-deps'])
+    ffmpeg_backend = FFmpegBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
     input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
     process = ffmpeg_backend.convert(
         input_file,
         output_file,
-        verbose=STATE["verbose"],
         in_options=in_options,
         out_options=out_options,
     )
