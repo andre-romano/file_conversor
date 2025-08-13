@@ -30,9 +30,38 @@ def test_image_rotate(tmp_path):
     assert out_path.exists()
 
 
-def test_image_convert_webp(tmp_path):
+def test_image_convert_heif_jpg(tmp_path):
+    in_path = Path("tests/.data/test.heif").resolve()
+    out_path = tmp_path / "test.jpg"
+
+    result = runner.invoke(
+        app_cmd, ["image", "convert", str(in_path), "-o", str(out_path)]
+    )
+    assert result.exit_code == 0
+    assert out_path.exists()
+
+    in_path = out_path
+    out_path = tmp_path / "test.heif"
+
+    result = runner.invoke(
+        app_cmd, ["image", "convert", str(in_path), "-o", str(out_path)]
+    )
+    assert result.exit_code == 0
+    assert out_path.exists()
+
+
+def test_image_convert_png_jpg(tmp_path):
     in_path = Path("tests/.data/test.png").resolve()
-    out_path = tmp_path / "test.webp"
+    out_path = tmp_path / "test.jpg"
+
+    result = runner.invoke(
+        app_cmd, ["image", "convert", str(in_path), "-o", str(out_path)]
+    )
+    assert result.exit_code == 0
+    assert out_path.exists()
+
+    in_path = out_path
+    out_path = tmp_path / "test.png"
 
     result = runner.invoke(
         app_cmd, ["image", "convert", str(in_path), "-o", str(out_path)]

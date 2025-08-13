@@ -15,6 +15,7 @@ dependencies = [
     "img2pdf>=0.6.1",
     "pywin32>=311",
     "pymupdf>=1.26.3",
+    "pillow-heif>=1.1.0",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"

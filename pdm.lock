@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:95bcee6033c6e9206454b30ac87a62b2e7400517a6a603f348f750d437976613"
+content_hash = "sha256:ce90c5a172c5b7c377a4e087d14c243af23491111c1c285f42bf79e7f30c4379"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -704,6 +704,26 @@ files = [
     {file = "pillow-11.3.0-cp313-cp313t-win_amd64.whl", hash = "sha256:857844335c95bea93fb39e0fa2726b4d9d758850b34075a7e3ff4f4fa3aa3b31"},
     {file = "pillow-11.3.0-cp313-cp313t-win_arm64.whl", hash = "sha256:8797edc41f3e8536ae4b10897ee2f637235c94f27404cac7297f7b607dd0716e"},
     {file = "pillow-11.3.0.tar.gz", hash = "sha256:3828ee7586cd0b2091b6209e5ad53e20d0649bbe87164a459d0676e035e8f523"},
+]
+
+[[package]]
+name = "pillow-heif"
+version = "1.1.0"
+requires_python = ">=3.9"
+summary = "Python interface for libheif library"
+groups = ["default"]
+dependencies = [
+    "pillow>=11.1.0",
+]
+files = [
+    {file = "pillow_heif-1.1.0-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:f262bed5978797fa2c22615be821c6fd767a786bd72396a38d07583adde1e37e"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:c9d37ed097d28c4970461f244d8c2156d0f710f9eee00a36b29142fb6a050fc2"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:66f6d04a1f8483a8820d8b1dcb893bfb8103e320dd72d762ec687e92bb92a69b"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9923700a3031ca27d2d68e99b09217e6d9360fd45bbe6975cd5b5e48e422cf71"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:f4be665888167c481b63fe5a5b62cda2f81c575f54bade9eb1b004137542f76a"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:ef1f4ab291e37dbbe22d8ccf1e2dde1a6561b43a4eed1d992fe795d4b62c1258"},
+    {file = "pillow_heif-1.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:0e3f34354ac8b4be505a25f705be907997e6a1172d21667f7a1d1ff8e3b9d10d"},
+    {file = "pillow_heif-1.1.0.tar.gz", hash = "sha256:6c0c5f81a780185bbddc56e0d5537c53aa6cb5fb6018f5a60534a47c53f5455d"},
 ]
 
 [[package]]

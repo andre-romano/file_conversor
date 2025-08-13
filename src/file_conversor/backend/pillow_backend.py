@@ -4,10 +4,12 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-from pathlib import Path
+import pillow_heif
 
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
+
+from pathlib import Path
 
 # user-provided imports
 from file_conversor.config import Log
@@ -19,6 +21,9 @@ LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)
+
+# register HEIF format
+pillow_heif.register_heif_opener()
 
 
 class PillowBackend(AbstractBackend):
@@ -32,6 +37,7 @@ class PillowBackend(AbstractBackend):
     SUPPORTED_IN_FORMATS = {
         "bmp": {},
         "gif": {},
+        "heif": {},
         "ico": {},
         "jfif": {},
         "jpg": {},
@@ -46,6 +52,7 @@ class PillowBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "bmp": {"format": "BMP"},
         "gif": {"format": "GIF"},
+        "heif": {"format": "HEIF"},
         "ico": {"format": "ICO"},
         "jpg": {"format": "JPEG"},
         "apng": {"format": "PNG"},
@@ -180,9 +187,9 @@ class PillowBackend(AbstractBackend):
             format = format.upper()  # ensure uppercase format
 
             # 0. Preservar EXIF e ICC se existirem
-            if "exif" in img.info:
+            if "exif" in img.info and img.info["exif"]:
                 params.setdefault("exif", img.info["exif"])
-            if "icc_profile" in img.info:
+            if "icc_profile" in img.info and img.info["icc_profile"]:
                 params.setdefault("icc_profile", img.info["icc_profile"])
 
             # 1. Transparência -> converter para RGBA

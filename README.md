@@ -96,7 +96,7 @@ For more information about the usage:
 1. Right click a file in Windows Explorer
 2. Choose an action from "File Conversor" menu
   
-<img src="./readme/ctx_menu.jpg" width="500px">
+<img src="./readme/ctx_menu.jpg" width="600px">
 
 ## Support this project
 
