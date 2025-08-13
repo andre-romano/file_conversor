@@ -1,3 +1,5 @@
+[![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano)
+
 # File Conversor
 Python program to convert and compress audio/video/text/etc files to other formats
 
@@ -15,6 +17,11 @@ Python program to convert and compress audio/video/text/etc files to other forma
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
     - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
+  - [Support this project](#support-this-project)
+    - [Gold tier supporters](#gold-tier-supporters)
+    - [Silver tier supporters](#silver-tier-supporters)
+    - [Bronze tier supporters](#bronze-tier-supporters)
+    - [Special thanks](#special-thanks)
   - [Acknowledgements](#acknowledgements)
   - [License and Copyright](#license-and-copyright)
 
@@ -79,8 +86,24 @@ For more information about the usage:
 
 1. Right click a file in Windows Explorer
 2. Choose an action from "File Conversor" menu
+  
+![alt](./readme/ctx_menu.jpg)
+
+## Support this project
+
+If you enjoy this project, consider supporting us with a donation in our Github Sponsors.
+
+### Gold tier supporters
+
+### Silver tier supporters
+
+### Bronze tier supporters
+
+### Special thanks
 
 ## Acknowledgements
+
+We would like to say our thanks to the incredible work provided by other contributors to this project:
 
 - Icons:
   - [Freepik](https://www.flaticon.com/authors/freepik)

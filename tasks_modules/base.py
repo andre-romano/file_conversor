@@ -15,7 +15,6 @@ def mkdirs(c):
         "dist",
         "docs",
         "htmlcov",
-        "uml",
     ]
     for dir in dirs:
         Path(dir).mkdir(parents=True, exist_ok=True)
@@ -50,11 +49,6 @@ def clean_docs(c):
 
 
 @task(pre=[mkdirs])
-def clean_uml(c):
-    remove_path(f"uml/*")
-
-
-@task(pre=[mkdirs])
 def clean_changelog(c):
     remove_path(f"CHANGELOG.md")
     remove_path(f"RELEASE_NOTES.md")
@@ -65,7 +59,6 @@ def clean_changelog(c):
            clean_dist,
            clean_htmlcov,
            clean_docs,
-           clean_uml,
            clean_changelog,
            ])
 def clean(c):
@@ -78,16 +71,16 @@ def tests(c, args: str = ""):
     c.run(f"pdm run pytest {args.split()}")
 
 
-@task(pre=[clean_uml,])
-def uml(c):
-    print("[bold] Generating uml/ ... [/]")
-    c.run("pdm run pyreverse -A --filter-mode=ALL --colorized -d uml/ -o jpg src/")
-    if not Path("uml/classes.jpg").exists():
-        raise RuntimeError("UML PyReverse - Empty dist/classes.jpg")
-    c.run("pdm run pydeps src/ --noshow --reverse -Tpng -o uml/dependencies.png")
-    if not Path("uml/dependencies.png").exists():
-        raise RuntimeError("UML PyDeps - Empty dist/dependencies.png")
-    print("[bold] Generating uml/ ... [/][bold green]OK[/]")
+# @task(pre=[clean_uml,])
+# def uml(c):
+#     print("[bold] Generating uml/ ... [/]")
+#     c.run("pdm run pyreverse -A --filter-mode=ALL --colorized -d uml/ -o jpg src/")
+#     if not Path("uml/classes.jpg").exists():
+#         raise RuntimeError("UML PyReverse - Empty dist/classes.jpg")
+#     c.run("pdm run pydeps src/ --noshow --reverse -Tpng -o uml/dependencies.png")
+#     if not Path("uml/dependencies.png").exists():
+#         raise RuntimeError("UML PyDeps - Empty dist/dependencies.png")
+#     print("[bold] Generating uml/ ... [/][bold green]OK[/]")
 
 
 @task
