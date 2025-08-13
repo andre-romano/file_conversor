@@ -1,6 +1,7 @@
 
 # scripts\install_app.py
 
+import shutil
 import sysconfig
 import argparse
 import os
@@ -173,6 +174,52 @@ class Environment:
         return self.python("-m", "pip", *args, **kwargs)
 
 
+class Shim:
+
+    def __init__(self, app_name: str, env: Environment) -> None:
+        super().__init__()
+        self._app_name = app_name
+        self._env = env
+
+        self._exe_path = shutil.which(app_name)
+        if not self._exe_path:
+            self._exe_path = f'"{sys.executable}" -m "{app_name}"'
+
+        self._shim_path = Path(f"{self._app_name}.cmd") if WINDOWS else Path(f"{self._app_name}.sh")
+
+    def get(self) -> Path:
+        return self._shim_path
+
+    def _create_shim_nt(self):
+        self._shim_path.write_text(f"""
+@echo off
+{self._exe_path} %*
+""", encoding="utf-8")
+
+    def _create_shim_posix(self):
+        self._shim_path.write_text(f"""#!/bin/bash
+{self._exe_path} "$@"
+""", encoding="utf-8")
+
+    def create_shim(self):
+        if WINDOWS:
+            self._create_shim_nt()
+        else:
+            self._create_shim_posix()
+
+        if not self._shim_path.exists():
+            raise InstallationError(
+                return_code=1,
+                log=f"Shim file '{self._shim_path}' not created.",
+            )
+
+    def delete_shim(self):
+        if not self._shim_path.exists():
+            print(f"WARN: '{self._shim_path}' shim file does not exist. Nothing to delete.")
+            return
+        self._shim_path.unlink()
+
+
 class Installer:
     def __init__(self,
                  env: Environment,
@@ -189,6 +236,7 @@ class Installer:
         self._force = force or False
         self._install = install or False
         self._uninstall = uninstall or False
+        self._shim = Shim(self._app_name, self._env)
         self._ensure_pip()
         self._update_pip()
 
@@ -204,23 +252,35 @@ class Installer:
         self._env.pip("install", "--upgrade", "pip")
 
     def _install_app(self) -> None:
+        self._pre_install_app()
         print(f"Installing {self._app_name} {f'v{self._version}' if self._version else ''} ...")
         specs = f"{self._app_name}=={self._version}" if self._version else self._app_name
         self._env.pip("install", specs)
         self._post_install_app()
 
-    def _post_install_app(self):
-        print("Post-install steps ...")
-        self._env.run(self._app_name, "win", "install-menu")
-
-    def _pre_uninstall_app(self):
-        print("Pre-uninstall steps ...")
-        self._env.run(self._app_name, "win", "uninstall-menu")
-
     def _uninstall_app(self) -> None:
         self._pre_uninstall_app()
         print(f"Uninstalling {self._app_name} {f'v{self._version}' if self._version else ''} ...")
         self._env.pip("uninstall", self._app_name, "-y")
+        self._post_uninstall_app()
+
+    def _pre_install_app(self):
+        print("Pre-install steps ...")
+
+    def _post_install_app(self):
+        print("Post-install steps ...")
+        self._shim.create_shim()
+        if WINDOWS:
+            self._env.run(str(self._shim.get()), "win", "install-menu",)
+
+    def _pre_uninstall_app(self):
+        print("Pre-uninstall steps ...")
+        if WINDOWS:
+            self._env.run(str(self._shim.get()), "win", "uninstall-menu",)
+
+    def _post_uninstall_app(self):
+        print("Post-uninstall steps ...")
+        self._shim.delete_shim()
 
     def run(self):
         if not self._install and not self._uninstall:
