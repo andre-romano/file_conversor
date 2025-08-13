@@ -4,6 +4,8 @@
 import os
 import shutil
 
+from pathlib import Path
+
 # user-provided imports
 from file_conversor.system import PLATFORM_LINUX, PLATFORM_MACOS
 
@@ -14,8 +16,14 @@ _ = get_translation()
 
 
 class BrewPackageManager(AbstractPackageManager):
-    def __init__(self, dependencies: dict[str, str]) -> None:
-        super().__init__(dependencies)
+    def __init__(self,
+                 dependencies: dict[str, str],
+                 env: list[str | Path] | None = None,
+                 ) -> None:
+        super().__init__(
+            dependencies=dependencies,
+            env=env,
+        )
 
     def _get_pkg_manager_installed(self):
         return shutil.which("brew")

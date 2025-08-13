@@ -30,11 +30,16 @@ class LibreofficeImpressBackend(AbstractLibreofficeBackend):
 
     def __init__(
         self,
+        install_deps: bool | None,
         verbose: bool = False,
     ):
         """
         Initialize the backend
 
+        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
         :param verbose: Verbose logging. Defaults to False.      
         """
-        super().__init__(verbose=verbose)
+        super().__init__(
+            install_deps=install_deps,
+            verbose=verbose,
+        )

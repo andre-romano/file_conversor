@@ -5,6 +5,8 @@ import os
 import shutil
 import subprocess
 
+from pathlib import Path
+
 # user-provided imports
 from file_conversor.system import PLATFORM_WINDOWS
 
@@ -22,15 +24,20 @@ logger = LOG.getLogger(__name__)
 class ScoopPackageManager(AbstractPackageManager):
     def __init__(self,
                  dependencies: dict[str, str],
+                 env: list[str | Path] | None = None,
                  buckets: list[str] | None = None,
                  ) -> None:
         """
         Inits Scoop pkg manager.
 
         :param dependencies: Format {executable: dependency}
+        :param env: Environment PATHs to add, to allow dependency finding.
         :param buckets: Buckets to add, to allow dependency install.
         """
-        super().__init__(dependencies)
+        super().__init__(
+            dependencies,
+            env=env,
+        )
         self._buckets = buckets if buckets else []
 
         self.add_pre_install_callback(self._ensure_buckets)

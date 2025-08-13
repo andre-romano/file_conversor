@@ -73,7 +73,10 @@ def convert(
                                              callback=lambda x: check_file_format(x, XLS_BACKEND.SUPPORTED_OUT_FORMATS),
                                              )],
 ):
-    xls_backend = XLS_BACKEND()
+    xls_backend = XLS_BACKEND(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
 
     logger.info(f"{_('Processing file')} '{input_file}' => '{output_file}' ...")
 

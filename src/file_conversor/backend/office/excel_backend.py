@@ -3,16 +3,9 @@
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
-from file_conversor.backend.abstract_backend import AbstractBackend
-
-# conditional import
-if CURR_PLATFORM == PLATFORM_WINDOWS:
-    from win32com import client
-else:
-    client = None
+from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
 
@@ -20,7 +13,7 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class ExcelBackend(AbstractBackend):
+class ExcelBackend(AbstractMSOfficeBackend):
     """
     A class that provides an interface for handling doc files using ``excel`` (comtypes).
     """
@@ -43,15 +36,20 @@ class ExcelBackend(AbstractBackend):
 
     def __init__(
         self,
+        install_deps: bool | None = None,
         verbose: bool = False,
     ):
         """
         Initialize the backend
 
+        :param install_deps: Reserved for future use. 
         :param verbose: Verbose logging. Defaults to False.      
         """
-        super().__init__()
-        self._verbose = verbose
+        super().__init__(
+            prog_id="Excel.Application",
+            install_deps=install_deps,
+            verbose=verbose,
+        )
 
     def convert(
         self,
@@ -67,8 +65,6 @@ class ExcelBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found.
         :raises RuntimeError: if os != Windows.
         """
-        if not client:
-            raise RuntimeError("This backend supports only Windows OS")
         input_path = Path(input_file).resolve()
         output_path = Path(output_file).resolve()
 
@@ -76,26 +72,20 @@ class ExcelBackend(AbstractBackend):
 
         out_config = ExcelBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
 
-        excel = client.Dispatch("Excel.Application")
-        excel.Visible = False
-
-        workbook = excel.Workbooks.Open(str(input_path))
-        if output_path.suffix.lower() == ".pdf":
-            workbook.ExportAsFixedFormat(
-                Filename=str(output_path),
-                Type=0,  # 0 = pdf
-                Quality=0,
-                IncludeDocProperties=True,
-                IgnorePrintAreas=False,
-                OpenAfterPublish=False,
-            )
-        else:
-            workbook.SaveAs(
-                str(output_path),
-                FileFormat=out_config['format'],
-            )
-        workbook.Close(SaveChanges=False)
-        try:
-            excel.Quit()
-        except:
-            logger.warning(f"{_('Failed to close Excel properly')}.")
+        with Win32Com(self.PROG_ID, visible=False) as excel:
+            workbook = excel.Workbooks.Open(str(input_path))
+            if output_path.suffix.lower() == ".pdf":
+                workbook.ExportAsFixedFormat(
+                    Filename=str(output_path),
+                    Type=0,  # 0 = pdf
+                    Quality=0,
+                    IncludeDocProperties=True,
+                    IgnorePrintAreas=False,
+                    OpenAfterPublish=False,
+                )
+            else:
+                workbook.SaveAs(
+                    str(output_path),
+                    FileFormat=out_config['format'],
+                )
+            workbook.Close(SaveChanges=False)

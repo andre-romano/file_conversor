@@ -8,6 +8,8 @@ from pathlib import Path
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.dependency.brew_pkg_manager import BrewPackageManager
+from file_conversor.dependency.scoop_pkg_manager import ScoopPackageManager
 
 LOG = Log.get_instance()
 
@@ -22,17 +24,34 @@ class AbstractLibreofficeBackend(AbstractBackend):
 
     def __init__(
         self,
+        install_deps: bool | None,
         verbose: bool = False,
     ):
         """
         Initialize the backend
 
+        :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
+
         :param verbose: Verbose logging. Defaults to False.      
         """
-        super().__init__()
+        super().__init__(
+            pkg_managers={
+                ScoopPackageManager({
+                    "soffice": "libreoffice"
+                }, buckets=[
+                    "extras",
+                ], env=[
+                    r"C:\Users\Andre\scoop\apps\libreoffice\current\LibreOffice\program"
+                ]),
+                BrewPackageManager({
+                    "soffice": "libreoffice"
+                }),
+            },
+            install_answer=install_deps,
+        )
         self._verbose = verbose
 
-        self._libreoffice_bin = self.find_in_path("libreoffice")
+        self._libreoffice_bin = self.find_in_path("soffice")
 
     def convert(
         self,

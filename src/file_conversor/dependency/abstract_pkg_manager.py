@@ -4,12 +4,14 @@
 This module provides functionalities for handling external backends.
 """
 
+import os
 import platform
 import shutil
 import subprocess
 
 from rich import print
 from typing import Any, Callable, Iterable
+from pathlib import Path
 
 # user-provided imports
 from file_conversor.config import Log
@@ -23,7 +25,10 @@ logger = LOG.getLogger(__name__)
 
 class AbstractPackageManager:
 
-    def __init__(self, dependencies: dict[str, str]) -> None:
+    def __init__(self,
+                 dependencies: dict[str, str],
+                 env: list[str | Path] | None = None,
+                 ) -> None:
         """
         Initializes package manager.
 
@@ -32,6 +37,7 @@ class AbstractPackageManager:
         super().__init__()
         self._os_type = platform.system()
         self._dependencies = dependencies
+        self._env = env
         self._pre_install_dep_callbacks: list[Callable[[], Any]] = []
         self._post_install_dep_callbacks: list[Callable[[], Any]] = []
 
@@ -44,6 +50,7 @@ class AbstractPackageManager:
         missing_dependencies = set([])
 
         # check if executable exists
+        self._set_env_path()
         for executable, dependency in self._dependencies.items():
             found_exe = shutil.which(executable)
             if not found_exe:
@@ -119,6 +126,20 @@ class AbstractPackageManager:
     def add_post_install_callback(self, callback: Callable[[], Any]):
         """ Adds a post-install callback to run after installing dependencies. """
         self._post_install_dep_callbacks.append(callback)
+
+    def _set_env_path(self):
+        if not self._env:
+            logger.debug(f"No env PATH to set for pkg manager")
+            return
+        # check if needs to add path
+        env_paths = os.environ["PATH"].split(os.pathsep)
+        for path_str in self._env:
+            path_str = str(path_str)
+            if path_str in env_paths:
+                logger.debug(f"Skipping path '{path_str}'. Already in ENV")
+                continue
+            env_paths.append(path_str)
+        os.environ["PATH"] = os.pathsep.join(env_paths)
 
     def _get_pkg_manager_installed(self) -> str | None:
         raise NotImplementedError("Method not overloaded.")
