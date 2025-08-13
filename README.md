@@ -1,4 +1,4 @@
-[![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano)
+<!-- [![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano) -->
 
 # File Conversor
 Python program to convert and compress audio/video/text/etc files to other formats
