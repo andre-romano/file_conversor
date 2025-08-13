@@ -4,7 +4,6 @@
 This module provides functionalities for handling PDF files using ``qpdf`` backend.
 """
 
-import shutil
 import subprocess
 
 # user-provided imports
@@ -91,7 +90,7 @@ class QPDFBackend(AbstractBackend):
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             universal_newlines=True
         )
         return process

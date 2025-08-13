@@ -1,7 +1,6 @@
 # src\file_conversor\backend\office\powerpoint_backend.py
 
 from pathlib import Path
-from typing import Iterable
 
 # user-provided imports
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS

@@ -5,8 +5,6 @@ import os
 import shutil
 import subprocess
 
-from typing import Callable, Any, Iterable
-
 # user-provided imports
 from file_conversor.system import PLATFORM_WINDOWS
 

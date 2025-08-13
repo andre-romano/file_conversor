@@ -5,7 +5,6 @@ This module provides functionalities for handling audio and video files using FF
 """
 
 import json
-import shutil
 import subprocess
 import re
 
@@ -341,7 +340,7 @@ class FFmpegBackend(AbstractBackend):
         _convert_process = subprocess.Popen(
             ffmpeg_command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             universal_newlines=True
         )
         return _convert_process

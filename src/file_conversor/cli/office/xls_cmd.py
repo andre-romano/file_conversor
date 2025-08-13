@@ -1,12 +1,10 @@
 
 # src\file_conversor\cli\xls_cmd.py
 
-import re
-import time
 import typer
 
 from pathlib import Path
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 
 from rich import print
 
@@ -17,7 +15,7 @@ from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format, check_valid_options
+from file_conversor.utils.validators import check_file_format
 
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu

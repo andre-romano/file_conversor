@@ -151,7 +151,7 @@ def repair(
 
     process.wait()
     if process.returncode != 0:
-        raise RuntimeError(qpdf_backend.dump_streams(process))
+        raise RuntimeError(process.stdout)
 
     logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
 

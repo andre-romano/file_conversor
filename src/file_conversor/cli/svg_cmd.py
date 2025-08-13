@@ -7,9 +7,6 @@ from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
-from rich.text import Text
-from rich.panel import Panel
-from rich.console import Group
 
 # user-provided modules
 from file_conversor.backend import PyMuSVGBackend
@@ -17,9 +14,8 @@ from file_conversor.backend import PyMuSVGBackend
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import File
 from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
+from file_conversor.utils.validators import check_file_format
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 

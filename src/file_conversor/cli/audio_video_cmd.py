@@ -248,6 +248,6 @@ def convert(
 
     process.wait()
     if process.returncode != 0:
-        raise RuntimeError(ffmpeg_backend.dump_streams(process))
+        raise RuntimeError(process.stdout)
 
     logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")

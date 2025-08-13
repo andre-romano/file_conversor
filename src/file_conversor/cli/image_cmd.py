@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
-from rich.text import Text
 from rich.panel import Panel
 from rich.console import Group
 

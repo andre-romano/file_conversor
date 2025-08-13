@@ -3,7 +3,6 @@
 import subprocess
 
 from pathlib import Path
-from typing import Iterable
 
 # user-provided imports
 from file_conversor.config import Log

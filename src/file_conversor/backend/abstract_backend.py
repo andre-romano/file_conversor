@@ -7,7 +7,6 @@ This module provides functionalities for handling external backends.
 import os
 import platform
 import shutil
-import subprocess
 import typer
 
 from pathlib import Path
@@ -55,20 +54,6 @@ class AbstractBackend:
         """
         if not os.path.isfile(filename):
             raise FileNotFoundError(f"{_("File")} '{filename}' {_("not found")}")
-
-    @staticmethod
-    def dump_streams(process: subprocess.Popen | None, stdout=True, stderr=True) -> str:
-        """Dumps stdout and/or stderr into a string"""
-        res = ""
-        if not process:
-            return res
-        if process.stderr:
-            for line in process.stderr:
-                res += line
-        if process.stdout:
-            for line in process.stdout:
-                res += line
-        return res
 
     def __init__(
         self,

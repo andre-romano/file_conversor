@@ -7,9 +7,6 @@ This module provides functionalities for handling files using ``pymupdf`` backen
 import fitz  # pymupdf
 from pathlib import Path
 
-from datetime import datetime
-from typing import Any, Iterable
-
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 
