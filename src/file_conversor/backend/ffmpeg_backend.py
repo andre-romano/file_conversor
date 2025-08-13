@@ -8,6 +8,7 @@ import json
 import subprocess
 import re
 
+from pathlib import Path
 from datetime import timedelta
 from typing import Iterable
 
@@ -15,7 +16,7 @@ from typing import Iterable
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import File
+from file_conversor.utils.validators import check_file_format
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -237,16 +238,16 @@ class FFmpegBackend(AbstractBackend):
         :raises ValueError: If the input file format is not supported.
         """
         # check file is found
-        in_file = File(input_file)
-        if not in_file.is_file():
+        input_path = Path(input_file)
+        if not input_path.exists() and not input_path.is_file():
             raise FileNotFoundError(f"Input file '{input_file}' not found")
 
         # check if the input file has a supported format
-        in_file.check_supported_format(self.SUPPORTED_IN_FORMATS)
+        check_file_format(input_path, self.SUPPORTED_IN_FORMATS)
 
         # set the input format options based on the file extension
         in_opts = []
-        in_ext = in_file.get_extension()
+        in_ext = input_path.suffix[1:]
         for opt, value in self.SUPPORTED_IN_FORMATS[in_ext].items():
             in_opts.extend([opt, value])
 
@@ -260,22 +261,19 @@ class FFmpegBackend(AbstractBackend):
 
         :return: (Output file, out options).
 
-        :raises FileExistsError: If the output path is a file.
-        :raises FileNotFoundError: If the output directory could not be created.
-        :raises ValueError: If the output file format is not supported.        
+        :raises typer.BadParameter: Unsupported format, or file not found.
         """
-        out_file = File(output_file)
+        output_path = Path(output_file)
 
         # create out dir (if it does not exists)
-        out_dir = File(out_file.get_full_dirname())
-        out_dir.mkdir()
+        output_path.parent.mkdir(exist_ok=True)
 
         # check if the output file has a supported format
-        File(output_file).check_supported_format(self.SUPPORTED_OUT_FORMATS)
+        check_file_format(output_path, self.SUPPORTED_OUT_FORMATS)
 
         # set the output format options based on the file extension
         out_opts = []
-        out_ext = out_file.get_extension()
+        out_ext = output_path.suffix[1:]
         for opt, value in self.SUPPORTED_OUT_FORMATS[out_ext].items():
             out_opts.extend([opt, value])
 

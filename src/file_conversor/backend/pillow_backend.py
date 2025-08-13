@@ -15,7 +15,6 @@ from pathlib import Path
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.utils.file import File
 
 LOG = Log.get_instance()
 
@@ -106,8 +105,8 @@ class PillowBackend(AbstractBackend):
         if quality < 1 or quality > 100:
             raise ValueError(f"{_('Invalid quality level. Valid values are')} 1-100.")
 
-        out_file = File(output_file)
-        format = self.SUPPORTED_OUT_FORMATS[out_file.get_extension()]["format"]
+        output_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[output_ext]["format"]
 
         img = Image.open(input_file)
         self._save_fix_errors(
@@ -131,8 +130,8 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_file = File(output_file)
-        format = self.SUPPORTED_OUT_FORMATS[out_file.get_extension()]["format"]
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = Image.open(input_file)
         img = img.rotate(rotate)
@@ -156,8 +155,8 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_file = File(output_file)
-        format = self.SUPPORTED_OUT_FORMATS[out_file.get_extension()]["format"]
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = Image.open(input_file)
         if x_y:

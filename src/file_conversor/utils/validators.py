@@ -8,8 +8,6 @@ from typing import Any, Iterable, List
 # user provided imports
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.file import File
-
 _ = get_translation()
 
 
@@ -38,7 +36,7 @@ def check_positive_integer(bitrate: int | float):
     return bitrate
 
 
-def check_file_format(filename_or_iter: list | dict | set | str | None, format_dict: dict | list, exists: bool = False):
+def check_file_format(filename_or_iter: list | dict | set | str | Path | None, format_dict: dict | list, exists: bool = False):
     """
     Checks if the provided format is supported.
 
@@ -52,18 +50,18 @@ def check_file_format(filename_or_iter: list | dict | set | str | None, format_d
     file_list = []
     if isinstance(filename_or_iter, (list, dict, set)):
         file_list = list(filename_or_iter)
-    elif isinstance(filename_or_iter, str):
-        file_list.append(filename_or_iter)
+    elif isinstance(filename_or_iter, (str | Path)):
+        file_list.append(str(filename_or_iter))
     elif filename_or_iter is None:
         return filename_or_iter
     else:
         raise TypeError(f"{_('Invalid type')} '{type(filename_or_iter)}' {_('for')} filename_or_iter. {_('Valid values are Iterable | str | None')}.")
     for filename in file_list:
-        file = File(filename)
-        file_format = file.get_extension().lower()
+        file_path = Path(filename)
+        file_format = file_path.suffix[1:].lower()
         if file_format not in format_dict:
             raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
-        if exists and not file.is_file():
+        if exists and not file_path.exists() and not file_path.is_file():
             raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")
     return filename_or_iter
 

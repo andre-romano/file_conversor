@@ -21,7 +21,6 @@ from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import File
 from file_conversor.utils.rich import DummyProgress
 
 # get app config
@@ -154,13 +153,12 @@ class BatchBackend(AbstractBackend):
 
     def _gen_cmd_list(self, input_path: Path, in_path: Path, out_path: Path, cmd_template: str):
         """Creates the command list based on cmd_template"""
-        in_file = File(str(input_path))
         cmd_list = []
         for cmd in shlex.split(f"{State.get_executable()} {cmd_template}"):
             # replace placeholders
-            cmd = cmd.replace(f"{{in_file_path}}", f"{in_file.get_full_path()}")
-            cmd = cmd.replace(f"{{in_file_name}}", f"{in_file.get_filename()}")
-            cmd = cmd.replace(f"{{in_file_ext}}", f"{in_file.get_extension()}")
+            cmd = cmd.replace(f"{{in_file_path}}", f"{input_path.resolve()}")
+            cmd = cmd.replace(f"{{in_file_name}}", f"{input_path.with_suffix("").name}")
+            cmd = cmd.replace(f"{{in_file_ext}}", f"{input_path.suffix[1:]}")
             cmd = cmd.replace(f"{{in_dir}}", f"{in_path}")
             cmd = cmd.replace(f"{{out_dir}}", f"{out_path}")
             # normalize paths

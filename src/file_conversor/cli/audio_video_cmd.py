@@ -20,7 +20,6 @@ from file_conversor.backend import FFmpegBackend
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import File
 from file_conversor.utils.rich import get_progress_bar
 from file_conversor.utils.validators import check_positive_integer, check_file_format
 from file_conversor.utils.formatters import format_bitrate, format_bytes
@@ -221,9 +220,11 @@ def convert(
     in_options = []
     out_options = []
 
+    out_ext = Path(output_file).suffix[1:]
+
     # configure out options
     out_options.extend(["-b:a", f"{audio_bitrate}k"])
-    if File(output_file).get_extension() in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
+    if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
         out_options.extend(["-b:v", f"{video_bitrate}k"])
 
     # execute ffmpeg

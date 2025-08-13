@@ -16,7 +16,6 @@ from file_conversor.backend import PillowBackend, Img2PDFBackend
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import File
 from file_conversor.utils.rich import get_progress_bar
 from file_conversor.utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
 
@@ -124,6 +123,7 @@ def info(
         callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
+    file_ext = Path(filename).suffix[1:]
 
     formatted = []
     metadata: PillowBackend.Exif
@@ -136,7 +136,7 @@ def info(
 
     # 📁 Informações gerais do arquivo
     formatted.append(f"  - {_('Name')}: {filename}")
-    formatted.append(f"  - {_('Format')}: {File(filename).get_extension().upper()}")
+    formatted.append(f"  - {_('Format')}: {file_ext.upper()}")
     if metadata:
         for tag, value in metadata.items():
             tag_name = PillowBackend.Exif_TAGS.get(tag, f"{tag}")
@@ -305,12 +305,14 @@ def rotate(
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
-        in_file = File(input_file)
+        input_path = Path(input_file)
+        input_name = input_path.with_suffix("").name
+        input_ext = input_path.suffix[1:]
 
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.rotate(
             input_file=input_file,
-            output_file=output_file if output_file else f"{in_file.get_filename()}_rotated.{in_file.get_extension()}",
+            output_file=output_file if output_file else f"{input_name}_rotated.{input_ext}",
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
@@ -347,12 +349,14 @@ def mirror(
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
-        in_file = File(input_file)
+        input_path = Path(input_file)
+        input_name = input_path.with_suffix("").name
+        input_ext = input_path.suffix[1:]
 
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.mirror(
             input_file=input_file,
-            output_file=output_file if output_file else f"{in_file.get_filename()}_mirrored.{in_file.get_extension()}",
+            output_file=output_file if output_file else f"{input_name}_mirrored.{input_ext}",
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)
