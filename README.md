@@ -38,9 +38,9 @@ Python program to convert, compress and manipulate audio/video/text/docs/etc fil
 
 This project requires the following external dependencies to work properly:
 - Python 3
+- LibreOffice (or Microsoft Office)
 - FFmpeg
 - Ghostscript
-- qpdf
 
 The app will prompt for download of the external dependencies, when needed.
 

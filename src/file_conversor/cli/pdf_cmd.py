@@ -11,7 +11,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import PyPDFBackend, QPDFBackend, PyMuPDFBackend, GhostscriptBackend
+from file_conversor.backend.pdf import PyPDFBackend, PikePDFBackend, PyMuPDFBackend, GhostscriptBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -109,7 +109,7 @@ ctx_menu.register_callback(register_ctx_menu)
 # pdf repair
 @pdf_cmd.command(
     help=f"""
-        {_('Repair (lightly) corrupted PDF files (requires QPDF external library).')}        
+        {_('Repair (lightly) corrupted PDF files (optionally compressing them).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
@@ -117,42 +117,36 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor pdf repair input_file.pdf -o output_file.pdf` 
 """)
 def repair(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(QPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                              callback=lambda x: check_file_format(x, QPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PikePDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PikePDFBackend.SUPPORTED_IN_FORMATS, exists=True),
                                               )],
     output_file: Annotated[str | None, typer.Option("--output", "-o",
-                                                    help=f"{_('Output file')} ({', '.join(QPDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _repaired.pdf at the end)')}.",
-                                                    callback=lambda x: check_file_format(x, QPDFBackend.SUPPORTED_OUT_FORMATS),
+                                                    help=f"{_('Output file')} ({', '.join(PikePDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _repaired.pdf at the end)')}.",
+                                                    callback=lambda x: check_file_format(x, PikePDFBackend.SUPPORTED_OUT_FORMATS),
                                                     )] = None,
-    decrypt_password: Annotated[str | None, typer.Option("--password", "-p",
-                                                         help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                         )] = None,
+    password: Annotated[str | None, typer.Option("--password", "-p",
+                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
+                                                 )] = None,
     compress: Annotated[bool, typer.Option("--compress", "-c",
                                            help=_("Compress output PDF file (losslessly). Defaults to True (compress)."),
                                            is_flag=True,
                                            )] = True,
 ):
-    qpdf_backend = QPDFBackend(verbose=STATE["verbose"], install_deps=CONFIG['install-deps'])
+    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        task1 = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100,)
 
-        process = qpdf_backend.repair(
+        pikepdf_backend.repair(
             # files
             input_file=input_file,
             output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
 
             # options
-            decrypt_password=decrypt_password,
+            decrypt_password=password,
             compress=compress,
+            progress_callback=lambda p: progress.update(task, completed=p)
         )
-        while process.poll() is None:
-            time.sleep(0.25)
-        progress.update(task1, total=100, completed=100)
-
-    process.wait()
-    if process.returncode != 0:
-        raise RuntimeError(process.stdout)
-
+        progress.update(task, total=100, completed=100)
     logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
 
 
