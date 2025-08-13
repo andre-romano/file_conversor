@@ -1,54 +1,49 @@
 
 # tests/test_app_cmd.py
 
-import pytest
 import typer
 
-from typer.testing import CliRunner
-
-from file_conversor.cli.app_cmd import app_cmd
-
-runner = CliRunner()
+from tests.utils import Test, DATA_PATH, app_cmd
 
 
 def test_no_log_flag():
-    result = runner.invoke(app_cmd, ["-nl", "help"])
+    result = Test.invoke("-nl", "help")
     assert result.exit_code == 0
 
 
 def test_no_progress_flag():
-    result = runner.invoke(app_cmd, ["-np", "help"])
+    result = Test.invoke("-np", "help")
     assert result.exit_code == 0
 
 
 def test_quiet_flag():
-    result = runner.invoke(app_cmd, ["-q", "help"])
+    result = Test.invoke("-q", "help")
     assert result.exit_code == 0
 
 
 def test_verbose_flag():
-    result = runner.invoke(app_cmd, ["--verbose", "help"])
+    result = Test.invoke("--verbose", "help")
     assert result.exit_code == 0
 
 
 def test_debug_flag():
-    result = runner.invoke(app_cmd, ["-d", "help"])
+    result = Test.invoke("-d", "help")
     assert result.exit_code == 0
 
 
 def test_help_cmd():
-    result = runner.invoke(app_cmd, ["help"])
+    result = Test.invoke("help")
     ctx = typer.Context(typer.main.get_command(app_cmd))
     assert ctx.command.get_help(ctx) in result.output
 
 
 def test_help_flag():
-    result = runner.invoke(app_cmd, ["--help"])
+    result = Test.invoke("--help")
     ctx = typer.Context(typer.main.get_command(app_cmd))
     assert ctx.command.get_help(ctx) in result.output
 
 
 def test_help_short_flag():
-    result = runner.invoke(app_cmd, ["-h"])
+    result = Test.invoke("-h")
     ctx = typer.Context(typer.main.get_command(app_cmd))
     assert ctx.command.get_help(ctx) in result.output

@@ -1,22 +1,18 @@
 # tests\cli\test_batch_cmd.py
 
-from typer.testing import CliRunner
-
-from file_conversor.cli.app_cmd import app_cmd
-
-runner = CliRunner()
+from tests.utils import Test, DATA_PATH, app_cmd
 
 
 def test_config_show():
-    result = runner.invoke(app_cmd, ["config", "show", "--help"])
+    result = Test.invoke("config", "show", "--help")
     assert "config show" in result.output
 
 
 def test_config_set():
-    result = runner.invoke(app_cmd, ["config", "set", "--help"])
+    result = Test.invoke("config", "set", "--help")
     assert "config set" in result.output
 
 
 def test_config():
-    result = runner.invoke(app_cmd, ["config", "--help"])
+    result = Test.invoke("config", "--help")
     assert "config" in result.output
