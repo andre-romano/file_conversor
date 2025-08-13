@@ -1,10 +1,11 @@
 <!-- [![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano) -->
 
 # File Conversor
-Python program to convert and compress audio/video/text/etc files to other formats
+Python program to convert, compress and manipulate audio/video/text/docs/etc files to other formats.
 
 **Summary**:
 - [File Conversor](#file-conversor)
+  - [Features](#features)
   - [External dependencies](#external-dependencies)
   - [Installing](#installing)
     - [For Windows](#for-windows)
@@ -21,9 +22,17 @@ Python program to convert and compress audio/video/text/etc files to other forma
     - [Gold tier supporters](#gold-tier-supporters)
     - [Silver tier supporters](#silver-tier-supporters)
     - [Bronze tier supporters](#bronze-tier-supporters)
-    - [Special thanks](#special-thanks)
   - [Acknowledgements](#acknowledgements)
   - [License and Copyright](#license-and-copyright)
+
+## Features
+- Integration with Windows Explorer context menu (right click in file).
+- Compress files (mp4, mp3, pdf, jpg, etc).
+- Convert multiple file formats (xlsx <=> ods, docx => pdf, mkv <=> mp4, jpg <=> png, etc).
+- Get metadata info about files (EXIF for images, stream data for video/audio, etc).
+- Perform manipulations upon files (PDF split/rotation/encryption, image rotation/enhancements, etc).
+- Batch file manipulation (using operation pipelines and config files, for task automation and advanced usage needs).
+- CLI for script automation.
 
 ## External dependencies
 
@@ -33,7 +42,7 @@ This project requires the following external dependencies to work properly:
 - Ghostscript
 - qpdf
 
-The app will prompt for download of the external dependencies, if needed.
+The app will prompt for download of the external dependencies, when needed.
 
 ## Installing
 
@@ -87,7 +96,7 @@ For more information about the usage:
 1. Right click a file in Windows Explorer
 2. Choose an action from "File Conversor" menu
   
-![alt](./readme/ctx_menu.jpg)
+<img src="./readme/ctx_menu.jpg" width="500px">
 
 ## Support this project
 
@@ -98,8 +107,6 @@ If you enjoy this project, consider supporting us with a donation in our Github 
 ### Silver tier supporters
 
 ### Bronze tier supporters
-
-### Special thanks
 
 ## Acknowledgements
 
