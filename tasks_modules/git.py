@@ -7,7 +7,7 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import pypi, scoop
+from tasks_modules import pypi
 
 
 @task
@@ -39,7 +39,7 @@ def release_notes(c):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[pypi.publish, scoop.publish,])
+@task(pre=[pypi.publish,])
 def publish(c):
     """"Publish Git"""
     print(f"[bold] Publishing to GitHub ... [/]")

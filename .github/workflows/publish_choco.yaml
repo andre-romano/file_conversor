@@ -1,6 +1,9 @@
 name: Publish Chocolatey
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 env:

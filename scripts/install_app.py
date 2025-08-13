@@ -1,6 +1,7 @@
 
 # scripts\install_app.py
 
+import shlex
 import shutil
 import sysconfig
 import argparse
@@ -175,49 +176,22 @@ class Environment:
 
 
 class Shim:
-
-    def __init__(self, app_name: str, env: Environment) -> None:
-        super().__init__()
-        self._app_name = app_name
-        self._env = env
-
-        self._exe_path = shutil.which(app_name)
-        if not self._exe_path:
-            self._exe_path = f'"{sys.executable}" -m "{app_name}"'
-
-        self._shim_path = Path(f"{self._app_name}.cmd") if WINDOWS else Path(f"{self._app_name}.sh")
-
-    def get(self) -> Path:
-        return self._shim_path
-
-    def _create_shim_nt(self):
-        self._shim_path.write_text(f"""
-@echo off
-{self._exe_path} %*
-""", encoding="utf-8")
-
-    def _create_shim_posix(self):
-        self._shim_path.write_text(f"""#!/bin/bash
-{self._exe_path} "$@"
-""", encoding="utf-8")
-
-    def create_shim(self):
-        if WINDOWS:
-            self._create_shim_nt()
-        else:
-            self._create_shim_posix()
-
-        if not self._shim_path.exists():
-            raise InstallationError(
-                return_code=1,
-                log=f"Shim file '{self._shim_path}' not created.",
-            )
-
-    def delete_shim(self):
-        if not self._shim_path.exists():
-            print(f"WARN: '{self._shim_path}' shim file does not exist. Nothing to delete.")
-            return
-        self._shim_path.unlink()
+    @staticmethod
+    def get_command(app_name: str) -> list[str]:
+        exe_path = shutil.which(app_name)
+        if not exe_path:
+            exe_path = f'"{sys.executable}" -m "{app_name}"'
+            print("WARNING: shim for app not found. Creating shim for 'python -m' ...")
+            if WINDOWS:
+                shim_path = Path(f"{app_name}.cmd").resolve()
+                shim_path.write_text(f'@echo off\r\n{exe_path} %*\r\n', encoding="utf-8")
+            else:
+                shim_path = Path(f"{app_name}.sh").resolve()
+                shim_path.write_text(f'#!/bin/sh\n{exe_path} "$@"\n', encoding="utf-8")
+                shim_path.chmod(0o755)
+            print(shim_path.read_text(encoding="utf-8"))
+            exe_path = str(shim_path)
+        return shlex.split(exe_path)
 
 
 class Installer:
@@ -236,7 +210,7 @@ class Installer:
         self._force = force or False
         self._install = install or False
         self._uninstall = uninstall or False
-        self._shim = Shim(self._app_name, self._env)
+        self._app_cmd = Shim.get_command(self._app_name)
         self._ensure_pip()
         self._update_pip()
 
@@ -269,18 +243,16 @@ class Installer:
 
     def _post_install_app(self):
         print("Post-install steps ...")
-        self._shim.create_shim()
         if WINDOWS:
-            self._env.run(str(self._shim.get()), "win", "install-menu",)
+            self._env.run(*self._app_cmd, "win", "install-menu",)
 
     def _pre_uninstall_app(self):
         print("Pre-uninstall steps ...")
         if WINDOWS:
-            self._env.run(str(self._shim.get()), "win", "uninstall-menu",)
+            self._env.run(*self._app_cmd, "win", "uninstall-menu",)
 
     def _post_uninstall_app(self):
         print("Post-uninstall steps ...")
-        self._shim.delete_shim()
 
     def run(self):
         if not self._install and not self._uninstall:
