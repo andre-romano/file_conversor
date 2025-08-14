@@ -8,6 +8,8 @@ from rich import print
 from typing import Annotated
 
 # user-provided imports
+from file_conversor import __VERSION__
+
 from file_conversor.cli import audio_video_cmd
 from file_conversor.cli import batch_cmd
 from file_conversor.cli import config_cmd
@@ -124,6 +126,12 @@ app_cmd.add_typer(config_cmd,
 #####################
 
 
+def version_callback(value: bool):
+    if value:
+        typer.echo(f"File Conversor {__VERSION__}")
+        raise typer.Exit()
+
+
 # help
 @app_cmd.command(
     help=f"{_('Show the application help')}",
@@ -179,6 +187,12 @@ def main_callback(
         debug: Annotated[bool, typer.Option(
             "--debug", "-d",
             help=_("Enable debug mode"),
+            is_flag=True,
+        )] = False,
+        version: Annotated[bool, typer.Option(
+            "--version", "-V",
+            help=_("Display version"),
+            callback=version_callback,
             is_flag=True,
         )] = False,
 ):
