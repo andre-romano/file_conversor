@@ -31,10 +31,9 @@ jobs:
           pip install pdm
           pdm install
 
-      - name: Build with Chocolatey
+      - name: Build and check with Chocolatey
         run: |
-          pdm run invoke choco.build
-          ls dist/*.nupkg || exit 1
+          pdm run invoke choco.check
 
       - name: Push to Chocolatey
         env:

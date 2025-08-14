@@ -86,7 +86,28 @@ def build(c: InvokeContext):
     pass
 
 
-@task(pre=[build,])
+@task(pre=[build,],)
+def install_app(c: InvokeContext):
+    print(f"[bold] Installing scoop package ... [/]")
+    result = c.run(rf'scoop install "{SCOOP_JSON}"')
+    assert (result is not None) and (result.return_code == 0)
+    print(f"[bold] Installing scoop package ... [/][bold green]OK[/]")
+
+
+@task
+def uninstall_app(c: InvokeContext):
+    print(f"[bold] Uninstalling scoop package ... [/]")
+    result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')
+    assert (result is not None) and (result.return_code == 0)
+    print(f"[bold] Uninstalling scoop package ... [/][bold green]OK[/]")
+
+
+@task(pre=[install_app,], post=[uninstall_app,])
+def check(c: InvokeContext):
+    base.check(c)
+
+
+@task(pre=[check,])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
     result = c.run(f'git status', hide=True)
@@ -103,24 +124,3 @@ def publish(c: InvokeContext):
     result = c.run(f'git push')
     assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Publishing to Scoop (using GitHub) ... OK [/]")
-
-
-@task(pre=[install,],)
-def install_app(c: InvokeContext):
-    print(f"[bold] Installing scoop package ... [/]")
-    result = c.run(rf'scoop install "{SCOOP_JSON}"')
-    assert (result is not None) and (result.return_code == 0)
-    print(f"[bold] Installing scoop package ... [/][bold green]OK[/]")
-
-
-@task(post=[install,],)
-def uninstall_app(c: InvokeContext):
-    print(f"[bold] Uninstalling scoop package ... [/]")
-    result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')
-    assert (result is not None) and (result.return_code == 0)
-    print(f"[bold] Uninstalling scoop package ... [/][bold green]OK[/]")
-
-
-@task(pre=[install_app,], post=[uninstall_app,])
-def check(c: InvokeContext):
-    base.check(c)

@@ -35,9 +35,9 @@ jobs:
         run: |
           pdm run invoke git.release-notes
 
-      - name: Build Installer .EXE
+      - name: Build and check Installer .EXE
         run: |
-          pdm run invoke inno.build
+          pdm run invoke inno.check
 
       - name: Upload release notes
         uses: actions/upload-artifact@v4
