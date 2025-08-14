@@ -110,7 +110,7 @@ def check(c: InvokeContext):
     base.check(c)
 
 
-@task(pre=[check,])
+@task(pre=[build,])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
     result = c.run(f'git status', hide=True)
