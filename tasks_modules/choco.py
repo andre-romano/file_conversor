@@ -9,6 +9,8 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
+from tasks_modules import base
+
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
@@ -18,7 +20,7 @@ CHOCO_DEPS = {
 
 
 @task
-def mkdirs(c):
+def mkdirs(c: InvokeContext):
     _config.mkdir([
         CHOCO_PATH,
         "dist",
@@ -26,17 +28,17 @@ def mkdirs(c):
 
 
 @task(pre=[mkdirs])
-def clean_choco(c):
+def clean_choco(c: InvokeContext):
     remove_path(f"{CHOCO_PATH}/*")
 
 
 @task(pre=[mkdirs])
-def clean_nupkg(c):
+def clean_nupkg(c: InvokeContext):
     remove_path("dist/*.nupkg")
 
 
 @task(pre=[clean_choco, ])
-def create_manifest(c):
+def create_manifest(c: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Chocolatey manifest files ... [/]", end="")
@@ -64,6 +66,7 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
 Write-Output "Installing app ..."
 & python "$installer" -i --version "$version"  
 ''', encoding="utf-8")
+    assert install_ps1_path.exists()
 
     # chocolateyUninstall.ps1
     uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
@@ -86,6 +89,7 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
 Write-Output "Uninstalling app ..."
 & python "$installer" -u --version "$version"
 """, encoding="utf-8")
+    assert uninstall_ps1_path.exists()
 
     # PACKAGE.nuspec
     CHOCO_NUSPEC.write_text(f"""<?xml version='1.0' encoding='utf-8'?>
@@ -112,11 +116,13 @@ Write-Output "Uninstalling app ..."
   </files>  
 </package>
 """, encoding="utf-8")
+    assert CHOCO_NUSPEC.exists()
+
     print("[bold green]OK[/]")
 
 
 @task
-def install(c):
+def install(c: InvokeContext):
     if shutil.which("choco"):
         return
     print("[bold] Installing Chocolatey ... [/]")
@@ -128,23 +134,35 @@ def install(c):
 
 
 @task(pre=[clean_nupkg, create_manifest, install,])
-def build(c):
+def build(c: InvokeContext):
     if not CHOCO_NUSPEC.exists():
         raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
 
     print(f"[bold] Building choco package ... [/]")
-    c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
+    result = c.run(f"choco pack -y --outdir dist/ {CHOCO_NUSPEC}")
+    assert (result is not None) and (result.return_code == 0)
     if not list(Path("dist").glob("*.nupkg")):
         raise RuntimeError("Build CHOCO - Empty dist/*.nupkg")
     print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,])
-def check(c):
-    print(f"[bold] Test choco package ... [/]")
-    c.run(f"choco install -y {PROJECT_NAME} --source-dir=./dist")
-    print(f"[bold] Test choco package ... [/][bold green]OK[/]")
+@task(pre=[build, base.is_admin,],)
+def install_app(c: InvokeContext):
+    print(rf'[bold] Installing choco package ... [/]')
+    dist_path = Path(rf".\dist").resolve()
+    result = c.run(rf'choco install -y --acceptlicense "{PROJECT_NAME}" --version="{PROJECT_VERSION}" --source="{dist_path}"')
+    assert (result is not None) and (result.return_code == 0)
+    print(rf'[bold] Installing choco package ... [/][bold green]OK[/]')
 
-    print(f"[bold] Cleaning choco tests ... [/]")
-    c.run(f"choco uninstall -y {PROJECT_NAME} --source-dir=./dist")
-    print(f"[bold] Cleaning choco tests ... [/][bold green]OK[/]")
+
+@task(pre=[base.is_admin,])
+def uninstall_app(c: InvokeContext):
+    print(rf'[bold] Uninstalling choco package ... [/]')
+    result = c.run(rf'choco uninstall -y "{PROJECT_NAME}"')
+    assert (result is not None) and (result.return_code == 0)
+    print(rf'[bold] Uninstalling choco package ... [/][bold green]OK[/]')
+
+
+@task(pre=[install_app,], post=[uninstall_app,])
+def check(c: InvokeContext):
+    base.check(c)

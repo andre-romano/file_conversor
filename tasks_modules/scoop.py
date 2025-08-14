@@ -19,19 +19,19 @@ SCOOP_DEPS = {
 
 
 @task
-def mkdirs(c):
+def mkdirs(c: InvokeContext):
     _config.mkdir([
         SCOOP_PATH,
     ])
 
 
 @task(pre=[mkdirs])
-def clean_scoop(c):
+def clean_scoop(c: InvokeContext):
     remove_path(f"{SCOOP_PATH}/*")
 
 
 @task(pre=[clean_scoop, ])
-def create_manifest(c):
+def create_manifest(c: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
@@ -65,79 +65,62 @@ def create_manifest(c):
             "url": INSTALL_APP_URL,
         }
     }, indent=4), encoding="utf-8")
-    if not SCOOP_JSON.exists():
-        raise FileNotFoundError(f"File '{SCOOP_JSON}' not found!")
+    assert SCOOP_JSON.exists()
 
     print("[bold green] OK [/]",)
 
 
 @task
-def install(c):
+def install(c: InvokeContext):
     if shutil.which("scoop"):
         return
     print("[bold] Installing Scoop ... [/]")
-    if not INSTALL_SCOOP.exists():
-        raise RuntimeError(f"Install Scoop - Script {INSTALL_SCOOP} does not exist")
+    assert INSTALL_SCOOP.exists()
     c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_SCOOP}"')
     if not shutil.which("scoop"):
         raise RuntimeError("'scoop' not found in PATH")
 
 
 @task(pre=[create_manifest, install,])
-def build(c):
+def build(c: InvokeContext):
     pass
 
 
 @task(pre=[build,])
-def publish(c):
+def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
     result = c.run(f'git status', hide=True)
+    assert (result is not None) and (result.return_code == 0)
     if Path(SCOOP_PATH).name not in result.stdout:
         print(f"[bold] Skipping publish: no changes in bucket file. [/]")
         return
-    c.run(f'git add "{SCOOP_PATH}"', hide=True)
-    c.run(f'git commit -m "ci: scoop bucket {GIT_RELEASE}"', hide=True)
-    c.run(f'git push')
+    result = c.run(f'git add "{SCOOP_PATH}"', hide=True)
+    assert (result is not None) and (result.return_code == 0)
+
+    result = c.run(f'git commit -m "ci: scoop bucket {GIT_RELEASE}"', hide=True)
+    assert (result is not None) and (result.return_code == 0)
+
+    result = c.run(f'git push')
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Publishing to Scoop (using GitHub) ... OK [/]")
 
 
-@task(pre=[install,])
-def add_bucket(c):
-    result = c.run(f'scoop bucket list "{SCOOP_PATH}"', hide=True)
-    if PROJECT_HOMEPAGE in result.stdout:
-        print(f"[bold] {PROJECT_NAME} bucket already in Scoop [/]")
-        return
-    print(f"[bold] Adding bucket '{PROJECT_NAME}' to Scoop ... [/]")
-    c.run(f'scoop bucket add "{PROJECT_NAME}" "{PROJECT_HOMEPAGE}"')
-    print(f"[bold] Adding bucket '{PROJECT_NAME}' to Scoop ... OK [/]")
-
-
-@task(pre=[install,])
-def rm_bucket(c):
-    result = c.run(f'scoop bucket list "{SCOOP_PATH}"', hide=True)
-    if not PROJECT_HOMEPAGE in result.stdout:
-        print(f"[bold] {PROJECT_NAME} bucket NOT in Scoop [/]")
-        return
-    print(f"[bold] Removing bucket from Scoop ... [/]")
-    c.run(f'scoop bucket rm "{PROJECT_NAME}"')
-    print(f"[bold] Removing bucket from Scoop ... OK [/]")
-
-
-@task(pre=[add_bucket,],)
-def install_app(c):
+@task(pre=[install,],)
+def install_app(c: InvokeContext):
     print(f"[bold] Installing scoop package ... [/]")
-    c.run(f"scoop install {PROJECT_NAME}")
+    result = c.run(rf'scoop install "{SCOOP_JSON}"')
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Installing scoop package ... [/][bold green]OK[/]")
 
 
-@task(post=[rm_bucket,],)
-def uninstall_app(c):
+@task(post=[install,],)
+def uninstall_app(c: InvokeContext):
     print(f"[bold] Uninstalling scoop package ... [/]")
-    c.run(f"scoop uninstall {PROJECT_NAME}")
+    result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Uninstalling scoop package ... [/][bold green]OK[/]")
 
 
 @task(pre=[install_app,], post=[uninstall_app,])
-def check(c):
-    if not shutil.which(PROJECT_NAME):
-        raise RuntimeError(f"'{PROJECT_NAME}' not found in PATH")
+def check(c: InvokeContext):
+    base.check(c)

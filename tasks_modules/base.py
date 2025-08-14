@@ -1,15 +1,21 @@
 # tasks_modules\base.py
 
-from pathlib import Path
+import os
+import platform
+
 from invoke.tasks import task
+
+from pathlib import Path
 
 # user provided
 from tasks_modules import _config
 from tasks_modules._config import *
 
+WINDOWS = (platform.system() == "Windows")
+
 
 @task
-def mkdirs(c):
+def mkdirs(c: InvokeContext):
     dirs = [
         "build",
         "dist",
@@ -23,33 +29,33 @@ def mkdirs(c):
 
 
 @task
-def clean_logs(c):
+def clean_logs(c: InvokeContext):
     remove_path(f"**/*.log")
     remove_path(f"**/*.log.*")
 
 
 @task(pre=[mkdirs])
-def clean_build(c):
+def clean_build(c: InvokeContext):
     remove_path(f"build/*")
 
 
 @task(pre=[mkdirs])
-def clean_dist(c):
+def clean_dist(c: InvokeContext):
     remove_path(f"dist/*")
 
 
 @task(pre=[mkdirs])
-def clean_htmlcov(c):
+def clean_htmlcov(c: InvokeContext):
     remove_path(f"htmlcov/*")
 
 
 @task(pre=[mkdirs])
-def clean_docs(c):
+def clean_docs(c: InvokeContext):
     remove_path(f"docs/*")
 
 
 @task(pre=[mkdirs])
-def clean_changelog(c):
+def clean_changelog(c: InvokeContext):
     remove_path(f"CHANGELOG.md")
     remove_path(f"RELEASE_NOTES.md")
 
@@ -61,18 +67,20 @@ def clean_changelog(c):
            clean_docs,
            clean_changelog,
            ])
-def clean(c):
+def clean(c: InvokeContext):
     pass
 
 
 @task(pre=[clean_htmlcov, ])
 def tests(c, args: str = ""):
     print("[bold] Running tests ... [/]")
-    c.run(f"pdm run pytest {args.split()}")
+    result = c.run(f"pdm run pytest {args.split()}")
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold] Running tests ... [bold green]OK[/][/]")
 
 
 # @task(pre=[clean_uml,])
-# def uml(c):
+# def uml(c:InvokeContext):
 #     print("[bold] Generating uml/ ... [/]")
 #     c.run("pdm run pyreverse -A --filter-mode=ALL --colorized -d uml/ -o jpg src/")
 #     if not Path("uml/classes.jpg").exists():
@@ -84,10 +92,11 @@ def tests(c, args: str = ""):
 
 
 @task
-def locales_template(c):
+def locales_template(c: InvokeContext):
     """ Update locales template (.pot)"""
     print(f"[bold] Creating locales template (.pot) ... [/]", end="")
-    c.run(f"pdm run pybabel extract -F babel.cfg -o {I18N_TEMPLATE} .")
+    result = c.run(f"pdm run pybabel extract -F babel.cfg -o {I18N_TEMPLATE} .")
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Creating locales template (.pot) ... [/][bold green]OK[/]")
 
 
@@ -99,30 +108,35 @@ def locales_create(c, locale: str):
     :param locale: Locale code (e.g., en_US, pt_BR, etc)
     """
     print(f"[bold] Creating new locale '{locale}' ... [/]")
-    c.run(f"pdm run pybabel init -i {I18N_TEMPLATE} -d {I18N_PATH} -l {locale}")
+    result = c.run(f"pdm run pybabel init -i {I18N_TEMPLATE} -d {I18N_PATH} -l {locale}")
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Creating new locale '{locale}' ... [/][bold green]OK[/]")
 
 
 @task(pre=[locales_template])
-def locales_update(c):
+def locales_update(c: InvokeContext):
     """ Update locales' .PO files based on current template (.pot)"""
     print(f"[bold] Updating locales based on template .pot file ... [/]")
-    c.run(f"pdm run pybabel update -i {I18N_TEMPLATE} -d {I18N_PATH}")
+    result = c.run(f"pdm run pybabel update -i {I18N_TEMPLATE} -d {I18N_PATH}")
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Updating locales based on template .pot file ... [/][bold green]OK[/]")
 
 
 @task
-def locales_build(c):
+def locales_build(c: InvokeContext):
     """ Build locales' .MO files based on .PO files ..."""
     print(f"[bold] Building locales .mo files ... [/]")
-    c.run(f"pdm run pybabel compile -d {I18N_PATH}")
+    result = c.run(f"pdm run pybabel compile -d {I18N_PATH}")
+    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Building locales .mo files ... [/][bold green]OK[/]")
 
 
 @task
-def publish_install_script(c):
+def publish_install_script(c: InvokeContext):
     print(f"[bold] Publishing install script ... [/]")
     result = c.run(f"git status", hide=True)
+    if result is None:
+        raise RuntimeError("'git status' failed")
     if INSTALL_APP_PY.name not in result.stdout:
         print(f"[bold] Skipping publish: no changes in install script.  [/]")
         return
@@ -130,3 +144,34 @@ def publish_install_script(c):
     c.run(f"git commit -m \"ci: install script update\"", hide=True)
     c.run(f"git push")
     print(f"[bold] Publishing install script ... OK [/]")
+
+
+@task
+def check(c: InvokeContext):
+    print(f"[bold] Checking app '{PROJECT_NAME}' ... [/]")
+    app_exe = shutil.which(PROJECT_NAME)
+    if not app_exe:
+        raise RuntimeError(f"'{PROJECT_NAME}' not found in PATH")
+    print(f"[bold] '{PROJECT_NAME}' found:[/] '{app_exe}'")
+    result = c.run(f'"{app_exe}" -V')
+    assert result is not None
+    if PROJECT_VERSION not in result.stdout:
+        raise RuntimeError(f"'{PROJECT_NAME}' version mismatch. Expected: '{PROJECT_VERSION}'.")
+    assert result.return_code == 0
+    print(f"[bold] Checking app '{PROJECT_NAME}' ... [/][bold green]OK[/]")
+
+
+@task
+def is_admin(c: InvokeContext):
+    print(f"[bold] Checking for admin rights ... [/]")
+    if WINDOWS:
+        try:
+            import ctypes
+            if ctypes.windll.shell32.IsUserAnAdmin():
+                return
+        except:
+            pass
+    else:
+        if os.geteuid() == 0:  # type: ignore
+            return
+    raise RuntimeError("User is not admin")
