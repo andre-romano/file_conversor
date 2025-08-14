@@ -30,7 +30,7 @@ def clean_scoop(c):
     remove_path(f"{SCOOP_PATH}/*")
 
 
-@task(pre=[clean_scoop, base.publish_install_script, ])
+@task(pre=[clean_scoop, ])
 def create_manifest(c):
     """Update choco files, based on pyproject.toml"""
 

@@ -49,7 +49,7 @@ def test(c):
     print(f"[bold] Testing PyPi ... [/][bold green]OK[/]")
 
 
-@task(pre=[check,],)
+@task(pre=[check,], post=[base.publish_install_script,])
 def publish(c):
     print(f"[bold] Publishing to PyPi ... [/]")
     c.run(f"pdm run twine upload dist/*.whl dist/*.tar.gz")
