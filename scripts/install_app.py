@@ -1,14 +1,13 @@
 
 # scripts\install_app.py
 
-import shlex
+import re
 import shutil
-import sysconfig
 import argparse
 import os
+import sys
 import platform
 import subprocess
-import sys
 import tempfile
 
 from pathlib import Path
@@ -36,133 +35,6 @@ class InstallationError(RuntimeError):
         self.log = log
 
 
-class OSEnvPath:
-    @staticmethod
-    def __set_path_persistent_nt(*paths: Path, scope: str):
-        # Read current PATH from user environment
-        import winreg
-
-        if scope == "machine":
-            hive = winreg.HKEY_LOCAL_MACHINE
-            key = r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
-        elif scope == "user":
-            hive = winreg.HKEY_CURRENT_USER
-            key = r"Environment"
-        else:
-            raise InstallationError(return_code=1, log=f"Scope '{scope}' not valid")
-
-        with winreg.OpenKey(hive, key, 0, winreg.KEY_READ) as k:
-            try:
-                current_path, _ = winreg.QueryValueEx(k, "PATH")
-            except FileNotFoundError:
-                current_path = ""
-
-        # Only add if missing
-        modified = False
-        for path in paths:
-            if str(path).lower() not in current_path.lower():
-                current_path = str(path) + os.pathsep + current_path
-                print(f"Added to PATH: {path}")
-                modified = True
-            else:
-                print(f"Skipping '{path}'. Already in PATH.")
-
-        # save
-        if modified:
-            with winreg.OpenKey(hive, key, 0, winreg.KEY_SET_VALUE) as k:
-                winreg.SetValueEx(k, "PATH", 0, winreg.REG_EXPAND_SZ, current_path)
-                print(f"PATH saved")
-
-    @staticmethod
-    def __set_path_persistent_posix(*paths: Path, scope: str):
-        # Determine which files to modify based on scope
-        if scope == "user":
-            config_files = [
-                Path.home() / ".bashrc",
-                Path.home() / ".profile",
-                Path.home() / ".bash_profile",
-                Path.home() / ".zshrc"  # For zsh users
-            ]
-        elif scope == "machine":  # machine
-            config_files = [Path("/etc/environment")]
-        else:
-            raise InstallationError(return_code=1, log=f"Scope '{scope}' not valid")
-
-        # Get current PATH
-        current_path = os.environ.get("PATH", "")
-        path_list = current_path.split(os.pathsep)
-
-        # Check which paths need to be added
-        paths_to_add = [str(p.resolve()) for p in paths
-                        if str(p.resolve()) not in path_list]
-
-        if not paths_to_add:
-            print("All paths already in PATH.")
-            return
-
-        # Prepare PATH modification line
-        export_line = f'\nexport PATH="{"".join(f"{p}:" for p in paths_to_add)}$PATH"\n'
-
-        # Check if export already exists
-        for config_file in config_files:
-            if not config_file.exists():
-                continue
-
-            with open(config_file, "r") as f:
-                content = f.read()
-
-            if any(p in content for p in paths_to_add):
-                print(f"Skipping {config_file} - PATH already modified")
-                continue
-
-            # Append the export
-            with open(config_file, "a") as f:
-                f.write(export_line)
-            print(f"Added PATH to {config_file}")
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._os_prefix = 'nt' if WINDOWS else 'posix'
-        self._scope = "machine" if IS_ADMIN else "user"
-
-        machine_bin_path = Path(sysconfig.get_path('scripts', scheme=f"{self._os_prefix}"))
-        user_bin_path = Path(sysconfig.get_path('scripts', scheme=f"{self._os_prefix}_user"))
-
-        print("INFO: Detected Python shim paths:")
-        print(machine_bin_path)
-        print(user_bin_path)
-        print()
-
-        self._paths: list[Path] = [machine_bin_path]
-        if not IS_ADMIN:
-            print(f"WARNING: Marking user path '{user_bin_path}' for addition ...")
-            self._paths.append(user_bin_path)
-
-    def set_path_process(self):
-        print("INFO: Setting env PATH ...")
-        env_paths = os.environ["PATH"].split(os.pathsep)
-        for path in self._paths:
-            if not path.exists():
-                raise InstallationError(return_code=1, log=f"Folder '{path}' not exists.")
-            if str(path).strip() not in env_paths:
-                print(f"Adding path '{path}' to ENV.")
-                env_paths.append(str(path))
-        os.environ["PATH"] = os.pathsep.join(env_paths)
-        print()
-
-    def set_path_persistent(self,):
-        print("INFO: Setting persistent PATH ...")
-        if WINDOWS:
-            OSEnvPath.__set_path_persistent_nt(*self._paths, scope=self._scope)
-        else:
-            OSEnvPath.__set_path_persistent_posix(*self._paths, scope=self._scope)
-        print()
-
-    def run(self):
-        self.set_path_process()
-        self.set_path_persistent()
-
-
 class Environment:
     def __init__(self) -> None:
         super().__init__()
@@ -171,8 +43,22 @@ class Environment:
         if not Path(self._python).exists():
             raise InstallationError(return_code=1, log="Python binary not found")
         print(f"Python bin: {self._python}\n")
-        osenv = OSEnvPath()
-        osenv.run()
+
+    @staticmethod
+    def remove_path(*patterns: str):
+        """Remove dir or file, using globs / wildcards"""
+        for pattern in patterns:
+            for path in Path('.').glob(pattern):
+                if not path.exists():
+                    pass
+                print(f"Cleaning '{path}' ... ", end="")
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()  # Remove single file
+                if path.exists():
+                    raise RuntimeError(f"Cannot remove dir / file '{path}'")
+                print("[bold green]OK[/]")
 
     @staticmethod
     def run(*args, **kwargs) -> subprocess.CompletedProcess:
@@ -198,27 +84,19 @@ class Environment:
     def pip(self, *args, **kwargs) -> subprocess.CompletedProcess:
         return self.python("-m", "pip", *args, **kwargs)
 
+    def pdm(self, *args, **kwargs) -> subprocess.CompletedProcess:
+        return self.python("-m", "pdm", *args, **kwargs)
 
-class Shim:
-    @staticmethod
-    def get_command(app_name: str, create: bool = False) -> list[str]:
-        exe_path = shutil.which(app_name)
-        if not exe_path:
-            exe_path = f'"{sys.executable}" -m "{app_name}"'
-            print("WARNING: shim for app not found.")
-            if not create:
-                raise FileNotFoundError(f"App '{app_name}' not found in PATH")
-            print("INFO: Creating shim for 'python -m' ...")
-            if WINDOWS:
-                shim_path = Path(f"{app_name}.cmd").resolve()
-                shim_path.write_text(f'@echo off\r\n{exe_path} %*\r\n', encoding="utf-8")
-            else:
-                shim_path = Path(f"{app_name}.sh").resolve()
-                shim_path.write_text(f'#!/bin/sh\n{exe_path} "$@"\n', encoding="utf-8")
-                shim_path.chmod(0o755)
-            print(shim_path.read_text(encoding="utf-8"))
-            exe_path = str(shim_path)
-        return shlex.split(f'"{exe_path}"')
+    def find_shim(self, app: str) -> Path:
+        shim_path = "Scripts" if WINDOWS else "bin"
+        REGEX_APP = re.compile(rf"^{app}(\.(bin|sh|cmd|bat|exe))?$")
+        for path in Path(f'.venv/{shim_path}').rglob("*"):
+            match = REGEX_APP.match(path.name)
+            if match:
+                path = path.resolve()
+                print(f"Found shim: '{path}'")
+                return path
+        raise InstallationError(return_code=1, log=f"Shim for '{app}' not found")
 
 
 class Installer:
@@ -251,33 +129,31 @@ class Installer:
         print("Updating 'pip' ...")
         self._env.pip("install", "--upgrade", "pip")
 
-    def _install_app(self) -> None:
-        self._pre_install_app()
-        print(f"Installing {self._app_name} {f'v{self._version}' if self._version else ''} ...")
-        specs = f"{self._app_name}=={self._version}" if self._version else self._app_name
-        self._env.pip("install", specs)
-        self._post_install_app()
-
-    def _uninstall_app(self) -> None:
-        self._pre_uninstall_app()
-        print(f"Uninstalling {self._app_name} {f'v{self._version}' if self._version else ''} ...")
-        self._env.pip("uninstall", self._app_name, "-y")
-        self._post_uninstall_app()
-
     def _pre_install_app(self):
         print("Pre-install steps ...")
+        self._env.pip("install", "pdm")
+        self._env.pdm("init", "--no-git", "--name", f"{self._app_name}_local", "--project-version", self._version, "--license", "not_set", "--non-interactive")
+
+    def _install_app(self) -> None:
+        print(f"Installing {self._app_name} {f'v{self._version}' if self._version else ''} ...")
+        specs = f"{self._app_name}=={self._version}" if self._version else self._app_name
+        self._env.pdm("add", specs)
 
     def _post_install_app(self):
-        app_cmd = Shim.get_command(self._app_name, create=True)
+        app_shim = self._env.find_shim(self._app_name)
         print("Post-install steps ...")
         if WINDOWS:
-            self._env.run(*app_cmd, "win", "install-menu",)
+            self._env.run(str(app_shim), "win", "install-menu",)
 
     def _pre_uninstall_app(self):
-        app_cmd = Shim.get_command(self._app_name)
+        app_shim = self._env.find_shim(self._app_name)
         print("Pre-uninstall steps ...")
         if WINDOWS:
-            self._env.run(*app_cmd, "win", "uninstall-menu",)
+            self._env.run(str(app_shim), "win", "uninstall-menu",)
+
+    def _uninstall_app(self) -> None:
+        print(f"Uninstalling {self._app_name} {f'v{self._version}' if self._version else ''} ...")
+        self._env.remove_path(rf"*")
 
     def _post_uninstall_app(self):
         print("Post-uninstall steps ...")
@@ -289,11 +165,15 @@ class Installer:
             raise InstallationError(return_code=1, log=f"More than one operation mode informed: -i and -u flags")
 
         if self._install:
+            self._pre_install_app()
             self._install_app()
+            self._post_install_app()
+            print("Install SUCCESS")
         elif self._uninstall:
+            self._pre_uninstall_app()
             self._uninstall_app()
-
-        print("Installation SUCCESS")
+            self._post_uninstall_app()
+            print("Uninstall SUCCESS")
         return 0
 
 
@@ -337,7 +217,7 @@ def main():
         if not isinstance(e, InstallationError):
             print(repr(e))
 
-        print("\nERROR: Installation failed.")
+        print("\nERROR: (Un)Install failed.")
 
         import traceback
         _, path = tempfile.mkstemp(

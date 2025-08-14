@@ -48,6 +48,9 @@ def create_manifest(c: InvokeContext):
         "depends": list(SCOOP_DEPS.keys()),
         "url": INSTALL_APP_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
+        "bin": [
+            rf".venv/Scripts/{PROJECT_NAME}.exe"
+        ],
         "installer": {
             "script": [
                 f"python3 \"$dir\\{INSTALL_APP_PY.name}\" -i --version $version",

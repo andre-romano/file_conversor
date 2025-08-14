@@ -56,6 +56,7 @@ $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $installer   = "$toolsDir\{INSTALL_APP_PY.name}"
 $url         = "{INSTALL_APP_URL}"
 $checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
+$exePath     = "./.venv/Scripts/$packageName.exe"
 
 Get-ChocolateyWebFile -PackageName "$packageName" `
                       -FileFullPath "$installer" `
@@ -65,6 +66,9 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
 
 Write-Output "Installing app ..."
 & python "$installer" -i --version "$version"  
+
+Write-Output "Installing shim ..."
+Install-BinFile -Name "$packageName" -Path "$exePath"
 ''', encoding="utf-8")
     assert install_ps1_path.exists()
 
@@ -85,6 +89,9 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
                       -Url "$url" `
                       -Checksum "$checksum" `
                       -ChecksumType "sha256"
+
+Write-Output "Removing shim ..."
+Uninstall-BinFile -Name "$packageName"
 
 Write-Output "Uninstalling app ..."
 & python "$installer" -u --version "$version"
