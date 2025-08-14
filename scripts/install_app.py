@@ -132,7 +132,7 @@ class Installer:
     def _pre_install_app(self):
         print("Pre-install steps ...")
         self._env.pip("install", "pdm")
-        self._env.pdm("init", "--no-git", "--name", f"{self._app_name}_local", "--project-version", self._version, "--license", "not_set", "--non-interactive")
+        self._env.pdm("init", "--no-git", "--name", f"{self._app_name}_local", "--project-version", "0.0.0", "--license", "not_set", "--non-interactive")
 
     def _install_app(self) -> None:
         print(f"Installing {self._app_name} {f'v{self._version}' if self._version else ''} ...")

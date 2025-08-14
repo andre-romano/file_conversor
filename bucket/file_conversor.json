@@ -8,6 +8,9 @@
     ],
     "url": "https://cdn.statically.io/gh/andre-romano/file_conversor@v0.3.2/scripts/install_app.py",
     "hash": "3cf213c4017ce5e5a48e4a3b5c4d9ab2078a709adbd9ca68ba8b0bd3f01b64bd",
+    "bin": [
+        ".venv/Scripts/file_conversor.exe"
+    ],
     "installer": {
         "script": [
             "python3 \"$dir\\install_app.py\" -i --version $version"
