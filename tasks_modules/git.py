@@ -4,10 +4,9 @@ from pathlib import Path
 from invoke.tasks import task
 
 # user provided
-from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import pypi
+from tasks_modules import pypi, scoop
 
 
 @task
@@ -39,7 +38,7 @@ def release_notes(c):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[pypi.publish,])
+@task(pre=[pypi.publish,], post=[scoop.publish,])
 def publish(c):
     """"Publish Git"""
     print(f"[bold] Publishing to GitHub ... [/]")

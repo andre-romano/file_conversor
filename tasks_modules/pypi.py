@@ -7,7 +7,7 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import base, scoop
+from tasks_modules import base
 
 
 @task
@@ -49,7 +49,7 @@ def test(c):
     print(f"[bold] Testing PyPi ... [/][bold green]OK[/]")
 
 
-@task(pre=[check,], post=[scoop.publish,])
+@task(pre=[check,],)
 def publish(c):
     print(f"[bold] Publishing to PyPi ... [/]")
     c.run(f"pdm run twine upload dist/*.whl dist/*.tar.gz")
