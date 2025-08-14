@@ -17,6 +17,17 @@ from typing import Optional
 WINDOWS = (platform.system() == "Windows")
 print(f"PLATFORM: {platform.system()}")
 
+IS_ADMIN = False
+if WINDOWS:
+    try:
+        import ctypes
+        IS_ADMIN = ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        pass
+else:
+    IS_ADMIN = (os.geteuid() == 0)  # type: ignore
+print(f"IS_ADMIN: {'yes' if IS_ADMIN else 'no'}\n")
+
 
 class InstallationError(RuntimeError):
     def __init__(self, return_code: int = 0, log: Optional[str] = None):
@@ -26,21 +37,6 @@ class InstallationError(RuntimeError):
 
 
 class OSEnvPath:
-
-    @staticmethod
-    def set_path_process(*paths: Path):
-        for path in paths:
-            if not path.exists():
-                raise InstallationError(return_code=1, log=f"Folder '{path}' not exists.")
-            os.environ["PATH"] = str(path) + os.pathsep + os.environ["PATH"]
-
-    @staticmethod
-    def set_path_persistent(*paths: Path, scope: str):
-        if WINDOWS:
-            OSEnvPath.__set_path_persistent_nt(*paths, scope=scope)
-        else:
-            OSEnvPath.__set_path_persistent_posix(*paths, scope=scope)
-
     @staticmethod
     def __set_path_persistent_nt(*paths: Path, scope: str):
         # Read current PATH from user environment
@@ -126,17 +122,45 @@ class OSEnvPath:
 
     def __init__(self) -> None:
         super().__init__()
-        os_prefix = 'nt' if WINDOWS else 'posix'
-        self._paths = [
-            Path(sysconfig.get_path('scripts', scheme=f"{os_prefix}")),
-            Path(sysconfig.get_path('scripts', scheme=f"{os_prefix}_user")),
-        ]
+        self._os_prefix = 'nt' if WINDOWS else 'posix'
+        self._scope = "machine" if IS_ADMIN else "user"
+
+        machine_bin_path = Path(sysconfig.get_path('scripts', scheme=f"{self._os_prefix}"))
+        user_bin_path = Path(sysconfig.get_path('scripts', scheme=f"{self._os_prefix}_user"))
+
+        print("INFO: Detected Python shim paths:")
+        print(machine_bin_path)
+        print(user_bin_path)
+        print()
+
+        self._paths: list[Path] = [machine_bin_path]
+        if not IS_ADMIN:
+            print(f"WARNING: Marking user path '{user_bin_path}' for addition ...")
+            self._paths.append(user_bin_path)
+
+    def set_path_process(self):
+        print("INFO: Setting env PATH ...")
+        env_paths = os.environ["PATH"].split(os.pathsep)
+        for path in self._paths:
+            if not path.exists():
+                raise InstallationError(return_code=1, log=f"Folder '{path}' not exists.")
+            if str(path).strip() not in env_paths:
+                print(f"Adding path '{path}' to ENV.")
+                env_paths.append(str(path))
+        os.environ["PATH"] = os.pathsep.join(env_paths)
+        print()
+
+    def set_path_persistent(self,):
+        print("INFO: Setting persistent PATH ...")
+        if WINDOWS:
+            OSEnvPath.__set_path_persistent_nt(*self._paths, scope=self._scope)
+        else:
+            OSEnvPath.__set_path_persistent_posix(*self._paths, scope=self._scope)
+        print()
 
     def run(self):
-        print(f"--- Setting Python scripts PATH ----")
-        self.set_path_process(*self._paths)
-        self.set_path_persistent(*self._paths, scope="user")
-        print(f"--- END ----")
+        self.set_path_process()
+        self.set_path_persistent()
 
 
 class Environment:
@@ -177,11 +201,14 @@ class Environment:
 
 class Shim:
     @staticmethod
-    def get_command(app_name: str) -> list[str]:
+    def get_command(app_name: str, create: bool = False) -> list[str]:
         exe_path = shutil.which(app_name)
         if not exe_path:
             exe_path = f'"{sys.executable}" -m "{app_name}"'
-            print("WARNING: shim for app not found. Creating shim for 'python -m' ...")
+            print("WARNING: shim for app not found.")
+            if not create:
+                raise FileNotFoundError(f"App '{app_name}' not found in PATH")
+            print("INFO: Creating shim for 'python -m' ...")
             if WINDOWS:
                 shim_path = Path(f"{app_name}.cmd").resolve()
                 shim_path.write_text(f'@echo off\r\n{exe_path} %*\r\n', encoding="utf-8")
@@ -191,7 +218,7 @@ class Shim:
                 shim_path.chmod(0o755)
             print(shim_path.read_text(encoding="utf-8"))
             exe_path = str(shim_path)
-        return shlex.split(exe_path)
+        return shlex.split(f'"{exe_path}"')
 
 
 class Installer:
@@ -210,7 +237,6 @@ class Installer:
         self._force = force or False
         self._install = install or False
         self._uninstall = uninstall or False
-        self._app_cmd = Shim.get_command(self._app_name)
         self._ensure_pip()
         self._update_pip()
 
@@ -242,14 +268,16 @@ class Installer:
         print("Pre-install steps ...")
 
     def _post_install_app(self):
+        app_cmd = Shim.get_command(self._app_name, create=True)
         print("Post-install steps ...")
         if WINDOWS:
-            self._env.run(*self._app_cmd, "win", "install-menu",)
+            self._env.run(*app_cmd, "win", "install-menu",)
 
     def _pre_uninstall_app(self):
+        app_cmd = Shim.get_command(self._app_name)
         print("Pre-uninstall steps ...")
         if WINDOWS:
-            self._env.run(*self._app_cmd, "win", "uninstall-menu",)
+            self._env.run(*app_cmd, "win", "uninstall-menu",)
 
     def _post_uninstall_app(self):
         print("Post-uninstall steps ...")
