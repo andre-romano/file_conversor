@@ -8,9 +8,6 @@
     ],
     "url": "https://cdn.statically.io/gh/andre-romano/file_conversor@master/scripts/install_app.py",
     "hash": "e61c0dd5e4ecb2df20c209f6bad0d646aee9ad170549d95a0bb6384bb71f45e0",
-    "bin": [
-        "file_conversor.cmd"
-    ],
     "installer": {
         "script": [
             "python3 \"$dir\\install_app.py\" -i --version $version"
