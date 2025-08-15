@@ -1,15 +1,14 @@
 # src\file_conversor\cli\app_cmd.py
 
+import tomllib
 import sys
 import typer
 
 from rich import print
 
-from typing import Annotated
+from typing import Annotated, Any
 
 # user-provided imports
-from file_conversor import __VERSION__
-
 from file_conversor.cli import audio_video_cmd
 from file_conversor.cli import batch_cmd
 from file_conversor.cli import config_cmd
@@ -128,7 +127,11 @@ app_cmd.add_typer(config_cmd,
 
 def version_callback(value: bool):
     if value:
-        typer.echo(f"File Conversor {__VERSION__}")
+        VERSION = None
+        with open(State.get_resources_folder() / "pyproject.toml", "rb") as f:
+            PYPROJECT = tomllib.load(f)
+            VERSION = str(PYPROJECT["project"]["version"])
+        typer.echo(f"File Conversor {VERSION}")
         raise typer.Exit()
 
 

@@ -44,7 +44,7 @@ INSTALL_SCOOP = Path(f'{SCRIPTS_PATH}/install_scoop.ps1')
 
 UNINSTALL_APP = Path("unins000.exe")
 
-INSTALL_APP = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer")
+INSTALL_APP = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer.exe")
 INSTALL_APP_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 # INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP.parent.name}/{INSTALL_APP.name}"

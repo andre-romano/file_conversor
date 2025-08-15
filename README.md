@@ -9,9 +9,9 @@ Python program to convert, compress and manipulate audio/video/text/docs/etc fil
   - [External dependencies](#external-dependencies)
   - [Installing](#installing)
     - [For Windows](#for-windows)
-      - [Option 1. Scoop Package Manager (recommended)](#option-1-scoop-package-manager-recommended)
-      - [Option 2. PyPi](#option-2-pypi)
-      - [Option 3. Installer (EXE)](#option-3-installer-exe)
+      - [Option 1. Installer (EXE)](#option-1-installer-exe)
+      - [Option 2. Choco Package Manager](#option-2-choco-package-manager)
+      - [Option 3. PyPi](#option-3-pypi)
     - [For Linux / MacOS](#for-linux--macos)
       - [Option 1. PyPi](#option-1-pypi)
   - [Usage](#usage)
@@ -48,25 +48,24 @@ The app will prompt for download of the external dependencies, when needed.
 
 ### For Windows
 
-#### Option 1. Scoop Package Manager (recommended)
+#### Option 1. Installer (EXE)
 
-1. Open PowerShell (no admin priviledges needed) and run:
+1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
+2. Execute installer (.exe file)
+
+#### Option 2. Choco Package Manager
+
+1. Open PowerShell (admin priviledges needed) and run:
 
 ```bash
-scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
-scoop install file_conversor -k
+choco install file_conversor -y
 ```
 
-#### Option 2. PyPi
+#### Option 3. PyPi
 
 ```bash
 pip install file_conversor
 ```
-
-#### Option 3. Installer (EXE)
-
-1. Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-2. Execute installer (.exe file)
 
 ### For Linux / MacOS
 

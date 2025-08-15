@@ -39,7 +39,7 @@ def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[release_notes, inno.build,], post=[pypi.publish, scoop.publish, choco.publish])
+@task(pre=[release_notes, inno.build,], post=[pypi.publish, choco.publish])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to GitHub ... [/]")
     result = c.run(f"git tag {GIT_RELEASE}")

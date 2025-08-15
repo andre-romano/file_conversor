@@ -1,7 +1,9 @@
 
 # tasks_modules\choco.py
 
+import os
 import re
+
 from pathlib import Path
 from invoke.tasks import task
 
@@ -45,6 +47,10 @@ def create_manifest(c: InvokeContext):
     CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
     CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
 
+    CHOCO_INSTALL_PATH = Path(os.path.expandvars(rf"%programfiles(x86)%")) / PROJECT_NAME
+    APP_BIN = CHOCO_INSTALL_PATH / rf"{PROJECT_NAME}.exe"
+    UNINSTALLER_BIN = CHOCO_INSTALL_PATH / UNINSTALL_APP.name
+
     # chocolateyInstall.ps1
     install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
     install_ps1_path.write_text(rf'''
@@ -64,7 +70,10 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
                       -ChecksumType "sha256"
 
 Write-Output "Installing app ..."
-& "$installer" /DIR="$toolsDir" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART
+Start-Process -FilePath "$installer" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait
+
+Write-Output "Installing shim ..."
+Install-BinFile -Name "{APP_BIN.with_suffix("").name}" -Path "{APP_BIN}"
 ''', encoding="utf-8")
     assert install_ps1_path.exists()
 
@@ -76,10 +85,13 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$uninstaller = "$toolsDir\{UNINSTALL_APP.name}"
+$uninstaller = "{UNINSTALLER_BIN}"
+
+Write-Output "Removing shim ..."
+Uninstall-BinFile -Name "{APP_BIN.with_suffix("").name}"
 
 Write-Output "Uninstalling app ..."
-& "$uninstaller" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART
+Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait
 """, encoding="utf-8")
     assert uninstall_ps1_path.exists()
 

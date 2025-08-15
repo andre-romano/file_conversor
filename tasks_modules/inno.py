@@ -59,10 +59,10 @@ def clean_inno(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_exe(c: InvokeContext):
-    _config.remove_path(f"dist/{INSTALL_APP}")
+    _config.remove_path(f"{INSTALL_APP}")
 
 
-@task(pre=[clean_inno,])
+@task(pre=[clean_inno, pyinstaller.check])
 def create_manifest(c: InvokeContext):
     """Update inno files, based on pyproject.toml"""
 
@@ -90,16 +90,16 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SourceDir={Path(".").resolve()}
 OutputDir={Path("./dist").resolve()}
-OutputBaseFilename={INSTALL_APP.name}
+OutputBaseFilename={INSTALL_APP.with_suffix("").name}
 
 [Files]
 Source: "{APP_DIST_PATH}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "{{app}}\{PROJECT_NAME}.exe"; Parameters: "win install-menu"; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "{{app}}\{PROJECT_NAME}.exe"; Parameters: "win uninstall-menu"; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
 ''', encoding="utf-8")
     assert setup_iss_path.exists()
     print("[bold green]OK[/]")
@@ -116,7 +116,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_exe, create_manifest, install, pyinstaller.check])
+@task(pre=[clean_exe, create_manifest, install,])
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")

@@ -31,7 +31,7 @@ def clean_scoop(c: InvokeContext):
 
 
 @task(pre=[clean_scoop, ])
-def create_manifest(c: InvokeContext):
+def manifest(c: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
@@ -50,12 +50,12 @@ def create_manifest(c: InvokeContext):
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "installer": {
             "script": [
-                f"\"$dir\\{INSTALL_APP.name}\" /DIR=\"$dir\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART",
+                f"\"$dir\\{INSTALL_APP.name}\" /DIR=\"$dir\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-",
             ]
         },
         "uninstaller": {
             "script": [
-                f"\"$dir\\{UNINSTALL_APP.name}\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART"
+                f"\"$dir\\{UNINSTALL_APP.name}\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-"
             ]
         },
         "checkver": {
@@ -81,7 +81,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'scoop' not found in PATH")
 
 
-@task(pre=[create_manifest, install,])
+@task(pre=[manifest, install,])
 def build(c: InvokeContext):
     pass
 
