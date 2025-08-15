@@ -6,7 +6,7 @@ from invoke.tasks import task
 # user provided
 from tasks_modules._config import *
 
-from tasks_modules import pypi, scoop
+from tasks_modules import choco, inno, pypi, scoop
 
 
 @task
@@ -29,20 +29,18 @@ def changelog(c: InvokeContext):
 @task(pre=[changelog,])
 def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... [/]")
-    release_notes_path = Path("RELEASE_NOTES.md")
-    if release_notes_path.exists():
-        release_notes_path.unlink()
+    if RELEASE_NOTES_PATH.exists():
+        RELEASE_NOTES_PATH.unlink()
 
-    result = c.run(f"pdm run git-changelog --release-notes > {release_notes_path}")
+    result = c.run(f"pdm run git-changelog --release-notes > {RELEASE_NOTES_PATH}")
     assert (result is not None) and (result.return_code == 0)
-    if not release_notes_path.exists():
-        raise RuntimeError(f"{release_notes_path} does not exist")
+    if not RELEASE_NOTES_PATH.exists():
+        raise RuntimeError(f"{RELEASE_NOTES_PATH} does not exist")
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[pypi.publish,], post=[scoop.publish,])
+@task(pre=[release_notes, inno.build,], post=[pypi.publish, scoop.publish, choco.publish])
 def publish(c: InvokeContext):
-    """"Publish Git"""
     print(f"[bold] Publishing to GitHub ... [/]")
     result = c.run(f"git tag {GIT_RELEASE}")
     assert (result is not None) and (result.return_code == 0)
@@ -51,6 +49,16 @@ def publish(c: InvokeContext):
     assert (result is not None) and (result.return_code == 0)
 
     result = c.run(f"git push --tags")
+    assert (result is not None) and (result.return_code == 0)
+
+    gh_cmd = [
+        "gh", "release",
+        "create", rf'"{GIT_RELEASE}"',
+        "--title", rf'"{GIT_RELEASE}"',
+        "--notes-file", rf'"{RELEASE_NOTES_PATH}"',
+        rf'"{INSTALL_APP}"',
+    ]
+    result = c.run(" ".join(gh_cmd))
     assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Publishing to GitHub ... [/][bold green]OK[/]")
 
@@ -63,5 +71,4 @@ def unpublish(c: InvokeContext):
 
     result = c.run(f"git push origin --delete {GIT_RELEASE}")
     assert (result is not None) and (result.return_code == 0)
-
     print(f"[bold] Removing tag {GIT_RELEASE} from GitHub ... [/][bold green]OK[/]")

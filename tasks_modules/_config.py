@@ -28,6 +28,9 @@ PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
 
 PROJECT_HOMEPAGE = f"https://github.com/andre-romano/{PROJECT_NAME}"
 
+MANIFEST_IN_PATH = Path("MANIFEST.in")
+RELEASE_NOTES_PATH = Path("RELEASE_NOTES.md")
+
 ICONS_PATH = str(PYPROJECT["tool"]["myproject"]["icons_path"])
 I18N_PATH = str(PYPROJECT["tool"]["myproject"]["locales_path"])
 
@@ -39,10 +42,27 @@ SCRIPTS_PATH = str(f'scripts')
 INSTALL_CHOCO = Path(f'{SCRIPTS_PATH}/install_choco.ps1')
 INSTALL_SCOOP = Path(f'{SCRIPTS_PATH}/install_scoop.ps1')
 
-INSTALL_APP_PY = Path(f"{SCRIPTS_PATH}/install_app.py")
+UNINSTALL_APP = Path("unins000.exe")
+
+INSTALL_APP = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer")
+INSTALL_APP_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
-INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
+# INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP.parent.name}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://cdn.jsdelivr.net/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
+
+
+def copy(src: Path, dst: Path):
+    print(f"Copying '{src}' => '{dst}' ...", end="")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    if src.is_file():
+        shutil.copy2(src=src, dst=dst)
+    elif src.is_dir():
+        # If the directory exists, remove it first to avoid errors
+        if dst.exists():
+            shutil.rmtree(dst)
+        shutil.copytree(src=src, dst=dst)
+    assert dst.exists()
+    print(f"[bold green]OK[/]")
 
 
 def remove_path(path_pattern: str):

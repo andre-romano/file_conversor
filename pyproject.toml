@@ -124,4 +124,5 @@ dev = [
     "invoke>=2.2.0",
     "git-changelog>=2.5.3",
     "twine>=6.1.0",
+    "pyinstaller>=6.15.0",
 ]

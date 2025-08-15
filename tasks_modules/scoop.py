@@ -14,7 +14,7 @@ SCOOP_PATH = str("bucket")
 SCOOP_JSON = Path(f"{SCOOP_PATH}/{PROJECT_NAME}.json")
 
 SCOOP_DEPS = {
-    "python": ""
+    # "python": ""
 }
 
 
@@ -36,8 +36,8 @@ def create_manifest(c: InvokeContext):
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
 
-    if not INSTALL_APP_PY.exists():
-        raise RuntimeError(f"File '{INSTALL_APP_PY}' not found!")
+    if not INSTALL_APP.exists():
+        raise RuntimeError(f"File '{INSTALL_APP}' not found!")
 
     # bucket/file_conersor.json
     SCOOP_JSON.write_text(json.dumps({
@@ -48,17 +48,14 @@ def create_manifest(c: InvokeContext):
         "depends": list(SCOOP_DEPS.keys()),
         "url": INSTALL_APP_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
-        "bin": [
-            rf".venv/Scripts/{PROJECT_NAME}.exe"
-        ],
         "installer": {
             "script": [
-                f"python3 \"$dir\\{INSTALL_APP_PY.name}\" -i --version $version",
+                f"\"$dir\\{INSTALL_APP.name}\" /DIR=\"$dir\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART",
             ]
         },
         "uninstaller": {
             "script": [
-                f"python3 \"$dir\\{INSTALL_APP_PY.name}\" -u --version $version"
+                f"\"$dir\\{UNINSTALL_APP.name}\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART"
             ]
         },
         "checkver": {

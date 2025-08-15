@@ -15,7 +15,7 @@ CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
 CHOCO_DEPS = {
-    "python": ""
+    # "python": ""
 }
 
 
@@ -53,10 +53,9 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$installer   = "$toolsDir\{INSTALL_APP_PY.name}"
+$installer   = "$toolsDir\{INSTALL_APP.name}"
 $url         = "{INSTALL_APP_URL}"
 $checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
-$exePath     = "./.venv/Scripts/$packageName.exe"
 
 Get-ChocolateyWebFile -PackageName "$packageName" `
                       -FileFullPath "$installer" `
@@ -65,10 +64,7 @@ Get-ChocolateyWebFile -PackageName "$packageName" `
                       -ChecksumType "sha256"
 
 Write-Output "Installing app ..."
-& python "$installer" -i --version "$version"  
-
-Write-Output "Installing shim ..."
-Install-BinFile -Name "$packageName" -Path "$exePath"
+& "$installer" /DIR="$toolsDir" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART
 ''', encoding="utf-8")
     assert install_ps1_path.exists()
 
@@ -80,21 +76,10 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$installer   = "$toolsDir\{INSTALL_APP_PY.name}"
-$url         = "{INSTALL_APP_URL}"
-$checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
-
-Get-ChocolateyWebFile -PackageName "$packageName" `
-                      -FileFullPath "$installer" `
-                      -Url "$url" `
-                      -Checksum "$checksum" `
-                      -ChecksumType "sha256"
-
-Write-Output "Removing shim ..."
-Uninstall-BinFile -Name "$packageName"
+$uninstaller = "$toolsDir\{UNINSTALL_APP.name}"
 
 Write-Output "Uninstalling app ..."
-& python "$installer" -u --version "$version"
+& "$uninstaller" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART
 """, encoding="utf-8")
     assert uninstall_ps1_path.exists()
 
@@ -173,3 +158,11 @@ def uninstall_app(c: InvokeContext):
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
     base.check(c)
+
+
+@task(pre=[build,])
+def publish(c: InvokeContext):
+    print(rf'[bold] Publihsing choco package ... [/]')
+    result = c.run(rf'choco push dist/*.nupkg --source https://push.chocolatey.org/')
+    assert (result is not None) and (result.return_code == 0)
+    print(rf'[bold] Publihsing choco package ... [/][bold green]OK[/]')

@@ -132,21 +132,6 @@ def locales_build(c: InvokeContext):
 
 
 @task
-def publish_install_script(c: InvokeContext):
-    print(f"[bold] Publishing install script ... [/]")
-    result = c.run(f"git status", hide=True)
-    if result is None:
-        raise RuntimeError("'git status' failed")
-    if INSTALL_APP_PY.name not in result.stdout:
-        print(f"[bold] Skipping publish: no changes in install script.  [/]")
-        return
-    c.run(f"git add {INSTALL_APP_PY}", hide=True)
-    c.run(f"git commit -m \"ci: install script update\"", hide=True)
-    c.run(f"git push")
-    print(f"[bold] Publishing install script ... OK [/]")
-
-
-@task
 def check(c: InvokeContext):
     print(f"[bold] Checking app '{PROJECT_NAME}' ... [/]")
     app_exe = shutil.which(PROJECT_NAME)

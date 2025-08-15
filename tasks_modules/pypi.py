@@ -66,7 +66,7 @@ def check(c: InvokeContext):
     base.check(c)
 
 
-@task(pre=[check, ])
+@task(pre=[build, ])
 def test(c: InvokeContext):
     print(f"[bold] Testing PyPi ... [/]")
     result = c.run(f"pdm run twine upload --repository testpypi dist/*.whl dist/*.tar.gz")
@@ -74,7 +74,7 @@ def test(c: InvokeContext):
     print(f"[bold] Testing PyPi ... [/][bold green]OK[/]")
 
 
-@task(pre=[check,], post=[base.publish_install_script,])
+@task(pre=[build,],)
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to PyPi ... [/]")
     result = c.run(f"pdm run twine upload dist/*.whl dist/*.tar.gz")
