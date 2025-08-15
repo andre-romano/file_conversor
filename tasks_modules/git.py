@@ -39,9 +39,9 @@ def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[release_notes, inno.build,], post=[pypi.publish, choco.publish])
-def publish(c: InvokeContext):
-    print(f"[bold] Publishing to GitHub ... [/]")
+@task(post=[release_notes,])
+def tag(c: InvokeContext):
+    print(f"[bold] Git tagging {GIT_RELEASE} ... [/]")
     result = c.run(f"git tag {GIT_RELEASE}")
     assert (result is not None) and (result.return_code == 0)
 
@@ -50,7 +50,12 @@ def publish(c: InvokeContext):
 
     result = c.run(f"git push --tags")
     assert (result is not None) and (result.return_code == 0)
+    print(f"[bold] Git tagging {GIT_RELEASE} ... [bold green]OK[/][/]")
 
+
+@task(pre=[inno.build, tag,], post=[pypi.publish, choco.publish])
+def publish(c: InvokeContext):
+    print(f"[bold] Publishing to GitHub ... [/]")
     gh_cmd = [
         "gh", "release",
         "create", rf'"{GIT_RELEASE}"',

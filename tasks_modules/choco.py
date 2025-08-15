@@ -175,6 +175,7 @@ def check(c: InvokeContext):
 @task(pre=[build,])
 def publish(c: InvokeContext):
     print(rf'[bold] Publihsing choco package ... [/]')
-    result = c.run(rf'choco push dist/*.nupkg --source https://push.chocolatey.org/')
+    nupkg_path = list(Path("dist").glob("*.nupkg"))[0]
+    result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/')
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Publihsing choco package ... [/][bold green]OK[/]')
