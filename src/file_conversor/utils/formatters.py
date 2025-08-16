@@ -2,7 +2,7 @@
 
 def format_bytes(size: float) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""
-    # Tamanho em bytes para string legível
+    # Size in bytes to a human-readable string
     for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if size < 1024.0:
             return f"{size:.1f} {unit}"

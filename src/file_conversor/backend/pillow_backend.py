@@ -178,17 +178,17 @@ class PillowBackend(AbstractBackend):
         try:
             format = format.upper()  # ensure uppercase format
 
-            # 0. Preservar EXIF e ICC se existirem
+            # 0. Preserve EXIF and ICC if they exist
             if "exif" in img.info and img.info["exif"]:
                 params.setdefault("exif", img.info["exif"])
             if "icc_profile" in img.info and img.info["icc_profile"]:
                 params.setdefault("icc_profile", img.info["icc_profile"])
 
-            # 1. Transparência -> converter para RGBA
+            # 1. Transparency -> convert to RGBA
             if img.mode == "P" and "transparency" in img.info:
                 img = img.convert("RGBA")
 
-            # 2. Converter modos incompatíveis com o formato de destino
+            # 2. Convert incompatible modes to the target format
             if format in ("JPEG",) and img.mode not in ("RGB", "L"):
                 img = img.convert("RGB")
             elif format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):

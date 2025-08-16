@@ -182,7 +182,7 @@ class FFmpegBackend(AbstractBackend):
         """
         duration_secs = self.calculate_file_total_duration(file_path)
 
-        # Converte segundos para timedelta e formata como HH:MM:SS
+        # Convert seconds to timedelta and format as HH:MM:SS
         td = timedelta(seconds=int(duration_secs))
         return str(td)
 

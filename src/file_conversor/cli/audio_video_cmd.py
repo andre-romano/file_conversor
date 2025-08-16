@@ -127,7 +127,7 @@ def info(
         metadata = ffmpeg_backend.get_file_info(filename)
         progress.update(ffprobe_task, total=100, completed=100)
 
-    # 📁 Informações gerais do arquivo
+    # 📁 General file information
     if "format" in metadata:
         format_info: dict = metadata["format"]
 
