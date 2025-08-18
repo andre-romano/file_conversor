@@ -179,26 +179,20 @@ def compress(
                                              help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
                                              callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
                                              )] = CONFIG["pdf-compression"],
-
-    preset: Annotated[str, typer.Option("--preset", "-p",
-                                        help=f"{_('Compatibility preset. Valid values are')} '1.3', '1.4', ..., '1.7' . {_('Defaults to')} {CONFIG["pdf-preset"]}.",
-                                        callback=lambda x: check_valid_options(x, ["1.3", "1.4", "1.5", "1.6", "1.7"]),
-                                        )] = CONFIG["pdf-preset"],
 ):
     gs_backend = GhostscriptBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE['verbose'],
     )
 
-    compression_level = "NOT_SET"
-    if compression == "none":
-        compression_level = GhostscriptBackend.COMPRESSION_NONE
-    elif compression == "low":
-        compression_level = GhostscriptBackend.COMPRESSION_LOW
+    if compression == "high":
+        compression_level = GhostscriptBackend.Compression.HIGH
     elif compression == "medium":
-        compression_level = GhostscriptBackend.COMPRESSION_MEDIUM
-    elif compression == "high":
-        compression_level = GhostscriptBackend.COMPRESSION_HIGH
+        compression_level = GhostscriptBackend.Compression.MEDIUM
+    elif compression == "low":
+        compression_level = GhostscriptBackend.Compression.LOW
+    else:
+        compression_level = GhostscriptBackend.Compression.NONE
 
     # display current progress
     with get_progress_bar() as progress:
@@ -207,7 +201,6 @@ def compress(
             input_file=input_file,
             output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_compressed.pdf",
             compression_level=compression_level,
-            compatibility_preset=preset,
         )
         progress.update(task, total=100, completed=100)
     logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

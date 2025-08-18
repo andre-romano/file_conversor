@@ -38,7 +38,6 @@ class Configuration:
             "image-page-size": None,  # Default image => PDF page size
             "image-set-metadata": True,  # Default image => PDF set metadata
             "pdf-compression": "medium",  # Default PDF compression level
-            "pdf-preset": "1.5",         # Default PDF compatibility preset
         }
 
         self.load()
