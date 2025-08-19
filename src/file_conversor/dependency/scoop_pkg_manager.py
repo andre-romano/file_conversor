@@ -3,14 +3,13 @@
 
 import os
 import shutil
-import subprocess
 
 from pathlib import Path
 
 # user-provided imports
 from file_conversor.system import PLATFORM_WINDOWS
 
-from file_conversor.config.log import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
@@ -69,15 +68,15 @@ class ScoopPackageManager(AbstractPackageManager):
 
     def _ensure_buckets(self):
         scoop_bin = self._get_pkg_manager_installed() or "SCOOP_NOT_FOUND"
-        process = subprocess.run([scoop_bin, "bucket", "list"],
-                                 capture_output=True,
-                                 text=True, check=True)
+        process = Environment.run(
+            f"{scoop_bin}", "bucket", "list",
+        )
         for bucket in self._buckets:
             if bucket in process.stdout:
                 logger.info(f"{_('Skipping bucket')} '{bucket}'. {_('Already added in scoop')}.")
                 continue
             logger.info(f"{_('Adding bucket')} '{bucket}' {_('to scoop')}.")
-            subprocess.run([scoop_bin, "bucket", "add", bucket],
-                           capture_output=True,
-                           text=True, check=True)
+            Environment.run(
+                f"{scoop_bin}", "bucket", "add", f"{bucket}",
+            )
             logger.info(f"{_('Bucket')} '{bucket}' {_('added to scoop')}.")

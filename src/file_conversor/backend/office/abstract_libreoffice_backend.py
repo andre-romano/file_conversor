@@ -5,9 +5,11 @@ import subprocess
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
+
 from file_conversor.backend.abstract_backend import AbstractBackend
+
 from file_conversor.dependency.brew_pkg_manager import BrewPackageManager
 from file_conversor.dependency.scoop_pkg_manager import ScoopPackageManager
 
@@ -65,7 +67,6 @@ class AbstractLibreofficeBackend(AbstractBackend):
         :param input_file: Input file.        
 
         :raises FileNotFoundError: if input file not found.
-        :raises RuntimeError: if LibreOffice fails.
         """
         self.check_file_exists(input_file)
 
@@ -75,7 +76,8 @@ class AbstractLibreofficeBackend(AbstractBackend):
         output_dir = output_path.parent
         output_format = output_path.suffix.lstrip(".").lower()
 
-        command = [
+        # Execute command
+        process = Environment.run(
             str(self._libreoffice_bin),
             "--headless",
             "--convert-to",
@@ -83,19 +85,5 @@ class AbstractLibreofficeBackend(AbstractBackend):
             "--outdir",
             str(output_dir),
             str(input_path)
-        ]
-
-        # Execute command
-        logger.info("Executing LibreOffice ...")
-        logger.debug(" ".join(command))
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
-        process.wait()
-        if process.returncode != 0:
-            raise RuntimeError(
-                f"{_('LibreOffice conversion failed with error code')} '{process.returncode}': {process.stderr}"
-            )
+        return process

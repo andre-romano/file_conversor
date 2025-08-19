@@ -8,7 +8,6 @@ import shlex
 import os
 import subprocess
 import json
-import re
 
 from pathlib import Path
 
@@ -18,14 +17,13 @@ from rich.progress import Progress
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import DummyProgress
 
 # get app config
 CONFIG = Configuration.get_instance()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -123,11 +121,7 @@ class BatchBackend(AbstractBackend):
             try:
                 cmd_list = self._gen_cmd_list(in_path, in_path=in_path, out_path=output_path, cmd_template=cmd_template)
                 logger.debug(f"Command list: '{cmd_list}'")
-                process = subprocess.run(cmd_list,
-                                         #  cwd=self.SCRIPT_WORKDIR,
-                                         capture_output=True,
-                                         check=True,
-                                         )
+                process = Environment.run(*cmd_list)
                 logger.debug(f"Processing file '{in_path}': [bold green]{_('SUCCESS')}[/] ({process.returncode})")
             except Exception as e:
                 logger.error(f"Processing file '{in_path}': [bold red]{_('FAILED')}[/]")
@@ -154,7 +148,7 @@ class BatchBackend(AbstractBackend):
     def _gen_cmd_list(self, input_path: Path, in_path: Path, out_path: Path, cmd_template: str):
         """Creates the command list based on cmd_template"""
         cmd_list = []
-        for cmd in shlex.split(f"{State.get_executable()} {cmd_template}"):
+        for cmd in shlex.split(f"{Environment.get_executable()} {cmd_template}"):
             # replace placeholders
             cmd = cmd.replace(f"{{in_file_path}}", f"{input_path.resolve()}")
             cmd = cmd.replace(f"{{in_file_name}}", f"{input_path.with_suffix("").name}")

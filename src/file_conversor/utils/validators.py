@@ -1,5 +1,6 @@
 # src\file_conversor\utils\validators.py
 
+import subprocess
 import typer
 
 from pathlib import Path

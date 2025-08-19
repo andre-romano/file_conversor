@@ -11,7 +11,7 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import PyMuSVGBackend
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
@@ -31,20 +31,20 @@ svg_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = State.get_icons_folder()
+    icons_folder_path = Environment.get_icons_folder()
     # PyMuSVGBackend commands
     for ext in PyMuSVGBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{State.get_executable()} svg convert "%1" -o "%1.jpg"',
+                command=f'{Environment.get_executable()} svg convert "%1" -o "%1.jpg"',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{State.get_executable()} svg convert "%1" -o "%1.png"',
+                command=f'{Environment.get_executable()} svg convert "%1" -o "%1.png"',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
         ])

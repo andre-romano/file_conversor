@@ -13,7 +13,7 @@ from rich import print
 # user-provided modules
 from file_conversor.backend.pdf import PyPDFBackend, PikePDFBackend, PyMuPDFBackend, GhostscriptBackend
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
@@ -36,66 +36,66 @@ pdf_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = State.get_icons_folder()
+    icons_folder_path = Environment.get_icons_folder()
     ctx_menu.add_extension(".pdf", [
         WinContextCommand(
             name="to_png",
             description="To PNG",
-            command=f'{State.get_executable()} pdf convert "%1" -o "%1.png"',
+            command=f'{Environment.get_executable()} pdf convert "%1" -o "%1.png"',
             icon=str(icons_folder_path / 'png.ico'),
         ),
         WinContextCommand(
             name="to_jpg",
             description="To JPG",
-            command=f'{State.get_executable()} pdf convert "%1" -o "%1.jpg"',
+            command=f'{Environment.get_executable()} pdf convert "%1" -o "%1.jpg"',
             icon=str(icons_folder_path / 'jpg.ico'),
         ),
         WinContextCommand(
             name="compress",
             description="Compress",
-            command=f'{State.get_executable()} pdf compress "%1"',
+            command=f'{Environment.get_executable()} pdf compress "%1"',
             icon=str(icons_folder_path / 'compress.ico'),
         ),
         WinContextCommand(
             name="repair",
             description="Repair",
-            command=f'{State.get_executable()} pdf repair "%1"',
+            command=f'{Environment.get_executable()} pdf repair "%1"',
             icon=str(icons_folder_path / 'repair.ico'),
         ),
         WinContextCommand(
             name="split",
             description="Split",
-            command=f'{State.get_executable()} pdf split "%1"',
+            command=f'{Environment.get_executable()} pdf split "%1"',
             icon=str(icons_folder_path / 'split.ico'),
         ),
         WinContextCommand(
             name="extract",
             description="Extract",
-            command=f'cmd /k "{State.get_executable()} pdf extract "%1""',
+            command=f'cmd /k "{Environment.get_executable()} pdf extract "%1""',
             icon=str(icons_folder_path / 'extract.ico'),
         ),
         WinContextCommand(
             name="rotate_anticlock_90",
             description="Rotate Left",
-            command=f'{State.get_executable()} pdf rotate "%1" -r "1-:-90"',
+            command=f'{Environment.get_executable()} pdf rotate "%1" -r "1-:-90"',
             icon=str(icons_folder_path / "rotate_left.ico"),
         ),
         WinContextCommand(
             name="rotate_clock_90",
             description="Rotate Right",
-            command=f'{State.get_executable()} pdf rotate "%1" -r "1-:90"',
+            command=f'{Environment.get_executable()} pdf rotate "%1" -r "1-:90"',
             icon=str(icons_folder_path / "rotate_right.ico"),
         ),
         WinContextCommand(
             name="encrypt",
             description="Encrypt",
-            command=f'cmd /k "{State.get_executable()} pdf encrypt "%1""',
+            command=f'cmd /k "{Environment.get_executable()} pdf encrypt "%1""',
             icon=str(icons_folder_path / "padlock_locked.ico"),
         ),
         WinContextCommand(
             name="decrypt",
             description="Decrypt",
-            command=f'cmd /k "{State.get_executable()} pdf decrypt "%1""',
+            command=f'cmd /k "{Environment.get_executable()} pdf decrypt "%1""',
             icon=str(icons_folder_path / "padlock_unlocked.ico"),
         ),
     ])

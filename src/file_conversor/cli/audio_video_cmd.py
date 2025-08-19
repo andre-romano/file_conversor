@@ -17,7 +17,7 @@ from rich.console import Group
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
@@ -39,43 +39,43 @@ audio_video_cmd = typer.Typer()
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
-    icons_folder_path = State.get_icons_folder()
+    icons_folder_path = Environment.get_icons_folder()
     for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{State.get_executable()} audio-video info "%1""',
+                command=f'cmd /k "{Environment.get_executable()} audio-video info "%1""',
                 icon=str(icons_folder_path / 'info.ico'),
             ),
             WinContextCommand(
                 name="to_avi",
                 description="To AVI",
-                command=f'{State.get_executable()} audio-video convert "%1" -o "%1.avi"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.avi"',
                 icon=str(icons_folder_path / 'avi.ico'),
             ),
             WinContextCommand(
                 name="to_mp4",
                 description="To MP4",
-                command=f'{State.get_executable()} audio-video convert "%1" -o "%1.mp4"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mp4"',
                 icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
-                command=f'{State.get_executable()} audio-video convert "%1" -o "%1.mkv"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mkv"',
                 icon=str(icons_folder_path / 'mkv.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
                 description="To MP3",
-                command=f'{State.get_executable()} audio-video convert "%1" -o "%1.mp3"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mp3"',
                 icon=str(icons_folder_path / 'mp3.ico'),
             ),
             WinContextCommand(
                 name="to_m4a",
                 description="To M4A",
-                command=f'{State.get_executable()} audio-video convert "%1" -o "%1.m4a"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.m4a"',
                 icon=str(icons_folder_path / 'm4a.ico'),
             ),
         ])

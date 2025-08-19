@@ -13,7 +13,7 @@ from rich.console import Group
 # user-provided modules
 from file_conversor.backend import PillowBackend, Img2PDFBackend, MozJPEGBackend, OxiPNGBackend
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
@@ -33,14 +33,14 @@ image_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = State.get_icons_folder()
+    icons_folder_path = Environment.get_icons_folder()
     # compression command
     for ext in ["jpg", "jpeg", "png"]:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="compress",
                 description="Compress",
-                command=f'{State.get_executable()} image compress "%1" -q 90',
+                command=f'{Environment.get_executable()} image compress "%1" -q 90',
                 icon=str(icons_folder_path / 'compress.ico'),
             ),
         ])
@@ -50,7 +50,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_pdf",
                 description="To PDF",
-                command=f'{State.get_executable()} image to-pdf "%1"',
+                command=f'{Environment.get_executable()} image to-pdf "%1"',
                 icon=str(icons_folder_path / "pdf.ico"),
             ),
         ])
@@ -60,49 +60,49 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{State.get_executable()} image info "%1""',
+                command=f'cmd /k "{Environment.get_executable()} image info "%1""',
                 icon=str(icons_folder_path / "info.ico"),
             ),
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.jpg" -q 90',
+                command=f'{Environment.get_executable()} image convert "%1" -o "%1.jpg" -q 90',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.png" -q 90',
+                command=f'{Environment.get_executable()} image convert "%1" -o "%1.png" -q 90',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_webp",
                 description="To WEBP",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.webp" -q 90',
+                command=f'{Environment.get_executable()} image convert "%1" -o "%1.webp" -q 90',
                 icon=str(icons_folder_path / 'webp.ico'),
             ),
             WinContextCommand(
                 name="rotate_anticlock_90",
                 description="Rotate Left",
-                command=f'{State.get_executable()} image rotate "%1" -r -90',
+                command=f'{Environment.get_executable()} image rotate "%1" -r -90',
                 icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
                 name="rotate_clock_90",
                 description="Rotate Right",
-                command=f'{State.get_executable()} image rotate "%1" -r 90',
+                command=f'{Environment.get_executable()} image rotate "%1" -r 90',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_x",
                 description="Mirror X axis",
-                command=f'{State.get_executable()} image mirror "%1" -a x',
+                command=f'{Environment.get_executable()} image mirror "%1" -a x',
                 icon=str(icons_folder_path / "left_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_y",
                 description="Mirror Y axis",
-                command=f'{State.get_executable()} image mirror "%1" -a y',
+                command=f'{Environment.get_executable()} image mirror "%1" -a y',
                 icon=str(icons_folder_path / "up_down.ico"),
             ),
         ])

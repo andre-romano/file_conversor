@@ -4,13 +4,12 @@
 This module provides functionalities for handling files using ``ghostscript`` backend.
 """
 
-import subprocess
 from pathlib import Path
 from enum import Enum
 from typing import Any
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -194,10 +193,7 @@ class GhostscriptBackend(AbstractBackend):
         logger.debug(f"{" ".join(command)}")
 
         # Execute the FFmpeg command
-        _convert_process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True
+        process = Environment.run(
+            *command,
         )
-        return _convert_process
+        return process

@@ -11,7 +11,7 @@ from pathlib import Path
 from rich import print
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
@@ -83,9 +83,7 @@ class OxiPNGBackend(AbstractBackend):
         :param compression_level: Image compression level (0-6). Defaults to 6 (max compression).              
         :param kwargs: Optional arguments.
 
-        :return: Subprocess.Popen object
-
-        :raises RuntimeError: If backend encounters an error during execution.
+        :return: Subprocess.CompletedProcess object
         """
         # copy input to output
         shutil.copy2(src=input_file, dst=output_file)
@@ -99,14 +97,8 @@ class OxiPNGBackend(AbstractBackend):
             command.extend([f"--strip", f"safe",])
         command.append(f"{output_file}")
 
-        logger.info(f"Executing backend ...")
-        logger.debug(f"{" ".join(command)}")
-
         # Execute the command
-        process = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True,
+        process = Environment.run(
+            *command,
         )
         return process

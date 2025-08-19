@@ -6,23 +6,23 @@ import locale
 from pathlib import Path
 from typing import Any
 
-from file_conversor.config.state import State
+from file_conversor.config.environment import Environment
 
 
 class Configuration:
 
     __instance = None
 
-    @staticmethod
-    def get_instance():
-        if not Configuration.__instance:
-            Configuration.__instance = Configuration()
-        return Configuration.__instance
+    @classmethod
+    def get_instance(cls):
+        if not cls.__instance:
+            cls.__instance = cls()
+        return cls.__instance
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.__config_path = State.get_resources_folder() / ".config.json"
+        self.__config_path = Environment.get_resources_folder() / ".config.json"
         # Define configuration dictionary
         language = "en_US"
         if locale.getlocale() and locale.getlocale()[0]:

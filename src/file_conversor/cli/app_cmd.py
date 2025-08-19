@@ -22,7 +22,7 @@ from file_conversor.cli.office import doc_cmd, ppt_cmd, xls_cmd
 
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 # Get app config
@@ -128,7 +128,7 @@ app_cmd.add_typer(config_cmd,
 def version_callback(value: bool):
     if value:
         VERSION = None
-        with open(State.get_resources_folder() / "pyproject.toml", "rb") as f:
+        with open(Environment.get_resources_folder() / "pyproject.toml", "rb") as f:
             PYPROJECT = tomllib.load(f)
             VERSION = str(PYPROJECT["project"]["version"])
         typer.echo(f"File Conversor {VERSION}")
@@ -207,4 +207,4 @@ def main_callback(
         "debug": debug,
     })
     logger.debug(f"Command: {sys.argv}")
-    State.get_executable()
+    Environment.get_executable()

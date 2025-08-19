@@ -6,7 +6,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from file_conversor.cli.app_cmd import app_cmd
-from file_conversor.config.state import State
+from file_conversor.config.environment import Environment
 
 
 DATA_PATH = Path(f"tests/.data")
@@ -23,7 +23,7 @@ class Test:
 
     @staticmethod
     def run(*cmd_list: str):
-        exe_cmd_list = shlex.split(f'"{sys.executable}" "{State.get_resources_folder() / "__main__.py"}"')
+        exe_cmd_list = shlex.split(f'"{sys.executable}" "{Environment.get_resources_folder() / "__main__.py"}"')
 
         cmd = exe_cmd_list.copy()
         cmd.extend(cmd_list)

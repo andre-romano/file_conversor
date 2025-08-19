@@ -97,17 +97,17 @@ class Log:
     # logfile name
     FILENAME = f".file_conversor.log"
 
-    @staticmethod
-    def get_instance(dest_folder: str | Path | None = ".", level: int = LEVEL_INFO):
+    @classmethod
+    def get_instance(cls, dest_folder: str | Path | None = ".", level: int = LEVEL_INFO):
         """
         Initialize logfile instance
 
         :param dest_folder: Destination folder to store log file. If None, do not log to file. Defaults to '.' (log to current working folder).
         :param level: Log level. Defaults to LEVEL_INFO.
         """
-        if not Log.__instance:
-            Log.__instance = Log(dest_folder=dest_folder, level=level)
-        return Log.__instance
+        if not cls.__instance:
+            cls.__instance = cls(dest_folder=dest_folder, level=level)
+        return cls.__instance
 
     def __init__(self, dest_folder: str | Path | None, level: int) -> None:
         """

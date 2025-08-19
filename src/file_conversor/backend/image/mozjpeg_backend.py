@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
@@ -71,7 +71,7 @@ class MozJPEGBackend(AbstractBackend):
             output_file: str | Path,
             quality: int,
             **kwargs,
-    ) -> subprocess.Popen:
+    ) -> subprocess.CompletedProcess:
         """
         Execute the command to compress the input file.
 
@@ -80,36 +80,23 @@ class MozJPEGBackend(AbstractBackend):
         :param quality: Output image quality.              
         :param kwargs: Optional arguments.
 
-        :return: Subprocess.Popen object
+        :return: Subprocess.CompletedProcess object
 
         :raises RuntimeError: If backend encounters an error during execution.
         """
-
-        # build ffmpeg command
-        command = [
+        # Execute the command
+        process = Environment.run(
             f"{self._mozjpeg_bin}",
             f"-quality", f"{quality}",
             f"-progressive",
             f"-optimize",
-            f"{input_file}"
-        ]
-
-        logger.info(f"Executing backend ...")
-        logger.debug(f"{" ".join(command)}")
-
-        # Execute the command
-        process = subprocess.Popen(
-            command,
+            f"{input_file}",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            text=False,
         )
-        stdout, stderr = process.communicate()
-        if process.returncode != 0:
-            raise RuntimeError(
-                f"MozJPEGBackend failed:\n{stderr.decode(errors='ignore')}"
-            )
 
         # Save the compressed output to file
         with open(output_file, "wb") as fp:
-            fp.write(stdout)
+            fp.write(process.stdout)
         return process

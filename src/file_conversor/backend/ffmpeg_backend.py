@@ -13,7 +13,7 @@ from datetime import timedelta
 from typing import Iterable
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
@@ -117,8 +117,8 @@ class FFmpegBackend(AbstractBackend):
 
         :return: Progress of FFMpeg [0-100], otherwise 0
         """
-        if process and process.stderr:
-            match = FFmpegBackend.PROGRESS_RE.search(process.stderr.readline())
+        if process and process.stdout:
+            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
             if match:
                 hours = int(match.group(1))
                 minutes = int(match.group(2))
@@ -163,15 +163,14 @@ class FFmpegBackend(AbstractBackend):
 
         :return: Total duration in seconds.
         """
-        result = subprocess.run(
-            [str(self._ffprobe_bin), '-v', 'error', '-show_entries',
-             'format=duration', '-of',
-             'default=noprint_wrappers=1:nokey=1', file_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True
+        process = Environment.run(
+            str(self._ffprobe_bin),
+            '-v', 'error', '-show_entries',
+            'format=duration', '-of',
+            'default=noprint_wrappers=1:nokey=1',
+            file_path,
         )
-        duration_str = result.stdout.strip()
+        duration_str = process.stdout.strip()
         return float(duration_str if duration_str else "0")
 
     def calculate_file_formatted_duration(self, file_path: str) -> str:
@@ -215,18 +214,16 @@ class FFmpegBackend(AbstractBackend):
 
         :return: JSON object
         """
-        command = [
-            str(self._ffprobe_bin),
+        result = Environment.run(
+            f"{self._ffprobe_bin}",
             "-v", "quiet",
             "-print_format", "json",
             "-show_format",
             "-show_streams",
             "-show_chapters",
             "-show_error",
-            file_path
-        ]
-        result = subprocess.run(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            f"{file_path}",
+        )
         return json.loads(result.stdout)
 
     def _set_input(self, input_file: str) -> tuple[str, list]:
@@ -332,14 +329,8 @@ class FFmpegBackend(AbstractBackend):
         # remove empty strings
         ffmpeg_command = [arg for arg in ffmpeg_command if arg != ""]
 
-        logger.info(f"Executing FFmpeg ...")
-        logger.debug(f"{" ".join(ffmpeg_command)}")
-
         # Execute the FFmpeg command
-        _convert_process = subprocess.Popen(
-            ffmpeg_command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True
+        process = Environment.run_nowait(
+            *ffmpeg_command,
         )
-        return _convert_process
+        return process

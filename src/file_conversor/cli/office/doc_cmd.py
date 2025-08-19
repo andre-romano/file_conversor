@@ -11,7 +11,7 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import DOC_BACKEND
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
@@ -33,14 +33,14 @@ doc_cmd = typer.Typer()
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = State.get_icons_folder()
+    icons_folder_path = Environment.get_icons_folder()
     # WordBackend commands
     for ext in DOC_BACKEND.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name=f"to_{ext}",
                 description=f"To {ext.upper()}",
-                command=f'{State.get_executable()} doc convert "%1" -o "%1.{ext}"',
+                command=f'{Environment.get_executable()} doc convert "%1" -o "%1.{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             ) for ext in DOC_BACKEND.SUPPORTED_OUT_FORMATS
         ])

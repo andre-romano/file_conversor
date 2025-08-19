@@ -4,7 +4,7 @@
 import gettext  # app translations / locales
 import locale
 
-from file_conversor.config.state import State
+from file_conversor.config.environment import Environment
 from file_conversor.config.config import Configuration
 
 CONFIG = Configuration.get_instance()
@@ -23,7 +23,7 @@ def get_translation():
     """
     sys_lang = get_system_locale()
     translation = gettext.translation(
-        'messages', State.get_locales_folder(),
+        'messages', Environment.get_locales_folder(),
         languages=[
             CONFIG["language"],
             sys_lang if sys_lang else "en_US",

@@ -1,10 +1,6 @@
 # src\file_conversor\config\state.py
 
-import shutil
-import sys
-
 from pathlib import Path
-from importlib.resources import files
 
 from typing import Any
 
@@ -56,46 +52,11 @@ def enable_debug_mode(value):
 class State:
     __instance = None
 
-    @staticmethod
-    def get_executable() -> str:
-        """Get the executable path for this app's CLI."""
-        res = ""
-
-        exe = shutil.which(sys.argv[0]) if sys.argv else None
-        if exe and not exe.endswith(".py"):
-            res = rf'"{exe}"'
-        else:
-            python_exe = sys.executable
-            main_py = Path(rf"{State.get_resources_folder()}/__main__.py")
-            res = rf'"{python_exe}" "{main_py}"'
-
-        logger.debug(f"Executable cmd: {res}")
-        return res
-
-    @staticmethod
-    def get_resources_folder() -> Path:
-        """Get the absolute path of the included folders in pip."""
-        res_path = Path(str(files("file_conversor"))).resolve()
-        return res_path
-
-    @staticmethod
-    def get_icons_folder() -> Path:
-        """Get the absolute path of the included folders in pip."""
-        icons_path = State.get_resources_folder() / ".icons"
-        logger.debug(f"Icons path: {icons_path}")
-        return icons_path
-
-    @staticmethod
-    def get_locales_folder() -> Path:
-        locales_path = State.get_resources_folder() / ".locales"
-        logger.debug(f"Locales path: {locales_path}")
-        return locales_path
-
-    @staticmethod
-    def get_instance():
-        if not State.__instance:
-            State.__instance = State()
-        return State.__instance
+    @classmethod
+    def get_instance(cls):
+        if not cls.__instance:
+            cls.__instance = cls()
+        return cls.__instance
 
     def __init__(self) -> None:
         super().__init__()

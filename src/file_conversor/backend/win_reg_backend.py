@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.config.log import Log
+from file_conversor.config import Environment, Log
 
 from file_conversor.system.win import WinRegFile
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -65,16 +65,9 @@ class WinRegBackend(AbstractBackend):
             winregfile.dump(temp_file)
 
             # build command
-            command = [str(self._reg_bin), "import", temp_file]
-
-            # Execute command
-            logger.info(f"Importing .REG file ...")
-            logger.debug(" ".join(command))
-
-            subprocess.run(command,
-                           capture_output=True,
-                           check=True,
-                           )
+            Environment.run(
+                f"{self._reg_bin}", "import", f"{temp_file}",
+            )
 
     def delete_keys(
         self,
@@ -97,19 +90,18 @@ class WinRegBackend(AbstractBackend):
         for _, key in winregfile.items():
             # Execute command
             try:
-                subprocess.run([str(self._reg_bin), "query", key.path],
-                               stdin=subprocess.DEVNULL,
-                               stdout=subprocess.DEVNULL,
-                               stderr=subprocess.DEVNULL,
-                               check=True,
-                               )
+                Environment.run(
+                    f"{self._reg_bin}", "query", f"{key.path}",
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
             except subprocess.CalledProcessError:
                 # logger.debug(f"SKIP - key '{key.path}' not found ...")
                 continue
 
-            subprocess.run([str(self._reg_bin), "delete", key.path, "/f"],
-                           capture_output=True,
-                           check=True,
-                           )
+            Environment.run(
+                f"{self._reg_bin}", "delete", f"{key.path}", "/f",
+            )
 
             logger.debug(f"'{key.path}' deleted")

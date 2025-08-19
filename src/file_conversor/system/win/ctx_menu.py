@@ -9,11 +9,10 @@ from rich import print
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
 from file_conversor.system.win.utils import is_admin
 
-from file_conversor.config import State, Log
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 # get app config
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -48,18 +47,18 @@ class WinContextCommand:
 class WinContextMenu:
     _instance = None
 
-    @staticmethod
-    def get_instance():
-        if not WinContextMenu._instance:
-            WinContextMenu._instance = WinContextMenu()
-        return WinContextMenu._instance
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+        return cls._instance
 
     def __init__(self) -> None:
         """Set context menu for all users, or for current user ONLY"""
         super().__init__()
 
         self.MENU_NAME = "File Conversor"
-        self.ICON_FILE_PATH = Path(f"{State.get_icons_folder()}/icon.ico").resolve()
+        self.ICON_FILE_PATH = Path(f"{Environment.get_icons_folder()}/icon.ico").resolve()
 
         self.ROOT_KEY_USER = rf"HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
         self.ROOT_KEY_MACHINE = rf"HKEY_LOCAL_MACHINE\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
