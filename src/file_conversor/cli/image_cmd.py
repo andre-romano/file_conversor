@@ -4,14 +4,14 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Callable, List
 
 from rich import print
 from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from file_conversor.backend import PillowBackend, Img2PDFBackend
+from file_conversor.backend import PillowBackend, Img2PDFBackend, MozJPEGBackend, OxiPNGBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -34,6 +34,16 @@ image_cmd = typer.Typer()
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = State.get_icons_folder()
+    # compression command
+    for ext in ["jpg", "jpeg", "png"]:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="compress",
+                description="Compress",
+                command=f'{State.get_executable()} image compress "%1" -q 90',
+                icon=str(icons_folder_path / 'compress.ico'),
+            ),
+        ])
     # IMG2PDF commands
     for ext in Img2PDFBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
@@ -56,19 +66,19 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.jpg" -q 95',
+                command=f'{State.get_executable()} image convert "%1" -o "%1.jpg" -q 90',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.png" -q 95',
+                command=f'{State.get_executable()} image convert "%1" -o "%1.png" -q 90',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_webp",
                 description="To WEBP",
-                command=f'{State.get_executable()} image convert "%1" -o "%1.webp" -q 95',
+                command=f'{State.get_executable()} image convert "%1" -o "%1.webp" -q 90',
                 icon=str(icons_folder_path / 'webp.ico'),
             ),
             WinContextCommand(
@@ -101,6 +111,67 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 # register commands in windows context menu
 ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
+
+
+# image compress
+COMPRESS_IN_FORMATS = []
+COMPRESS_IN_FORMATS.extend(MozJPEGBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_IN_FORMATS.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
+
+
+@image_cmd.command(
+    help=f"""
+        {_('Compress an image file (requires external libraries).')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor image compress input_file.jpg -q 85`
+
+        - `file_conversor image compress input_file.png -o output_file.png`
+    """)
+def compress(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(COMPRESS_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, COMPRESS_IN_FORMATS, exists=True),
+    )],
+
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')}. {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _compressed at the end)')}",
+                                                    )] = None,
+
+    quality: Annotated[int, typer.Option("--quality", "-q",
+                                         help=_("Image quality (valid only for JPG). Valid values are between 1-100."),
+                                         min=1, max=100,
+                                         )] = CONFIG["image-quality"],
+):
+    input_path = Path(input_file)
+    in_ext = input_path.suffix[1:]
+
+    output_path = Path(output_file if output_file else f"{input_path.with_suffix("")}_compressed")
+    output_path = output_path.with_suffix(f".{in_ext}")
+
+    out_ext = output_path.suffix[1:]
+    if out_ext in MozJPEGBackend.SUPPORTED_IN_FORMATS:
+        BACKEND_CLASS = MozJPEGBackend
+    elif out_ext in OxiPNGBackend.SUPPORTED_IN_FORMATS:
+        BACKEND_CLASS = OxiPNGBackend
+    else:
+        raise RuntimeError(f"Output format '{out_ext}' not supported")
+
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
+        backend = BACKEND_CLASS(
+            install_deps=CONFIG['install-deps'],
+            verbose=STATE["verbose"],
+        )
+        backend.compress(
+            input_file=input_path,
+            output_file=output_path,
+            quality=quality,
+        )
+        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # image info
