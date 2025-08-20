@@ -9,6 +9,8 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
+from tasks_modules import locales
+
 APP_FOLDER = Path(f"dist/{PROJECT_NAME}")
 
 
@@ -42,7 +44,7 @@ def clean_exe(c: InvokeContext):
     _config.remove_path(str(APP_FOLDER))
 
 
-@task(pre=[mkdirs])
+@task(pre=[mkdirs, locales.build])
 def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ...[/]")
     for include in parse_manifest_includes():
