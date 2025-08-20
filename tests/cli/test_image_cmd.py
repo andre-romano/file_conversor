@@ -3,6 +3,24 @@
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
+def test_render_svg_jpg(tmp_path):
+    in_path = DATA_PATH / "test.svg"
+    out_path = tmp_path / "test.jpg"
+
+    result = Test.invoke("image", "render", str(in_path), "-o", str(out_path))
+    assert result.exit_code == 0
+    assert out_path.exists()
+
+
+def test_render_svg_png(tmp_path):
+    in_path = DATA_PATH / "test.svg"
+    out_path = tmp_path / "test.png"
+
+    result = Test.invoke("image", "render", str(in_path), "-o", str(out_path))
+    assert result.exit_code == 0
+    assert out_path.exists()
+
+
 def test_image_mirror_x(tmp_path):
     in_path = DATA_PATH / "test.png"
     out_path = tmp_path / "test_mirror.png"

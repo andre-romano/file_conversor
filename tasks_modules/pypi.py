@@ -8,7 +8,7 @@ from requests import post
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import base
+from tasks_modules import base, locales
 
 
 @task
@@ -25,7 +25,7 @@ def clean_whl(c: InvokeContext):
     remove_path("dist/*.tar.gz")
 
 
-@task(pre=[clean_whl, base.locales_build, ])
+@task(pre=[clean_whl, locales.build, ])
 def build(c: InvokeContext):
     print(f"[bold] Building PyPi package ... [/]")
     result = c.run(f"pdm build")
