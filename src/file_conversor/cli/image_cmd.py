@@ -1,6 +1,7 @@
 
 # src\file_conversor\cli\image_cmd.py
 
+from functools import reduce
 import typer
 
 from pathlib import Path
@@ -11,7 +12,7 @@ from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from file_conversor.backend import PillowBackend, Img2PDFBackend, MozJPEGBackend, OxiPNGBackend
+from file_conversor.backend import PillowBackend, Img2PDFBackend, MozJPEGBackend, OxiPNGBackend, GifSicleBackend
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -31,11 +32,17 @@ logger = LOG.getLogger(__name__)
 
 image_cmd = typer.Typer()
 
+# image compress
+COMPRESS_BACKENDS_IN = []
+COMPRESS_BACKENDS_IN.extend(MozJPEGBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_BACKENDS_IN.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_BACKENDS_IN.extend(GifSicleBackend.SUPPORTED_IN_FORMATS)
+
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()
     # compression command
-    for ext in ["jpg", "jpeg", "png"]:
+    for ext in COMPRESS_BACKENDS_IN:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="compress",
@@ -114,11 +121,6 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 # image compress
-COMPRESS_IN_FORMATS = []
-COMPRESS_IN_FORMATS.extend(MozJPEGBackend.SUPPORTED_IN_FORMATS)
-COMPRESS_IN_FORMATS.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
-
-
 @image_cmd.command(
     help=f"""
         {_('Compress an image file (requires external libraries).')}
@@ -132,8 +134,8 @@ COMPRESS_IN_FORMATS.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
     """)
 def compress(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(COMPRESS_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, COMPRESS_IN_FORMATS, exists=True),
+        help=f"{_('Input file')} ({', '.join(COMPRESS_BACKENDS_IN)})",
+        callback=lambda x: check_file_format(x, COMPRESS_BACKENDS_IN, exists=True),
     )],
 
     output_file: Annotated[str | None, typer.Option("--output", "-o",
@@ -156,15 +158,17 @@ def compress(
         BACKEND_CLASS = MozJPEGBackend
     elif out_ext in OxiPNGBackend.SUPPORTED_IN_FORMATS:
         BACKEND_CLASS = OxiPNGBackend
+    elif out_ext in GifSicleBackend.SUPPORTED_IN_FORMATS:
+        BACKEND_CLASS = GifSicleBackend
     else:
         raise RuntimeError(f"Output format '{out_ext}' not supported")
 
+    backend = BACKEND_CLASS(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
     with get_progress_bar() as progress:
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        backend = BACKEND_CLASS(
-            install_deps=CONFIG['install-deps'],
-            verbose=STATE["verbose"],
-        )
         backend.compress(
             input_file=input_path,
             output_file=output_path,
