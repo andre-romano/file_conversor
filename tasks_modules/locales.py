@@ -10,7 +10,7 @@ from tasks_modules import _config
 from tasks_modules._config import *
 
 
-def _translate_locale(path: Path):
+def _translate_locale(c: InvokeContext, path: Path):
     exception = None
 
     locale = path.name
@@ -21,6 +21,7 @@ def _translate_locale(path: Path):
 
     if not po.untranslated_entries():
         print(f"[bold] Translating locale '{locale}' ... [/][bold yellow]NO CHANGES[/]")
+        c.run(f'git checkout "{path}"', hide=True)
         return
 
     translator = GoogleTranslator(source="en", target=lang_id)
@@ -79,7 +80,7 @@ def translate(c: InvokeContext):
         if not path.is_dir():
             continue
         try:
-            _translate_locale(path)
+            _translate_locale(c, path)
         except Exception as e:
             print(f"[bold red] ERROR:[/] {repr(e)}")
             exception = e

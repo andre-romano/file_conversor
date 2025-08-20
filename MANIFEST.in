@@ -1,4 +1,4 @@
-include LICENSE AUTHORS.md README.md CHANGELOG.md pyproject.toml
+include LICENSE AUTHORS.md README.md pyproject.toml
 
 recursive-include src/file_conversor/.data *
 recursive-include src/file_conversor/.icons *
