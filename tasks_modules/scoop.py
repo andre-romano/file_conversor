@@ -36,6 +36,8 @@ def manifest(c: InvokeContext):
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
 
+    INSTALL_APP_AUTOUPDATE = INSTALL_APP_URL.replace(PROJECT_VERSION, "$version")
+
     # bucket/file_conersor.json
     SCOOP_JSON.write_text(json.dumps({
         "version": PROJECT_VERSION,
@@ -61,7 +63,10 @@ def manifest(c: InvokeContext):
             "github": PROJECT_HOMEPAGE,
         },
         "autoupdate": {
-            "url": f"{INSTALL_APP_URL.replace(PROJECT_VERSION, "$version")}",
+            "url": f"{INSTALL_APP_AUTOUPDATE}",
+            "hash": {
+                "url": f"{INSTALL_APP_AUTOUPDATE.replace(".exe", INSTALL_APP_HASH.suffix)}"
+            }
         }
     }, indent=4), encoding="utf-8")
     assert SCOOP_JSON.exists()
