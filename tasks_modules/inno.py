@@ -116,7 +116,21 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_exe, create_manifest, install,])
+@task
+def gen_hash(c: InvokeContext):
+    print(f"[bold] Generating SHA256 hash ... [/]")
+    if not INSTALL_APP.exists():
+        raise RuntimeError(f"File {INSTALL_APP} not found")
+    hash = _config.get_hash(INSTALL_APP)
+    INSTALL_APP_HASH.write_text(rf"""
+{hash}  {INSTALL_APP.name}
+""", encoding="utf-8")
+    if not INSTALL_APP_HASH.exists():
+        raise RuntimeError("Failed to create sha256 file")
+    print(f"[bold] Generating SHA256 hash ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_exe, create_manifest, install,], post=[gen_hash])
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")

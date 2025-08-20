@@ -62,6 +62,7 @@ def publish(c: InvokeContext):
         "--title", rf'"{GIT_RELEASE}"',
         "--notes-file", rf'"{RELEASE_NOTES_PATH}"',
         rf'"{INSTALL_APP}"',
+        rf'"{INSTALL_APP_HASH}"',
     ]
     result = c.run(" ".join(gh_cmd))
     assert (result is not None) and (result.return_code == 0)

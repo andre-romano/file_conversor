@@ -50,6 +50,9 @@ INSTALL_APP_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/down
 # INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP.parent.name}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://cdn.jsdelivr.net/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 
+INSTALL_APP_HASH = INSTALL_APP.with_suffix(".sha256")
+INSTALL_APP_HASH_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP_HASH.name}"
+
 
 def copy(src: Path, dst: Path):
     print(f"Copying '{src}' => '{dst}' ...", end="")
@@ -87,8 +90,19 @@ def mkdir(dirs: Iterable):
             raise RuntimeError(f"Cannot create dir '{dir}'")
 
 
-def get_remote_hash(url):
+def get_hash(data: bytes | str | Path) -> str:
+    if isinstance(data, (str, Path)):
+        try:
+            data = Path(data).read_text()
+            data.replace("\r", "")
+            data = data.encode("utf-8")
+        except:
+            data = Path(data).read_bytes()
+    return hashlib.sha256(data).hexdigest()
+
+
+def get_remote_hash(url: str) -> str:
     response = requests.get(url)
     if not response.ok:
         raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
-    return hashlib.sha256(response.content).hexdigest()
+    return get_hash(response.content)
