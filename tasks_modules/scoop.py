@@ -36,9 +36,6 @@ def manifest(c: InvokeContext):
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
 
-    if not INSTALL_APP.exists():
-        raise RuntimeError(f"File '{INSTALL_APP}' not found!")
-
     # bucket/file_conersor.json
     SCOOP_JSON.write_text(json.dumps({
         "version": PROJECT_VERSION,
@@ -48,21 +45,23 @@ def manifest(c: InvokeContext):
         "depends": list(SCOOP_DEPS.keys()),
         "url": INSTALL_APP_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
-        "installer": {
-            "script": [
-                f"\"$dir\\{INSTALL_APP.name}\" /DIR=\"$dir\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-",
-            ]
-        },
-        "uninstaller": {
-            "script": [
-                f"\"$dir\\{UNINSTALL_APP.name}\" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-"
-            ]
-        },
+        "bin": f"{PROJECT_NAME}.exe",
+        "pre_install": [
+            rf'$exePath = Get-ChildItem -Path "$dir" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName',
+            rf'Start-Process -FilePath "$exePath" -ArgumentList "/DIR=$dir", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
+            rf'if (!(Test-Path "$dir\{PROJECT_NAME}.exe")) {{throw "Install failed: executable {PROJECT_NAME}.exe not found"}}',
+            rf'Remove-Item -Path "$exePath"',
+        ],
+        "pre_uninstall": [
+            rf'$exePath = Get-ChildItem -Path "$dir" -Filter {UNINSTALL_APP.name}  | Select-Object -ExpandProperty FullName',
+            rf'Start-Process -FilePath "$exePath" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
+            rf'if (Test-Path "$dir\{PROJECT_NAME}.exe") {{throw "Uninstall failed: executable still exists"}}',
+        ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
         },
         "autoupdate": {
-            "url": INSTALL_APP_URL,
+            "url": f"{INSTALL_APP_URL.replace(PROJECT_VERSION, "$version")}",
         }
     }, indent=4), encoding="utf-8")
     assert SCOOP_JSON.exists()
