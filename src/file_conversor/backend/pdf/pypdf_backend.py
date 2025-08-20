@@ -9,6 +9,8 @@ import math
 from pypdf import PdfReader, PdfWriter
 from pypdf.constants import UserAccessPermissions
 
+from pathlib import Path
+
 from typing import Iterable
 
 # user-provided imports
@@ -63,8 +65,8 @@ class PyPDFBackend(AbstractBackend):
             return len(reader.pages)
 
     def merge(self,
-              output_file: str,
-              input_files: dict[str, str],
+              output_file: str | Path,
+              input_files: dict[str | Path, str],
               ):
         """
         Merge input files into an output.
@@ -82,7 +84,7 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found.
         """
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfWriter() as writer:
             for in_file, decrypt_password in input_files.items():
@@ -92,11 +94,11 @@ class PyPDFBackend(AbstractBackend):
                         reader.decrypt(decrypt_password)
                     for page in reader.pages:
                         writer.add_page(page)
-            writer.write(f"{output_file}.pdf")
+            writer.write(output_path)
 
     def split(self,
-              output_file: str,
-              input_file: str,
+              output_file: str | Path,
+              input_file: str | Path,
               decrypt_password: str | None = None,
               ):
         """
@@ -110,7 +112,7 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         """
         self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix("")
 
         with PdfReader(input_file) as reader:
             if decrypt_password and reader.is_encrypted:
@@ -118,11 +120,11 @@ class PyPDFBackend(AbstractBackend):
             for i, page in enumerate(reader.pages):
                 with PdfWriter() as writer:
                     writer.add_page(page)
-                    writer.write(f"{output_file}_{i + 1}.pdf")
+                    writer.write(f"{output_path}_{i + 1}.pdf")
 
     def extract(self,
-                output_file: str,
-                input_file: str,
+                output_file: str | Path,
+                input_file: str | Path,
                 pages: Iterable[int],
                 decrypt_password: str | None = None,
                 ):
@@ -138,7 +140,7 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         """
         self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
@@ -146,11 +148,11 @@ class PyPDFBackend(AbstractBackend):
 
             for page_num in pages:
                 writer.add_page(reader.pages[page_num])
-            writer.write(f"{output_file}.pdf")
+            writer.write(output_path)
 
     def rotate(self,
-               output_file: str,
-               input_file: str,
+               output_file: str | Path,
+               input_file: str | Path,
                rotations: dict[int, int],
                decrypt_password: str | None = None,
                ):
@@ -167,7 +169,7 @@ class PyPDFBackend(AbstractBackend):
         :raises ValueError: if rotation degree is invalid (valid values are 0 or multiples of 90 degrees - positive or negative).        
         """
         self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
@@ -190,11 +192,11 @@ class PyPDFBackend(AbstractBackend):
                     page.rotate(rotation)  # clockwise: 90, 180, 270
                 writer.add_page(page)
             # save output file
-            writer.write(f"{output_file}.pdf")
+            writer.write(output_path)
 
     def encrypt(self,
-                output_file: str,
-                input_file: str,
+                output_file: str | Path,
+                input_file: str | Path,
                 owner_password: str,
                 user_password: str | None = None,
                 decrypt_password: str | None = None,
@@ -252,7 +254,7 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         """
         self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
@@ -296,11 +298,11 @@ class PyPDFBackend(AbstractBackend):
             )
 
             # save output file
-            writer.write(f"{output_file}.pdf")
+            writer.write(output_path)
 
     def decrypt(self,
-                output_file: str,
-                input_file: str,
+                output_file: str | Path,
+                input_file: str | Path,
                 password: str,
                 ):
         """
@@ -314,7 +316,7 @@ class PyPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         """
         self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             # decrypt file
@@ -324,4 +326,4 @@ class PyPDFBackend(AbstractBackend):
             # Generate decrypted pdf
             for page in reader.pages:
                 writer.add_page(page)
-            writer.write(f"{output_file}.pdf")
+            writer.write(output_path)

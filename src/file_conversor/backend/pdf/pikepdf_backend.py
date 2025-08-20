@@ -7,6 +7,8 @@ This module provides functionalities for handling PDF files using ``pikepdf`` ba
 import pikepdf
 
 from pikepdf import ObjectStreamMode
+
+from pathlib import Path
 from typing import Any, Callable
 
 # user-provided imports
@@ -44,7 +46,7 @@ class PikePDFBackend(AbstractBackend):
         self._verbose = verbose
 
     @staticmethod
-    def is_encrypted(file_path: str) -> bool:
+    def is_encrypted(file_path: str | Path) -> bool:
         """Checks if PDF file is encrypted"""
         try:
             with pikepdf.open(file_path):
@@ -56,8 +58,8 @@ class PikePDFBackend(AbstractBackend):
 
     def repair(
         self,
-        input_file: str,
-        output_file: str,
+        input_file: str | Path,
+        output_file: str | Path,
         progress_callback: Callable[[int], Any] | None = None,
         decrypt_password: str | None = None,
         compress: bool = True,

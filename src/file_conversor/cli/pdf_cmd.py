@@ -2,7 +2,6 @@
 # src\file_conversor\cli\pdf_cmd.py
 
 import re
-import time
 import typer
 
 from pathlib import Path
@@ -139,7 +138,7 @@ def repair(
         pikepdf_backend.repair(
             # files
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_repaired.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_repaired", "pdf"),
 
             # options
             decrypt_password=password,
@@ -199,7 +198,7 @@ def compress(
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         gs_backend.compress(
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_compressed.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_compressed", "pdf"),
             compression_level=compression_level,
         )
         progress.update(task, total=100, completed=100)
@@ -297,7 +296,7 @@ def merge(
         pypdf_backend.merge(
             # files
             input_files=filepath_dict,
-            output_file=output_file if output_file else f"{input_files[0].replace(".pdf", "")}_merged.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_files[0], "_merged", "pdf"),
         )
         progress.update(merge_task, total=100, completed=100)
 
@@ -418,7 +417,7 @@ def extract(
         pypdf_backend.extract(
             # files
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_extracted.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_extracted", "pdf"),
 
             # passwords
             decrypt_password=decrypt_password,
@@ -496,7 +495,7 @@ def rotate(
         pypdf_backend.rotate(
             # files
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_rotated.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_rotated", "pdf"),
 
             # passwords
             decrypt_password=decrypt_password,
@@ -590,7 +589,7 @@ def encrypt(
         pypdf_backend.encrypt(
             # files
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_encrypted.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_encrypted", "pdf"),
 
             # passwords
             owner_password=owner_password,
@@ -647,7 +646,7 @@ def decrypt(
         decrypt_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None,)
         pypdf_backend.decrypt(
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_file.replace(".pdf", "")}_decrypted.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_file, "_decrypted", "pdf"),
             password=password,
         )
         progress.update(decrypt_task, total=100, completed=100)

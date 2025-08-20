@@ -185,7 +185,7 @@ class FFmpegBackend(AbstractBackend):
         td = timedelta(seconds=int(duration_secs))
         return str(td)
 
-    def get_file_info(self, file_path: str) -> dict:
+    def get_file_info(self, file_path: str | Path) -> dict:
         """
         Executa ffprobe e retorna os metadados no formato JSON
 
@@ -226,7 +226,7 @@ class FFmpegBackend(AbstractBackend):
         )
         return json.loads(result.stdout)
 
-    def _set_input(self, input_file: str) -> tuple[str, list]:
+    def _set_input(self, input_file: str | Path) -> tuple[str, list]:
         """
         Set the input file and check if it has a supported format.
 
@@ -251,9 +251,9 @@ class FFmpegBackend(AbstractBackend):
         for opt, value in self.SUPPORTED_IN_FORMATS[in_ext].items():
             in_opts.extend([opt, value])
 
-        return input_file, in_opts
+        return f"{input_path}", in_opts
 
-    def _set_output(self, output_file: str) -> tuple[str, list]:
+    def _set_output(self, output_file: str | Path) -> tuple[str, list]:
         """
         Set the output file and check if it has a supported format.
 
@@ -277,12 +277,12 @@ class FFmpegBackend(AbstractBackend):
         for opt, value in self.SUPPORTED_OUT_FORMATS[out_ext].items():
             out_opts.extend([opt, value])
 
-        return output_file, out_opts
+        return f"{output_path}", out_opts
 
     def convert(
         self,
-            input_file: str,
-            output_file: str,
+            input_file: str | Path,
+            output_file: str | Path,
             overwrite_output: bool = True,
             stats: bool = False,
             in_options: Iterable | None = None,

@@ -1,7 +1,6 @@
 
 # src\file_conversor\cli\image_cmd.py
 
-from functools import reduce
 import typer
 
 from pathlib import Path
@@ -12,7 +11,7 @@ from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from file_conversor.backend import PillowBackend, Img2PDFBackend, MozJPEGBackend, OxiPNGBackend, GifSicleBackend
+from file_conversor.backend.image import *
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -33,16 +32,16 @@ logger = LOG.getLogger(__name__)
 image_cmd = typer.Typer()
 
 # image compress
-COMPRESS_BACKENDS_IN = []
-COMPRESS_BACKENDS_IN.extend(MozJPEGBackend.SUPPORTED_IN_FORMATS)
-COMPRESS_BACKENDS_IN.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
-COMPRESS_BACKENDS_IN.extend(GifSicleBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_IN_FORMATS = []
+COMPRESS_IN_FORMATS.extend(MozJPEGBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_IN_FORMATS.extend(OxiPNGBackend.SUPPORTED_IN_FORMATS)
+COMPRESS_IN_FORMATS.extend(GifSicleBackend.SUPPORTED_IN_FORMATS)
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()
     # compression command
-    for ext in COMPRESS_BACKENDS_IN:
+    for ext in COMPRESS_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="compress",
@@ -59,6 +58,22 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 description="To PDF",
                 command=f'{Environment.get_executable()} image to-pdf "%1"',
                 icon=str(icons_folder_path / "pdf.ico"),
+            ),
+        ])
+    # PyMuSVGBackend commands
+    for ext in PyMuSVGBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="to_jpg",
+                description="To JPG",
+                command=f'{Environment.get_executable()} image render "%1" -o "%1.jpg"',
+                icon=str(icons_folder_path / 'jpg.ico'),
+            ),
+            WinContextCommand(
+                name="to_png",
+                description="To PNG",
+                command=f'{Environment.get_executable()} image render "%1" -o "%1.png"',
+                icon=str(icons_folder_path / 'png.ico'),
             ),
         ])
     # Pillow commands
@@ -134,8 +149,8 @@ ctx_menu.register_callback(register_ctx_menu)
     """)
 def compress(
     input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(COMPRESS_BACKENDS_IN)})",
-        callback=lambda x: check_file_format(x, COMPRESS_BACKENDS_IN, exists=True),
+        help=f"{_('Input file')} ({', '.join(COMPRESS_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, COMPRESS_IN_FORMATS, exists=True),
     )],
 
     output_file: Annotated[str | None, typer.Option("--output", "-o",
@@ -148,17 +163,15 @@ def compress(
                                          )] = CONFIG["image-quality"],
 ):
     input_path = Path(input_file)
-    in_ext = input_path.suffix[1:]
 
-    output_path = Path(output_file if output_file else f"{input_path.with_suffix("")}_compressed")
-    output_path = output_path.with_suffix(f".{in_ext}")
-
+    output_path = Path(output_file) if output_file else Environment.get_output_path(input_path, "_compressed")
     out_ext = output_path.suffix[1:]
-    if out_ext in MozJPEGBackend.SUPPORTED_IN_FORMATS:
+
+    if out_ext in MozJPEGBackend.SUPPORTED_OUT_FORMATS:
         BACKEND_CLASS = MozJPEGBackend
-    elif out_ext in OxiPNGBackend.SUPPORTED_IN_FORMATS:
+    elif out_ext in OxiPNGBackend.SUPPORTED_OUT_FORMATS:
         BACKEND_CLASS = OxiPNGBackend
-    elif out_ext in GifSicleBackend.SUPPORTED_IN_FORMATS:
+    elif out_ext in GifSicleBackend.SUPPORTED_OUT_FORMATS:
         BACKEND_CLASS = GifSicleBackend
     else:
         raise RuntimeError(f"Output format '{out_ext}' not supported")
@@ -299,7 +312,7 @@ def to_pdf(
 
         img2pdf_backend.to_pdf(
             input_files=input_files,
-            output_file=output_file if output_file else f"{input_files[0].replace(".pdf", "")}.pdf",
+            output_file=output_file if output_file else Environment.get_output_path(input_files[0], "", "pdf"),
             dpi=dpi,
             image_fit=image_fit,
             page_size=page_sz,
@@ -307,6 +320,47 @@ def to_pdf(
         )
         progress.update(task, total=100, completed=100)
     logger.info(f"{_('PDF generation')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+# image render
+@image_cmd.command(
+    help=f"""
+        {_('Render an image vector file into a different format.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor image render input_file.svg -o output_file.jpg --dpi 300`
+
+        - `file_conversor image render input_file.svg -o output_file.png`
+    """)
+def render(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(PyMuSVGBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, PyMuSVGBackend.SUPPORTED_IN_FORMATS, exists=True),
+    )],
+
+    output_file: Annotated[str, typer.Option("--output", "-o",
+                                             help=f"{_('Output file')} ({', '.join(PyMuSVGBackend.SUPPORTED_OUT_FORMATS)})",
+                                             callback=lambda x: check_file_format(x, PyMuSVGBackend.SUPPORTED_OUT_FORMATS),
+                                             )],
+
+    dpi: Annotated[int, typer.Option("--dpi", "-d",
+                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
+                                     min=40, max=3600,
+                                     )] = CONFIG["image-dpi"],
+):
+    pymusvg_backend = PyMuSVGBackend(verbose=STATE['verbose'])
+    # display current progress
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
+        pymusvg_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            dpi=dpi,
+        )
+        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 # image convert
@@ -381,13 +435,11 @@ def rotate(
     # display current progress
     with get_progress_bar() as progress:
         input_path = Path(input_file)
-        input_name = input_path.with_suffix("").name
-        input_ext = input_path.suffix[1:]
 
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.rotate(
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_name}_rotated.{input_ext}",
+            output_file=output_file if output_file else Environment.get_output_path(input_path, "_rotated"),
             rotate=rotation,
         )
         progress.update(task, total=100, completed=100)
@@ -425,13 +477,11 @@ def mirror(
     # display current progress
     with get_progress_bar() as progress:
         input_path = Path(input_file)
-        input_name = input_path.with_suffix("").name
-        input_ext = input_path.suffix[1:]
 
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
         pillow_backend.mirror(
             input_file=input_file,
-            output_file=output_file if output_file else f"{input_name}_mirrored.{input_ext}",
+            output_file=output_file if output_file else Environment.get_output_path(input_path, "_mirrored"),
             x_y=True if axis == "x" else False,
         )
         progress.update(task, total=100, completed=100)

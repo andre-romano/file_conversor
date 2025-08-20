@@ -71,7 +71,7 @@ class MozJPEGBackend(AbstractBackend):
             output_file: str | Path,
             quality: int,
             **kwargs,
-    ) -> subprocess.CompletedProcess:
+    ):
         """
         Execute the command to compress the input file.
 

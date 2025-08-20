@@ -5,6 +5,7 @@ This module provides functionalities for handling files using ``ghostscript`` ba
 """
 
 from pathlib import Path
+
 from enum import Enum
 from typing import Any
 
@@ -129,8 +130,8 @@ class GhostscriptBackend(AbstractBackend):
         self._ghostscript_bin = self.find_in_path("gs")
 
     def compress(self,
-                 output_file: str,
-                 input_file: str,
+                 output_file: str | Path,
+                 input_file: str | Path,
                  compression_level: Compression,
                  compatibility_preset: CompatibilityPreset = CompatibilityPreset.PRESET_1_5,
                  downsampling_type: Downsampling = Downsampling.HIGH,

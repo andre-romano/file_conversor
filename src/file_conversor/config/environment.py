@@ -21,6 +21,18 @@ class Environment:
     __instance = None
 
     @classmethod
+    def get_output_path(cls,
+                        input_file: str | Path,
+                        end_part: str,
+                        out_ext: str | None = None,
+                        ):
+        in_path = Path(input_file)
+        in_ext = in_path.suffix[1:]
+        if not out_ext:
+            out_ext = in_ext
+        return Path(f"{in_path.with_suffix("")}{end_part}.{out_ext}")
+
+    @classmethod
     def get_executable(cls) -> str:
         """Get the executable path for this app's CLI."""
         res = ""

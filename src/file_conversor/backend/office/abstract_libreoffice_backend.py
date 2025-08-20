@@ -1,7 +1,5 @@
 # src\file_conversor\backend\office\abstract_libreoffice_backend.py
 
-import subprocess
-
 from pathlib import Path
 
 # user-provided imports

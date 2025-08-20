@@ -5,6 +5,7 @@ This module provides functionalities for handling files using ``pymupdf`` backen
 """
 
 import fitz  # pymupdf
+
 from pathlib import Path
 
 # user-provided imports

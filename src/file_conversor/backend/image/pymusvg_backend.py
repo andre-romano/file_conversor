@@ -5,6 +5,7 @@ This module provides functionalities for handling SVG files using ``pymupdf`` ba
 """
 
 import fitz  # pymupdf
+
 from pathlib import Path
 
 # user-provided imports
@@ -52,8 +53,6 @@ class PyMuSVGBackend(AbstractBackend):
         :raises ValueError: if output format is unsupported
         """
         self.check_file_exists(input_file)
-        in_path = Path(input_file)
-        out_path = Path(output_file)
 
         # open file
         doc = fitz.open(input_file)
@@ -61,4 +60,4 @@ class PyMuSVGBackend(AbstractBackend):
         # => .png, .jpg OUTPUT
         for page in doc:
             pix = page.get_pixmap(dpi=dpi)  # type: ignore
-            pix.save(f"{out_path.with_suffix("")}{out_path.suffix}")  # type: ignore
+            pix.save(output_file)  # type: ignore

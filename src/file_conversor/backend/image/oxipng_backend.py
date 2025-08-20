@@ -5,7 +5,6 @@ This module provides functionalities for handling files using oxipng.
 """
 
 import shutil
-import subprocess
 
 from pathlib import Path
 from rich import print

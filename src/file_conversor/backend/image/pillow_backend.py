@@ -63,7 +63,7 @@ class PillowBackend(AbstractBackend):
         super().__init__()
         self._verbose = verbose
 
-    def info(self, input_file: str,) -> Exif:
+    def info(self, input_file: str | Path,) -> Exif:
         """
         Get EXIF info from input file.
 
@@ -78,8 +78,8 @@ class PillowBackend(AbstractBackend):
 
     def convert(
         self,
-        output_file: str,
-        input_file: str,
+        output_file: str | Path,
+        input_file: str | Path,
         quality: int = 90,
         optimize: bool = True,
     ):
@@ -111,7 +111,7 @@ class PillowBackend(AbstractBackend):
             lossless=True if quality == 100 else False,  # valid only for WEBP
         )
 
-    def rotate(self, output_file: str, input_file: str, rotate: int):
+    def rotate(self, output_file: str | Path, input_file: str | Path, rotate: int):
         """
         Rotate input file by X degrees.
 
@@ -136,7 +136,7 @@ class PillowBackend(AbstractBackend):
             optimize=True,
         )
 
-    def mirror(self, output_file: str, input_file: str, x_y: bool):
+    def mirror(self, output_file: str | Path, input_file: str | Path, x_y: bool):
         """
         Mirror input file in relation X or Y axis.
 

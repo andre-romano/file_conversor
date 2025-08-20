@@ -6,6 +6,7 @@ This module provides functionalities for handling PDF files using ``img2pdf`` ba
 
 import img2pdf
 
+from pathlib import Path
 from datetime import datetime
 from typing import Any, Iterable
 
@@ -53,8 +54,8 @@ class Img2PDFBackend(AbstractBackend):
         self._verbose = verbose
 
     def to_pdf(self,
-               output_file: str,
-               input_files: Iterable[str],
+               output_file: str | Path,
+               input_files: Iterable[str | Path],
                image_fit: FIT_MODE = FIT_INTO,
                page_size: tuple[float, float] | None = LAYOUT_NONE,
                dpi: int = 200,
@@ -83,7 +84,7 @@ class Img2PDFBackend(AbstractBackend):
         """
         for input_file in input_files:
             self.check_file_exists(input_file)
-        output_file = output_file.replace(".pdf", "")
+        output_path = Path(output_file).with_suffix(".pdf")
 
         # get current day
         now = datetime.now()
@@ -108,5 +109,5 @@ class Img2PDFBackend(AbstractBackend):
                 fit=image_fit,
             )
 
-        with open(f"{output_file}.pdf", "wb") as f:
+        with open(output_path, "wb") as f:
             f.write(img2pdf.convert(*input_files, **opts))

@@ -46,7 +46,7 @@ class AbstractBackend:
         return path
 
     @staticmethod
-    def check_file_exists(filename: str):
+    def check_file_exists(filename: str | Path):
         """
         Check if `filename` exists
 

@@ -4,8 +4,6 @@
 This module provides functionalities for handling files using gifsicle.
 """
 
-import shutil
-
 from pathlib import Path
 from rich import print
 
