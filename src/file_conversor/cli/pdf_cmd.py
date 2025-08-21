@@ -75,6 +75,12 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             icon=str(icons_folder_path / 'extract.ico'),
         ),
         WinContextCommand(
+            name="extract_img",
+            description="Extract IMG",
+            command=f'{Environment.get_executable()} pdf extract-img "%1"',
+            icon=str(icons_folder_path / 'separate.ico'),
+        ),
+        WinContextCommand(
             name="rotate_anticlock_90",
             description="Rotate Left",
             command=f'{Environment.get_executable()} pdf rotate "%1" -r "1-:-90"',
