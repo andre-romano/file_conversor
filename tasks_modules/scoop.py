@@ -39,12 +39,11 @@ def manifest(c: InvokeContext):
     INSTALL_APP_AUTOUPDATE = INSTALL_APP_URL.replace(PROJECT_VERSION, "$version")
 
     # bucket/file_conersor.json
-    SCOOP_JSON.write_text(json.dumps({
+    json_obj = {
         "version": PROJECT_VERSION,
         "description": PROJECT_DESCRIPTION,
         "homepage": PROJECT_HOMEPAGE,
         "license": "Apache-2.0",
-        "depends": list(SCOOP_DEPS.keys()),
         "url": INSTALL_APP_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
         "bin": f"{PROJECT_NAME}.exe",
@@ -68,7 +67,10 @@ def manifest(c: InvokeContext):
                 "url": f"{INSTALL_APP_AUTOUPDATE.replace(".exe", INSTALL_APP_HASH.suffix)}"
             }
         }
-    }, indent=4), encoding="utf-8")
+    }
+    if SCOOP_DEPS:
+        json_obj["depends"] = list(SCOOP_DEPS.keys())
+    SCOOP_JSON.write_text(json.dumps(json_obj, indent=4) + "\n", encoding="utf-8")
     assert SCOOP_JSON.exists()
 
     print("[bold green] OK [/]",)
