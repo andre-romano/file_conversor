@@ -35,6 +35,24 @@ class PyPDFBackend(AbstractBackend):
         "pdf": {},
     }
 
+    @staticmethod
+    def len(
+            input_file: str,
+    ) -> int:
+        """
+        Get number of pages of input file.
+
+        :param input_file: Input PDF file.
+
+        :return: Number of pages.
+
+        :raises FileNotFoundError: if input file not found
+        """
+        PyPDFBackend.check_file_exists(input_file)
+
+        with PdfReader(input_file) as reader:
+            return len(reader.pages)
+
     def __init__(
         self,
         verbose: bool = False,
@@ -46,23 +64,6 @@ class PyPDFBackend(AbstractBackend):
         """
         super().__init__()
         self._verbose = verbose
-
-    def len(self,
-            input_file: str,
-            ) -> int:
-        """
-        Get number of pages of input file.
-
-        :param input_file: Input PDF file.
-
-        :return: Number of pages.
-
-        :raises FileNotFoundError: if input file not found
-        """
-        self.check_file_exists(input_file)
-
-        with PdfReader(input_file) as reader:
-            return len(reader.pages)
 
     def merge(self,
               output_file: str | Path,

@@ -230,30 +230,21 @@ def convert(
     if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
         out_options.extend(["-b:v", f"{video_bitrate}k"])
 
-    # execute ffmpeg
+    # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
-    input_file_duration = ffmpeg_backend.calculate_file_total_duration(input_file)
-    process = ffmpeg_backend.convert(
-        input_file,
-        output_file,
-        in_options=in_options,
-        out_options=out_options,
-    )
 
     # display current progress
     with get_progress_bar() as progress:
-        ffmpeg_task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100)
-        while process.poll() is None:
-            ffmpeg_completed = FFmpegBackend.get_convert_progress(process, input_file_duration)
-            progress.update(ffmpeg_task, completed=ffmpeg_completed)
-            time.sleep(0.25)
-        progress.update(ffmpeg_task, completed=100)
-
-    process.wait()
-    if process.returncode != 0:
-        raise RuntimeError(process.stdout)
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100)
+        process = ffmpeg_backend.convert(
+            input_file,
+            output_file,
+            in_options=in_options,
+            out_options=out_options,
+            progress_callback=lambda p: progress.update(task, completed=p)
+        )
 
     logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")

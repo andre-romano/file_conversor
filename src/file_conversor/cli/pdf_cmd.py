@@ -2,6 +2,8 @@
 # src\file_conversor\cli\pdf_cmd.py
 
 import re
+import tempfile
+import time
 import typer
 
 from pathlib import Path
@@ -108,7 +110,7 @@ ctx_menu.register_callback(register_ctx_menu)
 # pdf repair
 @pdf_cmd.command(
     help=f"""
-        {_('Repair (lightly) corrupted PDF files (optionally compressing them).')}        
+        {_('Repair (lightly) corrupted PDF files.')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
@@ -126,23 +128,18 @@ def repair(
     password: Annotated[str | None, typer.Option("--password", "-p",
                                                  help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
                                                  )] = None,
-    compress: Annotated[bool, typer.Option("--compress", "-c",
-                                           help=_("Compress output PDF file (losslessly). Defaults to True (compress)."),
-                                           is_flag=True,
-                                           )] = True,
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
         task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100,)
 
-        pikepdf_backend.repair(
+        pikepdf_backend.compress(
             # files
             input_file=input_file,
             output_file=output_file if output_file else Environment.get_output_path(input_file, "_repaired", "pdf"),
 
             # options
             decrypt_password=password,
-            compress=compress,
             progress_callback=lambda p: progress.update(task, completed=p)
         )
         progress.update(task, total=100, completed=100)
@@ -179,10 +176,13 @@ def compress(
                                              callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
                                              )] = CONFIG["pdf-compression"],
 ):
+    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     gs_backend = GhostscriptBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE['verbose'],
     )
+
+    output_path = Path(output_file if output_file else Environment.get_output_path(input_file, "_compressed", "pdf"))
 
     if compression == "high":
         compression_level = GhostscriptBackend.Compression.HIGH
@@ -193,15 +193,26 @@ def compress(
     else:
         compression_level = GhostscriptBackend.Compression.NONE
 
-    # display current progress
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        gs_backend.compress(
-            input_file=input_file,
-            output_file=output_file if output_file else Environment.get_output_path(input_file, "_compressed", "pdf"),
-            compression_level=compression_level,
-        )
-        progress.update(task, total=100, completed=100)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        num_pages = PyPDFBackend.len(input_file)
+        gs_out = Path(temp_dir) / "out_gs.pdf"
+        # display current progress
+        with get_progress_bar() as progress:
+            task1 = progress.add_task(f"{_('Step 1/2')} - '{input_file}':", total=100)
+            gs_backend.compress(
+                input_file=input_file,
+                output_file=gs_out,
+                compression_level=compression_level,
+                progress_callback=lambda p: progress.update(task1, completed=p)
+            )
+
+            task2 = progress.add_task(f"{_('Step 2/2')} - '{input_file}':", total=100)
+            pikepdf_backend.compress(
+                # files
+                input_file=gs_out,
+                output_file=output_path,
+                progress_callback=lambda p: progress.update(task2, completed=p),
+            )
     logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 

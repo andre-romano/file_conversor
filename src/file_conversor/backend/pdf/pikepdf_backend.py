@@ -56,22 +56,22 @@ class PikePDFBackend(AbstractBackend):
         except Exception as e:
             raise e  # other errors (corrupted file, etc.)
 
-    def repair(
+    def compress(
         self,
         input_file: str | Path,
         output_file: str | Path,
         progress_callback: Callable[[int], Any] | None = None,
         decrypt_password: str | None = None,
-        compress: bool = True,
+        linearize: bool = True,
     ):
         """
-        Repair input PDF file.
+        Compress input PDF file.
 
         :param input_files: Input PDF file. 
         :param output_files: Output PDF file.
         :param progress_callback: Progress callback executed as PDF is processed. Format callback(0-100). Defaults to None (no progress callback).
         :param decryption_password: Decryption password for input PDF file. Defaults to None (do not decrypt).
-        :param compress: Compress PDF output file structures. Defaults to True (compress structures, losslessly).
+        :param linearize: Linearize PDF file structures (speed up web render). Defaults to True.
 
         :raises FileNotFoundError: if input file not found.
         :raises PDFError, ForeignObjectError: if qpdf errors.
@@ -85,6 +85,7 @@ class PikePDFBackend(AbstractBackend):
             pdf.save(output_file,
                      progress=progress_callback,  # callback(0-100)
                      encryption=preserve_encryption,  # preserve encryption
-                     compress_streams=compress,  # compress streams
+                     compress_streams=True,  # compress streams
                      object_stream_mode=ObjectStreamMode(ObjectStreamMode.generate),  # generate streams as needed (max compression)
+                     linearize=linearize,
                      )

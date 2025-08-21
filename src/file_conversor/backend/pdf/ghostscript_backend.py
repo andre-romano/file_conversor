@@ -4,10 +4,12 @@
 This module provides functionalities for handling files using ``ghostscript`` backend.
 """
 
+import re
+
 from pathlib import Path
 
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
 
 # user-provided imports
 from file_conversor.config import Environment, Log
@@ -101,6 +103,9 @@ class GhostscriptBackend(AbstractBackend):
         },
     }
 
+    PROGRESS_RE = re.compile(r'Page\s*(\d+)')
+    NUM_PAGES_RE = re.compile(r'Processing pages (\d+) through (\d+)')
+
     def __init__(
         self,
         install_deps: bool | None,
@@ -136,6 +141,7 @@ class GhostscriptBackend(AbstractBackend):
                  compatibility_preset: CompatibilityPreset = CompatibilityPreset.PRESET_1_5,
                  downsampling_type: Downsampling = Downsampling.HIGH,
                  image_compression: ImageCompression = ImageCompression.JPG,
+                 progress_callback: Callable[[float], Any] | None = None,
                  ):
         """
         Compress input PDF files.
@@ -146,6 +152,7 @@ class GhostscriptBackend(AbstractBackend):
         :param compatibility_level: PDF compatibility level (1.3 - 1.7). Defaults to ``CompatibilityPreset.PRESET_1_5`` (good compatibility / stream compression support).
         :param downsampling_type: Image downsampling type. Defaults to ``Downsampling.HIGH`` (best image quality / slower processing).
         :param image_compression: Image compression format. Defaults to `ImageCompression.JPG` (great compatibility / good compression).
+        :param progress_callback: Progress callback (0-100). Defaults to None.
 
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
@@ -190,11 +197,30 @@ class GhostscriptBackend(AbstractBackend):
             f"{in_path}",
         ])
 
-        logger.info(f"Executing Ghostscript ...")
-        logger.debug(f"{" ".join(command)}")
-
         # Execute the FFmpeg command
-        process = Environment.run(
+        process = Environment.run_nowait(
             *command,
         )
+
+        num_pages = 0
+        while process.poll() is None:
+            if not process.stdout:
+                continue
+            line = process.stdout.readline()
+
+            match = GhostscriptBackend.NUM_PAGES_RE.search(line)
+            if match:
+                begin = int(match.group(1))
+                end = int(match.group(2))
+                num_pages = end - begin + 1
+
+            match = GhostscriptBackend.PROGRESS_RE.search(line)
+            if not match:
+                continue
+            pages = int(match.group(1))
+            progress = 100.0 * (float(pages) / num_pages)
+            if progress_callback:
+                progress_callback(progress)
+
+        Environment.check_returncode(process)
         return process

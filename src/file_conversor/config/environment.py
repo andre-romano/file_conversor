@@ -96,7 +96,7 @@ class Environment:
         :param stdout: Capture stdout, or not. Defaults to ``subprocess.PIPE``.
         :param stderr: Capture stderr, or not. Defaults to ``subprocess.STDOUT``.
         """
-        logger.info(f"Starting process ...")
+        logger.debug(f"Starting process ...")
         logger.debug(f"{" ".join(cmd)}")
 
         process = subprocess.Popen(
@@ -172,6 +172,17 @@ class Environment:
             stdout=output,
             stderr=error,
         )
+
+    @classmethod
+    def check_returncode(cls, process: subprocess.Popen | subprocess.CompletedProcess):
+        """Raises subprocess.CalledProcessError if process.returncode != 0"""
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(
+                returncode=process.returncode,
+                cmd=process.args,
+                output="\n".join(process.stdout.readlines()) if process.stdout else "",
+                stderr="\n".join(process.stderr.readlines()) if process.stderr else "",
+            )
 
     def __init__(self) -> None:
         super().__init__()

@@ -5,12 +5,12 @@ This module provides functionalities for handling audio and video files using FF
 """
 
 import json
-import subprocess
 import re
 
 from pathlib import Path
 from datetime import timedelta
-from typing import Iterable
+import subprocess
+from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.config import Environment, Log
@@ -107,26 +107,6 @@ class FFmpegBackend(AbstractBackend):
 
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
-    @staticmethod
-    def get_convert_progress(process: subprocess.Popen, file_duration_secs: float) -> float:
-        """
-        Gets FFMpeg current progress status, in percentage (0-100)
-
-        :param process: Subprocess.Popen object.
-        :param file_duration_secs: Input file duration (in secs).
-
-        :return: Progress of FFMpeg [0-100], otherwise 0
-        """
-        if process and process.stdout:
-            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
-            if match:
-                hours = int(match.group(1))
-                minutes = int(match.group(2))
-                seconds = float(match.group(3))
-                current_time = hours * 3600 + minutes * 60 + seconds
-                return 100.0 * (float(current_time) / file_duration_secs)
-        return 0
-
     def __init__(
         self,
         install_deps: bool | None,
@@ -157,23 +137,25 @@ class FFmpegBackend(AbstractBackend):
         self._ffprobe_bin = self.find_in_path("ffprobe")
         self._ffmpeg_bin = self.find_in_path("ffmpeg")
 
-    def calculate_file_total_duration(self, file_path: str) -> float:
+    def calculate_file_total_duration(self, file_path: str | Path) -> float:
         """
         Calculate file total duration (in secs), using `ffprobe`.
 
         :return: Total duration in seconds.
         """
         process = Environment.run(
-            str(self._ffprobe_bin),
-            '-v', 'error', '-show_entries',
-            'format=duration', '-of',
-            'default=noprint_wrappers=1:nokey=1',
-            file_path,
+            f'{self._ffprobe_bin}',
+            f'-v',
+            f'error',
+            f'-show_entries',
+            f'format=duration', '-of',
+            f'default=noprint_wrappers=1:nokey=1',
+            f'{file_path}',
         )
         duration_str = process.stdout.strip()
         return float(duration_str if duration_str else "0")
 
-    def calculate_file_formatted_duration(self, file_path: str) -> str:
+    def calculate_file_formatted_duration(self, file_path: str | Path) -> str:
         """
         Calculate file duration (formatted), using `ffprobe`.
 
@@ -287,7 +269,8 @@ class FFmpegBackend(AbstractBackend):
             stats: bool = False,
             in_options: Iterable | None = None,
             out_options: Iterable | None = None,
-    ) -> subprocess.Popen:
+            progress_callback: Callable[[float], Any] | None = None,
+    ):
         """
         Execute the FFmpeg command to convert the input file to the output file.
 
@@ -297,6 +280,7 @@ class FFmpegBackend(AbstractBackend):
         :param stats: Show progress stats. Defaults to False.      
         :param in_options: Additional input options. Defaults to None.      
         :param out_options: Additional output options. Defaults to None.    
+        :param progress_callback: Progress callback (0-100). Defaults to None.
 
         :return: Subprocess.Popen object
 
@@ -333,4 +317,23 @@ class FFmpegBackend(AbstractBackend):
         process = Environment.run_nowait(
             *ffmpeg_command,
         )
+
+        file_duration_secs = self.calculate_file_total_duration(input_file)
+        while process.poll() is None:
+            if not process.stdout:
+                continue
+
+            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
+            if not match:
+                continue
+            hours = int(match.group(1))
+            minutes = int(match.group(2))
+            seconds = float(match.group(3))
+
+            current_time = hours * 3600 + minutes * 60 + seconds
+            progress = 100.0 * (float(current_time) / file_duration_secs)
+            if progress_callback:
+                progress_callback(progress)
+
+        Environment.check_returncode(process)
         return process
