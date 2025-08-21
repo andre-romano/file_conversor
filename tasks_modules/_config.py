@@ -28,19 +28,20 @@ PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
 
 PROJECT_HOMEPAGE = f"https://github.com/andre-romano/{PROJECT_NAME}"
 
+ICONS_PATH = Path(PYPROJECT["tool"]["myproject"]["icons_path"])
+I18N_PATH = Path(PYPROJECT["tool"]["myproject"]["locales_path"])
+
+ICON_APP = Path(rf"{ICONS_PATH}/icon.ico")
+I18N_TEMPLATE = Path(rf"{I18N_PATH}/messages.pot")
+
 MANIFEST_IN_PATH = Path("MANIFEST.in")
 RELEASE_NOTES_PATH = Path("RELEASE_NOTES.md")
 
-ICONS_PATH = str(PYPROJECT["tool"]["myproject"]["icons_path"])
-I18N_PATH = str(PYPROJECT["tool"]["myproject"]["locales_path"])
-
-I18N_TEMPLATE = f"{I18N_PATH}/messages.pot"
-
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
-SCRIPTS_PATH = str(f'scripts')
-INSTALL_CHOCO = Path(f'{SCRIPTS_PATH}/install_choco.ps1')
-INSTALL_SCOOP = Path(f'{SCRIPTS_PATH}/install_scoop.ps1')
+SCRIPTS_PATH = Path(f'scripts')
+INSTALL_CHOCO = SCRIPTS_PATH / 'install_choco.ps1'
+INSTALL_SCOOP = SCRIPTS_PATH / 'install_scoop.ps1'
 
 UNINSTALL_APP = Path("unins000.exe")
 

@@ -83,17 +83,26 @@ def create_manifest(c: InvokeContext):
 AppName={PROJECT_TITLE}
 AppVersion={PROJECT_VERSION}
 DefaultDirName={{autopf}}/{PROJECT_NAME}
-DisableDirPage=yes
 Compression=LZMA2
 ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
+SetupIconFile={ICON_APP.resolve()}
+UninstallDisplayIcon={{app}}\{PROJECT_NAME}.exe
 SourceDir={Path(".").resolve()}
 OutputDir={Path("./dist").resolve()}
 OutputBaseFilename={INSTALL_APP.with_suffix("").name}
+AlwaysRestart=yes
 
 [Files]
 Source: "{APP_DIST_PATH}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+
+[Registry]
+; Adds app_folder to the USER PATH
+Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: not IsAdmin()
+
+; Adds app_folder to the SYSTEM PATH (requires admin privileges)
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Run]
 StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated

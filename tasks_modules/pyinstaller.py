@@ -57,7 +57,6 @@ def copy_includes(c: InvokeContext):
 @task(pre=[clean_exe,], post=[copy_includes,])
 def build(c: InvokeContext):
     MAIN_PATH = Path(rf"src/{PROJECT_NAME}/__main__.py")
-    ICON_APP = Path(rf"{ICONS_PATH}/icon.ico")
 
     print(f"[bold] Building Pyinstaller (EXE) ... [/]")
     cmd_list = [

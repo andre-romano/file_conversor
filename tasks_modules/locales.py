@@ -76,7 +76,7 @@ def update(c: InvokeContext):
 def translate(c: InvokeContext):
     """ Translate locales' .PO files using Google Translate"""
     exception = None
-    for path in Path(I18N_PATH).glob("*"):
+    for path in I18N_PATH.glob("*"):
         if not path.is_dir():
             continue
         try:
