@@ -17,7 +17,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format, check_is_bool_or_none, check_valid_options
+from file_conversor.utils.validators import check_file_format, check_is_bool_or_none, check_positive_integer, check_valid_options
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -126,6 +126,12 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 description="Mirror Y axis",
                 command=f'{Environment.get_executable()} image mirror "%1" -a y',
                 icon=str(icons_folder_path / "up_down.ico"),
+            ),
+            WinContextCommand(
+                name="resize",
+                description="Resize",
+                command=f'cmd /k "{Environment.get_executable()} image resize "%1""',
+                icon=str(icons_folder_path / "resize.ico"),
             ),
         ])
 
@@ -412,9 +418,9 @@ def convert(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf rotate input_file.jpg -o output_file.jpg -r 90` 
+        - `file_conversor image rotate input_file.jpg -o output_file.jpg -r 90` 
         
-        - `file_conversor pdf rotate input_file.jpg -o output_file.jpg -r -180` 
+        - `file_conversor image rotate input_file.jpg -o output_file.jpg -r -180` 
     """)
 def rotate(
     input_file: Annotated[str, typer.Argument(
@@ -454,9 +460,9 @@ def rotate(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf mirror input_file.jpg -o output_file.jpg -a x` 
+        - `file_conversor image mirror input_file.jpg -o output_file.jpg -a x` 
         
-        - `file_conversor pdf mirror input_file.jpg -o output_file.jpg -a y` 
+        - `file_conversor image mirror input_file.jpg -o output_file.jpg -a y` 
     """)
 def mirror(
     input_file: Annotated[str, typer.Argument(
@@ -483,6 +489,68 @@ def mirror(
             input_file=input_file,
             output_file=output_file if output_file else Environment.get_output_path(input_path, "_mirrored"),
             x_y=True if axis == "x" else False,
+        )
+        progress.update(task, total=100, completed=100)
+    logger.info(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+# image resize
+@image_cmd.command(
+    help=f"""
+        {_('Resize an image file.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+
+
+        *{_('Double the image size')}*:
+
+        - `file_conversor image resize input_file.jpg -s 2.0`    
+
+
+
+        *{_('Set the image width to 1024px')}*:
+
+        - `file_conversor image resize input_file.jpg -o output.png -w 1024`    
+    """)
+def resize(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
+    )],
+    scale: Annotated[float | None, typer.Option("--scale", "-s",
+                                                help=f"{_("Scale image proportion. Valid values start at 0.1. Defaults to")} None (use width to scale image).",
+                                                callback=lambda x: check_positive_integer(x),
+                                                )] = None,
+    width: Annotated[int | None, typer.Option("--width", "-w",
+                                              help=f"{_("Width in pixels (height is calculated based on width to keep image proportions). Defaults to")} None.",
+                                              callback=lambda x: check_positive_integer(x),
+                                              )] = None,
+    resampling: Annotated[str, typer.Option("--resampling", "-r",
+                                            help=f'{_("Resampling algorithm. Valid values are")}{", ".join(PillowBackend.RESAMPLING_OPTIONS)}{_("Defaults to 'bicubic.'")}',
+                                            callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
+                                            )] = "bicubic",
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _resized at the end)')}",
+                                                    callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),
+                                                    )] = None,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+    if not scale and not width:
+        scale = float(typer.prompt(f"{_('Scale image proportion (e.g., 1.5)')}"))
+
+    # display current progress
+    with get_progress_bar() as progress:
+        input_path = Path(input_file)
+
+        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
+        pillow_backend.resize(
+            input_file=input_file,
+            output_file=output_file if output_file else Environment.get_output_path(input_path, "_resized"),
+            scale=scale,
+            width=width,
+            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
         )
         progress.update(task, total=100, completed=100)
     logger.info(f"{_('Image mirroring')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

@@ -28,6 +28,13 @@ class PillowBackend(AbstractBackend):
     Exif = Image.Exif
     Exif_TAGS = TAGS
 
+    RESAMPLING_OPTIONS = {
+        "bicubic": Image.Resampling.BICUBIC,
+        "bilinear": Image.Resampling.BILINEAR,
+        "lanczos": Image.Resampling.LANCZOS,
+        "nearest": Image.Resampling.NEAREST,
+    }
+
     SUPPORTED_IN_FORMATS = {
         "bmp": {},
         "gif": {},
@@ -75,6 +82,47 @@ class PillowBackend(AbstractBackend):
 
         img = Image.open(input_file)
         return img.getexif()
+
+    def resize(self,
+               output_file: str | Path,
+               input_file: str | Path,
+               scale: float | None,
+               width: int | None,
+               resampling: Image.Resampling = Image.Resampling.BICUBIC,
+               ):
+        """
+        Resize input file.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.
+        :param width: Width in pixels.
+        :param height: Width in pixels.
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        with Image.open(input_file) as img:
+            if scale:
+                width = int(scale * img.width)
+            if not width:
+                raise RuntimeError(_("Need at either scale or width to resize an image"))
+            height = int(width * float(img.height) / img.width)
+
+            img = img.resize(
+                size=(width, height),
+                resample=resampling
+            )
+            self._save_fix_errors(
+                img,
+                output_file,
+                format=format,
+                quality=90,
+                optimize=True,
+            )
 
     def convert(
         self,

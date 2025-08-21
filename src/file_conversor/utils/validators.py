@@ -28,13 +28,15 @@ def check_is_bool_or_none(data: str | bool | None) -> bool | None:
     raise typer.BadParameter(_("Must be a bool or None."))
 
 
-def check_positive_integer(bitrate: int | float):
+def check_positive_integer(num: int | float | None):
     """
     Checks if the provided number is a positive integer.
     """
-    if bitrate <= 0:
+    if not num:
+        return num
+    if num <= 0:
         raise typer.BadParameter(_("Must be a positive integer."))
-    return bitrate
+    return num
 
 
 def check_file_format(filename_or_iter: list | dict | set | str | Path | None, format_dict: dict | list, exists: bool = False):
