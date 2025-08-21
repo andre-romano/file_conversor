@@ -3,7 +3,6 @@
 
 import re
 import tempfile
-import time
 import typer
 
 from pathlib import Path
@@ -439,6 +438,41 @@ def extract(
         progress.update(extract_task, total=100, completed=100)
 
     logger.info(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/].")
+
+
+# pdf extract-img
+@pdf_cmd.command(
+    help=f"""
+        {_('Extract images from a PDF.')}
+    """,
+    epilog=f"""
+**{_('Examples')}:** 
+
+- `file_conversor pdf extract-img input_file.pdf -o output_folder` 
+    """)
+def extract_img(
+    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
+                                              callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
+                                              )],
+    output_folder: Annotated[str | None, typer.Option("--output", "-o",
+                                                      help=f"{_('Output folder')} {_('Defaults to None')} ({_('use the same input file folder as output')})",
+                                                      )] = None,
+):
+    pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
+
+    input_path = Path(input_file)
+    output_path = Path(output_folder) if output_folder else input_path.parent
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')} '{input_path}':", total=100,)
+
+        pymupdf_backend.extract_images(
+            # files
+            input_path=input_path,
+            output_dir=output_path,
+            progress_callback=lambda p: progress.update(task, completed=p)
+        )
+
+    logger.info(f"{_('Extract images')}: [bold green]{_('SUCCESS')}[/].")
 
 
 # pdf rotate
