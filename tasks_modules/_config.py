@@ -107,3 +107,17 @@ def get_remote_hash(url: str) -> str:
     if not response.ok:
         raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
     return get_hash(response.content)
+
+
+def verify_with_sha256_file(sha_file: Path):
+    for line in sha_file.read_text().splitlines():
+        try:
+            expected, name = line.strip().split()
+        except:
+            continue
+        print(f"'{name}': ", end="")
+        actual = get_hash(sha_file.parent / name)
+        if actual.lower() != expected.lower():
+            print(f"[bold red]FAILED[/]")
+            raise RuntimeError(f"Hashes for '{name}' dont match. Expected: {expected}. Actual: {actual}")
+        print(f"[bold green]OK[/]")

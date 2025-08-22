@@ -62,6 +62,11 @@ def clean_exe(c: InvokeContext):
     _config.remove_path(f"{INSTALL_APP}")
 
 
+@task(pre=[mkdirs])
+def clean_hash(c: InvokeContext):
+    _config.remove_path(f"{INSTALL_APP_HASH}")
+
+
 @task(pre=[clean_inno, pyinstaller.check])
 def create_manifest(c: InvokeContext):
     """Update inno files, based on pyproject.toml"""
@@ -125,7 +130,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task
+@task(pre=[clean_hash])
 def gen_hash(c: InvokeContext):
     print(f"[bold] Generating SHA256 hash ... [/]")
     if not INSTALL_APP.exists():
@@ -136,6 +141,10 @@ def gen_hash(c: InvokeContext):
 """, encoding="utf-8")
     if not INSTALL_APP_HASH.exists():
         raise RuntimeError("Failed to create sha256 file")
+    if shutil.which("sha256sum"):
+        with c.cd(str(INSTALL_APP_HASH.parent.resolve())):
+            c.run(f"sha256sum -c {INSTALL_APP_HASH.name}")
+    _config.verify_with_sha256_file(INSTALL_APP_HASH)
     print(f"[bold] Generating SHA256 hash ... [/][bold green]OK[/]")
 
 
