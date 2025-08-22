@@ -105,6 +105,10 @@ app_cmd.add_typer(config_cmd,
                   help=_("Configure default options"),
                   rich_help_panel=UTILS_CONFIG_PANEL)
 
+app_cmd.add_typer(hash_cmd,
+                  name="hash",
+                  help=_("Hashing operations (check, gen, etc)"),
+                  rich_help_panel=UTILS_CONFIG_PANEL)
 
 #####################
 #     APP PANEL

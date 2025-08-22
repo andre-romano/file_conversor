@@ -16,3 +16,4 @@ from file_conversor.backend.image import *
 from file_conversor.backend.batch_backend import BatchBackend
 from file_conversor.backend.ffmpeg_backend import FFmpegBackend
 from file_conversor.backend.win_reg_backend import WinRegBackend
+from file_conversor.backend.hash_backend import HashBackend
