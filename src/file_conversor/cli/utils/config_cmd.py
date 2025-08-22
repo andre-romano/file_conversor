@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\config_cmd.py
+# src\file_conversor\cli\utils\config_cmd.py
 
 import typer
 

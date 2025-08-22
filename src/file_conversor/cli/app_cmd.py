@@ -9,15 +9,7 @@ from rich import print
 from typing import Annotated, Any
 
 # user-provided imports
-from file_conversor.cli import audio_video_cmd
-from file_conversor.cli import batch_cmd
-from file_conversor.cli import config_cmd
-from file_conversor.cli import image_cmd
-from file_conversor.cli import pdf_cmd
-from file_conversor.cli import win_cmd
-
-# office CLI
-from file_conversor.cli.office import doc_cmd, ppt_cmd, xls_cmd
+from file_conversor.cli import *
 
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
@@ -71,17 +63,17 @@ app_cmd.add_typer(pdf_cmd,
 
 app_cmd.add_typer(doc_cmd,
                   name="doc",
-                  help=f"{_('Word file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  help=f"{_('Document file manipulation')} {_('(requires MS Office / LibreOffice)')})",
                   rich_help_panel=OFFICE_PANEL)
 
 app_cmd.add_typer(xls_cmd,
                   name="xls",
-                  help=f"{_('Excel file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  help=f"{_('Spreadsheet file manipulation')} {_('(requires MS Office / LibreOffice)')})",
                   rich_help_panel=OFFICE_PANEL)
 
 app_cmd.add_typer(ppt_cmd,
                   name="ppt",
-                  help=f"{_('PowerPoint file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                  help=f"{_('Presentation file manipulation')} {_('(requires MS Office / LibreOffice)')})",
                   rich_help_panel=OFFICE_PANEL)
 
 ######################
@@ -127,15 +119,6 @@ def version_callback(value: bool):
             VERSION = str(PYPROJECT["project"]["version"])
         typer.echo(f"File Conversor {VERSION}")
         raise typer.Exit()
-
-
-# help
-@app_cmd.command(
-    help=f"{_('Show the application help')}",
-    rich_help_panel=UTILS_CONFIG_PANEL)
-def help():
-    ctx = typer.Context(typer.main.get_command(app_cmd))
-    print(ctx.command.get_help(ctx))
 
 
 # Main callback, to process global options
