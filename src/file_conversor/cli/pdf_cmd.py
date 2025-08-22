@@ -177,8 +177,8 @@ def compress(
                                                     )] = None,
 
     compression: Annotated[str, typer.Option("--compression", "-c",
-                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
-                                             callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
+                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                             callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                              )] = CONFIG["pdf-compression"],
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
@@ -189,15 +189,6 @@ def compress(
 
     output_path = Path(output_file if output_file else Environment.get_output_path(input_file, "_compressed", "pdf"))
 
-    if compression == "high":
-        compression_level = GhostscriptBackend.Compression.HIGH
-    elif compression == "medium":
-        compression_level = GhostscriptBackend.Compression.MEDIUM
-    elif compression == "low":
-        compression_level = GhostscriptBackend.Compression.LOW
-    else:
-        compression_level = GhostscriptBackend.Compression.NONE
-
     with tempfile.TemporaryDirectory() as temp_dir:
         num_pages = PyPDFBackend.len(input_file)
         gs_out = Path(temp_dir) / "out_gs.pdf"
@@ -207,7 +198,7 @@ def compress(
             gs_backend.compress(
                 input_file=input_file,
                 output_file=gs_out,
-                compression_level=compression_level,
+                compression_level=GhostscriptBackend.Compression.from_str(compression),
                 progress_callback=lambda p: progress.update(task1, completed=p)
             )
 
@@ -295,7 +286,7 @@ def merge(
         merge_task = progress.add_task(f"{_('Processing file')} '{output_file}':", total=None,)
 
         # get dict in format {filepath: password}
-        filepath_dict = {}
+        filepath_dict: dict[str | Path, str | None] = {}
         FILEPATH_RE = re.compile(r'^(.+?)(::(.+))?$')
         for arg in input_files:
             match = FILEPATH_RE.search(arg)

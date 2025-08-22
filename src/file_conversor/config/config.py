@@ -36,7 +36,7 @@ class Configuration:
             "image-dpi": 200,        # Default image => PDF dpi
             "image-fit": 'into',     # Default image => PDF fit mode
             "image-page-size": None,  # Default image => PDF page size
-            "image-set-metadata": True,  # Default image => PDF set metadata
+            "image-resampling": "bicubic",  # Default image resampling algorithm
             "pdf-compression": "medium",  # Default PDF compression level
         }
 

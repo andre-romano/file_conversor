@@ -67,7 +67,7 @@ class PyPDFBackend(AbstractBackend):
 
     def merge(self,
               output_file: str | Path,
-              input_files: dict[str | Path, str],
+              input_files: dict[str | Path, str | None],
               ):
         """
         Merge input files into an output.

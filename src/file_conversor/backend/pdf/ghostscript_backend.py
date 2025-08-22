@@ -31,6 +31,16 @@ class GhostscriptBackend(AbstractBackend):
     class OutputFileFormat(Enum):
         PDF = "pdfwrite"
 
+        @classmethod
+        def get_dict(cls):
+            return {
+                "pdf": cls.PDF,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
+
         def get_options(self) -> list[str]:
             return [f"-sDEVICE={self.value}"]
 
@@ -43,6 +53,19 @@ class GhostscriptBackend(AbstractBackend):
         """300 dpi quality - low compression / high quality"""
         NONE = "preprint"
         """600 dpi quality - no compression / highest quality"""
+
+        @classmethod
+        def get_dict(cls):
+            return {
+                "high": cls.HIGH,
+                "medium": cls.MEDIUM,
+                "low": cls.LOW,
+                "none": cls.NONE,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
 
         def get_options(self) -> list[str]:
             return [f"-dPDFSETTINGS=/{self.value}"]
@@ -59,6 +82,20 @@ class GhostscriptBackend(AbstractBackend):
         PRESET_1_7 = "1.7"
         """low campatibility / support for 3D and transparency"""
 
+        @classmethod
+        def get_dict(cls):
+            return {
+                "1.3": cls.PRESET_1_3,
+                "1.4": cls.PRESET_1_4,
+                "1.5": cls.PRESET_1_5,
+                "1.6": cls.PRESET_1_6,
+                "1.7": cls.PRESET_1_7,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
+
         def get_options(self) -> list[str]:
             return [f"-dCompatibilityLevel={self.value}"]  # PDF preset
 
@@ -69,6 +106,18 @@ class GhostscriptBackend(AbstractBackend):
         """medium processing / medium quality"""
         LOW = "Subsample"
         """fast processing / low quality"""
+
+        @classmethod
+        def get_dict(cls):
+            return {
+                "high": cls.HIGH,
+                "medium": cls.MEDIUM,
+                "low": cls.LOW,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
 
         def get_options(self) -> list[str]:
             return [
@@ -85,6 +134,18 @@ class GhostscriptBackend(AbstractBackend):
         """JPEG format (great support by browsers / open source viewers)"""
         PNG = "FlateEncode"
         """PNG format (great support / high file size)"""
+
+        @classmethod
+        def get_dict(cls):
+            return {
+                "jpx": cls.JPX,
+                "jpg": cls.JPG,
+                "png": cls.PNG,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
 
         def get_options(self) -> list[str]:
             return [

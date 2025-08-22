@@ -70,6 +70,8 @@ def check_file_format(filename_or_iter: list | dict | set | str | Path | None, f
 
 
 def check_valid_options(data: Any | None, valid_options: Iterable):
+    if not data:
+        return data
     if data not in valid_options:
         raise typer.BadParameter(f"'{data}' is invalid.  Valid options are {', '.join(valid_options)}.")
     return data

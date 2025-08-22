@@ -19,14 +19,15 @@ class Img2PDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``img2pdf``.
     """
 
-    FIT_MODE = img2pdf.FitMode
+    FIT_MODES = {
+        'into': img2pdf.FitMode.into,
+        'fill': img2pdf.FitMode.fill,
+    }
 
-    FIT_INTO = img2pdf.FitMode.into
-    FIT_FILL = img2pdf.FitMode.fill
-
-    LAYOUT_NONE = None  # pdf exact size as image
-    LAYOUT_A4_PORTRAIT_CM = (21.00, 29.70)  # A4 in cm
-    LAYOUT_A4_LANDSCAPE_CM = (LAYOUT_A4_PORTRAIT_CM[1], LAYOUT_A4_PORTRAIT_CM[0])
+    PAGE_LAYOUT = {
+        'a4': (21.00, 29.70),  # A4 in cm
+        'a4_landscape': (29.70, 21.00),
+    }
 
     SUPPORTED_IN_FORMATS = {
         "jpeg": {},
@@ -56,8 +57,8 @@ class Img2PDFBackend(AbstractBackend):
     def to_pdf(self,
                output_file: str | Path,
                input_files: Iterable[str | Path],
-               image_fit: FIT_MODE = FIT_INTO,
-               page_size: tuple[float, float] | None = LAYOUT_NONE,
+               image_fit: img2pdf.FitMode = FIT_MODES['into'],
+               page_size: tuple[float, float] | None = None,
                dpi: int = 200,
                include_metadata: bool = True
                ):

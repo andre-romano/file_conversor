@@ -279,48 +279,37 @@ def to_pdf(
                                      )] = CONFIG["image-dpi"],
 
     fit: Annotated[str, typer.Option("--fit", "-f",
-                                     help=_("Image fit. Valid only if ``--page-size`` is defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "),
-                                     callback=lambda x: check_valid_options(x.lower(), ['into', 'fill']),
+                                     help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG["image-fit"]}",
+                                     callback=lambda x: check_valid_options(x.lower(), Img2PDFBackend.FIT_MODES),
                                      )] = CONFIG["image-fit"],
 
     page_size: Annotated[str | None, typer.Option("--page-size", "-ps",
-                                                  help=_("Page size. Format '(width, height)'. Other valid values are: 'a4', 'a4_landscape'. Defaults to None (PDF size = image size)."),
-                                                  callback=lambda x: check_valid_options(x.lower() if x else None, [None, 'a4', 'a4_landscape']),
+                                                  help=f"{_("Page size. Format '(width, height)'. Other valid values are:")} {", ".join(Img2PDFBackend.PAGE_LAYOUT)}. {_("Defaults to None (PDF size = image size).")}",
+                                                  callback=lambda x: check_valid_options(x.lower() if x else None, Img2PDFBackend.PAGE_LAYOUT),
                                                   )] = CONFIG["image-page-size"],
 
     set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
-                                               help=_("Set PDF metadata. Defaults to True (set creator, producer, modification date, etc)."),
+                                               help=_("Set PDF metadata. Defaults to False (do not set creator, producer, modification date, etc)."),
                                                callback=check_is_bool_or_none,
                                                is_flag=True,
-                                               )] = CONFIG["image-set-metadata"],
+                                               )] = False,
 ):
     img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
     # display current progress
     with get_progress_bar() as progress:
         task = progress.add_task(f"{_('Processing file')} '{output_file}':", total=None)
 
-        # parse user input
-        image_fit: Img2PDFBackend.FIT_MODE
-        if fit == 'into':
-            image_fit = Img2PDFBackend.FIT_INTO
-        elif fit == 'fill':
-            image_fit = Img2PDFBackend.FIT_FILL
-
-        page_sz: tuple | None
-        if page_size is None:
-            page_sz = Img2PDFBackend.LAYOUT_NONE
-        elif page_size == 'a4':
-            page_sz = Img2PDFBackend.LAYOUT_A4_PORTRAIT_CM
-        elif page_size == 'a4_landscape':
-            page_sz = Img2PDFBackend.LAYOUT_A4_LANDSCAPE_CM
-        else:
+        page_sz: tuple | None = None
+        if page_size in Img2PDFBackend.PAGE_LAYOUT:
+            page_sz = Img2PDFBackend.PAGE_LAYOUT[page_size]
+        elif page_size:
             page_sz = tuple(page_size)
 
         img2pdf_backend.to_pdf(
             input_files=input_files,
             output_file=output_file if output_file else Environment.get_output_path(input_files[0], "", "pdf"),
             dpi=dpi,
-            image_fit=image_fit,
+            image_fit=Img2PDFBackend.FIT_MODES[fit],
             page_size=page_sz,
             include_metadata=set_metadata,
         )
@@ -528,9 +517,9 @@ def resize(
                                               callback=lambda x: check_positive_integer(x),
                                               )] = None,
     resampling: Annotated[str, typer.Option("--resampling", "-r",
-                                            help=f'{_("Resampling algorithm. Valid values are")}{", ".join(PillowBackend.RESAMPLING_OPTIONS)}{_("Defaults to 'bicubic.'")}',
+                                            help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG["image-resampling"]}.',
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
-                                            )] = "bicubic",
+                                            )] = CONFIG["image-resampling"],
     output_file: Annotated[str | None, typer.Option("--output", "-o",
                                                     help=f"{_('Output file')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}, {_('with _resized at the end)')}",
                                                     callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_OUT_FORMATS),

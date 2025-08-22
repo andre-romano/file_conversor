@@ -9,6 +9,8 @@ from rich import print
 from rich.pretty import Pretty
 
 # user-provided modules
+from file_conversor.backend import Img2PDFBackend, PillowBackend
+
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -72,20 +74,19 @@ def set(
                                            )] = CONFIG["image-dpi"],
 
     image_fit: Annotated[str, typer.Option("--image-fit", "-if",
-                                           help=_("Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "),
+                                           help=f'{_("Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}',
                                            callback=lambda x: check_valid_options(x.lower(), ['into', 'fill']),
                                            )] = CONFIG["image-fit"],
 
     image_page_size: Annotated[str | None, typer.Option("--image-page-size", "-ip",
-                                                        help=_("Page size (for ``image to_pdf`` command). Format (width, height). Other valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size = image size)."),
-                                                        callback=lambda x: check_valid_options(x.lower() if x else None, [None, 'a4', 'a4_landscape']),
+                                                        help=f'{_("Page size (for ``image to_pdf`` command). Format (width, height). Other valid values are:")} {", ".join(Img2PDFBackend.PAGE_LAYOUT)}',
+                                                        callback=lambda x: check_valid_options(x.lower() if x else None, Img2PDFBackend.PAGE_LAYOUT),
                                                         )] = CONFIG["image-page-size"],
 
-    image_set_metadata: Annotated[bool, typer.Option("--image-set-metadata", "-is",
-                                                     help=_("Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set creator, producer, modification date, etc)."),
-                                                     callback=check_is_bool_or_none,
-                                                     is_flag=True,
-                                                     )] = CONFIG["image-set-metadata"],
+    image_resampling: Annotated[str, typer.Option("--image-resampling", "-ir",
+                                                  help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG["image-resampling"]}',
+                                                  callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
+                                                  )] = CONFIG["image-resampling"],
 
     pdf_compression: Annotated[str, typer.Option("--pdf-compression", "-pc",
                                                  help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
@@ -102,7 +103,7 @@ def set(
         "image-dpi": image_dpi,
         "image-fit": image_fit,
         "image-page-size": image_page_size,
-        "image-set-metadata": image_set_metadata,
+        "image-resampling": image_resampling,
         "pdf-compression": pdf_compression,
     })
     CONFIG.save()

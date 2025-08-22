@@ -105,10 +105,10 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runascurrentuser waituntilterminated
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 ''', encoding="utf-8")
     assert setup_iss_path.exists()
     print("[bold green]OK[/]")
