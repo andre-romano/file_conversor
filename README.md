@@ -117,6 +117,7 @@ We would like to say our thanks to the incredible work provided by other contrib
   - [swifticons](https://www.flaticon.com/authors/swifticons)
   - [iconir](https://www.flaticon.com/authors/iconir)
   - [iconjam](https://www.flaticon.com/authors/iconjam)
+  - [muhammad-andy](https://www.flaticon.com/authors/muhammad-andy)
 
 ## License and Copyright
 

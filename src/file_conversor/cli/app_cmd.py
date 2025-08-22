@@ -57,6 +57,11 @@ app_cmd.add_typer(pdf_cmd,
                   help=_("PDF file manipulation"),
                   rich_help_panel=MULTIMEDIA_PANEL)
 
+app_cmd.add_typer(text_cmd,
+                  name="text",
+                  help=_("Text file manipulation (json, xml, etc)"),
+                  rich_help_panel=MULTIMEDIA_PANEL)
+
 ###############
 # OFFICE PANEL
 ###############

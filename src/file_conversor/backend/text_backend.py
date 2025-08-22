@@ -1,0 +1,127 @@
+# src\file_conversor\backend\text_backend.py
+
+import json
+import yaml
+import xmltodict
+
+from typing import Any, Callable, Iterable, Sequence
+
+from pathlib import Path
+
+from rich import print
+
+# user-provided imports
+from file_conversor.backend.abstract_backend import AbstractBackend
+
+from file_conversor.config import Environment, Configuration, Log
+from file_conversor.config.locale import get_translation
+
+# get app config
+CONFIG = Configuration.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
+
+
+class AbstractTextFile:
+    def __init__(self, filename: str | Path) -> None:
+        super().__init__()
+        self._filepath = Path(filename)
+
+    def read(self) -> Any:
+        raise NotImplementedError("not implemented")
+
+    def write(self, data: Any):
+        raise NotImplementedError("not implemented")
+
+
+class XMLTextFile(AbstractTextFile):
+    def read(self):
+        return xmltodict.parse(self._filepath.read_bytes())
+
+    def write(self, data: Any):
+        xml_str = xmltodict.unparse(data, pretty=True)
+        self._filepath.write_text(xml_str, encoding="utf-8")
+
+
+class JSONTextFile(AbstractTextFile):
+    def read(self):
+        return json.loads(self._filepath.read_bytes())
+
+    def write(self, data: Any):
+        json_str = json.dumps(data, indent=4)
+        self._filepath.write_text(json_str, encoding="utf-8")
+
+
+class YAMLTextFile(AbstractTextFile):
+    def read(self):
+        with open(self._filepath, mode="r") as fp:
+            return yaml.safe_load(fp)
+
+    def write(self, data: Any):
+        with open(self._filepath, mode="w") as fp:
+            yaml.dump(data, fp)
+
+
+class TextBackend(AbstractBackend):
+    SUPPORTED_IN_FORMATS = {
+        "json": {},
+        "xml": {},
+        "yaml": {},
+    }
+    SUPPORTED_OUT_FORMATS = {
+        "json": {},
+        "xml": {},
+        "yaml": {},
+    }
+
+    def __init__(
+        self,
+        verbose: bool = False,
+    ):
+        """
+        Initialize the Batch backend.
+        """
+        super().__init__()
+        self._verbose = verbose
+
+    def _get_text_file(
+            self,
+            filepath: Path,
+            formats: dict[str, dict[str, AbstractTextFile]],
+    ) -> tuple[str, AbstractTextFile]:
+        """"Checks file format and returns (ext, textfile)"""
+        ext = filepath.suffix[1:]
+        if ext not in formats:
+            raise ValueError(f"Unsupported input format '{ext}'. Supported formats: {', '.join(formats)}")
+        if ext == "xml":
+            text_file = XMLTextFile(filepath)
+        elif ext == "json":
+            text_file = JSONTextFile(filepath)
+        elif ext == "yaml":
+            text_file = YAMLTextFile(filepath)
+        else:
+            raise ValueError(f"TextFile class for extension '{ext}' not found")
+        logger.debug(f"Filepath: {filepath} - Class: {type(text_file)}")
+        return (ext, text_file)
+
+    def convert(
+            self,
+            input_file: str | Path,
+            output_file: str | Path,
+    ):
+        """
+        Convert text file to other formats
+
+        :param input_file: Input file
+        :param output_file: Output file        
+        """
+        input_file = Path(input_file)
+        output_file = Path(output_file)
+
+        _, in_txt_file = self._get_text_file(input_file, self.SUPPORTED_IN_FORMATS)
+        _, out_txt_file = self._get_text_file(output_file, self.SUPPORTED_OUT_FORMATS)
+
+        data = in_txt_file.read()
+        out_txt_file.write(data)
