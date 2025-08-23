@@ -62,7 +62,7 @@ def check_file_format(filename_or_iter: list | dict | set | str | Path | None, f
     for filename in file_list:
         file_path = Path(filename)
         file_format = file_path.suffix[1:].lower()
-        if file_format not in format_dict:
+        if format_dict and file_format not in format_dict:
             raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
         if exists and not file_path.exists() and not file_path.is_file():
             raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")

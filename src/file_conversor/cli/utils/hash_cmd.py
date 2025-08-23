@@ -60,6 +60,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def create(
     input_files: Annotated[List[str], typer.Argument(
         help=f"{_('Input files')}",
+        callback=lambda x: check_file_format(x, [], exists=True)
     )],
 
     output_file: Annotated[str, typer.Option("--output", "-o",
