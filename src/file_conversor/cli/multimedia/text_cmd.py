@@ -3,6 +3,7 @@
 
 import typer
 
+from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
@@ -52,6 +53,24 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} text convert "%1" -o "%1.yaml"',
                 icon=str(icons_folder_path / 'yaml.ico'),
             ),
+            WinContextCommand(
+                name="to_ini",
+                description="To INI",
+                command=f'{Environment.get_executable()} text convert "%1" -o "%1.ini"',
+                icon=str(icons_folder_path / 'ini.ico'),
+            ),
+            WinContextCommand(
+                name="check",
+                description="Check",
+                command=f'cmd /k "{Environment.get_executable()} text check "%1""',
+                icon=str(icons_folder_path / 'check.ico'),
+            ),
+            WinContextCommand(
+                name="compress",
+                description="Compress",
+                command=f'{Environment.get_executable()} text compress "%1"',
+                icon=str(icons_folder_path / 'compress.ico'),
+            ),
         ])
 
 
@@ -68,7 +87,7 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor hash convert file1.json -o file.xml` 
+- `file_conversor text convert file1.json -o file.xml` 
 """)
 def convert(
     input_file: Annotated[str, typer.Argument(
@@ -127,3 +146,41 @@ def check(
         logger.info(f"{_('Check')}: [bold red]{_('FAILED')}[/].")
         raise typer.Exit(1)
     logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")
+
+
+# text compress
+@text_cmd.command(
+    help=f"""
+        {_('Compress / minify text file formats (json, xml, yaml, etc).')}        
+    """,
+    epilog=f"""
+**{_('Examples')}:** 
+
+- `file_conversor hash compress file1.json -o file.min.json` 
+""")
+def compress(
+    input_file: Annotated[str, typer.Argument(
+        help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS)
+    )],
+
+    output_file: Annotated[str | None, typer.Option("--output", "-o",
+                                                    help=f"{_('Output file')} ({', '.join(TextBackend.SUPPORTED_OUT_FORMATS)}). {_('Default to')} None ({_('use same name of input file with .min.EXT in the end')})",
+                                                    callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_OUT_FORMATS)
+                                                    )] = None,
+):
+    input_path = Path(input_file)
+    in_ext = input_path.suffix[1:]
+
+    output_path = Path(output_file if output_file else input_file).with_suffix("").with_suffix(f".min.{in_ext}")
+
+    text_backend = TextBackend(verbose=STATE["verbose"])
+    with get_progress_bar() as progress:
+        task = progress.add_task(f"{_('Processing file')}:", total=None,)
+        text_backend.minify(
+            input_file=input_path,
+            output_file=output_path,
+        )
+        progress.update(task, total=100, completed=100)
+
+    logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")

@@ -36,13 +36,20 @@ class AbstractTextFile:
     def write(self, data: Any):
         raise NotImplementedError("not implemented")
 
+    def minify(self, data: Any):
+        self.write(data)
+
 
 class XMLTextFile(AbstractTextFile):
     def read(self):
         return xmltodict.parse(self._filepath.read_bytes())
 
-    def write(self, data: Any):
+    def write(self, data: Any, **kwargs):
         xml_str = xmltodict.unparse(data, pretty=True)
+        self._filepath.write_text(xml_str, encoding="utf-8")
+
+    def minify(self, data: Any):
+        xml_str = xmltodict.unparse(data, pretty=False)
         self._filepath.write_text(xml_str, encoding="utf-8")
 
 
@@ -54,6 +61,10 @@ class JSONTextFile(AbstractTextFile):
         json_str = json.dumps(data, indent=4)
         self._filepath.write_text(json_str, encoding="utf-8")
 
+    def minify(self, data: Any):
+        json_str = json.dumps(data, separators=(',', ':'), indent=None)
+        self._filepath.write_text(json_str, encoding="utf-8")
+
 
 class YAMLTextFile(AbstractTextFile):
     def read(self):
@@ -63,6 +74,15 @@ class YAMLTextFile(AbstractTextFile):
     def write(self, data: Any):
         with open(self._filepath, mode="w") as fp:
             yaml.dump(data, fp, indent=2)
+
+    def minify(self, data: Any):
+        with open(self._filepath, mode="w") as fp:
+            yaml.dump(
+                data,
+                fp,
+                default_flow_style=True,  # forces inline compact form
+                allow_unicode=True,       # preserves UTF-8 chars
+            )
 
 
 class INITextFile(AbstractTextFile):
@@ -166,3 +186,22 @@ class TextBackend(AbstractBackend):
             logger.error(rf"'{input_file}': [bold red]FAILED[/]")
             raise
         logger.info(rf"'{input_file}': [bold green]OK[/]")
+
+    def minify(self,
+               input_file: str | Path,
+               output_file: str | Path,
+               ):
+        """
+        Minifies text file
+
+        :param input_file: Input file
+        :param output_file: Output file  
+        """
+        input_file = Path(input_file)
+        output_file = Path(output_file)
+
+        _, in_txt_file = self._get_text_file(input_file, self.SUPPORTED_IN_FORMATS)
+        _, out_txt_file = self._get_text_file(output_file, self.SUPPORTED_OUT_FORMATS)
+
+        data = in_txt_file.read()
+        out_txt_file.minify(data)
