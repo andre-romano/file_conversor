@@ -138,6 +138,8 @@ class HashBackend(AbstractBackend):
         """
         input_file = Path(input_file)
         in_ext = input_file.suffix[1:]
+        if not input_file.exists():
+            raise FileNotFoundError(f"'{input_file}' not found")
 
         lines = input_file.read_text().splitlines()
         for idx, line in enumerate(lines, start=1):

@@ -94,7 +94,7 @@ def create(
 def check(
     input_files: Annotated[List[str], typer.Argument(
         help=f"{_('Input files')} ({', '.join(HashBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, HashBackend.SUPPORTED_IN_FORMATS)
+        callback=lambda x: check_file_format(x, HashBackend.SUPPORTED_IN_FORMATS, exists=True)
     )],
 ):
     exception = None

@@ -54,6 +54,12 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 icon=str(icons_folder_path / 'yaml.ico'),
             ),
             WinContextCommand(
+                name="to_toml",
+                description="To TOML",
+                command=f'{Environment.get_executable()} text convert "%1" -o "%1.toml"',
+                icon=str(icons_folder_path / 'toml.ico'),
+            ),
+            WinContextCommand(
                 name="to_ini",
                 description="To INI",
                 command=f'{Environment.get_executable()} text convert "%1" -o "%1.ini"',
@@ -92,7 +98,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def convert(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS)
+        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
     )],
 
     output_file: Annotated[str, typer.Option("--output", "-o",
@@ -127,6 +133,7 @@ def convert(
 def check(
     input_files: Annotated[List[str], typer.Argument(
         help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
     )],
 ):
     exception = None
@@ -161,7 +168,7 @@ def check(
 def compress(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS)
+        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
     )],
 
     output_file: Annotated[str | None, typer.Option("--output", "-o",

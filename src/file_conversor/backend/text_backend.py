@@ -1,5 +1,6 @@
 # src\file_conversor\backend\text_backend.py
 
+import toml
 import json
 import yaml
 import xmltodict
@@ -85,6 +86,16 @@ class YAMLTextFile(AbstractTextFile):
             )
 
 
+class TOMLTextFile(AbstractTextFile):
+    def read(self):
+        with open(self._filepath, mode="r") as fp:
+            return toml.load(fp)
+
+    def write(self, data: Any):
+        with open(self._filepath, mode="w") as fp:
+            toml.dump(data, fp)
+
+
 class INITextFile(AbstractTextFile):
     def read(self):
         config = configparser.ConfigParser()
@@ -105,16 +116,38 @@ class INITextFile(AbstractTextFile):
 
 class TextBackend(AbstractBackend):
     SUPPORTED_IN_FORMATS = {
-        "json": {},
-        "xml": {},
-        "yaml": {},
-        "ini": {},
+        "json": {
+            "cls": JSONTextFile,
+        },
+        "xml": {
+            "cls": XMLTextFile,
+        },
+        "yaml": {
+            "cls": YAMLTextFile,
+        },
+        "toml": {
+            "cls": TOMLTextFile,
+        },
+        "ini": {
+            "cls": INITextFile,
+        },
     }
     SUPPORTED_OUT_FORMATS = {
-        "json": {},
-        "xml": {},
-        "yaml": {},
-        "ini": {},
+        "json": {
+            "cls": JSONTextFile,
+        },
+        "xml": {
+            "cls": XMLTextFile,
+        },
+        "yaml": {
+            "cls": YAMLTextFile,
+        },
+        "toml": {
+            "cls": TOMLTextFile,
+        },
+        "ini": {
+            "cls": INITextFile,
+        },
     }
 
     def __init__(
@@ -130,22 +163,16 @@ class TextBackend(AbstractBackend):
     def _get_text_file(
             self,
             filepath: Path,
-            formats: dict[str, dict[str, AbstractTextFile]],
+            formats: dict[str, dict[str, type]],
     ) -> tuple[str, AbstractTextFile]:
         """"Checks file format and returns (ext, textfile)"""
         ext = filepath.suffix[1:]
         if ext not in formats:
             raise ValueError(f"Unsupported input format '{ext}'. Supported formats: {', '.join(formats)}")
-        if ext == "xml":
-            text_file = XMLTextFile(filepath)
-        elif ext == "json":
-            text_file = JSONTextFile(filepath)
-        elif ext == "yaml":
-            text_file = YAMLTextFile(filepath)
-        elif ext == "ini":
-            text_file = INITextFile(filepath)
-        else:
-            raise ValueError(f"TextFile class for extension '{ext}' not found")
+        if "cls" not in formats[ext]:
+            raise ValueError(f"Cannot find class for format '{ext}'.")
+        cls = formats[ext]["cls"]
+        text_file = cls(filepath)
         # logger.debug(f"Filepath: {filepath} - Class: {type(text_file)}")
         return (ext, text_file)
 
