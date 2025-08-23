@@ -3,6 +3,7 @@
 import json
 import yaml
 import xmltodict
+import configparser
 
 from typing import Any, Callable, Iterable, Sequence
 
@@ -61,7 +62,25 @@ class YAMLTextFile(AbstractTextFile):
 
     def write(self, data: Any):
         with open(self._filepath, mode="w") as fp:
-            yaml.dump(data, fp)
+            yaml.dump(data, fp, indent=2)
+
+
+class INITextFile(AbstractTextFile):
+    def read(self):
+        config = configparser.ConfigParser()
+        config.read(self._filepath)
+        return {section: dict(config[section]) for section in config.sections()}
+
+    def write(self, data: Any):
+        if not isinstance(data, dict):
+            raise ValueError(f"Cannot convert '{self._filepath}' => INI file. Expected input format: {{section_name: {{key1: value1, key2: value2, ...}} }}.")
+        config = configparser.ConfigParser()
+        for section, values in data.items():
+            if not isinstance(values, dict):
+                raise ValueError(f"Cannot convert '{self._filepath}' => INI file. Expected input format: {{section_name: {{key1: value1, key2: value2, ...}} }}")
+            config[section] = {str(k): str(v) for k, v in values.items()}
+        with open(self._filepath, "w") as f:
+            config.write(f)
 
 
 class TextBackend(AbstractBackend):
@@ -69,11 +88,13 @@ class TextBackend(AbstractBackend):
         "json": {},
         "xml": {},
         "yaml": {},
+        "ini": {},
     }
     SUPPORTED_OUT_FORMATS = {
         "json": {},
         "xml": {},
         "yaml": {},
+        "ini": {},
     }
 
     def __init__(
@@ -101,9 +122,11 @@ class TextBackend(AbstractBackend):
             text_file = JSONTextFile(filepath)
         elif ext == "yaml":
             text_file = YAMLTextFile(filepath)
+        elif ext == "ini":
+            text_file = INITextFile(filepath)
         else:
             raise ValueError(f"TextFile class for extension '{ext}' not found")
-        logger.debug(f"Filepath: {filepath} - Class: {type(text_file)}")
+        # logger.debug(f"Filepath: {filepath} - Class: {type(text_file)}")
         return (ext, text_file)
 
     def convert(
@@ -125,3 +148,21 @@ class TextBackend(AbstractBackend):
 
         data = in_txt_file.read()
         out_txt_file.write(data)
+
+    def check(self,
+              input_file: str | Path,
+              ):
+        """
+        Checks if file is wellformed (structure is correct)
+
+        :raises Exception: if file is not well structured
+        """
+        input_file = Path(input_file)
+
+        _, in_txt_file = self._get_text_file(input_file, self.SUPPORTED_IN_FORMATS)
+        try:
+            in_txt_file.read()
+        except:
+            logger.error(rf"'{input_file}': [bold red]FAILED[/]")
+            raise
+        logger.info(rf"'{input_file}': [bold green]OK[/]")

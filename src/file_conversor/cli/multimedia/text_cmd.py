@@ -73,6 +73,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def convert(
     input_file: Annotated[str, typer.Argument(
         help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS)
     )],
 
     output_file: Annotated[str, typer.Option("--output", "-o",
@@ -80,10 +81,10 @@ def convert(
                                              callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_OUT_FORMATS)
                                              )],
 ):
-    hash_backend = TextBackend(verbose=STATE["verbose"])
+    text_backend = TextBackend(verbose=STATE["verbose"])
     with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')}:", total=100,)
-        hash_backend.convert(
+        task = progress.add_task(f"{_('Processing file')}:", total=None,)
+        text_backend.convert(
             input_file=input_file,
             output_file=output_file,
         )
@@ -109,11 +110,20 @@ def check(
         help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
     )],
 ):
+    exception = None
     text_backend = TextBackend(verbose=STATE["verbose"])
-    logger.info(f"{_('Checking files ...')}")
 
-    # text_backend.check(
-    #     input_files=input_files,
-    # )
+    logger.info(f"{_('Checking files')} ...")
+    for input_file in input_files:
+        try:
+            text_backend.check(
+                input_file=input_file,
+            )
+        except Exception as e:
+            logger.error(repr(e))
+            exception = e
 
+    if exception:
+        logger.info(f"{_('Check')}: [bold red]{_('FAILED')}[/].")
+        raise typer.Exit(1)
     logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")

@@ -89,17 +89,28 @@ def create(
 **{_('Examples')}:** 
 
 - `file_conversor hash check file.sha256` 
+- `file_conversor hash check file.sha1 file.sha3_512` 
 """)
 def check(
-    input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(HashBackend.SUPPORTED_IN_FORMATS)})",
+    input_files: Annotated[List[str], typer.Argument(
+        help=f"{_('Input files')} ({', '.join(HashBackend.SUPPORTED_IN_FORMATS)})",
+        callback=lambda x: check_file_format(x, HashBackend.SUPPORTED_IN_FORMATS)
     )],
 ):
+    exception = None
     hash_backend = HashBackend(verbose=STATE["verbose"])
-    logger.info(f"{_('Checking file hashes ...')}")
 
-    hash_backend.check(
-        input_file=input_file,
-    )
+    for input_file in input_files:
+        try:
+            logger.info(f"{_('Checking file')} '{input_file}' ...")
+            hash_backend.check(
+                input_file=input_file,
+            )
+        except Exception as e:
+            logger.error(repr(e))
+            exception = e
 
+    if exception:
+        logger.info(f"{_('Hash check')}: [bold red]{_('FAILED')}[/].")
+        raise typer.Exit(1)
     logger.info(f"{_('Hash check')}: [bold green]{_('SUCCESS')}[/].")

@@ -6,6 +6,7 @@ import typer
 
 from rich import print
 
+from pathlib import Path
 from typing import Annotated, Any
 
 # user-provided imports
@@ -122,10 +123,11 @@ app_cmd.add_typer(hash_cmd,
 
 def version_callback(value: bool):
     if value:
-        VERSION = None
-        with open(Environment.get_resources_folder() / "pyproject.toml", "rb") as f:
-            PYPROJECT = tomllib.load(f)
-            VERSION = str(PYPROJECT["project"]["version"])
+        project_toml = Environment.get_resources_folder() / "pyproject.toml"
+        if not project_toml.exists():
+            project_toml = Path() / "pyproject.toml"
+        PYPROJECT = tomllib.loads(project_toml.read_text())
+        VERSION = str(PYPROJECT["project"]["version"])
         typer.echo(f"File Conversor {VERSION}")
         raise typer.Exit()
 
