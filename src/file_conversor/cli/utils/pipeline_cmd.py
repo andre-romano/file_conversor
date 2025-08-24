@@ -23,15 +23,15 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-batch_cmd = typer.Typer()
+pipeline_cmd = typer.Typer()
 
 
-# batch create
-@batch_cmd.command(
+# pipeline create
+@pipeline_cmd.command(
     help=f"""
-        {_('Creates a batch file processing pipeline (for tasks automation).')}        
+        {_('Creates a file processing pipeline (for tasks automation).')}        
 
-        {_('Will ask questions interactively to create a batch file processing pipeline.')}
+        {_('Will ask questions interactively to create the file processing pipeline.')}
 
         [bold]{_('Placeholders available for commands')}[/]:
 
@@ -58,7 +58,7 @@ batch_cmd = typer.Typer()
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor batch create` 
+- `file_conversor pipeline create` 
 """)
 def create():
     logger.info(f"{_('Creating batch pipeline')} ...")
@@ -82,29 +82,29 @@ def create():
             logger.error(f"{str(e)}")
 
     batch_backend.save_config()
-    logger.info(f"{_('Batch creation')}: [bold green]{_('SUCCESS')}[/].")
+    logger.info(f"{_('Pipeline creation')}: [bold green]{_('SUCCESS')}[/].")
 
 
-# batch execute
-@batch_cmd.command(
+# pipeline execute
+@pipeline_cmd.command(
     help=f"""
-        {_('Execute batch file processing pipeline.')}        
+        {_('Execute file processing pipeline.')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor batch execute c:/Users/Alice/Desktop/pipeline_name` 
+- `file_conversor pipeline execute c:/Users/Alice/Desktop/pipeline_name` 
 """)
 def execute(
     pipeline_folder: Annotated[str, typer.Argument(
         help=f"{_('Pipeline folder')}",
     )],
 ):
-    logger.info("Executing batch pipeline ...")
+    logger.info("Executing pipeline ...")
     with get_progress_bar() as progress:
         batch_backend = BatchBackend(pipeline_folder)
         batch_backend.load_config()
         batch_backend.execute(progress)
 
-    logger.info(f"{_('Batch execution')}: [bold green]{_('SUCCESS')}[/].")
+    logger.info(f"{_('Pipeline execution')}: [bold green]{_('SUCCESS')}[/].")
     logger.info(f"--------------------------------")

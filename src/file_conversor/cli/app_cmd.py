@@ -36,32 +36,8 @@ app_cmd = typer.Typer(
 
 # PANELS
 UTILS_CONFIG_PANEL = _("Utils and Config")
-MULTIMEDIA_PANEL = _("Multimedia files")
 OFFICE_PANEL = _("Office files")
-
-###############
-# MULTIMEDIA PANEL
-###############
-
-app_cmd.add_typer(audio_video_cmd,
-                  name="audio-video",
-                  help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
-
-app_cmd.add_typer(image_cmd,
-                  name="image",
-                  help=_("Image file manipulation"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
-
-app_cmd.add_typer(pdf_cmd,
-                  name="pdf",
-                  help=_("PDF file manipulation"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
-
-app_cmd.add_typer(text_cmd,
-                  name="text",
-                  help=_("Text file manipulation (json, xml, etc)"),
-                  rich_help_panel=MULTIMEDIA_PANEL)
+FILE_PANEL = _("Other files")
 
 ###############
 # OFFICE PANEL
@@ -82,6 +58,36 @@ app_cmd.add_typer(ppt_cmd,
                   help=f"{_('Presentation file manipulation')} {_('(requires MS Office / LibreOffice)')})",
                   rich_help_panel=OFFICE_PANEL)
 
+
+###############
+# FILE PANEL
+###############
+
+app_cmd.add_typer(audio_video_cmd,
+                  name="audio-video",
+                  help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
+                  rich_help_panel=FILE_PANEL)
+
+app_cmd.add_typer(image_cmd,
+                  name="image",
+                  help=_("Image file manipulation"),
+                  rich_help_panel=FILE_PANEL)
+
+app_cmd.add_typer(pdf_cmd,
+                  name="pdf",
+                  help=_("PDF file manipulation"),
+                  rich_help_panel=FILE_PANEL)
+
+app_cmd.add_typer(text_cmd,
+                  name="text",
+                  help=_("Text file manipulation (json, xml, etc)"),
+                  rich_help_panel=FILE_PANEL)
+
+app_cmd.add_typer(hash_cmd,
+                  name="hash",
+                  help=_("Hashing operations (check, gen, etc)"),
+                  rich_help_panel=FILE_PANEL)
+
 ######################
 # UTILS/CONFIG PANEL
 ######################
@@ -92,11 +98,16 @@ if CURR_PLATFORM == PLATFORM_WINDOWS:
                       help=_("Windows OS commands (for Windows ONLY)"),
                       rich_help_panel=UTILS_CONFIG_PANEL)
 
-app_cmd.add_typer(batch_cmd,
-                  name="batch",
-                  help=f"""{_('Batch file processing (task automation)')}
+app_cmd.add_typer(config_cmd,
+                  name="config",
+                  help=_("Configure default options"),
+                  rich_help_panel=UTILS_CONFIG_PANEL)
 
-{_('The batch processing pipeline works by monitoring an input folder, passing those files to the next pipeline stage, and processing them inside that stage. This process continues (output of the current stage is the input of the next stage), until those files reach the end of the pipeline.')}
+app_cmd.add_typer(pipeline_cmd,
+                  name="pipeline",
+                  help=f"""{_('Pipeline file processing (task automation)')}
+
+{_('The pipeline processsing by processing an input folder, passing those files to the next pipeline stage, and processing them inside that stage. This process continues (output of the current stage is the input of the next stage), until those files reach the end of the pipeline.')}
 
 
 
@@ -105,16 +116,6 @@ app_cmd.add_typer(batch_cmd,
 - {_('Input folder')} => {_('Stage 1')} => {_('Stage 2')} => ... => {_('Output Folder')}
 """,
     rich_help_panel=UTILS_CONFIG_PANEL)
-
-app_cmd.add_typer(config_cmd,
-                  name="config",
-                  help=_("Configure default options"),
-                  rich_help_panel=UTILS_CONFIG_PANEL)
-
-app_cmd.add_typer(hash_cmd,
-                  name="hash",
-                  help=_("Hashing operations (check, gen, etc)"),
-                  rich_help_panel=UTILS_CONFIG_PANEL)
 
 #####################
 #     APP PANEL
@@ -136,20 +137,6 @@ def version_callback(value: bool):
 @app_cmd.callback(
     help=f"""
         # File Conversor - CLI
-
-        **{_('Features')}:**
-
-        - {_('Compress image / audio / video / pdf files')}
-
-        - {_('Convert image / audio / video / pdf files')}
-
-        - {_('Batch file processing, for task automation using scripts')}
-        
-        - {_('Supports various input and output formats')} (mp3, mp4, mkv, jpg, png, webp, pdf, etc)
-        
-        - {_('Configure default options for conversion / compression')}
-        
-        - {_('Installs external dependencies automatically (using package managers)')}
     """,
     epilog=f"""
         {_('For more information, visit')} [http://www.github.com/andre-romano/file_conversor](http://www.github.com/andre-romano/file_conversor)
