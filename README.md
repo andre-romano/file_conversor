@@ -119,12 +119,11 @@ Run ``file_conversor -h`` to explore all available commands and options.
 - **Support us**:
   - If you enjoy this project, consider supporting us with a donation in our Github Sponsors.
 - **Acknowledgements**
-
-We’re grateful to the icon designers whose work is featured in the app: [Freepik](https://www.flaticon.com/authors/freepik), [atomicicon](https://www.flaticon.com/authors/atomicicon), [swifticons](https://www.flaticon.com/authors/swifticons), [iconir](https://www.flaticon.com/authors/iconir), [iconjam](https://www.flaticon.com/authors/iconjam), [muhammad-andy](https://www.flaticon.com/authors/muhammad-andy) (via [Flaticon](https://www.flaticon.com))
+  - We're grateful to the icon designers whose work is featured in the app: [Freepik](https://www.flaticon.com/authors/freepik), [atomicicon](https://www.flaticon.com/authors/atomicicon), [swifticons](https://www.flaticon.com/authors/swifticons), [iconir](https://www.flaticon.com/authors/iconir), [iconjam](https://www.flaticon.com/authors/iconjam), [muhammad-andy](https://www.flaticon.com/authors/muhammad-andy) (via [Flaticon](https://www.flaticon.com))
 
 ## License and Copyright
 
-Distributed under the Apache License 2.0.
+Distributed under the **Apache License 2.0**.
 
 See [`LICENSE`](./LICENSE) for details.
 

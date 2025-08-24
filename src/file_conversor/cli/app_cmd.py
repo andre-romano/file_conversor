@@ -68,6 +68,11 @@ app_cmd.add_typer(audio_video_cmd,
                   help=_("Audio / Video file manipulation (requires FFMpeg external library)"),
                   rich_help_panel=FILE_PANEL)
 
+app_cmd.add_typer(hash_cmd,
+                  name="hash",
+                  help=_("Hashing manipulation (check, gen, etc)"),
+                  rich_help_panel=FILE_PANEL)
+
 app_cmd.add_typer(image_cmd,
                   name="image",
                   help=_("Image file manipulation"),
@@ -81,11 +86,6 @@ app_cmd.add_typer(pdf_cmd,
 app_cmd.add_typer(text_cmd,
                   name="text",
                   help=_("Text file manipulation (json, xml, etc)"),
-                  rich_help_panel=FILE_PANEL)
-
-app_cmd.add_typer(hash_cmd,
-                  name="hash",
-                  help=_("Hashing operations (check, gen, etc)"),
                   rich_help_panel=FILE_PANEL)
 
 ######################

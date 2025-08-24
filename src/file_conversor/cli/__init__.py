@@ -6,7 +6,7 @@ This module initializes the CLI commands package.
 """
 
 # multimedia
-from file_conversor.cli.multimedia import *
+from file_conversor.cli.files import *
 
 # office
 from file_conversor.cli.office import *
