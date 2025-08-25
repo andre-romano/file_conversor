@@ -18,7 +18,7 @@ from file_conversor.backend import FFmpegBackend
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer import *
 from file_conversor.utils.validators import *
 from file_conversor.utils.formatters import *
@@ -208,27 +208,29 @@ def convert(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            out_ext = output_file.suffix[1:]
 
-            in_options = []
-            out_options = []
-            # configure options
-            out_options.extend(["-b:a", f"{audio_bitrate}k"])
-            if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-                out_options.extend(["-b:v", f"{video_bitrate}k"])
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        out_ext = output_file.suffix[1:]
 
-            # display current progress
-            process = ffmpeg_backend.convert(
-                input_file,
-                output_file,
-                overwrite_output=STATE["overwrite"],
-                in_options=in_options,
-                out_options=out_options,
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
+        in_options = []
+        out_options = []
+        # configure options
+        out_options.extend(["-b:a", f"{audio_bitrate}k"])
+        if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
+            out_options.extend(["-b:v", f"{video_bitrate}k"])
 
-    logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")
+        # display current progress
+        process = ffmpeg_backend.convert(
+            input_file,
+            output_file,
+            overwrite_output=STATE["overwrite"],
+            in_options=in_options,
+            out_options=out_options,
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
+    logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

@@ -16,7 +16,8 @@ from file_conversor.backend.image import *
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.formatters import *
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
 
@@ -159,19 +160,19 @@ def compress(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, "_compressed")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            logger.info(f"Processing '{output_file}' ... ")
-            compress_backend.compress(
-                input_file=input_file,
-                output_file=output_file,
-                quality=quality,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        compress_backend.compress(
+            input_file=input_file,
+            output_file=output_file,
+            quality=quality,
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_compressed")
+
     logger.info(f"{_('Image compression')}: [green bold]{_('SUCCESS')}[/]")
 
 
@@ -256,7 +257,7 @@ def to_pdf(
 
     output_file: OutputFileOption(Img2PDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
-    output_file = output_file if output_file else Path() / Environment.get_output_file(input_files[0], "", "pdf")
+    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
     if not STATE["overwrite"]:
         check_path_exists(output_file, exists=False)
 
@@ -300,20 +301,19 @@ def render(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pymusvg_backend = PyMuSVGBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pymusvg_backend.convert(
-                input_file=input_file,
-                output_file=output_file,
-                dpi=dpi,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pymusvg_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            dpi=dpi,
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
     logger.info(f"{_('Image render')}: [green bold]{_('SUCCESS')}[/]")
 
 
@@ -336,20 +336,19 @@ def convert(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pillow_backend.convert(
-                input_file=input_file,
-                output_file=output_file,
-                quality=quality,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pillow_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            quality=quality,
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
     logger.info(f"{_('Image convertion')}: [green bold]{_('SUCCESS')}[/]")
 
 
@@ -382,21 +381,20 @@ def rotate(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_rotated")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pillow_backend.rotate(
-                input_file=input_file,
-                output_file=output_file,
-                rotate=rotation,
-                resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pillow_backend.rotate(
+            input_file=input_file,
+            output_file=output_file,
+            rotate=rotation,
+            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_rotated")
+
     logger.info(f"{_('Image rotation')}: [green bold]{_('SUCCESS')}[/]")
 
 
@@ -423,20 +421,18 @@ def mirror(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_mirrored")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pillow_backend.mirror(
-                input_file=input_file,
-                output_file=output_file,
-                x_y=True if axis == "x" else False,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pillow_backend.mirror(
+            input_file=input_file,
+            output_file=output_file,
+            x_y=True if axis == "x" else False,
+        )
+        progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_mirrored")
     logger.info(f"{_('Image mirroring')}: [green bold]{_('SUCCESS')}[/]")
 
 
@@ -481,26 +477,18 @@ def resize(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
-    if not scale and not width:
-        if STATE["quiet"]:
-            raise RuntimeError(f"{_('Scale and width not provided')}")
-        userinput = str(typer.prompt(f"{_('Output image scale (e.g., 1.5)')}"))
-        scale = float(userinput)
 
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_resized")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pillow_backend.resize(
+            input_file=input_file,
+            output_file=output_file,
+            scale=parse_image_resize_scale(scale, width, quiet=STATE["quiet"]),
+            width=width,
+            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_resized")
 
-            print(f"Processing '{output_file}' ... ")
-            pillow_backend.resize(
-                input_file=input_file,
-                output_file=output_file,
-                scale=scale,
-                width=width,
-                resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
-            )
-            progress_mgr.complete_step()
     logger.info(f"{_('Image resize')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

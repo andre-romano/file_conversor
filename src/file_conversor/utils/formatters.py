@@ -11,6 +11,15 @@ from file_conversor.config.locale import get_translation
 _ = get_translation()
 
 
+def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool):
+    if not scale and not width:
+        if quiet:
+            raise RuntimeError(f"{_('Scale and width not provided')}")
+        userinput = str(typer.prompt(f"{_('Output image scale (e.g., 1.5)')}"))
+        scale = float(userinput)
+    return scale
+
+
 def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
     # get rotation dict in format {page: rotation}
     rotation_dict = {}

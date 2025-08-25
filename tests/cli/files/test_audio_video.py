@@ -4,14 +4,34 @@
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
-def test_audio_video_convert():
-    result = Test.invoke("audio-video", "convert", "--help")
-    assert "audio-video convert" in result.output
+def test_audio_video_convert(tmp_path):
+    test_cases = [
+        (DATA_PATH / "test.mp4", tmp_path / "test.mp4"),
+    ]
+
+    for in_path, out_path in test_cases:
+        result = Test.invoke(
+            "audio-video", "convert",
+            str(in_path),
+            *Test.get_format_params(out_path),
+            *Test.get_out_dir_params(out_path),
+        )
+        assert result.exit_code == 0
+        assert out_path.exists()
 
 
-def test_audio_video_info():
-    result = Test.invoke("audio-video", "info", "--help")
-    assert "audio-video info" in result.output
+def test_audio_video_info(tmp_path):
+    test_cases = [
+        (DATA_PATH / "test.mp4", tmp_path / "test.mp4"),
+    ]
+
+    for in_path, out_path in test_cases:
+        result = Test.invoke(
+            "audio-video", "info",
+            str(in_path),
+        )
+        assert result.exit_code == 0
+        assert "h264" in result.stdout
 
 
 def test_audio_video():

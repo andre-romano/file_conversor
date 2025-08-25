@@ -16,7 +16,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
-from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
 
@@ -98,23 +98,17 @@ def create(
 def check(
     input_files: InputFilesArgument(HashBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
-    exception = None
     hash_backend = HashBackend(verbose=STATE["verbose"])
 
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            try:
-                logger.info(f"{_('Checking file')} '{input_file}' ...")
-                hash_backend.check(
-                    input_file=input_file,
-                    progress_callback=progress_mgr.update_progress,
-                )
-            except Exception as e:
-                logger.error(repr(e))
-                exception = e
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"{_('Checking file')} '{input_file}' ...")
+        hash_backend.check(
+            input_file=input_file,
+            progress_callback=progress_mgr.update_progress,
+        )
+        progress_mgr.complete_step()
 
-    if exception:
-        logger.info(f"{_('Hash check')}: [bold red]{_('FAILED')}[/].")
-        raise typer.Exit(1)
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
     logger.info(f"{_('Hash check')}: [bold green]{_('SUCCESS')}[/].")

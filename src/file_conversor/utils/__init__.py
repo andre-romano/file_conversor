@@ -7,3 +7,4 @@ It can contain utility functions or classes that are used across the application
 """
 
 from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils.command_manager import CommandManager

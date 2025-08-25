@@ -6,11 +6,11 @@ from tests.utils import Test, DATA_PATH, app_cmd
 
 def test_text_compress(tmp_path):
     test_cases = [
-        (DATA_PATH / "test.xml", tmp_path / "test.min.xml"),
-        (DATA_PATH / "test.json", tmp_path / "test.min.json"),
-        (DATA_PATH / "test.yaml", tmp_path / "test.min.yaml"),
-        (DATA_PATH / "test.toml", tmp_path / "test.min.toml"),
-        (DATA_PATH / "test.ini", tmp_path / "test.min.ini"),
+        (DATA_PATH / "test.xml", tmp_path / "test_compressed.xml"),
+        (DATA_PATH / "test.json", tmp_path / "test_compressed.json"),
+        (DATA_PATH / "test.yaml", tmp_path / "test_compressed.yaml"),
+        (DATA_PATH / "test.toml", tmp_path / "test_compressed.toml"),
+        (DATA_PATH / "test.ini", tmp_path / "test_compressed.ini"),
     ]
 
     for in_path, out_path in test_cases:

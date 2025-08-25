@@ -4,7 +4,6 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
 
 from rich import print
 
@@ -17,7 +16,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
-from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
 
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
@@ -103,18 +102,15 @@ def convert(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            text_backend.convert(
-                input_file=input_file,
-                output_file=output_file,
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        text_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
     logger.info(f"{_('File conversion')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -133,22 +129,15 @@ def convert(
 def check(
     input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
-    exception = None
     text_backend = TextBackend(verbose=STATE["verbose"])
-
     logger.info(f"{_('Checking files')} ...")
-    for input_file in input_files:
-        try:
-            text_backend.check(
-                input_file=input_file,
-            )
-        except Exception as e:
-            logger.error(repr(e))
-            exception = e
 
-    if exception:
-        logger.info(f"{_('Check')}: [bold red]{_('FAILED')}[/].")
-        raise typer.Exit(1)
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        text_backend.check(
+            input_file=input_file,
+        )
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback)
     logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -170,16 +159,12 @@ def compress(
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
 
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem=f".min")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
-
-            text_backend.minify(
-                input_file=input_file,
-                output_file=output_file,
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        text_backend.minify(
+            input_file=input_file,
+            output_file=output_file,
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem=f"_compressed")
     logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")

@@ -1,7 +1,6 @@
 
 # src\file_conversor\cli\multimedia\pdf_cmd.py
 
-import re
 import tempfile
 import typer
 
@@ -16,7 +15,7 @@ from file_conversor.backend.pdf import PyPDFBackend, PikePDFBackend, PyMuPDFBack
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.formatters import parse_pdf_pages, parse_pdf_rotation
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
@@ -132,23 +131,22 @@ def repair(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_repaired")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pikepdf_backend.compress(
-                # files
-                input_file=input_file,
-                output_file=output_file,
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pikepdf_backend.compress(
+            # files
+            input_file=input_file,
+            output_file=output_file,
 
-                # options
-                decrypt_password=password,
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
+            # options
+            decrypt_password=password,
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_repaired")
+
     logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -181,31 +179,29 @@ def compress(
         install_deps=CONFIG['install-deps'],
         verbose=STATE['verbose'],
     )
-    # display current progress
-    with ProgressManager(len(input_files), total_steps_per_file=2) as progress_mgr:
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         with tempfile.TemporaryDirectory() as temp_dir:
-            for input_file in input_files:
-                output_file = output_dir / Environment.get_output_file(input_file, stem="_compressed")
-                if not STATE["overwrite"]:
-                    check_path_exists(output_file, exists=False)
+            gs_out = Path(temp_dir) / CommandManager.get_output_file(input_file, stem="_gs")
+            gs_backend.compress(
+                input_file=input_file,
+                output_file=gs_out,
+                compression_level=GhostscriptBackend.Compression.from_str(compression),
+                progress_callback=progress_mgr.update_progress
+            )
+            progress_mgr.complete_step()
 
-                gs_out = Path(temp_dir) / Environment.get_output_file(input_file, stem="_gs")
-                gs_backend.compress(
-                    input_file=input_file,
-                    output_file=gs_out,
-                    compression_level=GhostscriptBackend.Compression.from_str(compression),
-                    progress_callback=progress_mgr.update_progress
-                )
-                progress_mgr.complete_step()
+            pikepdf_backend.compress(
+                # files
+                input_file=gs_out,
+                output_file=output_file,
+                progress_callback=progress_mgr.update_progress
+            )
+            progress_mgr.complete_step()
+            print(f"Processing '{output_file}' ... OK")
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_compressed")
 
-                pikepdf_backend.compress(
-                    # files
-                    input_file=gs_out,
-                    output_file=output_file,
-                    progress_callback=progress_mgr.update_progress
-                )
-                progress_mgr.complete_step()
-                print(f"Processing '{output_file}' ... OK")
     logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
@@ -230,20 +226,18 @@ def convert(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ...")
-            pymupdf_backend.convert(
-                input_file=input_file,
-                output_file=output_file,
-                dpi=dpi,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ...")
+        pymupdf_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            dpi=dpi,
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
     logger.info(f"{_('File convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
@@ -274,7 +268,7 @@ def merge(
     password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
     output_file: OutputFileOption(PyPDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
-    output_file = output_file if output_file else Path() / Environment.get_output_file(input_files[0], stem="_merged", suffix=".pdf")
+    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
     if not STATE["overwrite"]:
         check_path_exists(output_file, exists=False)
 
@@ -321,20 +315,18 @@ def split(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file)
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            print(f"Processing '{output_file}' ... ")
-            pypdf_backend.split(
-                input_file=input_file,
-                output_file=output_file,
-                password=password,
-                progress_callback=progress_mgr.update_progress,
-            )
-            progress_mgr.complete_step()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pypdf_backend.split(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+            progress_callback=progress_mgr.update_progress,
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback)
     logger.info(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -363,21 +355,18 @@ def extract(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_extracted")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            pypdf_backend.extract(
-                input_file=input_file,
-                output_file=output_file,
-                password=password,
-                pages=parse_pdf_pages(pages),
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.extract(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+            pages=parse_pdf_pages(pages),
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_extracted")
     logger.info(f"{_('Extract pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -399,17 +388,17 @@ def extract_img(
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
 
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            pymupdf_backend.extract_images(
-                # files
-                input_file=input_file,
-                output_dir=output_dir,
-                overwrite_files=STATE["overwrite"],
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pymupdf_backend.extract_images(
+            # files
+            input_file=input_file,
+            output_dir=output_dir,
+            overwrite_files=STATE["overwrite"],
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback)
     logger.info(f"{_('Extract images')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -444,21 +433,18 @@ def rotate(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem="_rotated")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            pypdf_backend.rotate(
-                input_file=input_file,
-                output_file=output_file,
-                decrypt_password=password,
-                rotations=parse_pdf_rotation(rotation, pypdf_backend.len(input_file)),
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.rotate(
+            input_file=input_file,
+            output_file=output_file,
+            decrypt_password=password,
+            rotations=parse_pdf_rotation(rotation, pypdf_backend.len(input_file)),
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_rotated")
     logger.info(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -536,38 +522,35 @@ def encrypt(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem=f"_encrypted")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            pypdf_backend.encrypt(
-                # files
-                input_file=input_file,
-                output_file=output_file,
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.encrypt(
+            # files
+            input_file=input_file,
+            output_file=output_file,
 
-                # passwords
-                owner_password=owner_password,
-                user_password=user_password,
-                decrypt_password=decrypt_password,
+            # passwords
+            owner_password=owner_password,
+            user_password=user_password,
+            decrypt_password=decrypt_password,
 
-                # permissions
-                permission_annotate=allow_annotate,
-                permission_fill_forms=allow_fill_forms,
-                permission_modify=allow_modify,
-                permission_modify_pages=allow_modify_pages,
-                permission_copy=allow_copy,
-                permission_accessibility=allow_accessibility,
-                permission_print_low_quality=allow_print_lq,
-                permission_print_high_quality=allow_print_hq,
-                permission_all=allow_all,
+            # permissions
+            permission_annotate=allow_annotate,
+            permission_fill_forms=allow_fill_forms,
+            permission_modify=allow_modify,
+            permission_modify_pages=allow_modify_pages,
+            permission_copy=allow_copy,
+            permission_accessibility=allow_accessibility,
+            permission_print_low_quality=allow_print_lq,
+            permission_print_high_quality=allow_print_hq,
+            permission_all=allow_all,
 
-                encryption_algorithm=encrypt_algo,
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
+            encryption_algorithm=encrypt_algo,
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_encrypted")
     logger.info(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
 
 
@@ -596,18 +579,15 @@ def decrypt(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, stem=f"_decrypted")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
 
-            pypdf_backend.decrypt(
-                input_file=input_file,
-                output_file=output_file,
-                password=password,
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.decrypt(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+            progress_callback=progress_mgr.update_progress
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_decrypted")
     logger.info(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")

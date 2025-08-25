@@ -14,7 +14,7 @@ from file_conversor.backend import XLS_BACKEND
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
 
@@ -73,16 +73,12 @@ def convert(
         verbose=STATE["verbose"],
     )
 
-    with ProgressManager(len(input_files)) as progress_mgr:
-        for input_file in input_files:
-            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
-            if not STATE["overwrite"]:
-                check_path_exists(output_file, exists=False)
-
-            xls_backend.convert(
-                input_file=input_file,
-                output_file=output_file,
-            )
-            progress_mgr.complete_step()
-
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        xls_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+        )
+        progress_mgr.complete_step()
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
     logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
