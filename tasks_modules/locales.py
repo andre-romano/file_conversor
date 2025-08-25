@@ -90,7 +90,7 @@ def translate(c: InvokeContext):
     print(f"[bold] Translation i18N:[/] [bold green]SUCCESS[/]")
 
 
-@task
+@task(pre=[translate])
 def build(c: InvokeContext):
     """ Build locales' .MO files based on .PO files ..."""
     print(f"[bold] Building locales .mo files ... [/]")
