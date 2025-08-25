@@ -14,6 +14,7 @@ from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich import get_progress_bar
+from file_conversor.utils.validators import check_dir_exists
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -98,6 +99,7 @@ def create():
 def execute(
     pipeline_folder: Annotated[str, typer.Argument(
         help=f"{_('Pipeline folder')}",
+        callback=check_dir_exists
     )],
 ):
     logger.info("Executing pipeline ...")

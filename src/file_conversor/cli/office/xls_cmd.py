@@ -16,6 +16,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.progress_manager import ProgressManager
 from file_conversor.utils.validators import *
+from file_conversor.utils.typer import *
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -63,19 +64,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor doc convert input_file.xlsx -o output_file.pdf`
     """)
 def convert(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(XLS_BACKEND.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, XLS_BACKEND.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(XLS_BACKEND.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, XLS_BACKEND.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(XLS_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(XLS_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     xls_backend = XLS_BACKEND(
         install_deps=CONFIG['install-deps'],

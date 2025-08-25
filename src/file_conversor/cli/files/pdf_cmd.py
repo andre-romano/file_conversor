@@ -18,6 +18,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.progress_manager import ProgressManager
 from file_conversor.utils.validators import *
+from file_conversor.utils.typer import *
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -125,18 +126,9 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor pdf repair input_file.pdf -od D:/Downloads` 
 """)
 def repair(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PikePDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PikePDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    password: Annotated[str | None, typer.Option("--password", "-p",
-                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                 )] = None,
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PikePDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     with ProgressManager(len(input_files)) as progress_mgr:
@@ -176,20 +168,12 @@ def repair(
         - `file_conversor pdf compress input_file.pdf -o`
     """)
 def compress(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(GhostscriptBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, GhostscriptBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
+    input_files: InputFilesArgument(GhostscriptBackend),  # pyright: ignore[reportInvalidTypeForm]
     compression: Annotated[str, typer.Option("--compression", "-c",
                                              help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
                                              callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                              )] = CONFIG["pdf-compression"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     gs_backend = GhostscriptBackend(
@@ -239,25 +223,10 @@ def compress(
         - `file_conversor pdf convert input_file.pdf -f png -o`
     """)
 def convert(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(PyMuPDFBackend.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, PyMuPDFBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    dpi: Annotated[int, typer.Option("--dpi", "-d",
-                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
-                                     min=40, max=3600,
-                                     )] = CONFIG["image-dpi"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
     # display current progress
@@ -300,18 +269,9 @@ def convert(
 - `file_conversor pdf merge "input_file1.pdf" "input_file2.pdf" -p "unlock_password" -of output_file.pdf` 
     """)
 def merge(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)}).",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    password: Annotated[str | None, typer.Option("--password", "-p",
-                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                 )] = None,
-
-    output_file: Annotated[Path | None, typer.Option("--output-file", "-of",
-                                                     help=f"{_("Output file")} ({', '.join(PyPDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file of 1st file as output name')}, {_('with _merged.pdf at the end)')}",
-                                                     callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_OUT_FORMATS),
-                                                     )] = None,
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_file: OutputFileOption(PyPDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_file if output_file else Path() / Environment.get_output_file(input_files[0], stem="_merged", suffix=".pdf")
     if not STATE["overwrite"]:
@@ -355,18 +315,9 @@ def merge(
 - `file_conversor pdf split input_file.pdf` 
 """)
 def split(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    password: Annotated[str | None, typer.Option("--password", "-p",
-                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                 )] = None,
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with ProgressManager() as progress_mgr:
@@ -403,22 +354,12 @@ def split(
 - `file_conversor pdf extract input_file.pdf -pg 1-2 -pg 4-4 -pg 6-6 -od D:/Downloads` 
     """)
 def extract(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
     pages: Annotated[List[str] | None, typer.Option("--pages", "-pg",
                                                     help=_('Pages to extract (comma-separated list). Format "start-end".'),
                                                     )] = None,
-
-    password: Annotated[str | None, typer.Option("--password", "-p",
-                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                 )] = None,
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     if not pages:
         pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7)')}")
@@ -475,14 +416,8 @@ def extract(
 - `file_conversor pdf extract-img input_file.pdf -od D:/Downloads` 
     """)
 def extract_img(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyMuPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyMuPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
 
@@ -523,22 +458,12 @@ def extract_img(
 - `file_conversor pdf rotate input_file.pdf -r "5-7:90" -r "9:-90" -r "10-15:180"`
     """)
 def rotate(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
     rotation: Annotated[List[str], typer.Option("--rotation", "-r",
                                                 help=_("List of pages to rotate. Format ``\"page:rotation\"`` or ``\"start-end:rotation\"`` or ``\"start-:rotation\"`` ..."),
                                                 )],
-
-    password: Annotated[str | None, typer.Option("--password", "-p",
-                                                 help=_("Password used to open protected file. Defaults to None (do not decrypt)."),
-                                                 )] = None,
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with ProgressManager() as progress_mgr:
@@ -598,9 +523,7 @@ def rotate(
         - `file_conversor pdf encrypt input_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
                                                 help=_("Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF file."),
                                                 prompt=f"{_('Owner password for encryption (password will not be displayed, for your safety)')}",
@@ -655,10 +578,7 @@ def encrypt(
                                               callback=lambda x: check_valid_options(x, valid_options=[None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"])
                                               )] = "AES-256",
 
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with ProgressManager() as progress_mgr:
@@ -712,20 +632,13 @@ def encrypt(
         - `file_conversor pdf decrypt input_file.pdf -p 1234`
     """)
 def decrypt(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(PyPDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, PyPDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
+    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
     password: Annotated[str, typer.Option("--password", "-p",
                                           help=_("Password used for decryption."),
                                           prompt=f"{_('Password for decryption (password will not be displayed, for your safety)')}",
                                           hide_input=True,
                                           )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
     with ProgressManager() as progress_mgr:

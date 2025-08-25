@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, Callable, List
+from typing import Annotated, List
 
 from rich import print
 from rich.panel import Panel
@@ -18,6 +18,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.progress_manager import ProgressManager
 from file_conversor.utils.validators import *
+from file_conversor.utils.typer import *
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -150,20 +151,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor image compress input_file.png -od D:/Downloads -o`
     """)
 def compress(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(CompressBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, CompressBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    quality: Annotated[int, typer.Option("--quality", "-q",
-                                         help=_("Image quality (valid only for JPG). Valid values are between 1-100."),
-                                         min=1, max=100,
-                                         )] = CONFIG["image-quality"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(CompressBackend),  # pyright: ignore[reportInvalidTypeForm]
+    quality: QualityOption() = CONFIG["image-quality"],  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     compress_backend = CompressBackend(
         install_deps=CONFIG['install-deps'],
@@ -200,10 +190,7 @@ def compress(
         - `file_conversor image info filename.webp filename2.png filename3.gif`
     """)
 def info(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     for input_file in input_files:
@@ -249,15 +236,8 @@ def info(
         - `file_conversor image to-pdf input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(Img2PDFBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_IN_FORMATS, exists=True),
-                                                      )],
-
-    dpi: Annotated[int, typer.Option("--dpi", "-d",
-                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
-                                     min=40, max=3600,
-                                     )] = CONFIG["image-dpi"],
-
+    input_files: InputFilesArgument(Img2PDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
     fit: Annotated[str, typer.Option("--fit", "-f",
                                      help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG["image-fit"]}",
                                      callback=lambda x: check_valid_options(x.lower(), Img2PDFBackend.FIT_MODES),
@@ -274,10 +254,7 @@ def to_pdf(
                                                is_flag=True,
                                                )] = False,
 
-    output_file: Annotated[Path | None, typer.Option("--output-file", "-of",
-                                                     help=f"{_('Output file')} ({', '.join(Img2PDFBackend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same 1st input file as output name')}).",
-                                                     callback=lambda x: check_file_format(x, Img2PDFBackend.SUPPORTED_OUT_FORMATS),
-                                                     )] = None,
+    output_file: OutputFileOption(Img2PDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_file if output_file else Path() / Environment.get_output_file(input_files[0], "", "pdf")
     if not STATE["overwrite"]:
@@ -317,25 +294,10 @@ def to_pdf(
         - `file_conversor image render input_file.svg input_file2.svg -od D:/Downloads -f jpg --dpi 300`
     """)
 def render(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PyMuSVGBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PyMuSVGBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(PyMuSVGBackend.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, PyMuSVGBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    dpi: Annotated[int, typer.Option("--dpi", "-d",
-                                     help=_("Image quality in dots per inch (DPI). Valid values are between 40-3600."),
-                                     min=40, max=3600,
-                                     )] = CONFIG["image-dpi"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PyMuSVGBackend),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(PyMuSVGBackend),  # pyright: ignore[reportInvalidTypeForm]
+    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pymusvg_backend = PyMuSVGBackend(verbose=STATE['verbose'])
     # display current progress
@@ -368,25 +330,10 @@ def render(
         - `file_conversor image convert input_file.bmp -f png -od D:/Downloads`
     """)
 def convert(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(PillowBackend.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, PillowBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    quality: Annotated[int, typer.Option("--quality", "-q",
-                                         help=_("Image quality. Valid values are between 1-100."),
-                                         min=1, max=100,
-                                         )] = CONFIG["image-quality"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    quality: QualityOption() = CONFIG["image-quality"],  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
@@ -421,11 +368,7 @@ def convert(
         - `file_conversor image rotate input_file.jpg -r -180 -o`
     """)
 def rotate(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
     rotation: Annotated[int, typer.Option("--rotation", "-r",
                                           help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise rotation) and 360 (clockwise rotation)."),
                                           min=-360, max=360,
@@ -436,10 +379,7 @@ def rotate(
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
                                             )] = CONFIG["image-resampling"],
 
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
@@ -475,20 +415,12 @@ def rotate(
         - `file_conversor image mirror input_file.png -a y -o`
     """)
 def mirror(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
     axis: Annotated[str, typer.Option("--axis", "-a",
                                       help=_("Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
                                       callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
                                       )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     # display current progress
@@ -531,11 +463,7 @@ def mirror(
         - `file_conversor image resize input_file.jpg -od D:/Downloads -w 1024`
     """)
 def resize(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(PillowBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, PillowBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
     scale: Annotated[float | None, typer.Option("--scale", "-s",
                                                 help=f"{_("Scale image proportion. Valid values start at 0.1. Defaults to")} None (use width to scale image).",
                                                 callback=lambda x: check_positive_integer(x),
@@ -550,11 +478,7 @@ def resize(
                                             help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG["image-resampling"]}.',
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
                                             )] = CONFIG["image-resampling"],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     if not scale and not width:

@@ -19,6 +19,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager
+from file_conversor.utils.typer import *
 from file_conversor.utils.validators import *
 from file_conversor.utils.formatters import *
 
@@ -95,8 +96,6 @@ ctx_menu.register_callback(register_ctx_menu)
 
         - {_('Duration')} (HH:MM:SS)
 
-        - Bitrate
-
         - {_('Other properties')}
     """,
     epilog=f"""
@@ -107,11 +106,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor audio-video info other_filename.mp3`
     """)
 def info(
-    input_files: Annotated[List[str], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
+    input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
+
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
@@ -194,30 +191,17 @@ def info(
         - `file_conversor audio-video convert input_file.mp4 -f .mp3`
     """)
 def convert(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input file')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
-    )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
-
+    input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["audio-bitrate"],
-
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(

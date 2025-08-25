@@ -20,6 +20,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 from file_conversor.utils.progress_manager import ProgressManager
 
 from file_conversor.utils.validators import *
+from file_conversor.utils.typer import *
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -97,19 +98,9 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor text convert file1.json -f xml` 
 """)
 def convert(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
-                                                      )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(TextBackend.SUPPORTED_OUT_FORMATS)})",
-                                        callback=lambda x: check_valid_options(x, TextBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
     with ProgressManager(len(input_files)) as progress_mgr:
@@ -140,10 +131,7 @@ def convert(
 - `file_conversor text check file1.json file2.yaml` 
 """)
 def check(
-    input_files: Annotated[List[str], typer.Argument(
-        help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
-    )],
+    input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
     exception = None
     text_backend = TextBackend(verbose=STATE["verbose"])
@@ -177,14 +165,8 @@ def check(
 - `file_conversor hash compress file1.json` 
 """)
 def compress(
-    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-                                                      callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
-                                                      )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
 

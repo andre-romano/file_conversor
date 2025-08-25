@@ -18,6 +18,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 from file_conversor.utils.progress_manager import ProgressManager
 from file_conversor.utils.validators import *
+from file_conversor.utils.typer import *
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -61,20 +62,9 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor hash create file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
 """)
 def create(
-    input_files: Annotated[List[Path], typer.Argument(
-        help=f"{_('Input files')}",
-        callback=lambda x: check_file_format(x, [], exists=True)
-    )],
-
-    format: Annotated[str, typer.Option("--format", "-f",
-                                        help=f"{_('Output format')} ({', '.join(HashBackend.SUPPORTED_OUT_FORMATS)}).",
-                                        callback=lambda x: check_valid_options(x, HashBackend.SUPPORTED_OUT_FORMATS),
-                                        )],
-
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
-                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-                                             callback=lambda x: check_dir_exists(x, mkdir=True),
-                                             )] = Path(),
+    input_files: InputFilesArgument(),  # pyright: ignore[reportInvalidTypeForm]
+    format: FormatOption(HashBackend),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_dir / f"CHECKSUM.{format}"
     if not STATE["overwrite"]:
@@ -106,10 +96,7 @@ def create(
 - `file_conversor hash check file.sha1 file.sha3_512` 
 """)
 def check(
-    input_files: Annotated[List[str], typer.Argument(
-        help=f"{_('Input files')} ({', '.join(HashBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, HashBackend.SUPPORTED_IN_FORMATS, exists=True)
-    )],
+    input_files: InputFilesArgument(HashBackend),  # pyright: ignore[reportInvalidTypeForm]
 ):
     exception = None
     hash_backend = HashBackend(verbose=STATE["verbose"])
