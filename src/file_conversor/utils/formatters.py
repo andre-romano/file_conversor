@@ -1,6 +1,63 @@
 # src\file_conversor\utils\formatters.py
 
 import math
+import re
+import typer
+
+
+# user-provided modules
+from file_conversor.config.locale import get_translation
+
+_ = get_translation()
+
+
+def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
+    # get rotation dict in format {page: rotation}
+    rotation_dict = {}
+    for arg in rotation:
+        match = re.search(r'(\d+)(-(\d*)){0,1}:([-]{0,1}\d+)', arg)
+        if not match:
+            raise RuntimeError(f"{_('Invalid rotation instruction')} '{arg}'. {_("Valid format is 'begin-end:degree' or 'page:degree'")}.")
+
+        # check user input
+        begin = int(match.group(1)) - 1
+        end = begin
+        if match.group(3):
+            end = int(match.group(3)) - 1
+        elif match.group(2):
+            end = last_page
+        degree = int(match.group(4))
+        if end < begin:
+            raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
+
+        # create rotation_dict
+        for page_num in range(begin, end + 1):
+            rotation_dict[page_num] = degree
+    return rotation_dict
+
+
+def parse_pdf_pages(pages: list[str] | None) -> list[int]:
+    if not pages:
+        pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
+        pages = [p.strip() for p in str(pages_str).split(",")]
+
+    # parse user input
+    pages_list: list[int] = []
+    for arg in pages:
+        match = re.compile(r'(\d+)-(\d*){0,1}').search(arg)
+        if not match:
+            raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end'")}.")
+
+        # check user input
+        begin = int(match.group(1)) - 1
+        end = int(match.group(2)) - 1
+
+        if end < begin:
+            raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
+
+        # create pages list
+        pages_list.extend(range(begin, end + 1))
+    return pages_list
 
 
 def normalize_degree(deg: float | int) -> int:

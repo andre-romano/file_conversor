@@ -17,6 +17,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils.formatters import parse_pdf_pages, parse_pdf_rotation
 from file_conversor.utils.validators import *
 from file_conversor.utils.typer import *
 
@@ -320,7 +321,7 @@ def split(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             output_file = output_dir / Environment.get_output_file(input_file)
             if not STATE["overwrite"]:
@@ -361,31 +362,8 @@ def extract(
     password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
-    if not pages:
-        pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7)')}")
-        pages = [p.strip() for p in str(pages_str).split(",")]
-
-    # parse user input
-    pages_list = []
-    PAGES_RE = re.compile(r'(\d+)-(\d*){0,1}')
-    for arg in pages:
-        match = PAGES_RE.search(arg)
-        if not match:
-            raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end'")}.")
-
-        # check user input
-        begin = int(match.group(1)) - 1
-        end = int(match.group(2)) - 1
-
-        if end < begin:
-            raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
-
-        # create pages list
-        for page_num in range(begin, end + 1):
-            pages_list.append(page_num)
-
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             output_file = output_dir / Environment.get_output_file(input_file, stem="_extracted")
             if not STATE["overwrite"]:
@@ -395,7 +373,7 @@ def extract(
                 input_file=input_file,
                 output_file=output_file,
                 password=password,
-                pages=pages_list,
+                pages=parse_pdf_pages(pages),
                 progress_callback=progress_mgr.update_progress
             )
             progress_mgr.complete_step()
@@ -421,7 +399,7 @@ def extract_img(
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
 
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             pymupdf_backend.extract_images(
                 # files
@@ -466,40 +444,17 @@ def rotate(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             output_file = output_dir / Environment.get_output_file(input_file, stem="_rotated")
             if not STATE["overwrite"]:
                 check_path_exists(output_file, exists=False)
 
-            # get rotation dict in format {page: rotation}
-            rotation_dict = {}
-            ROTATION_RE = re.compile(r'(\d+)(-(\d*)){0,1}:([-]{0,1}\d+)')
-            for arg in rotation:
-                match = ROTATION_RE.search(arg)
-                if not match:
-                    raise RuntimeError(f"{_('Invalid rotation instruction')} '{arg}'. {_("Valid format is 'begin-end:degree' or 'page:degree'")}.")
-
-                # check user input
-                begin = int(match.group(1)) - 1
-                end = begin
-                if match.group(3):
-                    end = int(match.group(3)) - 1
-                elif match.group(2):
-                    end = pypdf_backend.len(input_file)
-                degree = int(match.group(4))
-                if end < begin:
-                    raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
-
-                # create rotation_dict
-                for page_num in range(begin, end + 1):
-                    rotation_dict[page_num] = degree
-
             pypdf_backend.rotate(
                 input_file=input_file,
                 output_file=output_file,
                 decrypt_password=password,
-                rotations=rotation_dict,
+                rotations=parse_pdf_rotation(rotation, pypdf_backend.len(input_file)),
                 progress_callback=progress_mgr.update_progress
             )
             progress_mgr.complete_step()
@@ -581,7 +536,7 @@ def encrypt(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             output_file = output_dir / Environment.get_output_file(input_file, stem=f"_encrypted")
             if not STATE["overwrite"]:
@@ -641,7 +596,7 @@ def decrypt(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
+    with ProgressManager(len(input_files)) as progress_mgr:
         for input_file in input_files:
             output_file = output_dir / Environment.get_output_file(input_file, stem=f"_decrypted")
             if not STATE["overwrite"]:

@@ -22,13 +22,14 @@ class Environment:
 
     @staticmethod
     def get_output_file(
-            output_file: Path,
+            output_file: str | Path,
             stem: str = "",
             suffix: str = "",
     ):
         """
         Get output file based on input
         """
+        output_file = Path(output_file)
         output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem}")
         output_name = output_name.with_suffix(suffix if suffix else output_file.suffix)
         return output_name.name
