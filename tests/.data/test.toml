@@ -1,0 +1,6 @@
+[package]
+key = []
+
+[package2]
+key2 = "yy"
+key3 = "yy"

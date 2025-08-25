@@ -38,8 +38,8 @@ class PyMuSVGBackend(AbstractBackend):
         self._verbose = verbose
 
     def convert(self,
-                output_file: str,
-                input_file: str,
+                output_file: str | Path,
+                input_file: str | Path,
                 dpi: int = 200,
                 ):
         """
@@ -52,12 +52,15 @@ class PyMuSVGBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
         """
+        input_file = Path(input_file).resolve()
+        output_file = Path(output_file).resolve()
+
         self.check_file_exists(input_file)
 
         # open file
-        doc = fitz.open(input_file)
+        doc = fitz.open(str(input_file))
 
         # => .png, .jpg OUTPUT
         for page in doc:
             pix = page.get_pixmap(dpi=dpi)  # type: ignore
-            pix.save(output_file)  # type: ignore
+            pix.save(str(output_file))  # type: ignore

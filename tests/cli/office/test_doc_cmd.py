@@ -4,21 +4,18 @@
 from tests.utils import Test, DATA_PATH
 
 
-def test_doc_convert_odt(tmp_path):
-    in_path = DATA_PATH / "test.docx"
-    out_path = tmp_path / "test.odt"
+def test_doc_convert_cases(tmp_path):
+    test_cases = [
+        (DATA_PATH / "test.docx", tmp_path / "test.pdf"),
+        (DATA_PATH / "test.docx", tmp_path / "test.odt"),
+    ]
 
-    process = Test.run("doc", "convert", str(in_path), "-o", str(out_path))
-
-    assert process.returncode == 0
-    assert out_path.exists()
-
-
-def test_doc_convert_pdf(tmp_path):
-    in_path = DATA_PATH / "test.docx"
-    out_path = tmp_path / "test.pdf"
-
-    process = Test.run("doc", "convert", str(in_path), "-o", str(out_path))
+    for in_path, out_path in test_cases:
+        process = Test.run(
+            "doc", "convert", str(in_path),
+            *Test.get_format_params(out_path),
+            *Test.get_out_dir_params(out_path),
+        )
     assert process.returncode == 0
     assert out_path.exists()
 

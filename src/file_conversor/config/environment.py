@@ -20,17 +20,18 @@ class Environment:
 
     __instance = None
 
-    @classmethod
-    def get_output_path(cls,
-                        input_file: str | Path,
-                        end_part: str,
-                        out_ext: str | None = None,
-                        ):
-        in_path = Path(input_file)
-        in_ext = in_path.suffix[1:]
-        if not out_ext:
-            out_ext = in_ext
-        return Path(f"{in_path.with_suffix("")}{end_part}.{out_ext}")
+    @staticmethod
+    def get_output_file(
+            output_file: Path,
+            stem: str = "",
+            suffix: str = "",
+    ):
+        """
+        Get output file based on input
+        """
+        output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem}")
+        output_name = output_name.with_suffix(suffix if suffix else output_file.suffix)
+        return output_name.name
 
     @classmethod
     def get_executable(cls) -> str:

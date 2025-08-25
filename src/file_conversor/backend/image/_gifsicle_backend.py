@@ -1,18 +1,15 @@
-# src\file_conversor\backend\mozjpeg_backend.py
+# src\file_conversor\backend\gifsicle_backend.py
 
 """
-This module provides functionalities for handling files using mozjpeg.
+This module provides functionalities for handling files using gifsicle.
 """
-
-import subprocess
 
 from pathlib import Path
+from rich import print
 
 # user-provided imports
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
-
-from file_conversor.utils.validators import check_file_format
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -23,17 +20,16 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class MozJPEGBackend(AbstractBackend):
+class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     """
-    Provides an interface for handling files using mozjpeg.
+    Provides an interface for handling files using gifsicle.
     """
 
     SUPPORTED_IN_FORMATS = {
-        'jpeg': {},
-        'jpg': {},
+        'gif': {},
     }
     SUPPORTED_OUT_FORMATS = {
-        'jpg': {},
+        'gif': {},
     }
 
     def __init__(
@@ -52,51 +48,42 @@ class MozJPEGBackend(AbstractBackend):
         super().__init__(
             pkg_managers={
                 ScoopPackageManager({
-                    "cjpeg": "mozjpeg"
+                    "gifsicle": "gifsicle"
                 }),
                 BrewPackageManager({
-                    "cjpeg": "mozjpeg"
+                    "gifsicle": "gifsicle"
                 }),
             },
             install_answer=install_deps,
         )
         self._verbose = verbose
 
-        # check ffprobe / ffmpeg
-        self._mozjpeg_bin = self.find_in_path("cjpeg")
+        # check binary
+        self._bin = self.find_in_path("gifsicle")
 
     def compress(
         self,
             input_file: str | Path,
             output_file: str | Path,
-            quality: int,
+            compression_level: int = 3,
             **kwargs,
     ):
         """
-        Execute the command to compress the input file.
+        Execute command to compress the input file.
 
         :param input_file: Input file path.
-        :param output_file: Output file path.      
-        :param quality: Output image quality.              
+        :param output_file: Output file path.              
+        :param compression_level: Image compression level (0-3). Defaults to 3 (max compression).              
         :param kwargs: Optional arguments.
 
         :return: Subprocess.CompletedProcess object
-
-        :raises RuntimeError: If backend encounters an error during execution.
         """
+
         # Execute the command
         process = Environment.run(
-            f"{self._mozjpeg_bin}",
-            f"-quality", f"{quality}",
-            f"-progressive",
-            f"-optimize",
+            f"{self._bin}",
+            f"-O={compression_level}",
             f"{input_file}",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=False,
+            f"-o", f"{output_file}",
         )
-
-        # Save the compressed output to file
-        with open(output_file, "wb") as fp:
-            fp.write(process.stdout)
         return process

@@ -3,6 +3,7 @@
 
 import typer
 
+from pathlib import Path
 from typing import Annotated, List
 
 from rich import print
@@ -15,8 +16,8 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
-from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format, check_valid_options
+from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils.validators import *
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -55,28 +56,40 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor hash create file1.jpg file2.pdf file3.exe -o file.sha256` 
+- `file_conversor hash create file1.jpg file2.pdf file3.exe -f sha256` 
+
+- `file_conversor hash create file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
 """)
 def create(
-    input_files: Annotated[List[str], typer.Argument(
+    input_files: Annotated[List[Path], typer.Argument(
         help=f"{_('Input files')}",
         callback=lambda x: check_file_format(x, [], exists=True)
     )],
 
-    output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(HashBackend.SUPPORTED_OUT_FORMATS)}).",
-                                             callback=lambda x: check_file_format(x, HashBackend.SUPPORTED_OUT_FORMATS)
-                                             )],
+    format: Annotated[str, typer.Option("--format", "-f",
+                                        help=f"{_('Output format')} ({', '.join(HashBackend.SUPPORTED_OUT_FORMATS)}).",
+                                        callback=lambda x: check_valid_options(x, HashBackend.SUPPORTED_OUT_FORMATS),
+                                        )],
+
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
+                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
+                                             callback=lambda x: check_dir_exists(x, mkdir=True),
+                                             )] = Path(),
 ):
-    hash_backend = HashBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        input_len = len(input_files)
-        task = progress.add_task(f"{_('Processing files')}:", total=input_len,)
+    output_file = output_dir / f"CHECKSUM.{format}"
+    if not STATE["overwrite"]:
+        check_path_exists(output_file, exists=False)
+
+    hash_backend = HashBackend(
+        verbose=STATE["verbose"],
+    )
+    with ProgressManager() as progress_mgr:
         hash_backend.generate(
             input_files=input_files,
             output_file=output_file,
-            progress_callback=lambda p: progress.update(task, completed=p),
+            progress_callback=progress_mgr.update_progress,
         )
+        progress_mgr.complete_step()
 
     logger.info(f"{_('Hash creation')}: [bold green]{_('SUCCESS')}[/].")
 
@@ -101,15 +114,18 @@ def check(
     exception = None
     hash_backend = HashBackend(verbose=STATE["verbose"])
 
-    for input_file in input_files:
-        try:
-            logger.info(f"{_('Checking file')} '{input_file}' ...")
-            hash_backend.check(
-                input_file=input_file,
-            )
-        except Exception as e:
-            logger.error(repr(e))
-            exception = e
+    with ProgressManager(len(input_files)) as progress_mgr:
+        for input_file in input_files:
+            try:
+                logger.info(f"{_('Checking file')} '{input_file}' ...")
+                hash_backend.check(
+                    input_file=input_file,
+                    progress_callback=progress_mgr.update_progress,
+                )
+            except Exception as e:
+                logger.error(repr(e))
+                exception = e
+            progress_mgr.complete_step()
 
     if exception:
         logger.info(f"{_('Hash check')}: [bold red]{_('FAILED')}[/].")

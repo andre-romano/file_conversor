@@ -150,6 +150,7 @@ class HashBackend(AbstractBackend):
                 logger.error(rf"'{filename}': [bold red]FAILED[/]")
                 raise HashCheckFailed(filename, expected=digest, actual=actual)
             logger.info(rf"'{filename}': [bold green]OK[/]")
+
             progress = 100.0 * (float(idx) / len(lines))
             if progress_callback:
                 progress_callback(progress)

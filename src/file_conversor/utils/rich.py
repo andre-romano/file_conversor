@@ -12,14 +12,14 @@ from file_conversor.config.state import State
 STATE = State.get_instance()
 
 
-class DummyProgress:
+class DummyProgress(Progress):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> Self:  # type: ignore
         return self
 
-    def __exit__(
+    def __exit__(  # type: ignore
         self,
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],

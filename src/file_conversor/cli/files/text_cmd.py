@@ -8,17 +8,18 @@ from typing import Annotated, List
 
 from rich import print
 
+
 # user-provided modules
+from file_conversor.backend import TextBackend
 
-
-from file_conversor.backend.text_backend import TextBackend
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
-from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format, check_valid_options
+from file_conversor.utils.progress_manager import ProgressManager
+
+from file_conversor.utils.validators import *
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -38,31 +39,31 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_xml",
                 description="To XML",
-                command=f'{Environment.get_executable()} text convert "%1" -o "%1.xml"',
+                command=f'{Environment.get_executable()} text convert "%1" -f "xml"',
                 icon=str(icons_folder_path / 'xml.ico'),
             ),
             WinContextCommand(
                 name="to_json",
                 description="To JSON",
-                command=f'{Environment.get_executable()} text convert "%1" -o "%1.json"',
+                command=f'{Environment.get_executable()} text convert "%1" -f "json"',
                 icon=str(icons_folder_path / 'json.ico'),
             ),
             WinContextCommand(
                 name="to_yaml",
                 description="To YAML",
-                command=f'{Environment.get_executable()} text convert "%1" -o "%1.yaml"',
+                command=f'{Environment.get_executable()} text convert "%1" -f "yaml"',
                 icon=str(icons_folder_path / 'yaml.ico'),
             ),
             WinContextCommand(
                 name="to_toml",
                 description="To TOML",
-                command=f'{Environment.get_executable()} text convert "%1" -o "%1.toml"',
+                command=f'{Environment.get_executable()} text convert "%1" -f "toml"',
                 icon=str(icons_folder_path / 'toml.ico'),
             ),
             WinContextCommand(
                 name="to_ini",
                 description="To INI",
-                command=f'{Environment.get_executable()} text convert "%1" -o "%1.ini"',
+                command=f'{Environment.get_executable()} text convert "%1" -f "ini"',
                 icon=str(icons_folder_path / 'ini.ico'),
             ),
             WinContextCommand(
@@ -93,27 +94,35 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor text convert file1.json -o file.xml` 
+- `file_conversor text convert file1.json -f xml` 
 """)
 def convert(
-    input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
-    )],
+    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
+                                                      callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
+                                                      )],
 
-    output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(TextBackend.SUPPORTED_OUT_FORMATS)}).",
-                                             callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_OUT_FORMATS)
-                                             )],
+    format: Annotated[str, typer.Option("--format", "-f",
+                                        help=f"{_('Output format')} ({', '.join(TextBackend.SUPPORTED_OUT_FORMATS)})",
+                                        callback=lambda x: check_valid_options(x, TextBackend.SUPPORTED_OUT_FORMATS),
+                                        )],
+
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
+                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
+                                             callback=lambda x: check_dir_exists(x, mkdir=True),
+                                             )] = Path(),
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')}:", total=None,)
-        text_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-        )
-        progress.update(task, total=100, completed=100)
+    with ProgressManager(len(input_files)) as progress_mgr:
+        for input_file in input_files:
+            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
+            if not STATE["overwrite"]:
+                check_path_exists(output_file, exists=False)
+
+            text_backend.convert(
+                input_file=input_file,
+                output_file=output_file,
+            )
+            progress_mgr.complete_step()
 
     logger.info(f"{_('File conversion')}: [bold green]{_('SUCCESS')}[/].")
 
@@ -159,35 +168,36 @@ def check(
 @text_cmd.command(
     help=f"""
         {_('Compress / minify text file formats (json, xml, yaml, etc).')}        
+        
+        {_('Outputs a file with .min at the end.')}
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor hash compress file1.json -o file.min.json` 
+- `file_conversor hash compress file1.json` 
 """)
 def compress(
-    input_file: Annotated[str, typer.Argument(
-        help=f"{_('Input file')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
-        callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
-    )],
+    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(TextBackend.SUPPORTED_IN_FORMATS)})",
+                                                      callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_IN_FORMATS, exists=True)
+                                                      )],
 
-    output_file: Annotated[str | None, typer.Option("--output", "-o",
-                                                    help=f"{_('Output file')} ({', '.join(TextBackend.SUPPORTED_OUT_FORMATS)}). {_('Default to')} None ({_('use same name of input file with .min.EXT in the end')})",
-                                                    callback=lambda x: check_file_format(x, TextBackend.SUPPORTED_OUT_FORMATS)
-                                                    )] = None,
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
+                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
+                                             callback=lambda x: check_dir_exists(x, mkdir=True),
+                                             )] = Path(),
 ):
-    input_path = Path(input_file)
-    in_ext = input_path.suffix[1:]
-
-    output_path = Path(output_file if output_file else input_file).with_suffix("").with_suffix(f".min.{in_ext}")
-
     text_backend = TextBackend(verbose=STATE["verbose"])
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')}:", total=None,)
-        text_backend.minify(
-            input_file=input_path,
-            output_file=output_path,
-        )
-        progress.update(task, total=100, completed=100)
+
+    with ProgressManager(len(input_files)) as progress_mgr:
+        for input_file in input_files:
+            output_file = output_dir / Environment.get_output_file(input_file, stem=f".min")
+            if not STATE["overwrite"]:
+                check_path_exists(output_file, exists=False)
+
+            text_backend.minify(
+                input_file=input_file,
+                output_file=output_file,
+            )
+            progress_mgr.complete_step()
 
     logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")

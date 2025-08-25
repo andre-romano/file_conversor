@@ -24,7 +24,7 @@ A powerful Python-based CLI tool (also planned with GUI support) for converting,
   - **Documents**: `docx ⇄ odt`, `docx → pdf`, etc
   - **Spreadsheets**: `xlsx ⇄ ods`, `xlsx → pdf`, etc
   - **Video**: `mkv ⇄ mp4`, `avi ⇄ mp4`, etc.
-  - **Images**: `jpg ⇄ png`, `gif ⇄ jpx`, etc.
+  - **Images**: `jpg ⇄ png`, `gif ⇄ webp`, `bmp ⇄ tiff`, etc.
   - **Audio**: `mp3 ⇄ m4a`, etc.
   - **Text**: `json ⇄ yaml`, `xml ⇄ json`, etc
   - And more ...

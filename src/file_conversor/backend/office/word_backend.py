@@ -52,8 +52,8 @@ class WordBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        output_file: str,
-        input_file: str,
+        output_file: str | Path,
+        input_file: str | Path,
     ):
         input_path = Path(input_file).resolve()
         output_path = Path(output_file).resolve()

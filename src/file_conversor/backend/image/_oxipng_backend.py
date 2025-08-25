@@ -24,7 +24,7 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class OxiPNGBackend(AbstractBackend):
+class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     """
     Provides an interface for handling files using oxipng.
     """

@@ -53,8 +53,8 @@ class ExcelBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        output_file: str,
-        input_file: str,
+        output_file: str | Path,
+        input_file: str | Path,
     ):
         """
         Convert input file into an output file.

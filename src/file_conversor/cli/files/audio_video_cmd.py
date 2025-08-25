@@ -1,11 +1,9 @@
 
 # src\file_conversor\cli\multimedia\audio_video_cmd.py
 
-import subprocess
-import time
 import typer
 
-from typing import Annotated
+from typing import Annotated, List
 from datetime import timedelta
 from pathlib import Path
 
@@ -20,9 +18,9 @@ from file_conversor.backend import FFmpegBackend
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_positive_integer, check_file_format
-from file_conversor.utils.formatters import format_bitrate, format_bytes
+from file_conversor.utils import ProgressManager
+from file_conversor.utils.validators import *
+from file_conversor.utils.formatters import *
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -51,31 +49,31 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_avi",
                 description="To AVI",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.avi"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -f "avi"',
                 icon=str(icons_folder_path / 'avi.ico'),
             ),
             WinContextCommand(
                 name="to_mp4",
                 description="To MP4",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mp4"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mp4"',
                 icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mkv"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mkv"',
                 icon=str(icons_folder_path / 'mkv.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
                 description="To MP3",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.mp3"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mp3"',
                 icon=str(icons_folder_path / 'mp3.ico'),
             ),
             WinContextCommand(
                 name="to_m4a",
                 description="To M4A",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -o "%1.m4a"',
+                command=f'{Environment.get_executable()} audio-video convert "%1" -f "m4a"',
                 icon=str(icons_folder_path / 'm4a.ico'),
             ),
         ])
@@ -109,81 +107,76 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor audio-video info other_filename.mp3`
     """)
 def info(
-    filename: Annotated[str, typer.Argument(
-        help=f"{_('File')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
+    input_files: Annotated[List[str], typer.Argument(
+        help=f"{_('Input files')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
 ):
-
-    formatted = []
-    metadata: dict
-    with get_progress_bar() as progress:
-        ffprobe_task = progress.add_task(f"{_('Parsing file metadata')} ...", total=None)
-
-        ffmpeg_backend = FFmpegBackend(
-            install_deps=CONFIG['install-deps'],
-            verbose=STATE["verbose"],
-        )
+    ffmpeg_backend = FFmpegBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+    for filename in input_files:
+        formatted = []
+        logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")
         metadata = ffmpeg_backend.get_file_info(filename)
-        progress.update(ffprobe_task, total=100, completed=100)
+        # 📁 General file information
+        if "format" in metadata:
+            format_info: dict = metadata["format"]
 
-    # 📁 General file information
-    if "format" in metadata:
-        format_info: dict = metadata["format"]
-
-        duration = format_info.get('duration', 'N/A')
-        if duration != "N/A":
-            duration_secs = int(float(duration))
-            duration_td = timedelta(seconds=duration_secs)
-            duration = str(duration_td)
-        size = format_info.get("size", "N/A")
-        if size != "N/A":
-            size = format_bytes(float(size))
-        bitrate = format_info.get('bit_rate', 'N/A')
-        if bitrate != "N/A":
-            bitrate = format_bitrate(int(bitrate))
-
-        formatted.append(Text(f"📁 {_('File Information')}:", style="bold cyan"))
-        formatted.append(f"  - {_('Name')}: {filename}")
-        formatted.append(f"  - {_('Format')}: {format_info.get('format_name', 'N/A')}")
-        formatted.append(f"  - {_('Duration')}: {duration}")
-        formatted.append(f"  - {_('Size')}: {size}")
-        formatted.append(f"  - {_('Bitrate')}: {bitrate}")
-
-    # 🎬 Streams de Mídia
-    if "streams" in metadata:
-        if len(metadata["streams"]) > 0:
-            formatted.append(Text(f"\n🎬 {_("Media Streams")}:", style="bold yellow"))
-        for i, stream in enumerate(metadata["streams"]):
-            stream_type = stream.get("codec_type", "unknown")
-            codec = stream.get("codec_name", "N/A")
-            resolution = f"{stream.get('width', '?')}x{stream.get('height', '?')}" if stream_type == "video" else ""
-            bitrate = stream.get("bit_rate", "N/A")
-
+            duration = format_info.get('duration', 'N/A')
+            if duration != "N/A":
+                duration_secs = int(float(duration))
+                duration_td = timedelta(seconds=duration_secs)
+                duration = str(duration_td)
+            size = format_info.get("size", "N/A")
+            if size != "N/A":
+                size = format_bytes(float(size))
+            bitrate = format_info.get('bit_rate', 'N/A')
             if bitrate != "N/A":
                 bitrate = format_bitrate(int(bitrate))
 
-            formatted.append(f"\n  🔹 {_('Stream')} #{i} ({stream_type.upper()}):")
-            formatted.append(f"    - {_('Codec')}: {codec}")
-            if resolution:
-                formatted.append(f"    - {_('Resolution')}: {resolution}")
-            formatted.append(f"    - {_('Bitrate')}: {bitrate}")
-            if stream_type == "audio":
-                formatted.append(f"    - {_('Sampling rate')}: {stream.get('sample_rate', 'N/A')} Hz")
-                formatted.append(f"    - {_('Channels')}: {stream.get('channels', 'N/A')}")
+            formatted.append(Text(f"📁 {_('File Information')}:", style="bold cyan"))
+            formatted.append(f"  - {_('Name')}: {filename}")
+            formatted.append(f"  - {_('Format')}: {format_info.get('format_name', 'N/A')}")
+            formatted.append(f"  - {_('Duration')}: {duration}")
+            formatted.append(f"  - {_('Size')}: {size}")
+            formatted.append(f"  - {_('Bitrate')}: {bitrate}")
 
-    # 📖 Capítulos
-    if "chapters" in metadata:
-        if len(metadata["chapters"]) > 0:
-            formatted.append(Text(f"\n📖 {_('Chapters')}:", style="bold green"))
-        for chapter in metadata["chapters"]:
-            title = chapter.get('tags', {}).get('title', 'N/A')
-            start = chapter.get('start_time', 'N/A')
-            formatted.append(f"  - {title} ({_('Time')}: {start}s)")
+        # 🎬 Streams de Mídia
+        if "streams" in metadata:
+            if len(metadata["streams"]) > 0:
+                formatted.append(Text(f"\n🎬 {_("Media Streams")}:", style="bold yellow"))
+            for i, stream in enumerate(metadata["streams"]):
+                stream_type = stream.get("codec_type", "unknown")
+                codec = stream.get("codec_name", "N/A")
+                resolution = f"{stream.get('width', '?')}x{stream.get('height', '?')}" if stream_type == "video" else ""
+                bitrate = stream.get("bit_rate", "N/A")
 
-    # Agrupar e exibir tudo com Rich
-    group = Group(*formatted)
-    print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
+                if bitrate != "N/A":
+                    bitrate = format_bitrate(int(bitrate))
+
+                formatted.append(f"\n  🔹 {_('Stream')} #{i} ({stream_type.upper()}):")
+                formatted.append(f"    - {_('Codec')}: {codec}")
+                if resolution:
+                    formatted.append(f"    - {_('Resolution')}: {resolution}")
+                formatted.append(f"    - {_('Bitrate')}: {bitrate}")
+                if stream_type == "audio":
+                    formatted.append(f"    - {_('Sampling rate')}: {stream.get('sample_rate', 'N/A')} Hz")
+                    formatted.append(f"    - {_('Channels')}: {stream.get('channels', 'N/A')}")
+
+        # 📖 Capítulos
+        if "chapters" in metadata:
+            if len(metadata["chapters"]) > 0:
+                formatted.append(Text(f"\n📖 {_('Chapters')}:", style="bold green"))
+            for chapter in metadata["chapters"]:
+                title = chapter.get('tags', {}).get('title', 'N/A')
+                start = chapter.get('start_time', 'N/A')
+                formatted.append(f"  - {title} ({_('Time')}: {start}s)")
+
+        # Agrupar e exibir tudo com Rich
+        group = Group(*formatted)
+        print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
 
 
 # audio_video convert
@@ -196,19 +189,26 @@ def info(
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor audio-video convert input_file.webm -o output_file.mp4 --audio-bitrate 192`
+        - `file_conversor audio-video convert input_file.webm -o output_dir/ -f mp4 --audio-bitrate 192`
 
-        - `file_conversor audio-video convert input_file.mp4 -o output_file.mp3`
+        - `file_conversor audio-video convert input_file.mp4 -f .mp3`
     """)
 def convert(
-    input_file: Annotated[str, typer.Argument(
+    input_files: Annotated[List[Path], typer.Argument(
         help=f"{_('Input file')} ({', '.join(FFmpegBackend.SUPPORTED_IN_FORMATS)})",
         callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_IN_FORMATS, exists=True),
     )],
-    output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
-                                             callback=lambda x: check_file_format(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
-                                             )],
+
+    format: Annotated[str, typer.Option("--format", "-f",
+                                        help=f"{_('Output format')} ({', '.join(FFmpegBackend.SUPPORTED_OUT_FORMATS)})",
+                                        callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_OUT_FORMATS),
+                                        )],
+
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
+                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
+                                             callback=lambda x: check_dir_exists(x, mkdir=True),
+                                             )] = Path(),
+
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
@@ -219,32 +219,32 @@ def convert(
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
 ):
-    process: subprocess.Popen | None = None
-    in_options = []
-    out_options = []
-
-    out_ext = Path(output_file).suffix[1:]
-
-    # configure out options
-    out_options.extend(["-b:a", f"{audio_bitrate}k"])
-    if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-        out_options.extend(["-b:v", f"{video_bitrate}k"])
-
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
+    with ProgressManager(len(input_files)) as progress_mgr:
+        for input_file in input_files:
+            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
+            out_ext = output_file.suffix[1:]
 
-    # display current progress
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=100)
-        process = ffmpeg_backend.convert(
-            input_file,
-            output_file,
-            in_options=in_options,
-            out_options=out_options,
-            progress_callback=lambda p: progress.update(task, completed=p)
-        )
+            in_options = []
+            out_options = []
+            # configure options
+            out_options.extend(["-b:a", f"{audio_bitrate}k"])
+            if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
+                out_options.extend(["-b:v", f"{video_bitrate}k"])
+
+            # display current progress
+            process = ffmpeg_backend.convert(
+                input_file,
+                output_file,
+                overwrite_output=STATE["overwrite"],
+                in_options=in_options,
+                out_options=out_options,
+                progress_callback=progress_mgr.update_progress
+            )
+            progress_mgr.complete_step()
 
     logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green] ({process.returncode})")

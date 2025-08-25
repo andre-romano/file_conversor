@@ -1,6 +1,5 @@
 # src\file_conversor\utils\validators.py
 
-import subprocess
 import typer
 
 from pathlib import Path
@@ -10,6 +9,33 @@ from typing import Any, Iterable, List
 from file_conversor.config.locale import get_translation
 
 _ = get_translation()
+
+
+def check_path_exists(data: str | Path | None, exists: bool = True):
+    if not data:
+        return data
+    path = Path(data)
+    if exists and not path.exists():
+        raise typer.BadParameter(f"{_("File")} '{path}' {_("not found")}")
+    if not exists and path.exists():
+        raise typer.BadParameter(f"{_("File")} '{path}' {_("exists")}")
+    return data
+
+
+def check_file_exists(data: str | Path | None):
+    check_path_exists(data)
+    if data and not Path(data).is_file():
+        raise typer.BadParameter(f"{_("Path")} '{data}' {_("is not a file")}")
+    return data
+
+
+def check_dir_exists(data: str | Path | None, mkdir: bool = False):
+    if data and mkdir:
+        Path(data).mkdir(parents=True, exist_ok=True)
+    check_path_exists(data)
+    if data and not Path(data).is_dir():
+        raise typer.BadParameter(f"{_("Path")} '{data}' {_("is not a directory")}")
+    return data
 
 
 def check_is_bool_or_none(data: str | bool | None) -> bool | None:
@@ -64,8 +90,8 @@ def check_file_format(filename_or_iter: list | dict | set | str | Path | None, f
         file_format = file_path.suffix[1:].lower()
         if format_dict and file_format not in format_dict:
             raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
-        if exists and not file_path.exists() and not file_path.is_file():
-            raise typer.BadParameter(f"{_("File")} '{filename}' {_("not found")}")
+        if exists:
+            check_file_exists(file_path)
     return filename_or_iter
 
 

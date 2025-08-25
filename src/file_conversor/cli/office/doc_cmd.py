@@ -14,10 +14,9 @@ from file_conversor.backend import DOC_BACKEND
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.rich import get_progress_bar
-from file_conversor.utils.validators import check_file_format
+from file_conversor.utils.progress_manager import ProgressManager
+from file_conversor.utils.validators import *
 
-from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
@@ -64,28 +63,36 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor doc convert input_file.docx -o output_file.pdf`
     """)
 def convert(
-    input_file: Annotated[str, typer.Argument(help=f"{_('Input file')} ({', '.join(DOC_BACKEND.SUPPORTED_IN_FORMATS)})",
-                                              callback=lambda x: check_file_format(x, DOC_BACKEND.SUPPORTED_IN_FORMATS, exists=True),
-                                              )],
+    input_files: Annotated[List[Path], typer.Argument(help=f"{_('Input files')} ({', '.join(DOC_BACKEND.SUPPORTED_IN_FORMATS)})",
+                                                      callback=lambda x: check_file_format(x, DOC_BACKEND.SUPPORTED_IN_FORMATS, exists=True),
+                                                      )],
 
-    output_file: Annotated[str, typer.Option("--output", "-o",
-                                             help=f"{_('Output file')} ({', '.join(DOC_BACKEND.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same input file as output name')}).",
-                                             callback=lambda x: check_file_format(x, DOC_BACKEND.SUPPORTED_OUT_FORMATS),
-                                             )],
+
+    format: Annotated[str, typer.Option("--format", "-f",
+                                        help=f"{_('Output format')} ({', '.join(DOC_BACKEND.SUPPORTED_OUT_FORMATS)})",
+                                        callback=lambda x: check_valid_options(x, DOC_BACKEND.SUPPORTED_OUT_FORMATS),
+                                        )],
+
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-od",
+                                             help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
+                                             callback=lambda x: check_dir_exists(x, mkdir=True),
+                                             )] = Path(),
 ):
     doc_backend = DOC_BACKEND(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
 
-    logger.info(f"{_('Processing file')} '{input_file}' => '{output_file}' ...")
+    with ProgressManager(len(input_files)) as progress_mgr:
+        for input_file in input_files:
+            output_file = output_dir / Environment.get_output_file(input_file, suffix=f".{format}")
+            if not STATE["overwrite"]:
+                check_path_exists(output_file, exists=False)
 
-    with get_progress_bar() as progress:
-        task = progress.add_task(f"{_('Processing file')} '{input_file}':", total=None)
-        doc_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-        )
-        progress.update(task, total=100, completed=100)
+            doc_backend.convert(
+                input_file=input_file,
+                output_file=output_file,
+            )
+            progress_mgr.complete_step()
 
     logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

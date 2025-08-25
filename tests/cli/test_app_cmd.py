@@ -7,27 +7,27 @@ from tests.utils import Test, DATA_PATH, app_cmd
 
 
 def test_no_log_flag():
-    result = Test.invoke("-nl", "config")
+    result = Test.invoke("-nl", "config", "-h")
     assert result.exit_code == 0
 
 
 def test_no_progress_flag():
-    result = Test.invoke("-np", "config")
+    result = Test.invoke("-np", "config", "-h")
     assert result.exit_code == 0
 
 
 def test_quiet_flag():
-    result = Test.invoke("-q", "config")
+    result = Test.invoke("-q", "config", "-h")
     assert result.exit_code == 0
 
 
 def test_verbose_flag():
-    result = Test.invoke("--verbose", "config")
+    result = Test.invoke("--verbose", "config", "-h")
     assert result.exit_code == 0
 
 
 def test_debug_flag():
-    result = Test.invoke("-d", "config")
+    result = Test.invoke("-d", "config", "-h")
     assert result.exit_code == 0
 
 

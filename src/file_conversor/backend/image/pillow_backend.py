@@ -12,6 +12,9 @@ from pathlib import Path
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
+
+from file_conversor.utils.formatters import normalize_degree
+
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 LOG = Log.get_instance()
@@ -86,8 +89,8 @@ class PillowBackend(AbstractBackend):
     def resize(self,
                output_file: str | Path,
                input_file: str | Path,
-               scale: float | None,
                width: int | None,
+               scale: float | None = None,
                resampling: Image.Resampling = Image.Resampling.BICUBIC,
                ):
         """
@@ -96,7 +99,8 @@ class PillowBackend(AbstractBackend):
         :param output_file: Output image file.
         :param input_file: Input image file.
         :param width: Width in pixels.
-        :param height: Width in pixels.
+        :param scale: Scale image in proportion. Must be >0 (if used).
+        :param resampling: Resampling algorithm used.
 
         :raises FileNotFoundError: if input file not found.
         """
@@ -107,9 +111,13 @@ class PillowBackend(AbstractBackend):
 
         with Image.open(input_file) as img:
             if scale:
+                if scale <= 0:
+                    raise RuntimeError(_("Scale must be >0"))
                 width = int(scale * img.width)
             if not width:
-                raise RuntimeError(_("Need at either scale or width to resize an image"))
+                raise RuntimeError(_("Need either scale or width to resize an image"))
+            if width <= 0:
+                raise RuntimeError(_("Width must be > 0"))
             height = int(width * float(img.height) / img.width)
 
             img = img.resize(
@@ -159,23 +167,33 @@ class PillowBackend(AbstractBackend):
             lossless=True if quality == 100 else False,  # valid only for WEBP
         )
 
-    def rotate(self, output_file: str | Path, input_file: str | Path, rotate: int):
+    def rotate(
+        self,
+            output_file: str | Path,
+            input_file: str | Path,
+            rotate: int,
+            resampling: Image.Resampling = Image.Resampling.BICUBIC,
+    ):
         """
-        Rotate input file by X degrees.
+        Rotate input file by X degrees (clockwise).
 
         :param output_file: Output image file.
         :param input_file: Input image file.
-        :param rotate: Rotation degrees (0-360).
+        :param rotate: Rotation degrees (-360-360).
+        :param resampling: Resampling algorithm used.
 
         :raises FileNotFoundError: if input file not found.
         """
         self.check_file_exists(input_file)
 
+        # parse rotation argument
+        rotate = normalize_degree(rotate)
+
         out_ext = Path(output_file).suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = Image.open(input_file)
-        img = img.rotate(rotate)
+        img = img.rotate(-rotate, resample=resampling, expand=True)  # clockwise rotation
         self._save_fix_errors(
             img,
             output_file,

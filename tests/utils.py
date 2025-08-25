@@ -16,8 +16,20 @@ class Test:
     RUNNER = CliRunner()
 
     @staticmethod
-    def invoke(*cmd_list: str):
+    def get_format_params(out_path: Path):
+        return ["-f", str(out_path.suffix[1:])]
 
+    @staticmethod
+    def get_out_dir_params(out_path: Path):
+        return ["-od", str(out_path.parent)]
+
+    @staticmethod
+    def get_out_file_params(out_path: Path):
+        return ["-of", str(out_path)]
+
+    @staticmethod
+    def invoke(*cmd_list: str):
+        print(f"Args: {' '.join([f'"{c}"' for c in cmd_list])}")
         result = Test.RUNNER.invoke(app_cmd, cmd_list)
         return result
 
@@ -27,6 +39,7 @@ class Test:
 
         cmd = exe_cmd_list.copy()
         cmd.extend(cmd_list)
+        print(f"Args: {' '.join([f'"{c}"' for c in cmd])}")
 
         process = subprocess.run(cmd,
                                  stdout=subprocess.PIPE,

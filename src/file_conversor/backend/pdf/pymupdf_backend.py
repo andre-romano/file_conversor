@@ -11,13 +11,16 @@ from pathlib import Path
 from typing import Any, Callable
 
 # user-provided imports
-from file_conversor.config import Environment, Log
+from file_conversor.config import Environment, Log, State
+from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
+STATE = State.get_instance()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
+_ = get_translation()
 
 
 class PyMuPDFBackend(AbstractBackend):
@@ -46,8 +49,8 @@ class PyMuPDFBackend(AbstractBackend):
         self._verbose = verbose
 
     def convert(self,
-                output_file: str,
-                input_file: str,
+                output_file: str | Path,
+                input_file: str | Path,
                 dpi: int = 200,
                 ):
         """
@@ -60,34 +63,35 @@ class PyMuPDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
         """
+        input_file = Path(input_file).resolve()
+        output_file = Path(output_file).resolve()
+
         self.check_file_exists(input_file)
-        in_path = Path(input_file)
-        out_path = Path(output_file)
 
         # open file
-        with fitz.open(input_file) as doc:
+        with fitz.open(str(input_file)) as doc:
             # => .png, .jpg, .svg OUTPUT
             for page in doc:
                 pix = page.get_pixmap(dpi=dpi)  # type: ignore
-                pix.save(f"{out_path.with_suffix("")}_{page.number + 1}{out_path.suffix}")  # type: ignore
+                pix.save(f"{output_file.with_suffix("")}_{page.number + 1}{output_file.suffix}")  # pyright: ignore[reportOptionalOperand]
 
     def extract_images(
             self,
-            input_path: str | Path,
+            input_file: str | Path,
             output_dir: str | Path,
+            overwrite_files: bool,
             progress_callback: Callable[[float], Any] | None = None,
     ):
         """
         Extract all images from a PDF using PyMuPDF (fitz).
         Saves images in their native formats.
         """
-        input_path = Path(input_path)
-        input_name = input_path.with_suffix("").name
+        input_file = Path(input_file)
+        input_name = input_file.with_suffix("").name
 
         output_dir = Path(output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
 
-        with fitz.open(input_path) as doc:
+        with fitz.open(input_file) as doc:
             page_len = len(doc)
             for page_index, page in enumerate(doc, start=1):  # type: ignore
                 images = page.get_images(full=True)  # list of image xrefs
@@ -104,12 +108,17 @@ class PyMuPDFBackend(AbstractBackend):
                     ext = base_image["ext"]  # format: png, jpg, jp2, etc.
                     width, height = base_image["width"], base_image["height"]
 
-                    fname = output_dir / f"{input_name}_page{page_index}_img{img_index}.{ext}"
-                    with open(fname, "wb") as f:
+                    output_file = output_dir / f"{input_name}_page{page_index}_img{img_index}.{ext}"
+                    if not STATE["overwrite"] and Path(output_file).exists():
+                        raise FileExistsError(f"{_('File')} '{output_file}' {_('exists')}")
+
+                    with open(output_file, "wb") as f:
                         f.write(img_bytes)
 
-                    # logger.debug(f"Extracted {fname} ({width}x{height})")
+                    # logger.debug(f"Extracted {output_file} ({width}x{height})")
 
                 progress = 100.0 * (float(page_index) / page_len)
                 if progress_callback:
                     progress_callback(progress)
+        if progress_callback:
+            progress_callback(100.0)

@@ -1,5 +1,7 @@
 # src\file_conversor\backend\office\abstract_msoffice_backend.py
 
+from pathlib import Path
+
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
@@ -81,8 +83,8 @@ class AbstractMSOfficeBackend(AbstractBackend):
 
     def convert(
         self,
-        output_file: str,
-        input_file: str,
+        output_file: str | Path,
+        input_file: str | Path,
     ):
         """
         Convert input file into an output file.

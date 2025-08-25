@@ -1,5 +1,17 @@
 # src\file_conversor\utils\formatters.py
 
+import math
+
+
+def normalize_degree(deg: float | int) -> int:
+    """Normalize clockwise degree to 0-360"""
+    # parse rotation argument
+    degree = int(math.fmod(deg, 360))
+    if degree < 0:
+        degree += 360  # fix rotation signal
+    return degree
+
+
 def format_bytes(size: float) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""
     # Size in bytes to a human-readable string

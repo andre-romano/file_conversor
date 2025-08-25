@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+	<metadata>
+		<id>file_conversor</id>
+		<version>0.3.4</version>
+		<title>File Conversor</title>
+		<authors>Andre Luiz Romano Madureira</authors>
+		<description>Universal file conversor for multimedia files (audio, video, pdf, docs, etc)</description>
+		<tags>file conversion multimedia docs video audio image converter</tags>
+		<iconUrl>http://rawcdn.githack.com/andre-romano/file_conversor/master/src/file_conversor/.icons/icon.png</iconUrl>
+		<projectUrl>https://github.com/andre-romano/file_conversor</projectUrl>
+		<projectSourceUrl>https://github.com/andre-romano/file_conversor</projectSourceUrl>
+		<licenseUrl>https://github.com/andre-romano/file_conversor/blob/master/LICENSE</licenseUrl>
+		<releaseNotes>https://github.com/andre-romano/file_conversor/blob/master/CHANGELOG.md</releaseNotes>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<dependencies></dependencies>
+	</metadata>
+	<files>
+		<file src="tools\**" target="tools"></file>
+	</files>
+</package>
