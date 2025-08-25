@@ -93,6 +93,9 @@ def mkdir(dirs: Iterable):
 
 def get_hash(data: bytes | str | Path) -> str:
     if isinstance(data, (str, Path)):
+        data = Path(data)
+        if not data.exists():
+            raise FileNotFoundError(f"{data}")
         try:
             data = Path(data).read_text()
             data.replace("\r", "")
