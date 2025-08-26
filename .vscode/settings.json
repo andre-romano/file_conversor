@@ -6,7 +6,8 @@
         "editor.defaultFormatter": "ms-python.autopep8",
     },
     "autopep8.args": [
-        "--ignore=E501"
+        "--ignore=E501",
+        "--exclude=__pycache__,*.egg-info,venv/,.venv/,*.pyc",
     ],
     "cSpell.ignorePaths": [
         "**/*",
