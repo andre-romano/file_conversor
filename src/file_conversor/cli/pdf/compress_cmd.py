@@ -1,0 +1,108 @@
+
+# src\file_conversor\cli\pdf\compress_cmd.py
+
+import tempfile
+import typer
+
+from pathlib import Path
+from typing import Annotated, List
+
+from rich import print
+
+# user-provided modules
+from file_conversor.backend.pdf import PikePDFBackend, GhostscriptBackend
+
+from file_conversor.cli.pdf._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+
+from file_conversor.config import Environment, Configuration, State, Log
+from file_conversor.config.locale import get_translation
+
+from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
+from file_conversor.utils.validators import check_valid_options
+
+from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+
+# get app config
+CONFIG = Configuration.get_instance()
+STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
+
+
+typer_cmd = typer.Typer()
+
+
+def register_ctx_menu(ctx_menu: WinContextMenu):
+    icons_folder_path = Environment.get_icons_folder()
+    for ext in GhostscriptBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="compress",
+                description="Compress",
+                command=f'{Environment.get_executable()} pdf compress "%1"',
+                icon=str(icons_folder_path / 'compress.ico'),
+            ),
+        ])
+
+
+# register commands in windows context menu
+ctx_menu = WinContextMenu.get_instance()
+ctx_menu.register_callback(register_ctx_menu)
+
+
+@typer_cmd.command(
+    rich_help_panel=RICH_HELP_PANEL,
+    help=f"""
+        {_('Compress a PDF file (requires Ghostscript external library).')}
+        
+        {_('Outputs a file with _compressed at the end.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor pdf compress input_file.pdf -od D:/Downloads`
+
+        - `file_conversor pdf compress input_file.pdf -c high`
+
+        - `file_conversor pdf compress input_file.pdf -o`
+    """)
+def compress(
+    input_files: InputFilesArgument(GhostscriptBackend),  # pyright: ignore[reportInvalidTypeForm]
+    compression: Annotated[str, typer.Option("--compression", "-c",
+                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                             callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
+                                             )] = CONFIG["pdf-compression"],
+    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+):
+    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
+    gs_backend = GhostscriptBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE['verbose'],
+    )
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gs_out = Path(temp_dir) / CommandManager.get_output_file(input_file, stem="_gs")
+            gs_backend.compress(
+                input_file=input_file,
+                output_file=gs_out,
+                compression_level=GhostscriptBackend.Compression.from_str(compression),
+                progress_callback=progress_mgr.update_progress
+            )
+            progress_mgr.complete_step()
+
+            pikepdf_backend.compress(
+                # files
+                input_file=gs_out,
+                output_file=output_file,
+                progress_callback=progress_mgr.update_progress
+            )
+            progress_mgr.complete_step()
+            print(f"Processing '{output_file}' ... OK")
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite"])
+    cmd_mgr.run(callback, out_stem="_compressed")
+
+    logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typer.testing import CliRunner
 
-from file_conversor.cli.app_cmd import app_cmd
+from file_conversor.cli import app_cmd
 from file_conversor.config.environment import Environment
 
 
@@ -14,6 +14,14 @@ DATA_PATH = Path(f"tests/.data")
 
 class Test:
     RUNNER = CliRunner()
+
+    @classmethod
+    def invoke_test_help(cls, *cmd: str):
+        result = cls.invoke(*cmd, "--help")
+        expected = " ".join(cmd)
+        print("EXP: ", expected, "- ACT:", result.stdout)
+        assert expected in result.output
+        assert result.exit_code == 0
 
     @staticmethod
     def get_format_params(out_path: Path):

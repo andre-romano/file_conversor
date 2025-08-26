@@ -1,0 +1,90 @@
+
+# src\file_conversor\cli\image\info_cmd.py
+
+import typer
+
+from pathlib import Path
+from typing import Annotated, List
+
+from rich import print
+from rich.panel import Panel
+from rich.console import Group
+
+# user-provided modules
+from file_conversor.backend.image import PillowBackend
+
+from file_conversor.cli.image._typer import OTHERS_PANEL as RICH_HELP_PANEL
+
+from file_conversor.config import Environment, Configuration, State, Log
+from file_conversor.config.locale import get_translation
+
+from file_conversor.utils.typer_utils import InputFilesArgument
+
+from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+
+# get app config
+CONFIG = Configuration.get_instance()
+STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger(__name__)
+
+typer_cmd = typer.Typer()
+
+
+def register_ctx_menu(ctx_menu: WinContextMenu):
+    icons_folder_path = Environment.get_icons_folder()
+    # Pillow commands
+    for ext in PillowBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="info",
+                description="Get Info",
+                command=f'cmd /k "{Environment.get_executable()} image info "%1""',
+                icon=str(icons_folder_path / "info.ico"),
+            ),
+        ])
+
+
+# register commands in windows context menu
+ctx_menu = WinContextMenu.get_instance()
+ctx_menu.register_callback(register_ctx_menu)
+
+
+@typer_cmd.command(
+    rich_help_panel=RICH_HELP_PANEL,
+    help=f"""
+        {_('Get EXIF information about a image file.')}
+
+        {_('This command retrieves metadata and other information about the image file')}:
+    """,
+    epilog=f"""
+        **{_('Examples')}:**
+
+        - `file_conversor image info other_filename.jpg`
+
+        - `file_conversor image info filename.webp filename2.png filename3.gif`
+    """)
+def info(
+    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+    for input_file in input_files:
+        formatted = []
+        in_ext = Path(input_file).suffix[1:]
+
+        logger.info(f"{_('Parsing metadata for')} '{input_file}' ...")
+        metadata = pillow_backend.info(input_file)
+
+        # 📁 Informações gerais do arquivo
+        formatted.append(f"  - {_('Name')}: {input_file}")
+        formatted.append(f"  - {_('Format')}: {in_ext.upper()}")
+        if metadata:
+            for tag, value in metadata.items():
+                tag_name = PillowBackend.Exif_TAGS.get(tag, f"{tag}")
+                formatted.append(f"  - {tag_name}: {value}")
+
+        # Agrupar e exibir tudo com Rich
+        group = Group(*formatted)
+        print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))

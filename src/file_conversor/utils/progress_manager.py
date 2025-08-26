@@ -2,7 +2,7 @@
 
 
 # user-provided
-from file_conversor.utils.rich import get_progress_bar
+from file_conversor.utils.rich_utils import get_progress_bar
 
 from file_conversor.config.locale import get_translation
 

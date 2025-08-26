@@ -20,7 +20,7 @@ from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.config import Environment, Configuration, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.rich import DummyProgress
+from file_conversor.utils.rich_utils import DummyProgress
 
 # get app config
 CONFIG = Configuration.get_instance()

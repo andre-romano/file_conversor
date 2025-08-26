@@ -7,7 +7,7 @@ import sys
 from rich import print
 
 # user provided imports
-from file_conversor.cli.app_cmd import app_cmd, STATE, CONFIG, logger, _
+from file_conversor.cli import app_cmd, STATE, CONFIG, logger, _
 from file_conversor.system import reload_user_path
 
 
@@ -16,7 +16,7 @@ def main():
     try:
         # begin app
         reload_user_path()
-        app_cmd()
+        app_cmd(prog_name="file_conversor")
     except Exception as e:
         error_type = str(type(e)).split("'")[1]
         logger.error(f"{error_type} ({e})", exc_info=True if STATE["debug"] else None)

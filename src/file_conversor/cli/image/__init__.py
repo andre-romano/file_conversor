@@ -1,0 +1,29 @@
+# src\file_conversor\cli\image\__init__.py
+
+import typer
+
+# user-provided modules
+from file_conversor.cli.image.compress_cmd import typer_cmd as compress_cmd
+from file_conversor.cli.image.convert_cmd import typer_cmd as convert_cmd
+from file_conversor.cli.image.info_cmd import typer_cmd as info_cmd
+from file_conversor.cli.image.mirror_cmd import typer_cmd as mirror_cmd
+from file_conversor.cli.image.render_cmd import typer_cmd as render_cmd
+from file_conversor.cli.image.resize_cmd import typer_cmd as resize_cmd
+from file_conversor.cli.image.rotate_cmd import typer_cmd as rotate_cmd
+from file_conversor.cli.image.to_pdf_cmd import typer_cmd as to_pdf_cmd
+
+image_cmd = typer.Typer()
+# CONVERSION_PANEL
+image_cmd.add_typer(convert_cmd)
+image_cmd.add_typer(render_cmd)
+image_cmd.add_typer(to_pdf_cmd)
+
+# TRANSFORMATION_PANEL
+image_cmd.add_typer(compress_cmd)
+image_cmd.add_typer(mirror_cmd)
+image_cmd.add_typer(resize_cmd)
+image_cmd.add_typer(rotate_cmd)
+
+# OTHERS_PANEL
+image_cmd.add_typer(info_cmd)
+# , rich_help_panel=OTHERS_PANEL
