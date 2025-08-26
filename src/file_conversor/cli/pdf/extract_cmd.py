@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.cli.pdf._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, EXTRACT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,7 +41,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="extract",
                 description="Extract",
-                command=f'cmd /k "{Environment.get_executable()} pdf extract "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_NAME}" "%1""',
                 icon=str(icons_folder_path / 'extract.ico'),
             ),
         ])
@@ -52,6 +53,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=EXTRACT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Extract specific pages from a PDF.')}
@@ -65,7 +67,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 *{_('Extract pages 1 to 2, 4 and 6')}*:
 
-- `file_conversor pdf extract input_file.pdf -pg 1-2 -pg 4-4 -pg 6-6 -od D:/Downloads` 
+- `file_conversor {COMMAND_NAME} {EXTRACT_NAME} input_file.pdf -pg 1-2 -pg 4-4 -pg 6-6 -od D:/Downloads` 
     """)
 def extract(
     input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -3,6 +3,10 @@
 import typer
 
 # user-provided modules
+from file_conversor.config.locale import get_translation
+
+from file_conversor.cli.pdf._typer import COMMAND_NAME
+
 from file_conversor.cli.pdf.compress_cmd import typer_cmd as compress_cmd
 from file_conversor.cli.pdf.convert_cmd import typer_cmd as convert_cmd
 from file_conversor.cli.pdf.decrypt_cmd import typer_cmd as decrypt_cmd
@@ -14,8 +18,12 @@ from file_conversor.cli.pdf.repair_cmd import typer_cmd as repair_cmd
 from file_conversor.cli.pdf.rotate_cmd import typer_cmd as rotate_cmd
 from file_conversor.cli.pdf.split_cmd import typer_cmd as split_cmd
 
+_ = get_translation()
 
-pdf_cmd = typer.Typer()
+pdf_cmd = typer.Typer(
+    name=COMMAND_NAME,
+    help=_("PDF file manipulation"),
+)
 # SECURITY_PANEL
 pdf_cmd.add_typer(encrypt_cmd)
 pdf_cmd.add_typer(decrypt_cmd)

@@ -1,3 +1,7 @@
+# tests\cli\image\test_image_to_pdf_cmd.py
+
+from file_conversor.cli.image._typer import COMMAND_NAME, TO_PDF_NAME
+
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
@@ -6,7 +10,7 @@ def test_image_to_pdf_cases(tmp_path):
     out_path = tmp_path / "test.pdf"
 
     result = Test.invoke(
-        "image", "to-pdf",
+        COMMAND_NAME, TO_PDF_NAME,
         str(in_path),
         *Test.get_out_file_params(out_path),
     )
@@ -15,4 +19,4 @@ def test_image_to_pdf_cases(tmp_path):
 
 
 def test_image_to_pdf_help():
-    Test.invoke_test_help("image", "to-pdf")
+    Test.invoke_test_help(COMMAND_NAME, TO_PDF_NAME)

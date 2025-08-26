@@ -1,5 +1,9 @@
+# tests\cli\pdf\test_pdf_split_cmd.py
 
 from pathlib import Path
+
+from file_conversor.cli.pdf._typer import COMMAND_NAME, SPLIT_NAME
+
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
@@ -8,7 +12,7 @@ def test_pdf_split_cases(tmp_path):
     out_path = tmp_path / "test.pdf"
 
     result = Test.invoke(
-        "pdf", "split",
+        COMMAND_NAME, SPLIT_NAME,
         str(in_path),
         *Test.get_out_dir_params(out_path),
     )
@@ -17,4 +21,4 @@ def test_pdf_split_cases(tmp_path):
 
 
 def test_pdf_split_help():
-    Test.invoke_test_help("pdf", "split")
+    Test.invoke_test_help(COMMAND_NAME, SPLIT_NAME)

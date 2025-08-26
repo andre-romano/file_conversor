@@ -6,9 +6,9 @@ import typer
 from typing import Annotated
 
 from rich import print
-from rich.pretty import Pretty
 
 # user-provided modules
+from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
 import file_conversor.cli.config.show_cmd as show_cmd
 
 from file_conversor.backend import Img2PDFBackend, PillowBackend
@@ -28,12 +28,19 @@ logger = LOG.getLogger(__name__)
 typer_cmd = typer.Typer()
 
 
-@typer_cmd.command(help=f"""
-    {_('Configure the default options for the file converter.')}
+@typer_cmd.command(
+    name=SET_NAME,
+    help=f"""
+        {_('Configure the default options for the file converter.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
 
-    **{_('Example')}:** `file_conversor configure --video-bitrate 5000`
-    **{_('Example')}:** `file_conversor configure --audio-bitrate 128`
-""")
+        - `file_conversor configure --video-bitrate 5000`
+
+        - `file_conversor configure --audio-bitrate 128`
+    """,
+)
 def set(
     language: Annotated[str, typer.Option("--language", "-l",
                                           help=_("Set preferred language for app (if available). Format lang_COUNTRY. Defaults to system preffered language or 'en_US' (English - United States)."),

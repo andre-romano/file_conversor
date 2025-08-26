@@ -1,3 +1,6 @@
+# tests\cli\text\test_text_compress_cmd.py
+
+from file_conversor.cli.text._typer import COMMAND_NAME, COMPRESS_NAME
 
 from tests.utils import Test, DATA_PATH, app_cmd
 
@@ -13,7 +16,7 @@ def test_text_compress_cases(tmp_path):
 
     for in_path, out_path in test_cases:
         result = Test.invoke(
-            "text", "compress",
+            COMMAND_NAME, COMPRESS_NAME,
             str(in_path),
             *Test.get_out_dir_params(out_path),
         )
@@ -22,4 +25,4 @@ def test_text_compress_cases(tmp_path):
 
 
 def test_text():
-    Test.invoke_test_help("text", "compress")
+    Test.invoke_test_help(COMMAND_NAME, COMPRESS_NAME)

@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.cli.pdf._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, ROTATE_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -41,13 +42,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="rotate_anticlock_90",
                 description="Rotate Left",
-                command=f'{Environment.get_executable()} pdf rotate "%1" -r "1-:-90"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:-90"',
                 icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
                 name="rotate_clock_90",
                 description="Rotate Right",
-                command=f'{Environment.get_executable()} pdf rotate "%1" -r "1-:90"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:90"',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
         ])
@@ -59,6 +60,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=ROTATE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Rotate PDF pages (clockwise or anti-clockwise).')}
@@ -72,13 +74,13 @@ ctx_menu.register_callback(register_ctx_menu)
 
 *{_('Rotate page 1 by 180 degress')}*:
 
-- `file_conversor pdf rotate input_file.pdf -o output_file.pdf -r "1:180"` 
+- `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.pdf -o output_file.pdf -r "1:180"` 
 
 
 
 *{_('Rotate page 5-7 by 90 degress, 9 by -90 degrees, 10-15 by 180 degrees')}*:
 
-- `file_conversor pdf rotate input_file.pdf -r "5-7:90" -r "9:-90" -r "10-15:180"`
+- `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.pdf -r "5-7:90" -r "9:-90" -r "10-15:180"`
     """)
 def rotate(
     input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

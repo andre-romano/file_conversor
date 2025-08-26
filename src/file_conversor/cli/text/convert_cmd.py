@@ -11,6 +11,8 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import TextBackend
 
+from file_conversor.cli.text._typer import COMMAND_NAME, CONVERT_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -38,31 +40,31 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_xml",
                 description="To XML",
-                command=f'{Environment.get_executable()} text convert "%1" -f "xml"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "xml"',
                 icon=str(icons_folder_path / 'xml.ico'),
             ),
             WinContextCommand(
                 name="to_json",
                 description="To JSON",
-                command=f'{Environment.get_executable()} text convert "%1" -f "json"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "json"',
                 icon=str(icons_folder_path / 'json.ico'),
             ),
             WinContextCommand(
                 name="to_yaml",
                 description="To YAML",
-                command=f'{Environment.get_executable()} text convert "%1" -f "yaml"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "yaml"',
                 icon=str(icons_folder_path / 'yaml.ico'),
             ),
             WinContextCommand(
                 name="to_toml",
                 description="To TOML",
-                command=f'{Environment.get_executable()} text convert "%1" -f "toml"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "toml"',
                 icon=str(icons_folder_path / 'toml.ico'),
             ),
             WinContextCommand(
                 name="to_ini",
                 description="To INI",
-                command=f'{Environment.get_executable()} text convert "%1" -f "ini"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "ini"',
                 icon=str(icons_folder_path / 'ini.ico'),
             ),
         ])
@@ -75,13 +77,14 @@ ctx_menu.register_callback(register_ctx_menu)
 
 # text convert
 @typer_cmd.command(
+    name=CONVERT_NAME,
     help=f"""
         {_('Converts text file formats (json, xml, yaml, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor text convert file1.json -f xml` 
+- `file_conversor {COMMAND_NAME} {CONVERT_NAME} file1.json -f xml` 
 """)
 def convert(
     input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -11,6 +11,7 @@ from rich import print
 from file_conversor.backend.image import PillowBackend
 
 from file_conversor.cli.image._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, MIRROR_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
@@ -39,13 +40,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="mirror_x",
                 description="Mirror X axis",
-                command=f'{Environment.get_executable()} image mirror "%1" -a x',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a x',
                 icon=str(icons_folder_path / "left_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_y",
                 description="Mirror Y axis",
-                command=f'{Environment.get_executable()} image mirror "%1" -a y',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a y',
                 icon=str(icons_folder_path / "up_down.ico"),
             ),
         ])
@@ -57,6 +58,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=MIRROR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Mirror an image file (vertically or horizontally).')}
@@ -66,9 +68,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image mirror input_file.jpg -od D:/Downloads -a x`
+        - `file_conversor {COMMAND_NAME} {MIRROR_NAME} input_file.jpg -od D:/Downloads -a x`
 
-        - `file_conversor image mirror input_file.png -a y -o`
+        - `file_conversor {COMMAND_NAME} {MIRROR_NAME} input_file.png -a y -o`
     """)
 def mirror(
     input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]

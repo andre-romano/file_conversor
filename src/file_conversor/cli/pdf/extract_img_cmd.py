@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyMuPDFBackend
 
 from file_conversor.cli.pdf._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, EXTRACT_IMG_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -41,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="extract_img",
                 description="Extract IMG",
-                command=f'{Environment.get_executable()} pdf extract-img "%1"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_IMG_NAME}" "%1"',
                 icon=str(icons_folder_path / 'separate.ico'),
             ),
         ])
@@ -54,6 +55,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 # pdf extract-img
 @typer_cmd.command(
+    name=EXTRACT_IMG_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Extract images from a PDF.')}
@@ -63,7 +65,7 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor pdf extract-img input_file.pdf -od D:/Downloads` 
+- `file_conversor {COMMAND_NAME} {EXTRACT_IMG_NAME} input_file.pdf -od D:/Downloads` 
     """)
 def extract_img(
     input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -11,6 +11,8 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import HashBackend
 
+from file_conversor.cli.hash._typer import COMMAND_NAME, CHECK_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -37,7 +39,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="check",
                 description="Check",
-                command=f'cmd /k "{Environment.get_executable()} hash check "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1""',
                 icon=str(icons_folder_path / 'check.ico'),
             ),
         ])
@@ -49,14 +51,15 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=CHECK_NAME,
     help=f"""
         {_('Checks a hash file (.sha256, .sha1, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor hash check file.sha256` 
-- `file_conversor hash check file.sha1 file.sha3_512` 
+- `file_conversor {COMMAND_NAME} {CHECK_NAME} file.sha256` 
+- `file_conversor {COMMAND_NAME} {CHECK_NAME} file.sha1 file.sha3_512` 
 """)
 def check(
     input_files: InputFilesArgument(HashBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.image import PillowBackend
 
 from file_conversor.cli.image._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, RESIZE_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -43,7 +44,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="resize",
                 description="Resize",
-                command=f'cmd /k "{Environment.get_executable()} image resize "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{RESIZE_NAME}" "%1""',
                 icon=str(icons_folder_path / "resize.ico"),
             ),
         ])
@@ -55,6 +56,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=RESIZE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Resize an image file.')}
@@ -68,13 +70,13 @@ ctx_menu.register_callback(register_ctx_menu)
 
         *{_('Double the image size')}*:
 
-        - `file_conversor image resize input_file.jpg -s 2.0`
+        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.jpg -s 2.0`
 
 
 
         *{_('Set the image width to 1024px')}*:
 
-        - `file_conversor image resize input_file.jpg -od D:/Downloads -w 1024`
+        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.jpg -od D:/Downloads -w 1024`
     """)
 def resize(
     input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]

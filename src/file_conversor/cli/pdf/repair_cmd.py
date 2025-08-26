@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PikePDFBackend
 
 from file_conversor.cli.pdf._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, REPAIR_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,7 +41,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="repair",
                 description="Repair",
-                command=f'{Environment.get_executable()} pdf repair "%1"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{REPAIR_NAME}" "%1"',
                 icon=str(icons_folder_path / 'repair.ico'),
             ),
         ])
@@ -52,6 +53,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=REPAIR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Repair (lightly) corrupted PDF files.')}        
@@ -61,7 +63,7 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor pdf repair input_file.pdf -od D:/Downloads` 
+- `file_conversor {COMMAND_NAME} {REPAIR_NAME} input_file.pdf -od D:/Downloads` 
 """)
 def repair(
     input_files: InputFilesArgument(PikePDFBackend),  # pyright: ignore[reportInvalidTypeForm]

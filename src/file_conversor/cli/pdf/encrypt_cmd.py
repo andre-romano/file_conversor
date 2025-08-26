@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.cli.pdf._typer import SECURITY_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, ENCRYPT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,7 +41,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="encrypt",
                 description="Encrypt",
-                command=f'cmd /k "{Environment.get_executable()} pdf encrypt "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{ENCRYPT_NAME}" "%1""',
                 icon=str(icons_folder_path / "padlock_locked.ico"),
             ),
         ])
@@ -52,6 +53,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=ENCRYPT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Protect PDF file with a password (create encrypted PDF file).')}
@@ -61,9 +63,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf encrypt input_file.pdf -od D:/Downloads --owner-password 1234`
+        - `file_conversor {COMMAND_NAME} {ENCRYPT_NAME} input_file.pdf -od D:/Downloads --owner-password 1234`
 
-        - `file_conversor pdf encrypt input_file.pdf -op 1234 --up 0000 -an -co`
+        - `file_conversor {COMMAND_NAME} {ENCRYPT_NAME} input_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
     input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

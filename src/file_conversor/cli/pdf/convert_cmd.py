@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyMuPDFBackend
 
 from file_conversor.cli.pdf._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, CONVERT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,13 +41,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{Environment.get_executable()} pdf convert "%1" -f "png"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png"',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{Environment.get_executable()} pdf convert "%1" -f "jpg"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg"',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
         ])
@@ -58,6 +59,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=CONVERT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Convert a PDF file to a different format.')}        
@@ -67,9 +69,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor pdf convert input_file.pdf -f jpg --dpi 200`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f jpg --dpi 200`
 
-        - `file_conversor pdf convert input_file.pdf -f png -o`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f png -o`
     """)
 def convert(
     input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

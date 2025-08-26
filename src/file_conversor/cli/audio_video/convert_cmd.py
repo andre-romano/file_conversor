@@ -11,6 +11,7 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
+from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
@@ -38,31 +39,31 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_avi",
                 description="To AVI",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -f "avi"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "avi"',
                 icon=str(icons_folder_path / 'avi.ico'),
             ),
             WinContextCommand(
                 name="to_mp4",
                 description="To MP4",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mp4"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mp4"',
                 icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mkv"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mkv"',
                 icon=str(icons_folder_path / 'mkv.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
                 description="To MP3",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -f "mp3"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mp3"',
                 icon=str(icons_folder_path / 'mp3.ico'),
             ),
             WinContextCommand(
                 name="to_m4a",
                 description="To M4A",
-                command=f'{Environment.get_executable()} audio-video convert "%1" -f "m4a"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "m4a"',
                 icon=str(icons_folder_path / 'm4a.ico'),
             ),
         ])
@@ -74,6 +75,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=CONVERT_NAME,
     help=f"""
         {_('Convert a audio/video file to a different format.')}
 
@@ -82,9 +84,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor audio-video convert input_file.webm -o output_dir/ -f mp4 --audio-bitrate 192`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.webm -o output_dir/ -f mp4 --audio-bitrate 192`
 
-        - `file_conversor audio-video convert input_file.mp4 -f .mp3`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f .mp3`
     """)
 def convert(
     input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]

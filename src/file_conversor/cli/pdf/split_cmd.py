@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.cli.pdf._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, SPLIT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,7 +41,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="split",
                 description="Split",
-                command=f'{Environment.get_executable()} pdf split "%1"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{SPLIT_NAME}" "%1"',
                 icon=str(icons_folder_path / 'split.ico'),
             ),
         ])
@@ -53,6 +54,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 # pdf split
 @typer_cmd.command(
+    name=SPLIT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Split PDF pages into several 1-page PDFs.')}
@@ -66,13 +68,13 @@ ctx_menu.register_callback(register_ctx_menu)
 
 *{_('Split pages of input_file.pdf into output_file_X.pdf files')}*:
 
-- `file_conversor pdf split input_file.pdf -od D:/Downloads` 
+- `file_conversor {COMMAND_NAME} {SPLIT_NAME} input_file.pdf -od D:/Downloads` 
 
 
 
 *{_('For every PDF page, generate a "input_file_X.pdf" file')}*:
 
-- `file_conversor pdf split input_file.pdf` 
+- `file_conversor {COMMAND_NAME} {SPLIT_NAME} input_file.pdf` 
 """)
 def split(
     input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

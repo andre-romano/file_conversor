@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.image import PillowBackend
 
 from file_conversor.cli.image._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, ROTATE_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -42,13 +43,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="rotate_anticlock_90",
                 description="Rotate Left",
-                command=f'{Environment.get_executable()} image rotate "%1" -r -90',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r -90',
                 icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
                 name="rotate_clock_90",
                 description="Rotate Right",
-                command=f'{Environment.get_executable()} image rotate "%1" -r 90',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r 90',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
         ])
@@ -60,6 +61,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=ROTATE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Rotate a image file (clockwise or anti-clockwise).')}
@@ -69,9 +71,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image rotate input_file.jpg -od D:/Downloads -r 90`
+        - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.jpg -od D:/Downloads -r 90`
 
-        - `file_conversor image rotate input_file.jpg -r -180 -o`
+        - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.jpg -r -180 -o`
     """)
 def rotate(
     input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]

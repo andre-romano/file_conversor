@@ -1,6 +1,8 @@
 
 # tests/cli/audio_video/test_convert.py
 
+from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
+
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
@@ -11,7 +13,7 @@ def test_audio_video_convert(tmp_path):
 
     for in_path, out_path in test_cases:
         result = Test.invoke(
-            "audio-video", "convert",
+            COMMAND_NAME, CONVERT_NAME,
             str(in_path),
             *Test.get_format_params(out_path),
             *Test.get_out_dir_params(out_path),
@@ -21,4 +23,4 @@ def test_audio_video_convert(tmp_path):
 
 
 def test_audio_video_convert_help():
-    Test.invoke_test_help("audio-video", "convert")
+    Test.invoke_test_help(COMMAND_NAME, CONVERT_NAME)

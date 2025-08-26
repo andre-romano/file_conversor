@@ -17,7 +17,9 @@ from rich.console import Group
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
+from file_conversor.cli.audio_video._typer import COMMAND_NAME, INFO_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
+
 from file_conversor.utils.formatters import format_bytes, format_bitrate
 from file_conversor.utils.typer_utils import InputFilesArgument
 
@@ -42,7 +44,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{Environment.get_executable()} audio-video info "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{INFO_NAME}" "%1""',
                 icon=str(icons_folder_path / 'info.ico'),
             ),
         ])
@@ -54,6 +56,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=INFO_NAME,
     help=f"""
         {_('Get information about a audio/video file.')}
 
@@ -68,9 +71,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor audio-video info filename.webm`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.webm`
 
-        - `file_conversor audio-video info other_filename.mp3`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp3`
     """)
 def info(
     input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -11,6 +11,7 @@ from rich import print
 from file_conversor.backend.image import PyMuSVGBackend
 
 from file_conversor.cli.image._typer import CONVERSION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, RENDER_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -39,13 +40,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{Environment.get_executable()} image render "%1" -f "jpg"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{RENDER_NAME}" "%1" -f "jpg"',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{Environment.get_executable()} image render "%1" -f "png"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{RENDER_NAME}" "%1" -f "png"',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
         ])
@@ -57,6 +58,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=RENDER_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Render an image vector file into a different format.')}
@@ -64,9 +66,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image render input_file.svg -f png`
+        - `file_conversor {COMMAND_NAME} {RENDER_NAME} input_file.svg -f png`
 
-        - `file_conversor image render input_file.svg input_file2.svg -od D:/Downloads -f jpg --dpi 300`
+        - `file_conversor {COMMAND_NAME} {RENDER_NAME} input_file.svg input_file2.svg -od D:/Downloads -f jpg --dpi 300`
     """)
 def render(
     input_files: InputFilesArgument(PyMuSVGBackend),  # pyright: ignore[reportInvalidTypeForm]

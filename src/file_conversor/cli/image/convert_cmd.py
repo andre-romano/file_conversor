@@ -11,6 +11,7 @@ from rich import print
 from file_conversor.backend.image import PillowBackend
 
 from file_conversor.cli.image._typer import CONVERSION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, CONVERT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -39,19 +40,19 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{Environment.get_executable()} image convert "%1" -f "jpg" -q 90',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg" -q 90',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{Environment.get_executable()} image convert "%1" -f "png" -q 90',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png" -q 90',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_webp",
                 description="To WEBP",
-                command=f'{Environment.get_executable()} image convert "%1" -f "webp" -q 90',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "webp" -q 90',
                 icon=str(icons_folder_path / 'webp.ico'),
             ),
         ])
@@ -63,6 +64,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=CONVERT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Convert a image file to a different format.')}
@@ -70,9 +72,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image convert input_file.webp -f jpg --quality 85`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.webp -f jpg --quality 85`
 
-        - `file_conversor image convert input_file.bmp -f png -od D:/Downloads`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.bmp -f png -od D:/Downloads`
     """)
 def convert(
     input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]

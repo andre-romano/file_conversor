@@ -10,6 +10,8 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import BatchBackend
 
+from file_conversor.cli.pipeline._typer import COMMAND_NAME, CREATE_NAME
+
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -29,6 +31,7 @@ typer_cmd = typer.Typer()
 
 # pipeline create
 @typer_cmd.command(
+    name=CREATE_NAME,
     help=f"""
         {_('Creates a file processing pipeline (for tasks automation).')}        
 
@@ -59,7 +62,7 @@ typer_cmd = typer.Typer()
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor pipeline create` 
+- `file_conversor {COMMAND_NAME} {CREATE_NAME}` 
 """)
 def create():
     logger.info(f"{_('Creating batch pipeline')} ...")

@@ -10,6 +10,8 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import BatchBackend
 
+from file_conversor.cli.pipeline._typer import COMMAND_NAME, EXECUTE_NAME
+
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -28,13 +30,14 @@ typer_cmd = typer.Typer()
 
 
 @typer_cmd.command(
+    name=EXECUTE_NAME,
     help=f"""
         {_('Execute file processing pipeline.')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor pipeline execute c:/Users/Alice/Desktop/pipeline_name` 
+- `file_conversor {COMMAND_NAME} {EXECUTE_NAME} c:/Users/Alice/Desktop/pipeline_name` 
 """)
 def execute(
     pipeline_folder: Annotated[str, typer.Argument(

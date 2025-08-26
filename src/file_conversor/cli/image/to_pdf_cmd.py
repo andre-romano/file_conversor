@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.image import Img2PDFBackend
 
 from file_conversor.cli.image._typer import CONVERSION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, TO_PDF_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -41,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_pdf",
                 description="To PDF",
-                command=f'{Environment.get_executable()} image to-pdf "%1"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{TO_PDF_NAME}" "%1"',
                 icon=str(icons_folder_path / "pdf.ico"),
             ),
         ])
@@ -53,6 +54,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=TO_PDF_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Convert a list of image files to one PDF file, one image per page.')}
@@ -66,13 +68,13 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image to-pdf input_file.jpg -of output_file.pdf --dpi 96`
+        - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file.jpg -of output_file.pdf --dpi 96`
 
-        - `file_conversor image to-pdf input_file1.bmp input_file2.png -of output_file.pdf`
+        - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf`
 
-        - `file_conversor image to-pdf input_file.jpg -of output_file.pdf -ps a4_landscape`
+        - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file.jpg -of output_file.pdf -ps a4_landscape`
 
-        - `file_conversor image to-pdf input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
+        - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
     input_files: InputFilesArgument(Img2PDFBackend),  # pyright: ignore[reportInvalidTypeForm]

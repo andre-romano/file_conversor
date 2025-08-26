@@ -1,5 +1,10 @@
 
+# tests\cli\pdf\test_pdf_compress_cmd.py
+
 from pathlib import Path
+
+from file_conversor.cli.pdf._typer import COMMAND_NAME, COMPRESS_NAME
+
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
@@ -8,7 +13,7 @@ def test_pdf_compress_cases(tmp_path):
     out_path = tmp_path / "test_compressed.pdf"
 
     result = Test.invoke(
-        "pdf", "compress",
+        COMMAND_NAME, COMPRESS_NAME,
         str(in_path),
         *Test.get_out_dir_params(out_path),
     )
@@ -17,4 +22,4 @@ def test_pdf_compress_cases(tmp_path):
 
 
 def test_pdf_compress_help():
-    Test.invoke_test_help("pdf", "compress")
+    Test.invoke_test_help(COMMAND_NAME, COMPRESS_NAME)

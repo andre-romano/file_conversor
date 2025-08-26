@@ -3,6 +3,10 @@
 import typer
 
 # user-provided modules
+from file_conversor.config.locale import get_translation
+
+from file_conversor.cli.image._typer import COMMAND_NAME
+
 from file_conversor.cli.image.compress_cmd import typer_cmd as compress_cmd
 from file_conversor.cli.image.convert_cmd import typer_cmd as convert_cmd
 from file_conversor.cli.image.info_cmd import typer_cmd as info_cmd
@@ -12,7 +16,12 @@ from file_conversor.cli.image.resize_cmd import typer_cmd as resize_cmd
 from file_conversor.cli.image.rotate_cmd import typer_cmd as rotate_cmd
 from file_conversor.cli.image.to_pdf_cmd import typer_cmd as to_pdf_cmd
 
-image_cmd = typer.Typer()
+_ = get_translation()
+
+image_cmd = typer.Typer(
+    name=COMMAND_NAME,
+    help=_("Image file manipulation"),
+)
 # CONVERSION_PANEL
 image_cmd.add_typer(convert_cmd)
 image_cmd.add_typer(render_cmd)
@@ -26,4 +35,3 @@ image_cmd.add_typer(rotate_cmd)
 
 # OTHERS_PANEL
 image_cmd.add_typer(info_cmd)
-# , rich_help_panel=OTHERS_PANEL

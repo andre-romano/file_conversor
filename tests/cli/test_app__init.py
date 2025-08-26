@@ -1,5 +1,5 @@
 
-# tests/test__init.py
+# tests\cli\test_app__init.py
 
 import typer
 

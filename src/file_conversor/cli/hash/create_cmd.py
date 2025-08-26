@@ -11,10 +11,10 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import HashBackend
 
+from file_conversor.cli.hash._typer import COMMAND_NAME, CREATE_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
-
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
@@ -32,15 +32,16 @@ typer_cmd = typer.Typer()
 
 
 @typer_cmd.command(
+    name=CREATE_NAME,
     help=f"""
         {_('Creates hash file (.sha256, .sha1, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor hash create file1.jpg file2.pdf file3.exe -f sha256` 
+- `file_conversor {COMMAND_NAME} {CREATE_NAME} file1.jpg file2.pdf file3.exe -f sha256` 
 
-- `file_conversor hash create file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
+- `file_conversor {COMMAND_NAME} {CREATE_NAME} file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
 """)
 def create(
     input_files: InputFilesArgument(),  # pyright: ignore[reportInvalidTypeForm]

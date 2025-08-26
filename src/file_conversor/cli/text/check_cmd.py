@@ -10,7 +10,10 @@ from rich import print
 
 # user-provided modules
 from file_conversor.backend import TextBackend
+
+from file_conversor.cli.text._typer import COMMAND_NAME, CHECK_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
+
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 from file_conversor.utils import ProgressManager, CommandManager
@@ -35,7 +38,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="check",
                 description="Check",
-                command=f'cmd /k "{Environment.get_executable()} text check "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1""',
                 icon=str(icons_folder_path / 'check.ico'),
             ),
         ])
@@ -48,15 +51,16 @@ ctx_menu.register_callback(register_ctx_menu)
 
 # text check
 @typer_cmd.command(
+    name=CHECK_NAME,
     help=f"""
         {_('Checks a text file (json, xml, yaml, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor text check file.json` 
+- `file_conversor {COMMAND_NAME} {CHECK_NAME} file.json` 
 
-- `file_conversor text check file1.json file2.yaml` 
+- `file_conversor {COMMAND_NAME} {CHECK_NAME} file1.json file2.yaml` 
 """)
 def check(
     input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]

@@ -14,6 +14,7 @@ from rich.console import Group
 from file_conversor.backend.image import PillowBackend
 
 from file_conversor.cli.image._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.image._typer import COMMAND_NAME, INFO_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -41,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{Environment.get_executable()} image info "%1""',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{INFO_NAME}" "%1""',
                 icon=str(icons_folder_path / "info.ico"),
             ),
         ])
@@ -53,6 +54,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=INFO_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Get EXIF information about a image file.')}
@@ -62,9 +64,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:**
 
-        - `file_conversor image info other_filename.jpg`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.jpg`
 
-        - `file_conversor image info filename.webp filename2.png filename3.gif`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.webp filename2.png filename3.gif`
     """)
 def info(
     input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]

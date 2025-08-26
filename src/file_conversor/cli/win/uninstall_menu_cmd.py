@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend import WinRegBackend
 
 from file_conversor.cli.win._typer import CONTEXT_MENU_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.win._typer import COMMAND_NAME, UNINSTALL_MENU_NAME
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -30,6 +31,7 @@ typer_cmd = typer.Typer()
 
 
 @typer_cmd.command(
+    name=UNINSTALL_MENU_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Uninstalls app context menu (right click in Windows Explorer).')}        
@@ -37,7 +39,7 @@ typer_cmd = typer.Typer()
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor win uninstall-menu` 
+- `file_conversor {COMMAND_NAME} {UNINSTALL_MENU_NAME}` 
 """)
 def uninstall_menu():
     winreg_backend = WinRegBackend(verbose=STATE["verbose"])

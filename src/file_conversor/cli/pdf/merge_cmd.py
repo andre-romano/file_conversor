@@ -12,6 +12,7 @@ from rich import print
 from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.cli.pdf._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.pdf._typer import COMMAND_NAME, MERGE_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -34,6 +35,7 @@ typer_cmd = typer.Typer()
 
 
 @typer_cmd.command(
+    name=MERGE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Merge (join) input PDFs into a single PDF file.')}
@@ -47,13 +49,13 @@ typer_cmd = typer.Typer()
 
 *{_('Merge files "input_file1.pdf" and "input_file2.pdf" into "output_file.pdf"')}*:
 
-- `file_conversor pdf merge "input_file1.pdf" "input_file2.pdf" -of output_file.pdf` 
+- `file_conversor {COMMAND_NAME} {MERGE_NAME} "input_file1.pdf" "input_file2.pdf" -of output_file.pdf` 
 
 
 
 *{_('Merge protected PDFs "input_file1.pdf" and "input_file2.pdf" with password "unlock_password"')}*:
 
-- `file_conversor pdf merge "input_file1.pdf" "input_file2.pdf" -p "unlock_password" -of output_file.pdf` 
+- `file_conversor {COMMAND_NAME} {MERGE_NAME} "input_file1.pdf" "input_file2.pdf" -p "unlock_password" -of output_file.pdf` 
     """)
 def merge(
     input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]

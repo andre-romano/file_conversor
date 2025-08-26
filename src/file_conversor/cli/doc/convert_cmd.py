@@ -11,6 +11,8 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import DOC_BACKEND
 
+from file_conversor.cli.doc._typer import COMMAND_NAME, CONVERT_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -40,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name=f"to_{ext}",
                 description=f"To {ext.upper()}",
-                command=f'{Environment.get_executable()} doc convert "%1" -o "%1.{ext}"',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -o "%1.{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             ) for ext in DOC_BACKEND.SUPPORTED_OUT_FORMATS
         ])
@@ -52,15 +54,16 @@ ctx_menu.register_callback(register_ctx_menu)
 
 
 @typer_cmd.command(
+    name=CONVERT_NAME,
     help=f"""
         {_('Convert document files into other formats (requires Microsoft Word / LibreOffice).')}
     """,
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor doc convert input_file.odt -o output_file.doc`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.odt -o output_file.doc`
 
-        - `file_conversor doc convert input_file.docx -o output_file.pdf`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.docx -o output_file.pdf`
     """)
 def convert(
     input_files: InputFilesArgument(DOC_BACKEND),  # pyright: ignore[reportInvalidTypeForm]

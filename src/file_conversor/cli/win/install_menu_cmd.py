@@ -13,6 +13,7 @@ import file_conversor.cli.win.uninstall_menu_cmd as uninstall_menu_cmd
 import file_conversor.cli.win.restart_explorer_cmd as restart_explorer_cmd
 
 from file_conversor.cli.win._typer import CONTEXT_MENU_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.win._typer import COMMAND_NAME, INSTALL_MENU_NAME
 
 from file_conversor.backend import WinRegBackend
 
@@ -33,6 +34,7 @@ typer_cmd = typer.Typer()
 
 
 @typer_cmd.command(
+    name=INSTALL_MENU_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Installs app context menu (right click in Windows Explorer).')}        
@@ -40,7 +42,7 @@ typer_cmd = typer.Typer()
     epilog=f"""
 **{_('Examples')}:** 
 
-- `file_conversor win install-menu` 
+- `file_conversor {COMMAND_NAME} {INSTALL_MENU_NAME}` 
 """)
 def install_menu(
     reboot_explorer: Annotated[bool, typer.Option("--restart-explorer", "-re",
