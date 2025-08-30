@@ -15,8 +15,6 @@ from typing import Mapping
 
 from pathlib import Path
 
-LOCK_FILE_DIR = Path(tempfile.mkdtemp()).resolve()
-
 
 class Log:
     class CustomLogger:
@@ -120,6 +118,7 @@ class Log:
         super().__init__()
         self._dest_path: Path | None = None
         self._file_handler: Handler | None = None
+        self._lock_file_dir = Path(tempfile.mkdtemp()).resolve()
 
         # configure logger
         self._log_formatter = Log.StripMarkupFormatter(
@@ -134,8 +133,8 @@ class Log:
     def shutdown(self):
         logging.shutdown()
         try:
-            if LOCK_FILE_DIR.exists():
-                shutil.rmtree(LOCK_FILE_DIR)
+            if self._lock_file_dir.exists():
+                shutil.rmtree(self._lock_file_dir)
         except PermissionError:
             pass
 
@@ -168,7 +167,7 @@ class Log:
             backupCount=7,       # keep 7 days of logs
             encoding='utf-8',
             utc=False,           # set to True if you want UTC-based rotation
-            lock_file_directory=str(LOCK_FILE_DIR),
+            lock_file_directory=str(self._lock_file_dir),
         )
         self._add_handler(self._file_handler)
 
