@@ -18,6 +18,8 @@ dependencies = [
     "pyyaml>=6.0.2",
     "xmltodict>=0.14.2",
     "toml>=0.10.2",
+    "concurrent-log-handler>=0.9.28",
+    "portalocker>=3.2.0",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"

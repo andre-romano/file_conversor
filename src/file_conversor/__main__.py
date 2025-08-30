@@ -7,12 +7,13 @@ import sys
 from rich import print
 
 # user provided imports
-from file_conversor.cli import app_cmd, STATE, CONFIG, logger, _
+from file_conversor.cli import app_cmd, STATE, CONFIG, LOG, logger, _
 from file_conversor.system import reload_user_path
 
 
 # Entry point of the app
 def main():
+    exitcode = 0
     try:
         # begin app
         reload_user_path()
@@ -25,8 +26,12 @@ def main():
             logger.error(f"STDERR: {e.stderr}")
             logger.error(f"STDOUT: {e.stdout}")
         if STATE["debug"]:
+            LOG.shutdown()
             raise
-        sys.exit(1)
+        exitcode = 1
+    finally:
+        LOG.shutdown()
+        sys.exit(exitcode)
 
 
 # Start the application

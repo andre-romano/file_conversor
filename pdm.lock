@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:261a6c0428ebc12d5c9b9f3d54053badd7ec449a402a3edd4fe5208466d2fc01"
+content_hash = "sha256:4d7fdcb67a0d35a26181bea17624f29a0dd94b86f47685582ccfd89e8df4333c"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -157,6 +157,20 @@ marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
+name = "concurrent-log-handler"
+version = "0.9.28"
+requires_python = ">=3.6"
+summary = "RotatingFileHandler replacement with concurrency, gzip and Windows support. Size and time based rotation."
+groups = ["default"]
+dependencies = [
+    "portalocker>=1.6.0",
+]
+files = [
+    {file = "concurrent_log_handler-0.9.28-py3-none-any.whl", hash = "sha256:65db25d05506651a61573937880789fc51c7555e7452303042b5a402fd78939c"},
+    {file = "concurrent_log_handler-0.9.28.tar.gz", hash = "sha256:4cc27969b3420239bd153779266f40d9713ece814e312b7aa753ce62c6eacdb8"},
 ]
 
 [[package]]
@@ -766,6 +780,20 @@ groups = ["dev"]
 files = [
     {file = "polib-1.2.0-py2.py3-none-any.whl", hash = "sha256:1c77ee1b81feb31df9bca258cbc58db1bbb32d10214b173882452c73af06d62d"},
     {file = "polib-1.2.0.tar.gz", hash = "sha256:f3ef94aefed6e183e342a8a269ae1fc4742ba193186ad76f175938621dbfc26b"},
+]
+
+[[package]]
+name = "portalocker"
+version = "3.2.0"
+requires_python = ">=3.9"
+summary = "Wraps the portalocker recipe for easy usage"
+groups = ["default"]
+dependencies = [
+    "pywin32>=226; platform_system == \"Windows\"",
+]
+files = [
+    {file = "portalocker-3.2.0-py3-none-any.whl", hash = "sha256:3cdc5f565312224bc570c49337bd21428bba0ef363bbcf58b9ef4a9f11779968"},
+    {file = "portalocker-3.2.0.tar.gz", hash = "sha256:1f3002956a54a8c3730586c5c77bf18fae4149e07eaf1c29fc3faf4d5a3f89ac"},
 ]
 
 [[package]]

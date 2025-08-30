@@ -2,16 +2,20 @@
 
 import re
 import logging
+import tempfile
+import shutil
 
 from rich import print
 
 from logging import Handler
-from logging.handlers import TimedRotatingFileHandler
+from concurrent_log_handler import ConcurrentTimedRotatingFileHandler
 
 from types import TracebackType
 from typing import Mapping
 
 from pathlib import Path
+
+LOCK_FILE_DIR = Path(tempfile.mkdtemp()).resolve()
 
 
 class Log:
@@ -127,6 +131,14 @@ class Log:
         self.set_level(level)
         self.set_dest_folder(dest_folder)
 
+    def shutdown(self):
+        logging.shutdown()
+        try:
+            if LOCK_FILE_DIR.exists():
+                shutil.rmtree(LOCK_FILE_DIR)
+        except PermissionError:
+            pass
+
     def getLogger(self, name: str | None = None) -> CustomLogger:
         return Log.CustomLogger(name)
 
@@ -149,13 +161,14 @@ class Log:
 
         self._dest_path = Path(dest_folder).resolve()
 
-        self._file_handler = TimedRotatingFileHandler(
+        self._file_handler = ConcurrentTimedRotatingFileHandler(
             filename=(self._dest_path / Log.FILENAME).resolve(),
             when='midnight',     # rotate at midnight
             interval=1,          # every 1 day
             backupCount=7,       # keep 7 days of logs
             encoding='utf-8',
-            utc=False            # set to True if you want UTC-based rotation
+            utc=False,           # set to True if you want UTC-based rotation
+            lock_file_directory=str(LOCK_FILE_DIR),
         )
         self._add_handler(self._file_handler)
 
