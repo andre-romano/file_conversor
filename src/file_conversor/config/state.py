@@ -48,10 +48,10 @@ def enable_debug_mode(value):
     LOG.set_level(Log.LEVEL_DEBUG)
 
 
-def enable_overwrite_mode(value):
+def enable_overwrite_output_mode(value):
     if not value:
         return
-    logger.info(f"File overwrite mode: [blue bold]ENABLED[/]")
+    logger.info(f"Output overwrite mode: [blue bold]ENABLED[/]")
 
 
 # STATE controller dict class
@@ -77,7 +77,7 @@ class State:
             "quiet": False,
             "verbose": False,
             "debug": False,
-            "overwrite": False,
+            "overwrite-output": False,
         }
         self.__callbacks = {
             "no-log": disable_log,
@@ -85,7 +85,7 @@ class State:
             "quiet": enable_quiet_mode,
             "verbose": enable_verbose_mode,
             "debug": enable_debug_mode,
-            "overwrite": enable_overwrite_mode,
+            "overwrite-output": enable_overwrite_output_mode,
         }
         # run callbacks
         for key, value in self.__data.items():

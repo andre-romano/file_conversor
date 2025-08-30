@@ -96,8 +96,8 @@ def main_callback(
             callback=version_callback,
             is_flag=True,
         )] = False,
-        overwrite: Annotated[bool, typer.Option(
-            "--overwrite", "-o",
+        overwrite_output: Annotated[bool, typer.Option(
+            "--overwrite-output", "-oo",
             help=f"{_("Overwrite output files")}. Defaults to False (do not overwrite).",
             is_flag=True,
         )] = False,
@@ -108,7 +108,7 @@ def main_callback(
         "quiet": quiet,
         "verbose": verbose,
         "debug": debug,
-        "overwrite": overwrite,
+        "overwrite-output": overwrite_output,
     })
     logger.debug(f"Command: {sys.argv}")
     Environment.get_executable()
