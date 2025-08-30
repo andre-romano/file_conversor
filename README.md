@@ -1,22 +1,43 @@
 <!-- [![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano) -->
 
 # File Conversor
-A powerful Python-based CLI tool (also planned with GUI support) for converting, compressing, and manipulating audio, video, text, document, and image files.
+A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
 
 **Summary**:
 - [File Conversor](#file-conversor)
+  - [Usage](#usage)
+    - [CLI - Command line interface](#cli---command-line-interface)
+    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
+  - [Why use File Conversor?](#why-use-file-conversor)
   - [Features](#features)
   - [External dependencies](#external-dependencies)
   - [Installing](#installing)
     - [For Windows](#for-windows)
     - [For Linux / MacOS](#for-linux--macos)
-  - [Usage](#usage)
-    - [CLI - Command line interface](#cli---command-line-interface)
-    - [GUI - Graphical user interface](#gui---graphical-user-interface)
-    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
-  - [Why use File Conversor?](#why-use-file-conversor)
   - [Contributing \& Support](#contributing--support)
   - [License and Copyright](#license-and-copyright)
+
+## Usage
+
+### CLI - Command line interface
+
+<img src="./assets/cli_demo.gif" >
+
+Run ``file_conversor -h`` to explore all available commands and options.
+
+### Windows Context Menu (Windows OS only)
+
+1. Right click a file in Windows Explorer
+2. Choose an action from "File Conversor" menu
+  
+<img src="./assets/ctx_menu.jpg" width="600px">
+
+## Why use File Conversor?
+
+- Automate repetitive file conversion or compression tasks
+- Manipulate various media formats with a single tool
+- Integrate seamlessly with scripting workflows
+- Configure advanced file processing pipelines
 
 ## Features
 
@@ -45,7 +66,8 @@ A powerful Python-based CLI tool (also planned with GUI support) for converting,
 - **Multiple Interfaces**  
   - **Windows Explorer integration**: right-click files for quick actions
   - CLI for scripting and automation  
-  - GUI (coming soon)  
+
+*For full feature set, check* [`FEATURE_SET.md`](FEATURE_SET.md)
 
 ## External dependencies
 
@@ -86,34 +108,6 @@ pip install file_conversor
 pip install file_conversor
 ```
 
-## Usage
-
-### CLI - Command line interface
-
-```bash
-file_conversor COMMANDS [OPTIONS]
-```
-
-Run ``file_conversor -h`` to explore all available commands and options.
-
-### GUI - Graphical user interface
-
-*TODO*
-
-### Windows Context Menu (Windows OS only)
-
-1. Right click a file in Windows Explorer
-2. Choose an action from "File Conversor" menu
-  
-<img src="./readme/ctx_menu.jpg" width="600px">
-
-## Why use File Conversor?
-
-- Automate repetitive file conversion or compression tasks
-- Manipulate various media formats with a single tool
-- Integrate seamlessly with scripting workflows
-- Configure advanced file processing pipelines
-
 ## Contributing & Support
 
 - **Support us**:
@@ -123,7 +117,5 @@ Run ``file_conversor -h`` to explore all available commands and options.
 
 ## License and Copyright
 
-Distributed under the **Apache License 2.0**.
-
-See [`LICENSE`](./LICENSE) for details.
+Distributed under the **Apache License 2.0**. See [`LICENSE`](./LICENSE) for details.
 
