@@ -6,8 +6,6 @@ from invoke.tasks import task
 # user provided
 from tasks_modules._config import *
 
-DOCKER_IMAGE = f"andre-romano/{PROJECT_NAME}:{PROJECT_VERSION}"
-
 docker_bin = shutil.which("docker")
 if not docker_bin:
     docker_bin = shutil.which("podman")

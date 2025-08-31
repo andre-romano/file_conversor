@@ -6,7 +6,7 @@ from invoke.tasks import task
 # user provided
 from tasks_modules._config import *
 
-from tasks_modules import choco, inno, pypi, scoop
+from tasks_modules import base, choco, inno, pypi, scoop
 
 
 @task
@@ -53,7 +53,7 @@ def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [bold green]OK[/][/]")
 
 
-@task(pre=[inno.build, tag,], post=[pypi.publish, scoop.publish, choco.publish])
+@task(pre=[base.tests, inno.build, tag,], post=[pypi.publish, scoop.publish, choco.publish])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to GitHub ... [/]")
     gh_cmd = [
