@@ -13,7 +13,7 @@ dependencies = [
     "cryptography>=45.0.5",
     "pillow>=11.3.0",
     "img2pdf>=0.6.1",
-    "pywin32>=311",
+    "pywin32>=311; sys_platform == 'win32'",
     "pymupdf>=1.26.3",
     "pyyaml>=6.0.2",
     "xmltodict>=0.14.2",
