@@ -20,6 +20,7 @@ def build(c: InvokeContext):
         raise RuntimeError("'docker' not found in PATH")
     build_cmd = [
         f"{docker_bin}", "build",
+        "--no-cache",
         "-t", f"{DOCKER_IMAGE}",
         ".",
     ]

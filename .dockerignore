@@ -10,8 +10,6 @@ build
 dist
 assets
 bucket
-scripts
-tasks_modules
 tests
 *.log
 *.log.*
