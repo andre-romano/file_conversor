@@ -35,35 +35,10 @@ def create_dockerfile(c: InvokeContext):
 # STAGE 1,2,3 - DEPENDENCIES
 {"\n".join([rf"FROM {dep}:{version} AS {dep.split("/")[1]}" for dep, version in DOCKER_DEPS.items()])}
 
-# STAGE 4 - BUILD
-FROM python:{PYTHON_VERSION}-slim AS build
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
-    LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8   
-
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
-    --mount=type=cache,target=/root/.cache/pip \
-    apt-get update \
-    && echo "Building app {PROJECT_NAME} ..." \
-    && apt-get install -y --no-install-recommends git ca-certificates locales curl \
-    && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen  \
-    && locale-gen en_US.UTF-8 \
-    && git clone {PROJECT_HOMEPAGE} /app \
-    && cd /app \
-    && git checkout {GIT_RELEASE} \
-    && pip install -U pip \
-    && pip install pdm invoke \
-    && pdm install \
-    && pdm run invoke pypi.build \
-    && echo "Building app {PROJECT_NAME} ... OK"
-
-# STAGE 5 - RELEASE
+# STAGE 4 - RELEASE
 FROM python:{PYTHON_VERSION}-slim AS release
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
-    LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8    
-
-# copy WHL
-COPY --from=build /app/dist/* /app/dist/
+    LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8   
 
 # copy binaries
 {"\n".join([rf"COPY --from={dep.split("/")[1]} /usr/local/bin/* /usr/local/bin" for dep, version in DOCKER_DEPS.items()])}    
@@ -72,11 +47,21 @@ RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/root/.cache/pip \
     apt-get update \
-    && echo "Installing app {PROJECT_NAME} ..." \
+    && echo "Building app {PROJECT_NAME} ..." \
     && apt-get install -y --no-install-recommends git ca-certificates locales curl {" ".join(APT_DEPS)} \
     && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen  \
-    && locale-gen en_US.UTF-8 \    
-    && pip install /app/dist/*.whl \
+    && locale-gen en_US.UTF-8 \
+    && git clone {PROJECT_HOMEPAGE} /app \
+    && cd /app \
+    && git checkout {GIT_RELEASE} \
+    && pip install -U pip \
+    && pip install pdm invoke \
+    && pdm install \
+    && pdm run invoke base.tests \
+    && pdm run invoke pypi.build \
+    && echo "Building app {PROJECT_NAME} ... OK" \
+    && echo "Installing app {PROJECT_NAME} ..." \
+    && pip install dist/*.whl \
     && {PROJECT_NAME} -V \
     && rm -rf /app \
     && echo "Installing app {PROJECT_NAME} ... OK"
@@ -84,6 +69,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # define app userspace
 WORKDIR /app
 ENTRYPOINT [ "{PROJECT_NAME}" ]
+CMD [ "--help" ]
 """, encoding="utf-8")
     if not DOCKERFILE_PATH.exists():
         raise FileNotFoundError(f"'{DOCKERFILE_PATH}' not found")
@@ -114,7 +100,6 @@ def check(c: InvokeContext):
         f"{docker_bin}", "run", "--rm", "--it",
         f"-v", "./tests:/app/tests",
         f"{DOCKER_REPOSITORY}/{PROJECT_NAME}:latest",
-        f"{PROJECT_NAME}", "--help",
     ]
     result = c.run(" ".join(run_cmd))
     assert (result is not None) and (result.return_code == 0)
