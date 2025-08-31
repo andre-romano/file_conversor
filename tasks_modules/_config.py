@@ -43,7 +43,8 @@ SCRIPTS_PATH = Path(f'scripts')
 INSTALL_CHOCO = SCRIPTS_PATH / 'install_choco.ps1'
 INSTALL_SCOOP = SCRIPTS_PATH / 'install_scoop.ps1'
 
-DOCKER_IMAGE = f"andreromano/{PROJECT_NAME}:{PROJECT_VERSION}"
+DOCKER_REPOSITORY = "andreromano"
+DOCKERFILE_PATH = Path(f"./dist/Dockerfile")
 
 UNINSTALL_APP = Path("unins000.exe")
 

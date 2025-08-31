@@ -8,10 +8,12 @@ from invoke.tasks import task
 from pathlib import Path
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, locales
 from tasks_modules._config import *
 
 WINDOWS = (platform.system() == "Windows")
+LINUX = (platform.system() == "Linux")
+MACOS = (platform.system() == "Darwin")
 
 
 @task
@@ -71,12 +73,12 @@ def clean(c: InvokeContext):
     pass
 
 
-@task(pre=[clean_htmlcov, ])
-def tests(c, args: str = ""):
+@task(pre=[clean_htmlcov, locales.build,])
+def tests(c: InvokeContext, args: str = ""):
     print("[bold] Running tests ... [/]")
     result = c.run(f"pdm run pytest {args.split()}")
     assert (result is not None) and (result.return_code == 0)
-    print("[bold] Running tests ... [bold green]OK[/][/]")
+    print("[bold] Running tests ... [/][bold green]OK[/]")
 
 
 # @task(pre=[clean_uml,])
@@ -111,7 +113,7 @@ def is_admin(c: InvokeContext):
     if WINDOWS:
         try:
             import ctypes
-            if ctypes.windll.shell32.IsUserAnAdmin():
+            if ctypes.windll.shell32.IsUserAnAdmin():  # pyright: ignore[reportAttributeAccessIssue]
                 return
         except:
             pass

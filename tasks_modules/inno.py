@@ -18,20 +18,20 @@ def get_uninstaller_path() -> Path | None:
 
     # Registry hives and paths to search
     registry_locations = [
-        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
-        (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
-        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
+        (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
     ]
 
     for hive, path in registry_locations:
-        with winreg.OpenKey(hive, path) as uninstall_key:
-            for i in range(winreg.QueryInfoKey(uninstall_key)[0]):
-                subkey_name = winreg.EnumKey(uninstall_key, i)
-                with winreg.OpenKey(uninstall_key, subkey_name) as subkey:
+        with winreg.OpenKey(hive, path) as uninstall_key:  # pyright: ignore[reportAttributeAccessIssue]
+            for i in range(winreg.QueryInfoKey(uninstall_key)[0]):  # pyright: ignore[reportAttributeAccessIssue]
+                subkey_name = winreg.EnumKey(uninstall_key, i)  # pyright: ignore[reportAttributeAccessIssue]
+                with winreg.OpenKey(uninstall_key, subkey_name) as subkey:  # pyright: ignore[reportAttributeAccessIssue]
                     try:
-                        display_name, _ = winreg.QueryValueEx(subkey, "DisplayName")
+                        display_name, _ = winreg.QueryValueEx(subkey, "DisplayName")  # pyright: ignore[reportAttributeAccessIssue]
                         if PROJECT_TITLE.lower() in display_name.lower():
-                            uninstall_str, _ = winreg.QueryValueEx(subkey, "UninstallString")
+                            uninstall_str, _ = winreg.QueryValueEx(subkey, "UninstallString")  # pyright: ignore[reportAttributeAccessIssue]
 
                             # Some uninstall strings are quoted and have extra args — clean them up
                             if uninstall_str.startswith('"'):

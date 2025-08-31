@@ -118,6 +118,23 @@ ignore = [
     "**/*.egg",
     "**/*.pyc",
 ]
+exclude = [
+    "**/__pycache__/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/venv/**",
+    "**/.venv/**",    
+    "**/.tox/**",
+    "**/.nox/**",
+    "**/.coverage/**",
+    "**/.mypy_cache/**",
+    "**/.pytest_cache/**",
+    "**/*.egg-info",
+    "**/*.bak",
+    "**/*.egg",
+    "**/*.pyc",
+]
 
 [dependency-groups]
 dev = [

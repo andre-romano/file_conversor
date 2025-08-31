@@ -12,8 +12,8 @@ from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
 # conditional import
 if CURR_PLATFORM == PLATFORM_WINDOWS:
-    import pythoncom
-    from win32com import client
+    import pythoncom  # pyright: ignore[reportMissingModuleSource]
+    from win32com import client  # pyright: ignore[reportMissingModuleSource]
 else:
     pythoncom = None
     client = None

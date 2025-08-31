@@ -20,7 +20,7 @@ def is_admin() -> bool:
     """True if app running with admin priviledges, False otherwise."""
     try:
         if ctypes:
-            return ctypes.windll.shell32.IsUserAnAdmin()
+            return ctypes.windll.shell32.IsUserAnAdmin()  # pyright: ignore[reportAttributeAccessIssue]
     except:
         pass
     return False
@@ -30,8 +30,8 @@ def reload_user_path():
     """Reload user PATH in current process."""
     if winreg is None:
         return
-    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment") as key:
-        user_path, _ = winreg.QueryValueEx(key, "PATH")
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment") as key:  # pyright: ignore[reportAttributeAccessIssue]
+        user_path, _ = winreg.QueryValueEx(key, "PATH")  # pyright: ignore[reportAttributeAccessIssue]
         os.environ["PATH"] = user_path + os.pathsep + os.environ["PATH"]
 
 
