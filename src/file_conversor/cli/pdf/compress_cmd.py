@@ -104,7 +104,7 @@ def compress(
             )
             progress_mgr.complete_step()
             print(f"Processing '{output_file}' ... OK")
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_stem="_compressed")
 
     logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

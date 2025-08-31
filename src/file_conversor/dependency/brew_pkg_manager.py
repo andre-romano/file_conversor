@@ -20,10 +20,24 @@ class BrewPackageManager(AbstractPackageManager):
                  dependencies: dict[str, str],
                  env: list[str | Path] | None = None,
                  ) -> None:
+        self._fix_path()
         super().__init__(
             dependencies=dependencies,
             env=env,
         )
+
+    def _fix_path(self):
+        possible_paths = [
+            "/opt/homebrew/bin",               # macOS (Apple Silicon)
+            "/usr/local/bin",                  # macOS (Intel)
+            "/home/linuxbrew/.linuxbrew/bin",  # Linux (Homebrew)
+            os.path.expanduser("~/.linuxbrew/bin"),  # Linux (Homebrew)
+        ]
+        for path in possible_paths:
+            brew_path = shutil.which("brew", path=os.pathsep.join([path]))
+            if brew_path:
+                os.environ["PATH"] += os.pathsep + path
+                break
 
     def _get_pkg_manager_installed(self):
         return shutil.which("brew")
@@ -32,22 +46,12 @@ class BrewPackageManager(AbstractPackageManager):
         return {PLATFORM_LINUX, PLATFORM_MACOS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
-        return ['/bin/bash', '-c', '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)']
+        return ['bash', '-c', 'export HOMEBREW_NO_INSTALL_CLEANUP=1 ; curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash']
 
     def _post_install_pkg_manager(self) -> None:
-        possible_paths = [
-            "/opt/homebrew/bin",               # macOS (Apple Silicon)
-            "/usr/local/bin",                  # macOS (Intel)
-            os.path.expanduser("~/.linuxbrew/bin"),  # Linux (Homebrew)
-        ]
-
-        for path in possible_paths:
-            brew_path = shutil.which("brew", path=os.pathsep.join([path]))
-            if brew_path:
-                os.environ["PATH"] += os.pathsep + path
-                break
+        self._fix_path()
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         pkg_mgr_bin = self._get_pkg_manager_installed()
         pkg_mgr_bin = pkg_mgr_bin if pkg_mgr_bin else "BREW_NOT_FOUND"
-        return [pkg_mgr_bin, "install", dependency]
+        return ["bash", "-c", f'export HOMEBREW_NO_INSTALL_CLEANUP=1 ; "{pkg_mgr_bin}" install "{dependency}"']

@@ -99,6 +99,6 @@ def convert(
             output_file=output_file,
         )
         progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_suffix=f".{format}")
     logger.info(f"{_('File conversion')}: [bold green]{_('SUCCESS')}[/].")

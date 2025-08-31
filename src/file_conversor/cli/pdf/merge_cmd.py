@@ -63,7 +63,7 @@ def merge(
     output_file: OutputFileOption(PyPDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
-    if not STATE["overwrite"]:
+    if not STATE["overwrite-output"]:
         check_path_exists(output_file, exists=False)
 
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])

@@ -78,10 +78,10 @@ def extract_img(
             # files
             input_file=input_file,
             output_dir=output_dir,
-            overwrite_files=STATE["overwrite"],
+            overwrite_files=STATE["overwrite-output"],
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback)
     logger.info(f"{_('Extract images')}: [bold green]{_('SUCCESS')}[/].")

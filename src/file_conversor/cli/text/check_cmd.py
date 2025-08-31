@@ -72,6 +72,6 @@ def check(
         text_backend.check(
             input_file=input_file,
         )
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite"])
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback)
     logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")

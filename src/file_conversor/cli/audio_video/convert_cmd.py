@@ -121,14 +121,14 @@ def convert(
         process = ffmpeg_backend.convert(
             input_file,
             output_file,
-            overwrite_output=STATE["overwrite"],
+            overwrite_output=STATE["overwrite-output"],
             in_options=in_options,
             out_options=out_options,
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_suffix=f".{format}")
 
     logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

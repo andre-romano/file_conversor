@@ -109,7 +109,7 @@ class PyMuPDFBackend(AbstractBackend):
                     width, height = base_image["width"], base_image["height"]
 
                     output_file = output_dir / f"{input_name}_page{page_index}_img{img_index}.{ext}"
-                    if not STATE["overwrite"] and Path(output_file).exists():
+                    if not STATE["overwrite-output"] and Path(output_file).exists():
                         raise FileExistsError(f"{_('File')} '{output_file}' {_('exists')}")
 
                     with open(output_file, "wb") as f:

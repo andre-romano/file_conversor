@@ -49,7 +49,7 @@ def create(
     output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_dir / f"CHECKSUM.{format}"
-    if not STATE["overwrite"]:
+    if not STATE["overwrite-output"]:
         check_path_exists(output_file, exists=False)
 
     hash_backend = HashBackend(

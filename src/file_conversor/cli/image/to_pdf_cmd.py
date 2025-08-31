@@ -98,7 +98,7 @@ def to_pdf(
     output_file: OutputFileOption(Img2PDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
-    if not STATE["overwrite"]:
+    if not STATE["overwrite-output"]:
         check_path_exists(output_file, exists=False)
 
     img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
