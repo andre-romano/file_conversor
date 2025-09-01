@@ -1,4 +1,4 @@
-# tasks_modules\choco.py
+# tasks_modules\scoop.py
 
 import json
 from pathlib import Path
@@ -7,15 +7,12 @@ from invoke.tasks import task
 # user provided
 from tasks_modules import _config
 from tasks_modules._config import *
+from tasks_modules._deps import *
 
 from tasks_modules import base
 
 SCOOP_PATH = str("bucket")
 SCOOP_JSON = Path(f"{SCOOP_PATH}/{PROJECT_NAME}.json")
-
-SCOOP_DEPS = {
-    # "python": ""
-}
 
 
 @task

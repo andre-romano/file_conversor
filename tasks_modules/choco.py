@@ -10,15 +10,12 @@ from invoke.tasks import task
 # user provided
 from tasks_modules import _config
 from tasks_modules._config import *
+from tasks_modules._deps import *
 
 from tasks_modules import base
 
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
-
-CHOCO_DEPS = {
-    # "python": ""
-}
 
 
 @task

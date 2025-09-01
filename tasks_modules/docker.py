@@ -1,23 +1,12 @@
 # tasks_modules\docker.py
 
-import sys
-
 from pathlib import Path
 from invoke.tasks import task
 
 # user provided
 from tasks_modules._config import *
+from tasks_modules._deps import *
 
-APT_DEPS = [
-    "libreoffice-nogui",
-    "ghostscript",
-    "ffmpeg",
-]
-DOCKER_DEPS = {
-    f"{DOCKER_REPOSITORY}/oxipng": "latest",
-    f"{DOCKER_REPOSITORY}/mozjpeg": "latest",
-    f"{DOCKER_REPOSITORY}/gifsicle": "latest",
-}
 
 docker_bin = shutil.which("docker")
 if not docker_bin:
@@ -26,29 +15,27 @@ if not docker_bin:
 
 @task
 def create_dockerfile(c: InvokeContext):
-    PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
-
     DOCKERFILE_PATH.parent.mkdir(parents=True, exist_ok=True)
     if DOCKERFILE_PATH.exists():
         DOCKERFILE_PATH.unlink()
     DOCKERFILE_PATH.write_text(rf"""# syntax=docker/dockerfile:1.7
 # STAGE 1,2,3 - DEPENDENCIES
-{"\n".join([rf"FROM {dep}:{version} AS {dep.split("/")[1]}" for dep, version in DOCKER_DEPS.items()])}
+{"\n".join([rf"FROM {dep}:{version} AS {dep.split("/")[1]}" for dep, version in DOCKER_IMAGE_DEPS.items()])}
 
 # STAGE 4 - RELEASE
-FROM python:{PYTHON_VERSION}-slim AS release
+FROM python:{DOCKER_PY_VERSION}-slim AS release
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8   
 
 # copy binaries
-{"\n".join([rf"COPY --from={dep.split("/")[1]} /usr/local/bin/* /usr/local/bin" for dep, version in DOCKER_DEPS.items()])}    
+{"\n".join([rf"COPY --from={dep.split("/")[1]} /usr/local/bin/* /usr/local/bin" for dep, version in DOCKER_IMAGE_DEPS.items()])}    
 
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/root/.cache/pip \
     apt-get update \
     && echo "Building app {PROJECT_NAME} ..." \
-    && apt-get install -y --no-install-recommends git ca-certificates locales curl {" ".join(APT_DEPS)} \
+    && apt-get install -y --no-install-recommends git ca-certificates locales curl {" ".join(DOCKER_APT_DEPS)} \
     && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen  \
     && locale-gen en_US.UTF-8 \
     && git clone {PROJECT_HOMEPAGE} /app \

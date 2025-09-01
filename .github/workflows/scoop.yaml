@@ -28,12 +28,12 @@ jobs:
 
       - name: Install application
         run: |
-          scoop add bucket file_conversor https://github.com/andre-romano/file_conversor
+          scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
           scoop install -k file_conversor
 
       - name: Test application
         run: |
-          file_conversor -V
+          pdm run invoke base.check
 
       - name: Update application
         run: |
