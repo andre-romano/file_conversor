@@ -1,0 +1,35 @@
+# .github/workflows/choco.yml
+name: Choco CI / CD
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and publish Choco package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pdm invoke
+          pdm install
+
+      - name: Build .nupkg
+        run: |
+          pdm run invoke choco.check
+
+      - name: Publish Choco package
+        run: |
+          choco push dist/*.nupkg --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCO_API_KEY }}

@@ -1,0 +1,49 @@
+# .github/workflows/scoop.yml
+name: Scoop CI / CD
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test Scoop package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pdm invoke
+          pdm install
+
+      - name: Install application
+        run: |
+          scoop add bucket file_conversor https://github.com/andre-romano/file_conversor
+          scoop install -k file_conversor
+
+      - name: Test application
+        run: |
+          file_conversor -V
+
+      - name: Update application
+        run: |
+          scoop update file_conversor
+
+      - name: Uninstall application
+        run: |
+          scoop uninstall file_conversor
+          if (Get-Command file_conversor -ErrorAction SilentlyContinue) {
+              Write-Error "file_conversor uninstall failed"
+              exit 1
+          }
+        shell: powershell

@@ -53,7 +53,7 @@ def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [bold green]OK[/][/]")
 
 
-@task(pre=[base.tests, inno.build, tag,], post=[pypi.publish, scoop.publish, choco.publish])
+@task(pre=[base.tests, inno.build, tag,], post=[scoop.publish])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to GitHub ... [/]")
     gh_cmd = [
