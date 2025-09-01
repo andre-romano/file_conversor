@@ -49,7 +49,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && echo "Building app {PROJECT_NAME} ... OK" \
     && echo "Installing app {PROJECT_NAME} ..." \
     && pip install dist/*.whl \
-    && {PROJECT_NAME} -V \
+    && pdm run invoke base.check \    
     && rm -rf /app \
     && echo "Installing app {PROJECT_NAME} ... OK"
 
