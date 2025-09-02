@@ -9,13 +9,13 @@ from rich import print
 
 
 # user-provided modules
+from file_conversor.backend import WinRegBackend
+
 import file_conversor.cli.win.uninstall_menu_cmd as uninstall_menu_cmd
 import file_conversor.cli.win.restart_explorer_cmd as restart_explorer_cmd
 
 from file_conversor.cli.win._typer import CONTEXT_MENU_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.win._typer import COMMAND_NAME, INSTALL_MENU_NAME
-
-from file_conversor.backend import WinRegBackend
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -31,6 +31,8 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
+
+EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
 
 
 @typer_cmd.command(

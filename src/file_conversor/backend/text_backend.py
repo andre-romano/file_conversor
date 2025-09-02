@@ -149,6 +149,7 @@ class TextBackend(AbstractBackend):
             "cls": INITextFile,
         },
     }
+    EXTERNAL_DEPENDENCIES = set([])
 
     def __init__(
         self,

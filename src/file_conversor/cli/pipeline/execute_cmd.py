@@ -28,6 +28,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = BatchBackend.EXTERNAL_DEPENDENCIES
+
 
 @typer_cmd.command(
     name=EXECUTE_NAME,

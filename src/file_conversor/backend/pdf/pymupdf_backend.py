@@ -35,6 +35,7 @@ class PyMuPDFBackend(AbstractBackend):
         "png": {},
         "jpg": {},
     }
+    EXTERNAL_DEPENDENCIES = set([])
 
     def __init__(
         self,

@@ -9,6 +9,6 @@ from tests.utils import Test, DATA_PATH, app_cmd
 
 
 @pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
-class TestWindowsHelpCommand:
+class TestWindowsHelp:
     def test_win_help(self,):
         Test.invoke_test_help(COMMAND_NAME)

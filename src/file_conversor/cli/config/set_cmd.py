@@ -27,6 +27,8 @@ logger = LOG.getLogger(__name__)
 # create command
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = set()
+
 
 @typer_cmd.command(
     name=SET_NAME,

@@ -21,6 +21,9 @@ class AbstractLibreofficeBackend(AbstractBackend):
     """
     A class that provides an interface for handling files using ``libreoffice``.
     """
+    EXTERNAL_DEPENDENCIES = {
+        "soffice",
+    }
 
     def __init__(
         self,

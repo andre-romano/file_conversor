@@ -5,5 +5,6 @@ from file_conversor.cli.xls._typer import COMMAND_NAME
 from tests.utils import Test, DATA_PATH
 
 
-def test_xls_help():
-    Test.invoke_test_help(COMMAND_NAME)
+class TestXlsHelp:
+    def test_xls_help(self,):
+        Test.invoke_test_help(COMMAND_NAME)

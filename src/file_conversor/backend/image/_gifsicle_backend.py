@@ -31,6 +31,9 @@ class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     SUPPORTED_OUT_FORMATS = {
         'gif': {},
     }
+    EXTERNAL_DEPENDENCIES = set([
+        "gifsicle",
+    ])
 
     def __init__(
         self,

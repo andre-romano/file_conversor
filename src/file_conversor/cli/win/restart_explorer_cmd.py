@@ -27,6 +27,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = set()
+
 
 @typer_cmd.command(
     name=RESTART_EXPLORER_NAME,

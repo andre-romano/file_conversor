@@ -33,6 +33,7 @@ class ExcelBackend(AbstractMSOfficeBackend):
         "pdf": {'format': 57},
         "html": {'format': 44},
     }
+    EXTERNAL_DEPENDENCIES = set()
 
     def __init__(
         self,

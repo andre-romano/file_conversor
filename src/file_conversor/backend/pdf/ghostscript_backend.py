@@ -163,6 +163,9 @@ class GhostscriptBackend(AbstractBackend):
             "out_file_format": OutputFileFormat.PDF,
         },
     }
+    EXTERNAL_DEPENDENCIES = {
+        "gs",
+    }
 
     PROGRESS_RE = re.compile(r'Page\s*(\d+)')
     NUM_PAGES_RE = re.compile(r'Processing pages (\d+) through (\d+)')

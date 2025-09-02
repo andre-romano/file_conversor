@@ -5,5 +5,6 @@ from file_conversor.cli.text._typer import COMMAND_NAME
 from tests.utils import Test, DATA_PATH, app_cmd
 
 
-def test_text_help():
-    Test.invoke_test_help(COMMAND_NAME)
+class TestTextHelp:
+    def test_text_help(self,):
+        Test.invoke_test_help(COMMAND_NAME)

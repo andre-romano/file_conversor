@@ -23,6 +23,8 @@ logger = LOG.getLogger(__name__)
 # create command
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = set()
+
 
 # config show
 @typer_cmd.command(

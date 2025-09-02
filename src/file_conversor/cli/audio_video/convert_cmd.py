@@ -30,6 +30,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
+
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands

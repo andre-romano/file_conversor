@@ -39,6 +39,11 @@ class CompressBackend(AbstractBackend):
         },
     }
     SUPPORTED_OUT_FORMATS = SUPPORTED_IN_FORMATS
+    EXTERNAL_DEPENDENCIES = {
+        *_GifSicleBackend.EXTERNAL_DEPENDENCIES,
+        *_MozJPEGBackend.EXTERNAL_DEPENDENCIES,
+        *_OxiPNGBackend.EXTERNAL_DEPENDENCIES,
+    }
 
     def __init__(
         self,

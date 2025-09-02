@@ -31,6 +31,7 @@ class PowerPointBackend(AbstractMSOfficeBackend):
         "odp": {'format': 35},
         "pdf": {'format': 32},
     }
+    EXTERNAL_DEPENDENCIES = set()
 
     def __init__(
         self,

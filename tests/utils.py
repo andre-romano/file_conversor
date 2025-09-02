@@ -1,8 +1,10 @@
 import shlex
+import shutil
 import subprocess
 import sys
 
 from pathlib import Path
+from typing import Iterable
 from typer.testing import CliRunner
 
 from file_conversor.cli import app_cmd
@@ -14,6 +16,10 @@ DATA_PATH = Path(f"tests/.data")
 
 class Test:
     RUNNER = CliRunner()
+
+    @classmethod
+    def dependencies_installed(cls, deps: Iterable[str]):
+        return all([shutil.which(dep) is not None for dep in deps])
 
     @classmethod
     def invoke_test_help(cls, *cmd: str):

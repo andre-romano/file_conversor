@@ -31,6 +31,7 @@ class WinRegBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "reg": {},
     }
+    EXTERNAL_DEPENDENCIES = set([])
 
     def __init__(self, verbose: bool = False):
         """

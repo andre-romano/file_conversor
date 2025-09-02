@@ -34,6 +34,7 @@ class PyPDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
+    EXTERNAL_DEPENDENCIES = set([])
 
     @staticmethod
     def len(

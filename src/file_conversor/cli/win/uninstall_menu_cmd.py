@@ -29,6 +29,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
+
 
 @typer_cmd.command(
     name=UNINSTALL_MENU_NAME,

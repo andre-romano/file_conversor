@@ -37,6 +37,8 @@ class BatchBackend(AbstractBackend):
 
     CONFIG_FILENAME = ".config_fc.json"
 
+    EXTERNAL_DEPENDENCIES = set([])
+
     def __init__(
         self,
         pipeline_folder: str

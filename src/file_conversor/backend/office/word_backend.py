@@ -32,6 +32,7 @@ class WordBackend(AbstractMSOfficeBackend):
         "pdf": {'format': 17},
         "html": {'format': 8},
     }
+    EXTERNAL_DEPENDENCIES = set()
 
     def __init__(
         self,

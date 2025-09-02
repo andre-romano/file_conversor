@@ -35,6 +35,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
+
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()

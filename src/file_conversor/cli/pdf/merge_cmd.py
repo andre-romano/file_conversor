@@ -33,6 +33,8 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
+EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
+
 
 @typer_cmd.command(
     name=MERGE_NAME,

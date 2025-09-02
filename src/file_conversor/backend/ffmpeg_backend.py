@@ -9,7 +9,6 @@ import re
 
 from pathlib import Path
 from datetime import timedelta
-import subprocess
 from typing import Any, Callable, Iterable
 
 # user-provided imports
@@ -106,6 +105,11 @@ class FFmpegBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
+
+    EXTERNAL_DEPENDENCIES = set([
+        "ffmpeg",
+        "ffprobe",
+    ])
 
     def __init__(
         self,

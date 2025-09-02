@@ -5,5 +5,6 @@ from file_conversor.cli.ppt._typer import COMMAND_NAME
 from tests.utils import Test, DATA_PATH
 
 
-def test_ppt_help():
-    Test.invoke_test_help(COMMAND_NAME)
+class TestPptHelp:
+    def test_ppt_help(self):
+        Test.invoke_test_help(COMMAND_NAME)
