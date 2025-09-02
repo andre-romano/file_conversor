@@ -21,14 +21,19 @@ def get_translation():
     """
     Get translation mechanism, based on user preferences.
     """
-    sys_lang = get_system_locale()
-    translation = gettext.translation(
-        'messages', Environment.get_locales_folder(),
-        languages=[
-            CONFIG["language"],
-            sys_lang if sys_lang else "en_US",
-            "en_US",  # fallback
-        ],
-        fallback=False
-    )
+    try:
+        sys_lang = get_system_locale()
+        translation = gettext.translation(
+            'messages', Environment.get_locales_folder(),
+            languages=[
+                CONFIG["language"],
+                sys_lang if sys_lang else "en_US",
+                "en_US",  # fallback
+            ],
+            fallback=False
+        )
+    except:
+        print("Sys lang:", get_system_locale())
+        print("Locales folder:", Environment.get_locales_folder())
+        raise
     return translation.gettext
