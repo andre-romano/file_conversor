@@ -1,8 +1,10 @@
 # tasks\_config.py
 
 import hashlib
+import os
 import shutil
 import tomllib
+import zipfile
 import requests
 
 from invoke.context import Context as InvokeContext
@@ -46,21 +48,26 @@ INSTALL_SCOOP = SCRIPTS_PATH / 'install_scoop.ps1'
 DOCKER_REPOSITORY = "andreromano"
 DOCKERFILE_PATH = Path(f"./dist/Dockerfile")
 
-UNINSTALL_APP = Path("unins000.exe")
+UNINSTALL_APP_WIN = Path("unins000.exe")
 
-INSTALL_APP = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer.exe")
-INSTALL_APP_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP.name}"
+INSTALL_APP_WIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64.zip")
+INSTALL_APP_LIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Lin_x64.zip")
+INSTALL_APP_MAC = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Mac_x64.zip")
+
+INSTALL_APP_WIN_EXE = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer.exe")
+INSTALL_APP_WIN_EXE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP_WIN_EXE.name}"
 # INSTALL_APP_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 # INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP.parent.name}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://cdn.jsdelivr.net/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 
-INSTALL_APP_HASH = INSTALL_APP.with_name("checksum.sha256")
+INSTALL_APP_HASH = Path(f"./dist/checksum.sha256")
 INSTALL_APP_HASH_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP_HASH.name}"
 
 RELEASE_NOTES_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/tag/{GIT_RELEASE}"
 SOURCE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/archive/refs/tags/{GIT_RELEASE}.zip"
+
 LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
-README_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/README.md"
+README_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/README.md"
 
 
 def copy(src: Path, dst: Path):
@@ -136,3 +143,48 @@ def verify_with_sha256_file(sha_file: Path):
             print(f"[bold red]FAILED[/]")
             raise RuntimeError(f"Hashes for '{name}' dont match. Expected: {expected}. Actual: {actual}")
         print(f"[bold green]OK[/]")
+
+
+def append_to_PATH(paths: str | Path | list[str | Path]):
+    path_list = [Path(paths)] if isinstance(paths, (str, Path)) else [Path(p) for p in paths]
+    env_paths = os.environ["PATH"].split(os.pathsep)
+    for path in path_list:
+        path = path.resolve()
+        if str(path) not in env_paths:
+            env_paths.append(str(path))
+    os.environ["PATH"] = os.pathsep.join(env_paths)
+
+
+def remove_from_PATH(paths: str | Path | list[str | Path]):
+    path_list = [Path(paths)] if isinstance(paths, (str, Path)) else [Path(p) for p in paths]
+    env_paths = os.environ["PATH"].split(os.pathsep)
+    for path in path_list:
+        path = path.resolve()
+        if str(path) in env_paths:
+            env_paths.remove(str(path))
+    os.environ["PATH"] = os.pathsep.join(env_paths)
+
+
+def compress(src: Path, dst: Path):
+    dst = dst.with_suffix(".zip")
+    if not src.is_dir():
+        raise ValueError(f"'{src}' is not a valid directory")
+
+    with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(src):
+            for file in files:
+                file_path = Path(root) / file
+                # keep relative path inside archive
+                arcname = file_path.relative_to(src.parent)
+                zipf.write(file_path, arcname)
+
+
+def extract(src: Path, dst: Path):
+    if not src.exists():
+        raise FileNotFoundError(f"'{src}' does not exist")
+
+    extract_to = Path(dst).resolve()
+    extract_to.mkdir(parents=True, exist_ok=True)
+
+    with zipfile.ZipFile(src, "r") as zipf:
+        zipf.extractall(extract_to)

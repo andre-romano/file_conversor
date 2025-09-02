@@ -6,9 +6,12 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: write # allow pushing changes
+
 jobs:
   build:
-    name: Test Scoop package
+    name: Scoop package CD
     runs-on: windows-latest
 
     steps:
@@ -26,24 +29,15 @@ jobs:
           pip install pdm invoke
           pdm install
 
-      - name: Install application
+      - name: Build and check scoop bucket
         run: |
-          scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
-          scoop install -k file_conversor
+          pdm run invoke scoop.check
 
-      - name: Test application
+      - name: Configure Git
         run: |
-          pdm run invoke base.check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Update application
+      - name: Publish scoop bucket
         run: |
-          scoop update file_conversor
-
-      - name: Uninstall application
-        run: |
-          scoop uninstall file_conversor
-          if (Get-Command file_conversor -ErrorAction SilentlyContinue) {
-              Write-Error "file_conversor uninstall failed"
-              exit 1
-          }
-        shell: powershell
+          pdm run invoke scoop.publish

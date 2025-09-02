@@ -1,5 +1,7 @@
 # tasks_modules\inno.py
 
+import os
+
 from pathlib import Path
 from invoke.tasks import task
 
@@ -12,36 +14,7 @@ from tasks_modules import pyinstaller, choco, base
 INNO_PATH = str("inno")
 INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 
-
-def get_uninstaller_path() -> Path | None:
-    import winreg
-
-    # Registry hives and paths to search
-    registry_locations = [
-        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
-        (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
-        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),  # pyright: ignore[reportAttributeAccessIssue]
-    ]
-
-    for hive, path in registry_locations:
-        with winreg.OpenKey(hive, path) as uninstall_key:  # pyright: ignore[reportAttributeAccessIssue]
-            for i in range(winreg.QueryInfoKey(uninstall_key)[0]):  # pyright: ignore[reportAttributeAccessIssue]
-                subkey_name = winreg.EnumKey(uninstall_key, i)  # pyright: ignore[reportAttributeAccessIssue]
-                with winreg.OpenKey(uninstall_key, subkey_name) as subkey:  # pyright: ignore[reportAttributeAccessIssue]
-                    try:
-                        display_name, _ = winreg.QueryValueEx(subkey, "DisplayName")  # pyright: ignore[reportAttributeAccessIssue]
-                        if PROJECT_TITLE.lower() in display_name.lower():
-                            uninstall_str, _ = winreg.QueryValueEx(subkey, "UninstallString")  # pyright: ignore[reportAttributeAccessIssue]
-
-                            # Some uninstall strings are quoted and have extra args — clean them up
-                            if uninstall_str.startswith('"'):
-                                exe_path = uninstall_str.split('"')[1]
-                            else:
-                                exe_path = uninstall_str.split(" ")[0]
-                            return exe_path
-                    except:
-                        pass
-    return None
+INSTALL_PATH = Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor"
 
 
 @task
@@ -59,12 +32,7 @@ def clean_inno(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_exe(c: InvokeContext):
-    _config.remove_path(f"{INSTALL_APP}")
-
-
-@task(pre=[mkdirs])
-def clean_hash(c: InvokeContext):
-    _config.remove_path(f"{INSTALL_APP_HASH}")
+    _config.remove_path(f"{INSTALL_APP_WIN_EXE}")
 
 
 @task(pre=[clean_inno, pyinstaller.check])
@@ -73,9 +41,8 @@ def create_manifest(c: InvokeContext):
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
 
-    APP_DIST_PATH = Path(f"./dist/{PROJECT_NAME}").resolve()
-    if not APP_DIST_PATH.exists():
-        raise RuntimeError(f"Path {APP_DIST_PATH} does not exist")
+    if not pyinstaller.APP_FOLDER.exists():
+        raise RuntimeError(f"Path {pyinstaller.APP_FOLDER} does not exist")
 
     # setup.iss
     setup_iss_path = Path(f"{INNO_ISS}")
@@ -92,15 +59,15 @@ Compression=LZMA2
 ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-SetupIconFile={ICON_APP.resolve()}
+SetupIconFile={ICON_APP}
 UninstallDisplayIcon={{app}}\{PROJECT_NAME}.exe
-SourceDir={Path(".").resolve()}
-OutputDir={Path("./dist").resolve()}
-OutputBaseFilename={INSTALL_APP.with_suffix("").name}
+SourceDir={Path(".")}
+OutputDir={INSTALL_APP_WIN_EXE.parent}
+OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
 AlwaysRestart=yes
 
 [Files]
-Source: "{APP_DIST_PATH}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{pyinstaller.APP_FOLDER}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -118,6 +85,9 @@ StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; 
     assert setup_iss_path.exists()
     print("[bold green]OK[/]")
 
+    print(f"{setup_iss_path}:")
+    print(setup_iss_path.read_text())
+
 
 @task(pre=[choco.install])
 def install(c: InvokeContext):
@@ -130,39 +100,28 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_hash])
-def gen_hash(c: InvokeContext):
-    print(f"[bold] Generating SHA256 hash ... [/]")
-    if not INSTALL_APP.exists():
-        raise RuntimeError(f"File {INSTALL_APP} not found")
-    hash = _config.get_hash(INSTALL_APP)
-    INSTALL_APP_HASH.write_text(rf"""
-{hash}  {INSTALL_APP.name}
-""", encoding="utf-8")
-    if not INSTALL_APP_HASH.exists():
-        raise RuntimeError("Failed to create sha256 file")
-    if shutil.which("sha256sum"):
-        with c.cd(str(INSTALL_APP_HASH.parent.resolve())):
-            c.run(f"sha256sum -c {INSTALL_APP_HASH.name}")
-    _config.verify_with_sha256_file(INSTALL_APP_HASH)
-    print(f"[bold] Generating SHA256 hash ... [/][bold green]OK[/]")
-
-
-@task(pre=[clean_exe, create_manifest, install,], post=[gen_hash])
+@task(pre=[clean_exe, create_manifest, install,], post=[pyinstaller.clean_app_folder])
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")
     assert (result is not None) and (result.return_code == 0)
-    if not list(Path("dist").glob("*.exe")):
-        raise RuntimeError("Build EXE - Empty dist/*.exe")
+    if not INSTALL_APP_WIN_EXE.exists():
+        raise RuntimeError(f"'{INSTALL_APP_WIN_EXE}' not found")
     print(f"[bold] Building Installer (EXE) ... [/][bold green]OK[/]")
 
 
 @task(pre=[build,],)
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/]')
-    exe_path = list(Path("dist").glob("*.exe"))[0]
-    result = c.run(rf'"{exe_path}" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART')
+    cmd = [
+        rf'"{INSTALL_APP_WIN_EXE}"',
+        rf'/DIR="{INSTALL_PATH}"',
+        "/SUPPRESSMSGBOXES",
+        "/VERYSILENT",
+        "/NORESTART",
+        "/SP-",
+    ]
+    result = c.run(" ".join(cmd))
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/][bold green]OK[/]')
 
@@ -170,15 +129,24 @@ def install_app(c: InvokeContext):
 @task
 def uninstall_app(c: InvokeContext):
     print(rf'[bold] Uninstalling {PROJECT_NAME} via Inno .EXE ... [/]')
-    exe_path = get_uninstaller_path()
-    if not exe_path:
-        raise RuntimeError(f"Uninstaller for '{PROJECT_TITLE}' not found")
+    exe_path = INSTALL_PATH / UNINSTALL_APP_WIN.name
+    if not exe_path.exists():
+        raise RuntimeError(f"'{exe_path}' not found")
     print(f"[bold]Found uninstaller: '{exe_path}'[/]")
-    result = c.run(rf'"{exe_path}" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART')
+    cmd = [
+        rf'"{exe_path}"',
+        "/SUPPRESSMSGBOXES",
+        "/VERYSILENT",
+        "/NORESTART",
+        "/SP-",
+    ]
+    result = c.run(" ".join(cmd))
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Uninstalling {PROJECT_NAME} via Inno .EXE ... [/][bold green]OK[/]')
 
 
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
+    _config.append_to_PATH(INSTALL_PATH)
     base.check(c)
+    _config.remove_from_PATH(INSTALL_PATH)

@@ -40,7 +40,7 @@ def mkdirs(c: InvokeContext):
 
 
 @task(pre=[mkdirs])
-def clean_exe(c: InvokeContext):
+def clean_app_folder(c: InvokeContext):
     _config.remove_path(str(APP_FOLDER))
 
 
@@ -54,7 +54,7 @@ def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_exe,], post=[copy_includes,])
+@task(pre=[clean_app_folder,], post=[copy_includes,])
 def build(c: InvokeContext):
     MAIN_PATH = Path(rf"src/{PROJECT_NAME}/__main__.py")
 

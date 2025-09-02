@@ -33,7 +33,7 @@ def manifest(c: InvokeContext):
 
     print("[bold] Updating Scoop manifest files ... [/]", end="")
 
-    INSTALL_APP_AUTOUPDATE = INSTALL_APP_URL.replace(PROJECT_VERSION, "$version")
+    INSTALL_APP_AUTOUPDATE = INSTALL_APP_WIN_EXE_URL.replace(PROJECT_VERSION, "$version")
 
     # bucket/file_conersor.json
     json_obj = {
@@ -41,8 +41,8 @@ def manifest(c: InvokeContext):
         "description": PROJECT_DESCRIPTION,
         "homepage": PROJECT_HOMEPAGE,
         "license": "Apache-2.0",
-        "url": INSTALL_APP_URL,
-        "hash": f"{_config.get_remote_hash(INSTALL_APP_URL)}",
+        "url": INSTALL_APP_WIN_EXE_URL,
+        "hash": f"{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}",
         "bin": f"{PROJECT_NAME}.exe",
         "pre_install": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName',
@@ -51,7 +51,7 @@ def manifest(c: InvokeContext):
             rf'Remove-Item -Path "$exePath"',
         ],
         "pre_uninstall": [
-            rf'$exePath = Get-ChildItem -Path "$dir" -Filter {UNINSTALL_APP.name}  | Select-Object -ExpandProperty FullName',
+            rf'$exePath = Get-ChildItem -Path "$dir" -Filter {UNINSTALL_APP_WIN.name}  | Select-Object -ExpandProperty FullName',
             rf'Start-Process -FilePath "$exePath" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
             rf'if (Test-Path "$dir\{PROJECT_NAME}.exe") {{throw "Uninstall failed: executable still exists"}}',
         ],
@@ -71,6 +71,9 @@ def manifest(c: InvokeContext):
     assert SCOOP_JSON.exists()
 
     print("[bold green] OK [/]",)
+
+    print(f"{SCOOP_JSON}:")
+    print(SCOOP_JSON.read_text())
 
 
 @task

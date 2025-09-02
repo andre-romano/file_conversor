@@ -1,9 +1,6 @@
 
 # tasks_modules\choco.py
 
-import os
-import re
-
 from pathlib import Path
 from invoke.tasks import task
 
@@ -53,8 +50,8 @@ $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $dir         = Join-Path ${{env:ProgramFiles(x86)}} "$packageName"
-$url         = "{INSTALL_APP_URL}"
-$checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
+$url         = "{INSTALL_APP_WIN_EXE_URL}"
+$checksum    = "{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}"  # SHA256
 
 Write-Output "Installing app ..."
 Install-ChocolateyPackage -PackageName $packageName `
@@ -79,7 +76,7 @@ $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $dir         = Join-Path ${{env:ProgramFiles(x86)}} "$packageName"
-$uninstaller = Join-Path "$dir" "{UNINSTALL_APP.name}"
+$uninstaller = Join-Path "$dir" "{UNINSTALL_APP_WIN.name}"
 
 Write-Output "Removing shim ..."
 Uninstall-BinFile -Name "{PROJECT_NAME}"
@@ -101,8 +98,8 @@ Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERY
     <summary>{PROJECT_DESCRIPTION}</summary>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
     <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
-    <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
-    <projectSourceUrl>{SOURCE_URL}</projectSourceUrl>
+    <projectSourceUrl>{PROJECT_HOMEPAGE}</projectSourceUrl>
+    <packageSourceUrl>{SOURCE_URL}</packageSourceUrl>
     <licenseUrl>{LICENSE_URL}</licenseUrl>
     <releaseNotes>{RELEASE_NOTES_URL}</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -118,6 +115,15 @@ Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERY
     assert CHOCO_NUSPEC.exists()
 
     print("[bold green]OK[/]")
+
+    print(f"{install_ps1_path}:")
+    print(install_ps1_path.read_text())
+
+    print(f"{uninstall_ps1_path}:")
+    print(uninstall_ps1_path.read_text())
+
+    print(f"{CHOCO_NUSPEC}:")
+    print(CHOCO_NUSPEC.read_text())
 
 
 @task
@@ -148,7 +154,7 @@ def build(c: InvokeContext):
 @task(pre=[build, base.is_admin,],)
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing choco package ... [/]')
-    dist_path = Path(rf".\dist").resolve()
+    dist_path = Path(rf".\dist")
     result = c.run(rf'choco install -y --acceptlicense "{PROJECT_NAME}" --version="{PROJECT_VERSION}" --source="{dist_path}"')
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Installing choco package ... [/][bold green]OK[/]')

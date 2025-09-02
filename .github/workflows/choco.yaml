@@ -26,7 +26,7 @@ jobs:
           pip install pdm invoke
           pdm install
 
-      - name: Build .nupkg
+      - name: Build and check .nupkg
         run: |
           pdm run invoke choco.check
 

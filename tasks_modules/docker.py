@@ -61,6 +61,9 @@ CMD [ "--help" ]
     if not DOCKERFILE_PATH.exists():
         raise FileNotFoundError(f"'{DOCKERFILE_PATH}' not found")
 
+    print(f"{DOCKERFILE_PATH}:")
+    print(DOCKERFILE_PATH.read_text())
+
 
 @task(pre=[create_dockerfile,])
 def build(c: InvokeContext):
@@ -71,7 +74,7 @@ def build(c: InvokeContext):
         f"{docker_bin}", "build", "--no-cache",
         "-t", f"{DOCKER_REPOSITORY}/{PROJECT_NAME}:{PROJECT_VERSION}",
         "-t", f"{DOCKER_REPOSITORY}/{PROJECT_NAME}:latest",
-        f"{DOCKERFILE_PATH.parent.resolve()}",
+        f"{DOCKERFILE_PATH.parent}",
     ]
     result = c.run(" ".join(build_cmd))
     assert (result is not None) and (result.return_code == 0)

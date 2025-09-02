@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from invoke.tasks import task
-from requests import post
 
 # user provided
 from tasks_modules import _config

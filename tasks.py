@@ -10,6 +10,7 @@ from tasks_modules import locales
 from tasks_modules import pyinstaller
 from tasks_modules import pypi
 from tasks_modules import scoop
+from tasks_modules import zip
 
 # Create namespace collection
 ns = Collection()
@@ -22,3 +23,4 @@ ns.add_collection(Collection.from_module(locales), name="locales")
 ns.add_collection(Collection.from_module(pyinstaller), name="pyinstaller")
 ns.add_collection(Collection.from_module(pypi), name="pypi")
 ns.add_collection(Collection.from_module(scoop), name="scoop")
+ns.add_collection(Collection.from_module(zip), name="zip")
