@@ -2,7 +2,7 @@
 
 [project]
 name = "file_conversor"
-version = "0.4.0"
+version = "0.4.1"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
