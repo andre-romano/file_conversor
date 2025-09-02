@@ -54,8 +54,13 @@ INSTALL_APP_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/down
 # INSTALL_APP_URL = f"https://cdn.statically.io/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP.parent.name}/{INSTALL_APP.name}"
 # INSTALL_APP_URL = f"https://cdn.jsdelivr.net/gh/andre-romano/{PROJECT_NAME}@{GIT_RELEASE}/{INSTALL_APP_PY.parent.name}/{INSTALL_APP_PY.name}"
 
-INSTALL_APP_HASH = INSTALL_APP.with_suffix(".sha256")
+INSTALL_APP_HASH = INSTALL_APP.with_name("checksum.sha256")
 INSTALL_APP_HASH_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP_HASH.name}"
+
+RELEASE_NOTES_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/tag/{GIT_RELEASE}"
+SOURCE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/archive/refs/tags/{GIT_RELEASE}.zip"
+LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
+README_URL = f"https://raw.githubusercontent.com/andre-romano/{PROJECT_NAME}/refs/tags/{GIT_RELEASE}/README.md"
 
 
 def copy(src: Path, dst: Path):
@@ -94,6 +99,13 @@ def mkdir(dirs: Iterable):
             raise RuntimeError(f"Cannot create dir '{dir}'")
 
 
+def get_url(url: str) -> bytes:
+    response = requests.get(url)
+    if not response.ok:
+        raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
+    return response.content
+
+
 def get_hash(data: bytes | str | Path) -> str:
     if isinstance(data, (str, Path)):
         data = Path(data)
@@ -109,10 +121,7 @@ def get_hash(data: bytes | str | Path) -> str:
 
 
 def get_remote_hash(url: str) -> str:
-    response = requests.get(url)
-    if not response.ok:
-        raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
-    return get_hash(response.content)
+    return get_hash(get_url(url))
 
 
 def verify_with_sha256_file(sha_file: Path):

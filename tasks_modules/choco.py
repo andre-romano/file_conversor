@@ -44,10 +44,6 @@ def create_manifest(c: InvokeContext):
     CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
     CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
 
-    CHOCO_INSTALL_PATH = Path(os.path.expandvars(rf"%programfiles(x86)%")) / PROJECT_NAME
-    APP_BIN = CHOCO_INSTALL_PATH / rf"{PROJECT_NAME}.exe"
-    UNINSTALLER_BIN = CHOCO_INSTALL_PATH / UNINSTALL_APP.name
-
     # chocolateyInstall.ps1
     install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
     install_ps1_path.write_text(rf'''
@@ -56,21 +52,21 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$installer   = "$toolsDir\{INSTALL_APP.name}"
+$dir         = Join-Path ${{env:ProgramFiles(x86)}} "$packageName"
 $url         = "{INSTALL_APP_URL}"
-$checksum    = "{_config.get_hash(INSTALL_APP)}"  # SHA256
-
-Get-ChocolateyWebFile -PackageName "$packageName" `
-                      -FileFullPath "$installer" `
-                      -Url "$url" `
-                      -Checksum "$checksum" `
-                      -ChecksumType "sha256"
+$checksum    = "{_config.get_remote_hash(INSTALL_APP_URL)}"  # SHA256
 
 Write-Output "Installing app ..."
-Start-Process -FilePath "$installer" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait
+Install-ChocolateyPackage -PackageName $packageName `
+    -FileType "exe" `
+    -SilentArgs "/DIR=`"$dir`" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
+    -Url $url `
+    -Checksum $checksum `
+    -ChecksumType "sha256"
 
 Write-Output "Installing shim ..."
-Install-BinFile -Name "{APP_BIN.with_suffix("").name}" -Path "{APP_BIN}"
+$exePath = Join-Path $dir "{PROJECT_NAME}.exe"
+Install-BinFile -Name "{PROJECT_NAME}" -Path $exePath
 ''', encoding="utf-8")
     assert install_ps1_path.exists()
 
@@ -82,10 +78,11 @@ $ErrorActionPreference = 'Stop'
 $packageName = "{PROJECT_NAME}"
 $version     = "{PROJECT_VERSION}" 
 $toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$uninstaller = "{UNINSTALLER_BIN}"
+$dir         = Join-Path ${{env:ProgramFiles(x86)}} "$packageName"
+$uninstaller = Join-Path "$dir" "{UNINSTALL_APP.name}"
 
 Write-Output "Removing shim ..."
-Uninstall-BinFile -Name "{APP_BIN.with_suffix("").name}"
+Uninstall-BinFile -Name "{PROJECT_NAME}"
 
 Write-Output "Uninstalling app ..."
 Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait
@@ -100,13 +97,14 @@ Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERY
     <version>{PROJECT_VERSION}</version>
     <title>{PROJECT_TITLE}</title>
     <authors>{", ".join(PROJECT_AUTHORS)}</authors>
-    <description>{PROJECT_DESCRIPTION}</description>
+    <description>{_config.get_url(README_URL).decode("utf-8")}</description>
+    <summary>{PROJECT_DESCRIPTION}</summary>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
     <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
     <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
-    <projectSourceUrl>{PROJECT_HOMEPAGE}</projectSourceUrl>
-    <licenseUrl>{PROJECT_HOMEPAGE}/blob/master/LICENSE</licenseUrl>
-    <releaseNotes>{PROJECT_HOMEPAGE}/blob/master/CHANGELOG.md</releaseNotes>
+    <projectSourceUrl>{SOURCE_URL}</projectSourceUrl>
+    <licenseUrl>{LICENSE_URL}</licenseUrl>
+    <releaseNotes>{RELEASE_NOTES_URL}</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
         {"\n        ".join(f'<dependency id="{dep}" ' + (f'version="{version}" ' if version else '') + "/>" for dep, version in CHOCO_DEPS.items())}
