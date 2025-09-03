@@ -1,7 +1,6 @@
 
 # src\file_conversor\config\locale.py
 
-import re
 import gettext  # app translations / locales
 import locale
 
@@ -15,13 +14,12 @@ def get_default_language():
     return "en_US"
 
 
-def get_available_languages() -> list[str]:
-    return [str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()]
+def get_available_languages() -> set[str]:
+    return set([str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()])
 
 
 def normalize_lang_code(lang: str | None):
-    if not lang or not re.match(r"[a-z]{2}_[A-Z]{2}", lang):
-        print(f"ERROR: invalid language code '{lang}'")
+    if not lang or lang not in get_available_languages():
         return None  # empty language code (force fallback in translation)
     return lang
 
@@ -46,7 +44,7 @@ def get_translation():
         translation = gettext.translation(
             'messages', Environment.get_locales_folder(),
             languages=[lang for lang in languages if lang],  # Filter out None entries
-            fallback=True,
+            fallback=False,
         )
     except:
         print("Sys lang:", get_system_locale())
