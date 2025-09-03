@@ -3,6 +3,7 @@ if (Get-Command scoop -ErrorAction SilentlyContinue) {
     exit 0
 }
 
+Import-Module Microsoft.PowerShell.Security -ErrorAction Stop
 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 
 if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
