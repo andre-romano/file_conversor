@@ -12,7 +12,7 @@ from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
 import file_conversor.cli.config.show_cmd as show_cmd
 
 from file_conversor.backend import Img2PDFBackend, PillowBackend
-from file_conversor.config import Configuration, State, Log, get_translation
+from file_conversor.config import Configuration, State, Log, locale, get_translation, get_available_languages
 
 from file_conversor.utils.validators import check_is_bool_or_none, check_positive_integer, check_valid_options
 
@@ -45,8 +45,9 @@ EXTERNAL_DEPENDENCIES = set()
 )
 def set(
     language: Annotated[str, typer.Option("--language", "-l",
-                                          help=_("Set preferred language for app (if available). Format lang_COUNTRY. Defaults to system preffered language or 'en_US' (English - United States)."),
-                                          )] = CONFIG["language"],
+                                          help=f'{_("Set preferred language for app (if available). Available languages:")} {", ".join(get_available_languages())}. {_("Defaults to system preffered language or 'en_US' (English - United States)")}.',
+                                          callback=lambda x: check_valid_options(x, get_available_languages()),
+                                          )] = locale.normalize_lang_code(CONFIG["language"]) or locale.get_default_language(),
 
     install_deps: Annotated[str | None, typer.Option("--install-deps", "-install",
                                                      help=_("Install missing external dependencies action. 'True' for auto install. 'False' to not install missing dependencies. 'None' to ask user for action."),

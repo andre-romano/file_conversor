@@ -10,6 +10,14 @@ from file_conversor.config.config import Configuration
 CONFIG = Configuration.get_instance()
 
 
+def get_default_language():
+    return "en_US"
+
+
+def get_available_languages() -> list[str]:
+    return [str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()]
+
+
 def normalize_lang_code(lang: str | None):
     if not lang or "_" not in lang:
         print(f"ERROR: invalid language code '{lang}'")
@@ -32,7 +40,7 @@ def get_translation():
         languages = [
             normalize_lang_code(CONFIG["language"]),
             normalize_lang_code(get_system_locale()),
-            "en_US",  # fallback
+            get_default_language(),  # fallback
         ]
         translation = gettext.translation(
             'messages', Environment.get_locales_folder(),
