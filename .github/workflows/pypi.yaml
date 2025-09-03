@@ -2,8 +2,10 @@
 name: PyPi CI / CD
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [Git Release CI / CD]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
