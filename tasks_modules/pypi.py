@@ -9,6 +9,8 @@ from tasks_modules._config import *
 
 from tasks_modules import base, locales
 
+to_remove: set[Path] = set()
+
 
 @task
 def mkdirs(c: InvokeContext):
@@ -24,7 +26,29 @@ def clean_whl(c: InvokeContext):
     remove_path("dist/*.tar.gz")
 
 
-@task(pre=[clean_whl, locales.build, ])
+@task(pre=[locales.build])
+def copy_includes(c: InvokeContext):
+    print("[bold]Copying MANIFEST.in includes ...[/]")
+    for include in _config.parse_manifest_includes():
+        include_path = Path(include)
+        dest_path = Path("./src") / PROJECT_NAME / include_path.name
+        if include_path.resolve() == dest_path.resolve():
+            continue
+        to_remove.add(dest_path)
+        _config.copy(src=include_path, dst=dest_path)
+    print("[bold]Copying MANIFEST.in includes ... [/][bold green]OK[/]")
+
+
+@task(pre=[locales.build])
+def remove_includes(c: InvokeContext):
+    print("[bold]Removing MANIFEST.in includes ...[/]")
+    for path in to_remove:
+        if path.exists():
+            _config.remove_path(str(path))
+    print("[bold]Removing MANIFEST.in includes ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_whl, copy_includes,], post=[remove_includes,])
 def build(c: InvokeContext):
     print(f"[bold] Building PyPi package ... [/]")
     result = c.run(f"pdm build")

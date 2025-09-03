@@ -14,23 +14,6 @@ from tasks_modules import locales
 APP_FOLDER = Path(f"dist/{PROJECT_NAME}")
 
 
-def parse_manifest_includes() -> list[str]:
-    add_data_list = []
-    if not MANIFEST_IN_PATH.exists():
-        raise RuntimeError(f"Manifest file '{MANIFEST_IN_PATH}' not exists")
-    for line in MANIFEST_IN_PATH.read_text().splitlines():
-        match = re.match(r"^[\s]*include[\s]+(.+)", line)
-        if match:
-            add_data_list.extend([filepath.strip() for filepath in match.group(1).split()])
-            continue
-
-        match = re.match(r"^[\s]*recursive-include[\s]+([^\s]+)", line)
-        if match:
-            add_data_list.append(match.group(1).strip())
-            continue
-    return add_data_list
-
-
 @task
 def mkdirs(c: InvokeContext):
     _config.mkdir([
@@ -47,7 +30,7 @@ def clean_app_folder(c: InvokeContext):
 @task(pre=[mkdirs, locales.build])
 def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ...[/]")
-    for include in parse_manifest_includes():
+    for include in _config.parse_manifest_includes():
         include_path = Path(include)
         dest_path = APP_FOLDER / "_internal" / PROJECT_NAME / include_path.name
         _config.copy(src=include_path, dst=dest_path)

@@ -21,6 +21,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: MinoruSekine/setup-scoop@v4.0.2
+        with:
+          install_scoop: "true"
+          buckets: extras
+          scoop_update: "true"
+          update_path: "true"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

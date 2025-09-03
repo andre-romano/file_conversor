@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import re
 import shutil
 import tomllib
 import zipfile
@@ -145,6 +146,23 @@ def verify_with_sha256_file(sha_file: Path):
             print(f"[bold red]FAILED[/]")
             raise RuntimeError(f"Hashes for '{name}' dont match. Expected: {expected}. Actual: {actual}")
         print(f"[bold green]OK[/]")
+
+
+def parse_manifest_includes() -> list[str]:
+    add_data_list = []
+    if not MANIFEST_IN_PATH.exists():
+        raise RuntimeError(f"Manifest file '{MANIFEST_IN_PATH}' not exists")
+    for line in MANIFEST_IN_PATH.read_text().splitlines():
+        match = re.match(r"^[\s]*include[\s]+(.+)", line)
+        if match:
+            add_data_list.extend([filepath.strip() for filepath in match.group(1).split()])
+            continue
+
+        match = re.match(r"^[\s]*recursive-include[\s]+([^\s]+)", line)
+        if match:
+            add_data_list.append(match.group(1).strip())
+            continue
+    return add_data_list
 
 
 def append_to_PATH(paths: str | Path | list[str | Path]):
