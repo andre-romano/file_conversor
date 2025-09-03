@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     name: Build and publish Choco package
     runs-on: windows-latest
 
