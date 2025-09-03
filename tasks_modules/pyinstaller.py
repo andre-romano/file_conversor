@@ -6,7 +6,7 @@ from pathlib import Path
 from invoke.tasks import task
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base
 from tasks_modules._config import *
 
 from tasks_modules import locales
@@ -78,7 +78,4 @@ def build(c: InvokeContext):
 
 @task(pre=[build,],)
 def check(c: InvokeContext):
-    APP_EXE = APP_FOLDER / f"{PROJECT_NAME}.exe"
-    result = c.run(f'"{APP_EXE}" -V')
-    assert (result is not None) and (result.return_code == 0)
-    assert PROJECT_VERSION in result.stdout
+    base.check(c, exe=APP_FOLDER / f"{PROJECT_NAME}")

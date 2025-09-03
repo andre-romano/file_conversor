@@ -147,6 +147,4 @@ def uninstall_app(c: InvokeContext):
 
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
-    _config.append_to_PATH(INSTALL_PATH)
-    base.check(c)
-    _config.remove_from_PATH(INSTALL_PATH)
+    base.check(c, exe=INSTALL_PATH / f"{PROJECT_NAME}.exe")

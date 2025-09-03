@@ -93,18 +93,19 @@ def tests(c: InvokeContext, args: str = ""):
 #     print("[bold] Generating uml/ ... [/][bold green]OK[/]")
 
 @task
-def check(c: InvokeContext):
-    print(f"[bold] Checking app '{PROJECT_NAME}' ... [/]")
-    app_exe = shutil.which(PROJECT_NAME)
+def check(c: InvokeContext, exe: str | Path = ""):
+    exe = exe if exe else PROJECT_NAME
+    print(f"[bold] Checking app '{exe}' ... [/]")
+    app_exe = shutil.which(exe)
     if not app_exe:
-        raise RuntimeError(f"'{PROJECT_NAME}' not found in PATH")
-    print(f"[bold] '{PROJECT_NAME}' found:[/] '{app_exe}'")
+        raise RuntimeError(f"'{exe}' not found in PATH")
+    print(f"[bold] Found:[/] '{app_exe}'")
     result = c.run(f'"{app_exe}" -V')
     assert result is not None
     if PROJECT_VERSION not in result.stdout:
-        raise RuntimeError(f"'{PROJECT_NAME}' version mismatch. Expected: '{PROJECT_VERSION}'.")
+        raise RuntimeError(f"'{exe}' version mismatch. Expected: '{PROJECT_VERSION}'.")
     assert result.return_code == 0
-    print(f"[bold] Checking app '{PROJECT_NAME}' ... [/][bold green]OK[/]")
+    print(f"[bold] Checking app '{exe}' ... [/][bold green]OK[/]")
 
 
 @task
