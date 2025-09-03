@@ -14,7 +14,7 @@ from tasks_modules import pyinstaller, choco, base
 INNO_PATH = str("inno")
 INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 
-INSTALL_PATH = Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor"
+INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor").resolve()
 
 
 @task
@@ -59,15 +59,15 @@ Compression=LZMA2
 ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-SetupIconFile={ICON_APP}
+SetupIconFile={ICON_APP.resolve()}
 UninstallDisplayIcon={{app}}\{PROJECT_NAME}.exe
-SourceDir={Path(".")}
-OutputDir={INSTALL_APP_WIN_EXE.parent}
+SourceDir={Path(".").resolve()}
+OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
 AlwaysRestart=yes
 
 [Files]
-Source: "{pyinstaller.APP_FOLDER}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{pyinstaller.APP_FOLDER.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
 
 [Registry]
 ; Adds app_folder to the USER PATH
