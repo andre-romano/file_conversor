@@ -71,6 +71,8 @@ README_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}
 
 
 def copy(src: Path, dst: Path):
+    if not src.exists():
+        raise FileNotFoundError(f"Src file '{src}' not found")
     print(f"Copying '{src}' => '{dst}' ...", end="")
     dst.parent.mkdir(parents=True, exist_ok=True)
     if src.is_file():
