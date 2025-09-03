@@ -87,7 +87,7 @@ def check(c: InvokeContext):
     if not docker_bin:
         raise RuntimeError("'docker' not found in PATH")
     run_cmd = [
-        f"{docker_bin}", "run", "--rm", "--it",
+        f"{docker_bin}", "run", "--rm", "-it",
         f"-v", "./tests:/app/tests",
         f"{DOCKER_REPOSITORY}/{PROJECT_NAME}:latest",
     ]
