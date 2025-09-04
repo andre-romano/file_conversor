@@ -85,12 +85,12 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.pdf -r "5-7:90" -r "9:-90" -r "10-15:180"`
     """)
 def rotate(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
     rotation: Annotated[List[str], typer.Option("--rotation", "-r",
                                                 help=_("List of pages to rotate. Format ``\"page:rotation\"`` or ``\"start-end:rotation\"`` or ``\"start-:rotation\"`` ..."),
                                                 )],
-    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    password: Annotated[str | None, PasswordOption()] = None,
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
 

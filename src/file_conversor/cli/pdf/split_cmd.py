@@ -79,9 +79,9 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {SPLIT_NAME} input_file.pdf` 
 """)
 def split(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    password: Annotated[str | None, PasswordOption()] = None,
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
 

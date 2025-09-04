@@ -78,7 +78,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp3`
     """)
 def info(
-    input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(FFmpegBackend)],
 ):
 
     ffmpeg_backend = FFmpegBackend(

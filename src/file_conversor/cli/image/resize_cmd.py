@@ -81,7 +81,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.jpg -od D:/Downloads -w 1024`
     """)
 def resize(
-    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
     scale: Annotated[float | None, typer.Option("--scale", "-s",
                                                 help=f"{_("Scale image proportion. Valid values start at 0.1. Defaults to")} None (use width to scale image).",
                                                 callback=lambda x: check_positive_integer(x),
@@ -96,7 +96,7 @@ def resize(
                                             help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG["image-resampling"]}.',
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
                                             )] = CONFIG["image-resampling"],
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 

@@ -79,8 +79,8 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
-    input_files: InputFilesArgument(Img2PDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(Img2PDFBackend)],
+    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
     fit: Annotated[str, typer.Option("--fit", "-f",
                                      help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG["image-fit"]}",
                                      callback=lambda x: check_valid_options(x.lower(), Img2PDFBackend.FIT_MODES),
@@ -97,7 +97,7 @@ def to_pdf(
                                                is_flag=True,
                                                )] = False,
 
-    output_file: OutputFileOption(Img2PDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
+    output_file: Annotated[Path | None, OutputFileOption(Img2PDFBackend)] = None,
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
     if not STATE["overwrite-output"]:

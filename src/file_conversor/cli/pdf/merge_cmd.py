@@ -60,9 +60,9 @@ EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {MERGE_NAME} "input_file1.pdf" "input_file2.pdf" -p "unlock_password" -of output_file.pdf` 
     """)
 def merge(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
-    output_file: OutputFileOption(PyPDFBackend) = None,  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    password: Annotated[str | None, PasswordOption()] = None,
+    output_file: Annotated[Path | None, OutputFileOption(PyPDFBackend)] = None,
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
     if not STATE["overwrite-output"]:

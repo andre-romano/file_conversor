@@ -3,6 +3,7 @@
 
 import typer
 
+from typing import Annotated, List
 from pathlib import Path
 
 from rich import print
@@ -67,8 +68,8 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} file1.json` 
 """)
 def compress(
-    input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(TextBackend)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
 

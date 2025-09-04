@@ -68,9 +68,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.docx -o output_file.pdf`
     """)
 def convert(
-    input_files: InputFilesArgument(DOC_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(DOC_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(DOC_BACKEND)],
+    format: Annotated[str, FormatOption(DOC_BACKEND)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     doc_backend = DOC_BACKEND(
         install_deps=CONFIG['install-deps'],

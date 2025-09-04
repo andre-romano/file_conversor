@@ -46,9 +46,9 @@ EXTERNAL_DEPENDENCIES = HashBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {CREATE_NAME} file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
 """)
 def create(
-    input_files: InputFilesArgument(),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(HashBackend),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument()],
+    format: Annotated[str, FormatOption(HashBackend)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     output_file = output_dir / f"CHECKSUM.{format}"
     if not STATE["overwrite-output"]:

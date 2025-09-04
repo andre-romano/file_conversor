@@ -66,9 +66,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.xlsx -o output_file.pdf`
     """)
 def convert(
-    input_files: InputFilesArgument(XLS_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(XLS_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(XLS_BACKEND)],
+    format: Annotated[str, (XLS_BACKEND)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     xls_backend = XLS_BACKEND(
         install_deps=CONFIG['install-deps'],

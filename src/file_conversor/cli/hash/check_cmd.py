@@ -64,7 +64,7 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {CHECK_NAME} file.sha1 file.sha3_512` 
 """)
 def check(
-    input_files: InputFilesArgument(HashBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(HashBackend)],
 ):
     hash_backend = HashBackend(verbose=STATE["verbose"])
 

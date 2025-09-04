@@ -71,7 +71,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.webp filename2.png filename3.gif`
     """)
 def info(
-    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     for input_file in input_files:

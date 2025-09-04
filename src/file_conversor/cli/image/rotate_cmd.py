@@ -78,7 +78,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.jpg -r -180 -o`
     """)
 def rotate(
-    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
     rotation: Annotated[int, typer.Option("--rotation", "-r",
                                           help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise rotation) and 360 (clockwise rotation)."),
                                           min=-360, max=360,
@@ -89,7 +89,7 @@ def rotate(
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
                                             )] = CONFIG["image-resampling"],
 
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 

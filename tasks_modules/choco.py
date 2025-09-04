@@ -98,7 +98,7 @@ Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERY
     <summary>{PROJECT_DESCRIPTION}</summary>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
     <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
-    <projectSourceUrl>{PROJECT_HOMEPAGE}</projectSourceUrl>
+    <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
     <packageSourceUrl>{SOURCE_URL}</packageSourceUrl>
     <licenseUrl>{LICENSE_URL}</licenseUrl>
     <releaseNotes>{RELEASE_NOTES_URL}</releaseNotes>

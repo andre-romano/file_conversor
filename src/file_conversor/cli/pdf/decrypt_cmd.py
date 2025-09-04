@@ -70,13 +70,13 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {DECRYPT_NAME} input_file.pdf -p 1234`
     """)
 def decrypt(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
     password: Annotated[str, typer.Option("--password", "-p",
                                           help=_("Password used for decryption."),
                                           prompt=f"{_('Password for decryption (password will not be displayed, for your safety)')}",
                                           hide_input=True,
                                           )],
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
 

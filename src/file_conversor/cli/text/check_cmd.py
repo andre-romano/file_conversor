@@ -4,6 +4,7 @@
 import typer
 
 from pathlib import Path
+from typing import Annotated, List
 
 from rich import print
 
@@ -65,7 +66,7 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {CHECK_NAME} file1.json file2.yaml` 
 """)
 def check(
-    input_files: InputFilesArgument(TextBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(TextBackend)],
 ):
     text_backend = TextBackend(verbose=STATE["verbose"])
     logger.info(f"{_('Checking files')} ...")

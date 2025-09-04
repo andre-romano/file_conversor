@@ -26,7 +26,7 @@ class CommandManager:
         output_name = output_name.with_suffix(suffix if suffix else output_file.suffix)
         return output_name.name
 
-    def __init__(self, input_files: List[str | Path] | str | Path, output_dir: Path, overwrite: bool, steps: int = 1) -> None:
+    def __init__(self, input_files: List[str] | List[Path] | str | Path, output_dir: Path, overwrite: bool, steps: int = 1) -> None:
         super().__init__()
         self._overwrite = overwrite
         self._output_dir = output_dir

@@ -70,8 +70,8 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {EXTRACT_IMG_NAME} input_file.pdf -od D:/Downloads` 
     """)
 def extract_img(
-    input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyMuPDFBackend)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
 

@@ -70,7 +70,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ENCRYPT_NAME} input_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
                                                 help=_("Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF file."),
                                                 prompt=f"{_('Owner password for encryption (password will not be displayed, for your safety)')}",
@@ -125,7 +125,7 @@ def encrypt(
                                               callback=lambda x: check_valid_options(x, valid_options=[None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"])
                                               )] = "AES-256",
 
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
 

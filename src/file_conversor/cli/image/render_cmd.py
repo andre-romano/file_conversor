@@ -73,10 +73,10 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {RENDER_NAME} input_file.svg input_file2.svg -od D:/Downloads -f jpg --dpi 300`
     """)
 def render(
-    input_files: InputFilesArgument(PyMuSVGBackend),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(PyMuSVGBackend),  # pyright: ignore[reportInvalidTypeForm]
-    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyMuSVGBackend)],
+    format: Annotated[str, FormatOption(PyMuSVGBackend)],
+    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pymusvg_backend = PyMuSVGBackend(verbose=STATE['verbose'])
 

@@ -70,9 +70,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file.png -od D:/Downloads -o`
     """)
 def compress(
-    input_files: InputFilesArgument(CompressBackend),  # pyright: ignore[reportInvalidTypeForm]
-    quality: QualityOption() = CONFIG["image-quality"],  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(CompressBackend)],
+    quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     compress_backend = CompressBackend(
         install_deps=CONFIG['install-deps'],

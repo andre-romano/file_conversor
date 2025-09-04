@@ -76,10 +76,10 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f png -o`
     """)
 def convert(
-    input_files: InputFilesArgument(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(PyMuPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    dpi: DPIOption() = CONFIG["image-dpi"],  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyMuPDFBackend)],
+    format: Annotated[str, FormatOption(PyMuPDFBackend)],
+    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
 

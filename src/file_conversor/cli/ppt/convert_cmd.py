@@ -66,9 +66,9 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pptx -o output_file.pdf`
     """)
 def convert(
-    input_files: InputFilesArgument(PPT_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(PPT_BACKEND),  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PPT_BACKEND)],
+    format: Annotated[str, FormatOption(PPT_BACKEND)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     ppt_backend = PPT_BACKEND(
         install_deps=CONFIG['install-deps'],

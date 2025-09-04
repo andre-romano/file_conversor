@@ -77,12 +77,12 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file.pdf -o`
     """)
 def compress(
-    input_files: InputFilesArgument(GhostscriptBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(GhostscriptBackend)],
     compression: Annotated[str, typer.Option("--compression", "-c",
                                              help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
                                              callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                              )] = CONFIG["pdf-compression"],
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     gs_backend = GhostscriptBackend(

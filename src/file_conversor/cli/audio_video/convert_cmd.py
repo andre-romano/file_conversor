@@ -91,8 +91,8 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f .mp3`
     """)
 def convert(
-    input_files: InputFilesArgument(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(FFmpegBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
+    format: Annotated[str, FormatOption(FFmpegBackend)],
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
@@ -101,7 +101,7 @@ def convert(
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(

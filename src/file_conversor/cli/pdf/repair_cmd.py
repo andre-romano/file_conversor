@@ -68,9 +68,9 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {REPAIR_NAME} input_file.pdf -od D:/Downloads` 
 """)
 def repair(
-    input_files: InputFilesArgument(PikePDFBackend),  # pyright: ignore[reportInvalidTypeForm]
-    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PikePDFBackend)],
+    password: Annotated[str | None, PasswordOption()] = None,
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
 

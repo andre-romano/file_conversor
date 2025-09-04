@@ -72,12 +72,12 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {EXTRACT_NAME} input_file.pdf -pg 1-2 -pg 4-4 -pg 6-6 -od D:/Downloads` 
     """)
 def extract(
-    input_files: InputFilesArgument(PyPDFBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
     pages: Annotated[List[str] | None, typer.Option("--pages", "-pg",
                                                     help=_('Pages to extract (comma-separated list). Format "start-end".'),
                                                     )] = None,
-    password: PasswordOption() = None,  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    password: Annotated[str | None, PasswordOption()] = None,
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
 

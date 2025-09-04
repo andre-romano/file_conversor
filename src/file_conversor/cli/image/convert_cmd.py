@@ -79,10 +79,10 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.bmp -f png -od D:/Downloads`
     """)
 def convert(
-    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
-    format: FormatOption(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
-    quality: QualityOption() = CONFIG["image-quality"],  # pyright: ignore[reportInvalidTypeForm]
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    format: Annotated[str, FormatOption(PillowBackend)],
+    quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 

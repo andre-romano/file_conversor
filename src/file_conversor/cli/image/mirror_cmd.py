@@ -75,12 +75,12 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {MIRROR_NAME} input_file.png -a y -o`
     """)
 def mirror(
-    input_files: InputFilesArgument(PillowBackend),  # pyright: ignore[reportInvalidTypeForm]
+    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
     axis: Annotated[str, typer.Option("--axis", "-a",
                                       help=_("Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
                                       callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
                                       )],
-    output_dir: OutputDirOption() = Path(),  # pyright: ignore[reportInvalidTypeForm]
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 
