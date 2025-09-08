@@ -24,6 +24,10 @@ class TestApp:
         result = Test.invoke("--verbose", "config", "-h")
         assert result.exit_code == 0
 
+    def test_version_flag(self,):
+        result = Test.invoke("--version")
+        assert result.exit_code == 0
+
     def test_debug_flag(self,):
         result = Test.invoke("-d", "config", "-h")
         assert result.exit_code == 0

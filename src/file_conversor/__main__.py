@@ -12,12 +12,13 @@ from file_conversor.system import reload_user_path
 
 
 # Entry point of the app
-def main():
-    exitcode = 0
+def main() -> None:
     try:
         # begin app
         reload_user_path()
         app_cmd(prog_name="file_conversor")
+        LOG.shutdown()
+        sys.exit(0)
     except Exception as e:
         error_type = str(type(e)).split("'")[1]
         logger.error(f"{error_type} ({e})", exc_info=True if STATE["debug"] else None)
@@ -25,13 +26,10 @@ def main():
             logger.error(f"CMD: {e.cmd} ({e.returncode})")
             logger.error(f"STDERR: {e.stderr}")
             logger.error(f"STDOUT: {e.stdout}")
-        if STATE["debug"]:
-            LOG.shutdown()
-            raise
-        exitcode = 1
-    finally:
         LOG.shutdown()
-        sys.exit(exitcode)
+        if STATE["debug"]:
+            raise
+        sys.exit(1)
 
 
 # Start the application

@@ -4,7 +4,7 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from PIL.ExifTags import TAGS
 
 from pathlib import Path
@@ -27,6 +27,18 @@ class PillowBackend(AbstractBackend):
     """
     A class that provides an interface for handling image files using ``pillow``.
     """
+
+    PILLOW_FILTERS: dict[str, type[ImageFilter.BuiltinFilter]] = {
+        "blur": ImageFilter.BLUR,
+        "smooth": ImageFilter.SMOOTH,
+        "smooth_more": ImageFilter.SMOOTH_MORE,
+        "sharpen": ImageFilter.DETAIL,
+        "sharpen_more": ImageFilter.SHARPEN,
+        "edge_enhance": ImageFilter.EDGE_ENHANCE,
+        "edge_enhance_more": ImageFilter.EDGE_ENHANCE_MORE,
+        "emboss": ImageFilter.EMBOSS,
+        "emboss_edge": ImageFilter.CONTOUR,
+    }
 
     Exif = Image.Exif
     Exif_TAGS = TAGS
@@ -84,7 +96,7 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        img = Image.open(input_file)
+        img = self._open(input_file)
         return img.getexif()
 
     def resize(self,
@@ -110,7 +122,7 @@ class PillowBackend(AbstractBackend):
         out_ext = Path(output_file).suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
-        with Image.open(input_file) as img:
+        with self._open(input_file) as img:
             if scale:
                 if scale <= 0:
                     raise RuntimeError(_("Scale must be >0"))
@@ -125,7 +137,7 @@ class PillowBackend(AbstractBackend):
                 size=(width, height),
                 resample=resampling
             )
-            self._save_fix_errors(
+            self._save(
                 img,
                 output_file,
                 format=format,
@@ -158,8 +170,8 @@ class PillowBackend(AbstractBackend):
         output_ext = Path(output_file).suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[output_ext]["format"]
 
-        img = Image.open(input_file)
-        self._save_fix_errors(
+        img = self._open(input_file)
+        self._save(
             img,
             output_file,
             format=format,
@@ -193,9 +205,9 @@ class PillowBackend(AbstractBackend):
         out_ext = Path(output_file).suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
-        img = Image.open(input_file)
+        img = self._open(input_file)
         img = img.rotate(-rotate, resample=resampling, expand=True)  # clockwise rotation
-        self._save_fix_errors(
+        self._save(
             img,
             output_file,
             format=format,
@@ -218,12 +230,12 @@ class PillowBackend(AbstractBackend):
         out_ext = Path(output_file).suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
-        img = Image.open(input_file)
+        img = self._open(input_file)
         if x_y:
             img = ImageOps.mirror(img)
         else:
             img = ImageOps.flip(img)
-        self._save_fix_errors(
+        self._save(
             img,
             output_file,
             format=format,
@@ -231,7 +243,216 @@ class PillowBackend(AbstractBackend):
             optimize=True,
         )
 
-    def _save_fix_errors(self, img: Image.Image, output_file: str | Path, format: str, **params):
+    def blur(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        blur_pixels: int,
+    ):
+        """
+        Blurs an input image file using GaussianBlur.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.        
+        :param blur_pixels: Blur radius (in pixels). Higher number = more blur.        
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        img = self._open(input_file)
+        img = img.filter(
+            ImageFilter.GaussianBlur(radius=blur_pixels)
+        )
+        self._save(
+            img,
+            output_file,
+            format=format,
+            quality=90,
+            optimize=True,
+        )
+
+    def unsharp_mask(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        radius: float,
+        percent: int,
+        threshold: int,
+    ):
+        """
+        Sharpens an input image file using unsharp mask.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.        
+
+        :param radius: Pixels to blur.
+        :param percent: Strength of sharpening.
+        :param threshold: How different pixels must be from neighbors to be sharpened (controls noise amplification).
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        img = self._open(input_file)
+        img = img.filter(ImageFilter.UnsharpMask(
+            radius=radius,
+            percent=percent,
+            threshold=threshold,
+        ))
+        self._save(
+            img,
+            output_file,
+            format=format,
+            quality=90,
+            optimize=True,
+        )
+
+    def antialias(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        radius: int,
+        algorithm: str = "median",
+    ):
+        """
+        Applies antialias to an input image file using Median or Mode algorithms.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.        
+
+        :param radius: Box radius (kernel size) to calculate pixel averaging.
+        :param algorithm: Algorithm used. Available options are "median" (default, replaces each pixel with the median of its neighbors), "mode" (replaces each pixel with the most common (mode) pixel value in the neighborhood).
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        img = self._open(input_file)
+        img = img.filter(
+            ImageFilter.MedianFilter(radius) if algorithm == "median" else
+            ImageFilter.ModeFilter(radius)
+        )
+        self._save(
+            img,
+            output_file,
+            format=format,
+            quality=90,
+            optimize=True,
+        )
+
+    def enhance(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        color_factor: float = 1.0,
+        contrast_factor: float = 1.0,
+        brightness_factor: float = 1.0,
+        sharpness_factor: float = 1.0,
+    ):
+        """
+        Enhances an input image file.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.        
+
+        :param color_factor: 0.0 = black and white | 1.0 = original color | 2.0 very saturated
+        :param contrast_factor: 0.0 = gray | 1.0 = original constrat | 2.0 strong contrast
+        :param brightness_factor: 0.0 = black | 1.0 = original brightness | 2.0 very bright
+        :param sharpness_factor: 0.0 = blurred | 1.0 = original | 2.0 sharpen edges
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        img = self._open(input_file)
+        img = ImageEnhance.Color(img).enhance(color_factor)
+        img = ImageEnhance.Contrast(img).enhance(contrast_factor)
+        img = ImageEnhance.Brightness(img).enhance(brightness_factor)
+        img = ImageEnhance.Sharpness(img).enhance(sharpness_factor)
+        self._save(
+            img,
+            output_file,
+            format=format,
+            quality=90,
+            optimize=True,
+        )
+
+    def filter(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        filters: list[ImageFilter.BuiltinFilter] | list[str],
+    ):
+        """
+        Enhances an input image file.
+
+        :param output_file: Output image file.
+        :param input_file: Input image file.        
+        :param filters: Filters to apply in image. Check PillowFilter for supported filters.
+
+        filters =
+
+        - "blur": {_('Blurs image')}
+
+        - "smooth": {_('Softens image, similar to blur')}
+
+        - "smooth_more": {_('Softens image more')}
+
+        - "sharpen": {_('Increase image sharpness')}
+
+        - "sharpen_more": {_('Increase image sharpness - stronger sharpness')}
+
+        - "edge_enhance": {_('Enhance edge contours of the image')}
+
+        - "edge_enhance_more": {_('Enhance edge contours of the image - stronger enhancement')}
+
+        - "edge_enhance_map": {_('Enhance edge contours of the image - use mapping algorithm')}
+
+        - "emboss": {_('Create 3D emboss effect in the image')}
+
+        - "emboss_draw": {_('Draw edge contours of the image')}
+
+        :raises FileNotFoundError: if input file not found.
+        """
+        self.check_file_exists(input_file)
+
+        out_ext = Path(output_file).suffix[1:]
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+
+        img = self._open(input_file)
+        for filter in filters:
+            if isinstance(filter, str):
+                filter = self.PILLOW_FILTERS[filter]
+            img = img.filter(filter)
+        self._save(
+            img,
+            output_file,
+            format=format,
+            quality=90,
+            optimize=True,
+        )
+
+    def _open(self, input_file: Path | str):
+        img = Image.open(input_file)
+        # 1. Transparency -> convert to RGBA
+        if img.mode == "P" and "transparency" in img.info:
+            img = img.convert("RGBA")
+        return img
+
+    def _save(self, img: Image.Image, output_file: str | Path, format: str, **params):
         """
         Corrects common errors in images and saves them.
 
@@ -250,10 +471,6 @@ class PillowBackend(AbstractBackend):
                 params.setdefault("exif", img.info["exif"])
             if "icc_profile" in img.info and img.info["icc_profile"]:
                 params.setdefault("icc_profile", img.info["icc_profile"])
-
-            # 1. Transparency -> convert to RGBA
-            if img.mode == "P" and "transparency" in img.info:
-                img = img.convert("RGBA")
 
             # 2. Convert incompatible modes to the target format
             if format in ("JPEG",) and img.mode not in ("RGB", "L"):
