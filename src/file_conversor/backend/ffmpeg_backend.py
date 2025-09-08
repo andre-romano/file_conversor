@@ -18,7 +18,7 @@ from file_conversor.config.locale import get_translation
 from file_conversor.utils.validators import check_file_format
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
-from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.abstract_backend import AbstractBackend, BackendOption
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -60,49 +60,75 @@ class FFmpegBackend(AbstractBackend):
 
     SUPPORTED_OUT_AUDIO_FORMATS = {
         'mp3': {
-            '-f': 'mp3',
-            '-c:a': 'libmp3lame',
+            "-f": BackendOption("-f", "mp3"),
+            "-c:a": BackendOption("-c:a", "libmp3lame"),
+            "-vn": BackendOption("-vn"),
         },
         'm4a': {
-            '-f': 'ipod',
-            '-c:a': 'aac',
+            "-f": BackendOption("-f", "ipod"),
+            "-c:a": BackendOption("-c:a", "aac"),
+            "-vn": BackendOption("-vn"),
         },
         'ogg': {
-            '-f': 'ogg',
-            '-c:a': 'libvorbis',
+            "-f": BackendOption("-f", "ogg"),
+            "-c:a": BackendOption("-c:a", "libvorbis"),
+            "-vn": BackendOption("-vn"),
         },
         'opus': {
-            '-f': 'opus',
-            '-c:a': 'libopus',
+            "-f": BackendOption("-f", "opus"),
+            "-c:a": BackendOption("-c:a", "libopus"),
+            "-vn": BackendOption("-vn"),
         },
         'flac': {
-            '-f': 'flac',
-            '-c:a': 'flac',
+            "-f": BackendOption("-f", "flac"),
+            "-c:a": BackendOption("-c:a", "flac"),
+            "-vn": BackendOption("-vn"),
         },
     }
     SUPPORTED_OUT_VIDEO_FORMATS = {
         'mp4': {
-            '-f': 'mp4',
-            '-c:v': 'libx264',
-            '-c:a': 'aac',
+            "-f": BackendOption("-f", "mp4"),
+            "-c:v": BackendOption("-c:v", "libx264"),
+            "-c:a": BackendOption("-c:a", "aac"),
         },
         'avi': {
-            '-f': 'avi',
-            '-c:v': 'mpeg4',
-            '-c:a': 'libmp3lame',
+            "-f": BackendOption("-f", "avi"),
+            "-c:v": BackendOption("-c:v", "mpeg4"),
+            "-c:a": BackendOption("-c:a", "libmp3lame"),
         },
         'mkv': {
-            '-f': 'matroska',
-            '-c:v': 'libx264',
-            '-c:a': 'aac',
+            "-f": BackendOption("-f", "matroska"),
+            "-c:v": BackendOption("-c:v", "libx264"),
+            "-c:a": BackendOption("-c:a", "aac"),
         },
         'webm': {
-            '-f': 'webm',
-            '-c:v': 'libvpx',
-            '-c:a': 'libvorbis',
+            "-f": BackendOption("-f", "webm"),
+            "-c:v": BackendOption("-c:v", "libvpx"),
+            "-c:a": BackendOption("-c:a", "libvorbis"),
         },
     }
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
+
+    SUPPORTED_AUDIO_CODECS = [
+        "aac",
+        "ac3",
+        "flac",
+        "libfdk_aac",
+        "libmp3lame",
+        "libopus",
+        "libvorbis",
+        "pcm_s16le",
+    ]
+
+    SUPPORTED_VIDEO_CODECS = [
+        "h264_nvenc",
+        "hevc_nvenc",
+        "libvpx",
+        "libvpx-vp9",
+        "libx264",
+        "libx265",
+        "mpeg4",
+    ]
 
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
@@ -212,7 +238,7 @@ class FFmpegBackend(AbstractBackend):
         )
         return json.loads(result.stdout)
 
-    def _set_input(self, input_file: str | Path) -> tuple[str, list]:
+    def _get_input_defaults(self, input_file: str | Path) -> list[BackendOption]:
         """
         Set the input file and check if it has a supported format.
 
@@ -232,14 +258,12 @@ class FFmpegBackend(AbstractBackend):
         check_file_format(input_path, self.SUPPORTED_IN_FORMATS)
 
         # set the input format options based on the file extension
-        in_opts = []
         in_ext = input_path.suffix[1:]
-        for opt, value in self.SUPPORTED_IN_FORMATS[in_ext].items():
-            in_opts.extend([opt, value])
+        if self.SUPPORTED_IN_FORMATS[in_ext]:
+            return [opt for opt in self.SUPPORTED_IN_FORMATS[in_ext].values()]
+        return []
 
-        return f"{input_path}", in_opts
-
-    def _set_output(self, output_file: str | Path) -> tuple[str, list]:
+    def _get_output_defaults(self, output_file: str | Path) -> list[BackendOption]:
         """
         Set the output file and check if it has a supported format.
 
@@ -252,18 +276,30 @@ class FFmpegBackend(AbstractBackend):
         output_path = Path(output_file)
 
         # create out dir (if it does not exists)
-        output_path.parent.mkdir(exist_ok=True)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # check if the output file has a supported format
         check_file_format(output_path, self.SUPPORTED_OUT_FORMATS)
 
         # set the output format options based on the file extension
-        out_opts = []
         out_ext = output_path.suffix[1:]
-        for opt, value in self.SUPPORTED_OUT_FORMATS[out_ext].items():
-            out_opts.extend([opt, value])
+        if self.SUPPORTED_OUT_FORMATS[out_ext]:
+            return [opt for opt in self.SUPPORTED_OUT_FORMATS[out_ext].values()]
+        return []
 
-        return f"{output_path}", out_opts
+    def _override_with(self, default_opts: list[BackendOption], user_opts: list[BackendOption]) -> list[str]:
+        res: list[str] = []
+        for opt in default_opts:
+            try:
+                idx = user_opts.index(opt)
+                user_opt = user_opts[idx]
+                res.extend(user_opt.get_list())
+                del user_opts[idx]
+            except ValueError:
+                res.extend(opt.get_list())
+        for opt in user_opts:
+            res.extend(opt.get_list())
+        return res
 
     def convert(
         self,
@@ -271,8 +307,8 @@ class FFmpegBackend(AbstractBackend):
             output_file: str | Path,
             overwrite_output: bool = True,
             stats: bool = False,
-            in_options: Iterable | None = None,
-            out_options: Iterable | None = None,
+            in_options: list[BackendOption] | None = None,
+            out_options: list[BackendOption] | None = None,
             progress_callback: Callable[[float], Any] | None = None,
     ):
         """
@@ -291,11 +327,11 @@ class FFmpegBackend(AbstractBackend):
         :raises RuntimeError: If FFmpeg encounters an error during execution.
         """
         # set input/output files and options
-        in_file, in_opts = self._set_input(input_file)
-        out_file, out_opts = self._set_output(output_file)
+        in_def_opts = self._get_input_defaults(input_file)
+        out_def_opts = self._get_output_defaults(output_file)
 
-        in_opts.extend(in_options if in_options else [])
-        out_opts.extend(out_options if out_options else [])
+        in_opts = self._override_with(in_def_opts, in_options if in_options else [])
+        out_opts = self._override_with(out_def_opts, out_options if out_options else [])
 
         # set global options
         global_options = [
@@ -310,9 +346,9 @@ class FFmpegBackend(AbstractBackend):
         ffmpeg_command.extend([str(self._ffmpeg_bin)])  # ffmpeg CLI
         ffmpeg_command.extend(global_options)    # set global options
         ffmpeg_command.extend(in_opts)           # set in options
-        ffmpeg_command.extend(["-i", in_file])   # set input
+        ffmpeg_command.extend(["-i", str(input_file)])   # set input
         ffmpeg_command.extend(out_opts)          # set out options
-        ffmpeg_command.extend([out_file])        # set output
+        ffmpeg_command.extend([str(output_file)])        # set output
 
         # remove empty strings
         ffmpeg_command = [arg for arg in ffmpeg_command if arg != ""]

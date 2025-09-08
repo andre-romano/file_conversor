@@ -31,7 +31,7 @@ class Configuration:
             "language": language,    # Default: system language or "en_US"
             "install-deps": True,    # Default: ask user to confirm dependency installation
             "audio-bitrate": 192,    # Default audio bitrate in kbps
-            "video-bitrate": 10000,  # Default video bitrate in kbps
+            "video-bitrate": 6000,   # Default video bitrate in kbps
             "image-quality": 90,     # Default image quality 90%
             "image-dpi": 200,        # Default image => PDF dpi
             "image-fit": 'into',     # Default image => PDF fit mode

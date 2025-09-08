@@ -10,12 +10,13 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
+from file_conversor.backend.abstract_backend import BackendOption
 
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.validators import check_positive_integer
+from file_conversor.utils.validators import check_positive_integer, check_valid_options
 from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
@@ -92,15 +93,29 @@ ctx_menu.register_callback(register_ctx_menu)
     """)
 def convert(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
+
     format: Annotated[str, FormatOption(FFmpegBackend)],
+
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=_("Audio bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["audio-bitrate"],
+
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
+
+    audio_codec: Annotated[str | None, typer.Option("--audio-codec", "-ac",
+                                                    help=f'{_("Audio codec. Available options are:")} {", ".join(FFmpegBackend.SUPPORTED_AUDIO_CODECS)}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
+                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_AUDIO_CODECS),
+                                                    )] = None,
+
+    video_codec: Annotated[str | None, typer.Option("--video-codec", "-vc",
+                                                    help=f'{_("Video codec. Available options are:")} {", ".join(FFmpegBackend.SUPPORTED_VIDEO_CODECS)}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
+                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_VIDEO_CODECS),
+                                                    )] = None,
+
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     # init ffmpeg
@@ -112,12 +127,18 @@ def convert(
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         out_ext = output_file.suffix[1:]
 
-        in_options = []
-        out_options = []
+        in_options: list[BackendOption] = []
+        out_options: list[BackendOption] = []
+
         # configure options
-        out_options.extend(["-b:a", f"{audio_bitrate}k"])
+        out_options.append(BackendOption("-b:a", f"{audio_bitrate}k"))
         if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-            out_options.extend(["-b:v", f"{video_bitrate}k"])
+            out_options.append(BackendOption("-b:v", f"{video_bitrate}k"))
+
+        if audio_codec:
+            out_options.append(BackendOption("-c:a", audio_codec))
+        if video_codec:
+            out_options.append(BackendOption("-c:v", video_codec))
 
         # display current progress
         process = ffmpeg_backend.convert(
