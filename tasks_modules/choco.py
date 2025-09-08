@@ -72,17 +72,33 @@ Install-BinFile -Name "{PROJECT_NAME}" -Path $exePath
     uninstall_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
 
-$packageName = "{PROJECT_NAME}"
-$version     = "{PROJECT_VERSION}" 
-$toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$dir         = Join-Path ${{env:ProgramFiles(x86)}} "$packageName"
-$uninstaller = Join-Path "$dir" "{UNINSTALL_APP_WIN.name}"
+$packageName = '{PROJECT_NAME}'
 
-Write-Output "Removing shim ..."
-Uninstall-BinFile -Name "{PROJECT_NAME}"
+[array]$key = Get-UninstallRegistryKey -SoftwareName '{PROJECT_TITLE}*'
 
-Write-Output "Uninstalling app ..."
-Start-Process -FilePath "$uninstaller" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait
+if ($key.Count -eq 1) {{
+    $key | ForEach-Object {{
+        $packageArgs = @{{
+            packageName    = $packageName
+            fileType       = 'EXE'
+            silentArgs     = '/SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-'
+            validExitCodes = @(0)
+            file           = "$($_.UninstallString)"
+        }}
+
+        Uninstall-ChocolateyPackage @packageArgs
+        Uninstall-BinFile -Name "$packageName"
+    }}
+}}
+elseif ($key.Count -eq 0) {{
+    Write-Warning "$packageName has already been uninstalled by other means."
+}}
+elseif ($key.Count -gt 1) {{
+    Write-Warning "$($key.Count) matches found!"
+    Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
+    Write-Warning "Please alert package maintainer the following keys were matched:"
+    $key | ForEach-Object {{ Write-Warning "- $($_.DisplayName)" }}
+}}
 """, encoding="utf-8")
     assert uninstall_ps1_path.exists()
 
