@@ -71,4 +71,4 @@ def blur(
     cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_stem="_blurred")
 
-    logger.info(f"{_('Image unsharp')}: [green bold]{_('SUCCESS')}[/]")
+    logger.info(f"{_('Image blur')}: [green bold]{_('SUCCESS')}[/]")

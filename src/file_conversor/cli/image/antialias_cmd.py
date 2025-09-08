@@ -96,4 +96,4 @@ def antialias(
     cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_stem="_antialiased")
 
-    logger.info(f"{_('Image filter')}: [green bold]{_('SUCCESS')}[/]")
+    logger.info(f"{_('Image antialiasing')}: [green bold]{_('SUCCESS')}[/]")
