@@ -42,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="check",
                 description="Check",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1"',
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1""',
                 icon=str(icons_folder_path / 'check.ico'),
             ),
         ])
