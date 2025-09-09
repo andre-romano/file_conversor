@@ -8,5 +8,6 @@ _ = get_translation()
 COMMAND_NAME = "audio-video"
 
 # SUBCOMMANDS
+CHECK_NAME = "check"
 CONVERT_NAME = "convert"
 INFO_NAME = "info"

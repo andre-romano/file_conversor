@@ -10,7 +10,6 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
-from file_conversor.backend.abstract_backend import BackendOption
 
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation

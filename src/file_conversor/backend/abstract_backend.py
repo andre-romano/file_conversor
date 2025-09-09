@@ -24,44 +24,6 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class BackendOption:
-    def __init__(self, option: str, *values: str) -> None:
-        super().__init__()
-        self._option = option
-        self._values = list(values)
-
-    @property
-    def option(self):
-        return self._option
-
-    @property
-    def values(self):
-        return self._values
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, BackendOption):
-            return self._option == other._option
-        elif isinstance(other, (list, set)):
-            return self.__str__() == " ".join(other)
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self._option)
-
-    def __repr__(self) -> str:
-        if not self._values:
-            return f'{self._option}'
-        return f'{self._option} {" ".join(self._values)}'
-
-    def __str__(self) -> str:
-        return self.__repr__()
-
-    def get_list(self) -> list[str]:
-        if not self._values:
-            return [self._option]
-        return [self._option, *self._values]
-
-
 class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.

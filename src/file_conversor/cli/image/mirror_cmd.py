@@ -76,7 +76,7 @@ ctx_menu.register_callback(register_ctx_menu)
     """)
 def mirror(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
-    axis: Annotated[str, AxisOption],
+    axis: Annotated[str, AxisOption()],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])

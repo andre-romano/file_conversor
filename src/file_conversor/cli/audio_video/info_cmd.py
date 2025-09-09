@@ -88,7 +88,7 @@ def info(
     for filename in input_files:
         formatted = []
         logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")
-        metadata = ffmpeg_backend.get_file_info(filename)
+        metadata = ffmpeg_backend.info(filename)
         # 📁 General file information
         if "format" in metadata:
             format_info: dict = metadata["format"]

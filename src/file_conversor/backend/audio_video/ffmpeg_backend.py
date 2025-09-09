@@ -4,6 +4,7 @@
 This module provides functionalities for handling audio and video files using FFmpeg.
 """
 
+import subprocess
 import json
 import re
 
@@ -116,78 +117,6 @@ class FFmpegBackend(AbstractBackend):
         self._ffprobe_bin = self.find_in_path("ffprobe")
         self._ffmpeg_bin = self.find_in_path("ffmpeg")
 
-    def calculate_file_total_duration(self, file_path: str | Path) -> float:
-        """
-        Calculate file total duration (in secs), using `ffprobe`.
-
-        :return: Total duration in seconds.
-        """
-        process = Environment.run(
-            f'{self._ffprobe_bin}',
-            f'-v',
-            f'error',
-            f'-show_entries',
-            f'format=duration', '-of',
-            f'default=noprint_wrappers=1:nokey=1',
-            f'{file_path}',
-        )
-        duration_str = process.stdout.strip()
-        return float(duration_str if duration_str else "0")
-
-    def get_file_info(self, file_path: str | Path) -> dict:
-        """
-        Executa ffprobe e retorna os metadados no formato JSON
-
-        result = {
-            streams: [],
-            chapters: [],
-            format: {},
-        }
-
-        stream = {
-            index,
-            codec_name,
-            codec_long_name,
-            codec_type: audio|video,
-            sampling_rate,
-            channels,
-            channel_layout: stereo|mono,
-        }
-
-        format = {
-            format_name,
-            format_long_name,
-            duration,
-            size,
-        }
-
-        :return: JSON object
-        """
-        result = Environment.run(
-            f"{self._ffprobe_bin}",
-            "-v", "quiet",
-            "-print_format", "json",
-            "-show_format",
-            "-show_streams",
-            "-show_chapters",
-            "-show_error",
-            f"{file_path}",
-        )
-        return json.loads(result.stdout)
-
-    def get_resolution(self, file_path: str | Path):
-        metadata = self.get_file_info(file_path)
-        if "streams" in metadata:
-            for stream in metadata["streams"]:
-                stream: dict[str, str]
-                stream_type = stream.get("codec_type", "unknown").lower()
-                if stream_type != "video":
-                    continue
-                width = int(stream.get('width', '0'))
-                height = int(stream.get('height', '0'))
-                return width, height if width > 0 and height > 0 else None, None
-        return None, None
-
     def _get_input_options(self, input_file: str | Path) -> list[str]:
         """
         Set the input file and check if it has a supported format.
@@ -287,6 +216,128 @@ class FFmpegBackend(AbstractBackend):
         # get options
         return container.get_options()
 
+    def _get_resolution(self, file_path: str | Path):
+        metadata = self.info(file_path)
+        if "streams" in metadata:
+            for stream in metadata["streams"]:
+                stream: dict[str, str]
+                stream_type = stream.get("codec_type", "unknown").lower()
+                if stream_type != "video":
+                    continue
+                width = int(stream.get('width', '0'))
+                height = int(stream.get('height', '0'))
+                return width, height if width > 0 and height > 0 else None, None
+        return None, None
+
+    def _execute_progress_callback(
+        self,
+        input_file: str | Path,
+        process: subprocess.Popen,
+        progress_callback: Callable[[float], Any] | None = None,
+    ):
+        file_duration_secs = self._calculate_file_total_duration(input_file)
+        while process.poll() is None:
+            if not process.stdout:
+                continue
+
+            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
+            if not match:
+                continue
+            hours = int(match.group(1))
+            minutes = int(match.group(2))
+            seconds = float(match.group(3))
+
+            current_time = hours * 3600 + minutes * 60 + seconds
+            progress = 100.0 * (float(current_time) / file_duration_secs)
+            if progress_callback:
+                progress_callback(progress)
+
+    def _calculate_file_total_duration(self, file_path: str | Path) -> float:
+        """
+        Calculate file total duration (in secs), using `ffprobe`.
+
+        :return: Total duration in seconds.
+        """
+        process = Environment.run(
+            f'{self._ffprobe_bin}',
+            f'-v',
+            f'error',
+            f'-show_entries',
+            f'format=duration', '-of',
+            f'default=noprint_wrappers=1:nokey=1',
+            f'{file_path}',
+        )
+        duration_str = process.stdout.strip()
+        return float(duration_str if duration_str else "0")
+
+    def info(self, file_path: str | Path) -> dict:
+        """
+        Executa ffprobe e retorna os metadados no formato JSON
+
+        result = {
+            streams: [],
+            chapters: [],
+            format: {},
+        }
+
+        stream = {
+            index,
+            codec_name,
+            codec_long_name,
+            codec_type: audio|video,
+            sampling_rate,
+            channels,
+            channel_layout: stereo|mono,
+        }
+
+        format = {
+            format_name,
+            format_long_name,
+            duration,
+            size,
+        }
+
+        :return: JSON object
+        """
+        result = Environment.run(
+            f"{self._ffprobe_bin}",
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            "-show_chapters",
+            "-show_error",
+            f"{file_path}",
+        )
+        return json.loads(result.stdout)
+
+    def check(
+        self,
+        file_path: str | Path,
+        progress_callback: Callable[[float], Any] | None = None,
+    ):
+        """
+        Check file integrity
+
+        :raises subprocess.CalledProcessError: if file is corrupted
+        """
+        try:
+            process = Environment.run_nowait(
+                f"{self._ffmpeg_bin}",
+                "-v", "error",
+                "-i", str(file_path),
+                "-f", "null", "-"
+            )
+            self._execute_progress_callback(
+                input_file=file_path,
+                process=process,
+                progress_callback=progress_callback,
+            )
+            logger.info(rf"'{file_path}': [bold green]OK[/]")
+        except subprocess.CalledProcessError as e:
+            logger.error(rf"'{file_path}': [bold red]FAILED[/]")
+            raise
+
     def convert(
         self,
             input_file: str | Path,
@@ -367,22 +418,11 @@ class FFmpegBackend(AbstractBackend):
             *ffmpeg_command,
         )
 
-        file_duration_secs = self.calculate_file_total_duration(input_file)
-        while process.poll() is None:
-            if not process.stdout:
-                continue
-
-            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
-            if not match:
-                continue
-            hours = int(match.group(1))
-            minutes = int(match.group(2))
-            seconds = float(match.group(3))
-
-            current_time = hours * 3600 + minutes * 60 + seconds
-            progress = 100.0 * (float(current_time) / file_duration_secs)
-            if progress_callback:
-                progress_callback(progress)
+        self._execute_progress_callback(
+            input_file=input_file,
+            process=process,
+            progress_callback=progress_callback,
+        )
 
         Environment.check_returncode(process)
         return process
