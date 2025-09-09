@@ -5,9 +5,14 @@ from file_conversor.config import get_translation
 
 _ = get_translation()
 
+TRANSFORMATION_PANEL = _("Transformations")
+OTHERS_PANEL = _("Other commands")
+
+# command
 COMMAND_NAME = "audio-video"
 
 # SUBCOMMANDS
 CHECK_NAME = "check"
 CONVERT_NAME = "convert"
 INFO_NAME = "info"
+ROTATE_NAME = "rotate"

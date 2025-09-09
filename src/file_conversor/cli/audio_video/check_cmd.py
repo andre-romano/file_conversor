@@ -11,6 +11,7 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
+from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, CHECK_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
@@ -54,6 +55,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 @typer_cmd.command(
     name=CHECK_NAME,
+    rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Checks a audio/video file for corruption / inconsistencies.')}
     """,

@@ -17,7 +17,9 @@ from rich.console import Group
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
+from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, INFO_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils.formatters import format_bytes, format_bitrate
@@ -59,6 +61,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 @typer_cmd.command(
     name=INFO_NAME,
+    rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Get information about a audio/video file.')}
 

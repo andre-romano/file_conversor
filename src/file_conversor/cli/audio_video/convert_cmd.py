@@ -11,6 +11,7 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
+from file_conversor.cli.audio_video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
@@ -85,6 +86,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 @typer_cmd.command(
     name=CONVERT_NAME,
+    rich_help_panel=RICH_HELP_PANEL,
     help=f"""
         {_('Convert a audio/video file to a different format.')}
 
