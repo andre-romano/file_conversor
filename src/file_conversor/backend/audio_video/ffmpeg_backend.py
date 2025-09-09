@@ -221,6 +221,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            fps: int | None = None,
             rotate: int | None = None,
             mirror_axis: str | None = None,
     ) -> list[str]:
@@ -232,6 +233,7 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param fps: Video FPS. Defaults to None (use the same as source).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
         :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
 
@@ -264,6 +266,9 @@ class FFmpegBackend(AbstractBackend):
         if video_bitrate:
             container.video.codec.set_bitrate(video_bitrate)
 
+        if fps:
+            container.video.codec.set("-r", fps)
+
         if rotate:
             video_filter = ""
             if rotate in (90, -270):
@@ -290,6 +295,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            fps: int | None = None,
             rotate: int | None = None,
             mirror_axis: str | None = None,
             overwrite_output: bool = True,
@@ -305,6 +311,7 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param fps: Video FPS. Defaults to None (use the same as source).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
         :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
         :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
@@ -324,6 +331,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate=video_bitrate,
             audio_codec=audio_codec,
             video_codec=video_codec,
+            fps=fps,
             rotate=rotate,
             mirror_axis=mirror_axis,
         )

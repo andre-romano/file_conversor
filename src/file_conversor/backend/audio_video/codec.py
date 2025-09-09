@@ -99,6 +99,7 @@ class VideoCodec(_Codec):
         super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, **kwargs)
         self._valid_options.add("-b:v")
         self._valid_options.add("-vf")
+        self._valid_options.add("-r")
 
     def set_bitrate(self, bitrate: int):
         self.set("-b:v", f"{bitrate}k")

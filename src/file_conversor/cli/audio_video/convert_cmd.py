@@ -122,6 +122,11 @@ def convert(
                                                     callback=lambda x: check_valid_options(x, FFmpegBackend.get_supported_video_codecs()),
                                                     )] = None,
 
+    fps: Annotated[int | None, typer.Option("--fps", "-fp",
+                                            help=f'{_("Target video FPS (frames per second). Defaults to None (use same fps as video source)")}',
+                                            min=1,
+                                            )] = None,
+
     rotation: Annotated[int | None, typer.Option("--rotation", "-r",
                                                  help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
                                                  callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
@@ -146,6 +151,7 @@ def convert(
             video_bitrate=video_bitrate,
             audio_codec=audio_codec,
             video_codec=video_codec,
+            fps=fps,
             rotate=rotation,
             mirror_axis=mirror_axis,
             overwrite_output=STATE["overwrite-output"],
