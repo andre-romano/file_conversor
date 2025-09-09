@@ -1,4 +1,4 @@
-# src\file_conversor\backend\ffmpeg_backend.py
+# src\file_conversor\backend\audio_video\ffmpeg_backend.py
 
 """
 This module provides functionalities for handling audio and video files using FFmpeg.
@@ -12,13 +12,15 @@ from datetime import timedelta
 from typing import Any, Callable, Iterable
 
 # user-provided imports
+from file_conversor.backend.audio_video.format_container import AudioCodec, VideoCodec, FormatContainer, AVAILABLE_VIDEO_CONTAINERS, AVAILABLE_AUDIO_CONTAINERS
+from file_conversor.backend.abstract_backend import AbstractBackend
+
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
-from file_conversor.backend.abstract_backend import AbstractBackend, BackendOption
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -58,77 +60,9 @@ class FFmpegBackend(AbstractBackend):
     }
     SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
 
-    SUPPORTED_OUT_AUDIO_FORMATS = {
-        'mp3': {
-            "-f": BackendOption("-f", "mp3"),
-            "-c:a": BackendOption("-c:a", "libmp3lame"),
-            "-vn": BackendOption("-vn"),
-        },
-        'm4a': {
-            "-f": BackendOption("-f", "ipod"),
-            "-c:a": BackendOption("-c:a", "aac"),
-            "-vn": BackendOption("-vn"),
-        },
-        'ogg': {
-            "-f": BackendOption("-f", "ogg"),
-            "-c:a": BackendOption("-c:a", "libvorbis"),
-            "-vn": BackendOption("-vn"),
-        },
-        'opus': {
-            "-f": BackendOption("-f", "opus"),
-            "-c:a": BackendOption("-c:a", "libopus"),
-            "-vn": BackendOption("-vn"),
-        },
-        'flac': {
-            "-f": BackendOption("-f", "flac"),
-            "-c:a": BackendOption("-c:a", "flac"),
-            "-vn": BackendOption("-vn"),
-        },
-    }
-    SUPPORTED_OUT_VIDEO_FORMATS = {
-        'mp4': {
-            "-f": BackendOption("-f", "mp4"),
-            "-c:v": BackendOption("-c:v", "libx264"),
-            "-c:a": BackendOption("-c:a", "aac"),
-        },
-        'avi': {
-            "-f": BackendOption("-f", "avi"),
-            "-c:v": BackendOption("-c:v", "mpeg4"),
-            "-c:a": BackendOption("-c:a", "libmp3lame"),
-        },
-        'mkv': {
-            "-f": BackendOption("-f", "matroska"),
-            "-c:v": BackendOption("-c:v", "libx264"),
-            "-c:a": BackendOption("-c:a", "aac"),
-        },
-        'webm': {
-            "-f": BackendOption("-f", "webm"),
-            "-c:v": BackendOption("-c:v", "libvpx"),
-            "-c:a": BackendOption("-c:a", "libvorbis"),
-        },
-    }
+    SUPPORTED_OUT_AUDIO_FORMATS = AVAILABLE_AUDIO_CONTAINERS
+    SUPPORTED_OUT_VIDEO_FORMATS = AVAILABLE_VIDEO_CONTAINERS
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
-
-    SUPPORTED_AUDIO_CODECS = [
-        "aac",
-        "ac3",
-        "flac",
-        "libfdk_aac",
-        "libmp3lame",
-        "libopus",
-        "libvorbis",
-        "pcm_s16le",
-    ]
-
-    SUPPORTED_VIDEO_CODECS = [
-        "h264_nvenc",
-        "hevc_nvenc",
-        "libvpx",
-        "libvpx-vp9",
-        "libx264",
-        "libx265",
-        "mpeg4",
-    ]
 
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
@@ -136,6 +70,22 @@ class FFmpegBackend(AbstractBackend):
         "ffmpeg",
         "ffprobe",
     ])
+
+    @classmethod
+    def __get_supported_codecs(cls, supported_format: dict[str, FormatContainer], is_audio: bool, ext: str | None = None) -> Iterable[str]:
+        res: set[str] = set()
+        for cont_ext, container in supported_format.items():
+            if not ext or (ext == cont_ext):
+                res.update([str(c) for c in (container.audio.available_codecs if is_audio else container.video.available_codecs)])
+        return sorted(res)
+
+    @classmethod
+    def get_supported_audio_codecs(cls, ext: str | None = None) -> Iterable[str]:
+        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_AUDIO_FORMATS, is_audio=True, ext=ext)
+
+    @classmethod
+    def get_supported_video_codecs(cls, ext: str | None = None) -> Iterable[str]:
+        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_VIDEO_FORMATS, is_audio=False, ext=ext)
 
     def __init__(
         self,
@@ -238,17 +188,18 @@ class FFmpegBackend(AbstractBackend):
         )
         return json.loads(result.stdout)
 
-    def _get_input_defaults(self, input_file: str | Path) -> list[BackendOption]:
+    def _get_input_options(self, input_file: str | Path) -> list[str]:
         """
         Set the input file and check if it has a supported format.
 
         :param input_file: Input file path.
 
-        :return: (Input file, in options).
+        :return:  in options
 
         :raises FileNotFoundError: If the input file does not exist.
         :raises ValueError: If the input file format is not supported.
         """
+        res: list[str] = []
         # check file is found
         input_path = Path(input_file)
         if not input_path.exists() and not input_path.is_file():
@@ -259,23 +210,33 @@ class FFmpegBackend(AbstractBackend):
 
         # set the input format options based on the file extension
         in_ext = input_path.suffix[1:]
-        if self.SUPPORTED_IN_FORMATS[in_ext]:
-            return [opt for opt in self.SUPPORTED_IN_FORMATS[in_ext].values()]
-        return []
+        for k, v in self.SUPPORTED_IN_FORMATS[in_ext].items():
+            res.extend([str(k), str(v)])
+        return res
 
-    def _get_output_defaults(self, output_file: str | Path) -> list[BackendOption]:
+    def _get_output_options(
+            self,
+            output_file: str | Path,
+            audio_bitrate: int | None = None,
+            video_bitrate: int | None = None,
+            audio_codec: str | None = None,
+            video_codec: str | None = None,
+    ) -> list[str]:
         """
         Set the output file and check if it has a supported format.
 
         :param output_file: Output file path.
+        :param audio_bitrate: Audio bitrate to use. Defaults to None (use source bitrate).      
+        :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
+        :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
+        :param video_codec: Video codec to use. Defaults to None (use container default codec).      
 
-        :return: (Output file, out options).
+        :return: out options
 
         :raises typer.BadParameter: Unsupported format, or file not found.
         """
-        output_path = Path(output_file)
-
         # create out dir (if it does not exists)
+        output_path = Path(output_file)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # check if the output file has a supported format
@@ -283,32 +244,33 @@ class FFmpegBackend(AbstractBackend):
 
         # set the output format options based on the file extension
         out_ext = output_path.suffix[1:]
-        if self.SUPPORTED_OUT_FORMATS[out_ext]:
-            return [opt for opt in self.SUPPORTED_OUT_FORMATS[out_ext].values()]
-        return []
+        container = self.SUPPORTED_OUT_FORMATS[out_ext]
 
-    def _override_with(self, default_opts: list[BackendOption], user_opts: list[BackendOption]) -> list[str]:
-        res: list[str] = []
-        for opt in default_opts:
-            try:
-                idx = user_opts.index(opt)
-                user_opt = user_opts[idx]
-                res.extend(user_opt.get_list())
-                del user_opts[idx]
-            except ValueError:
-                res.extend(opt.get_list())
-        for opt in user_opts:
-            res.extend(opt.get_list())
-        return res
+        # audio codec
+        if audio_codec:
+            container.audio.codec = AudioCodec.from_str(audio_codec)
+        if audio_bitrate:
+            container.audio.codec.set_bitrate(audio_bitrate)
+
+        # video codec
+        if video_codec:
+            container.video.codec = VideoCodec.from_str(video_codec)
+        if video_bitrate:
+            container.video.codec.set_bitrate(video_bitrate)
+
+        # get options
+        return container.get_options()
 
     def convert(
         self,
             input_file: str | Path,
             output_file: str | Path,
+            audio_bitrate: int | None = None,
+            video_bitrate: int | None = None,
+            audio_codec: str | None = None,
+            video_codec: str | None = None,
             overwrite_output: bool = True,
             stats: bool = False,
-            in_options: list[BackendOption] | None = None,
-            out_options: list[BackendOption] | None = None,
             progress_callback: Callable[[float], Any] | None = None,
     ):
         """
@@ -316,10 +278,12 @@ class FFmpegBackend(AbstractBackend):
 
         :param input_file: Input file path.
         :param output_file: Output file path.      
+        :param audio_bitrate: Audio bitrate to use. Defaults to None (use source bitrate).      
+        :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
+        :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
+        :param video_codec: Video codec to use. Defaults to None (use container default codec).      
         :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
         :param stats: Show progress stats. Defaults to False.      
-        :param in_options: Additional input options. Defaults to None.      
-        :param out_options: Additional output options. Defaults to None.    
         :param progress_callback: Progress callback (0-100). Defaults to None.
 
         :return: Subprocess.Popen object
@@ -327,11 +291,15 @@ class FFmpegBackend(AbstractBackend):
         :raises RuntimeError: If FFmpeg encounters an error during execution.
         """
         # set input/output files and options
-        in_def_opts = self._get_input_defaults(input_file)
-        out_def_opts = self._get_output_defaults(output_file)
+        in_opts = self._get_input_options(input_file)
 
-        in_opts = self._override_with(in_def_opts, in_options if in_options else [])
-        out_opts = self._override_with(out_def_opts, out_options if out_options else [])
+        out_opts = self._get_output_options(
+            output_file,
+            audio_bitrate=audio_bitrate,
+            video_bitrate=video_bitrate,
+            audio_codec=audio_codec,
+            video_codec=video_codec,
+        )
 
         # set global options
         global_options = [

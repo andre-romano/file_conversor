@@ -87,9 +87,9 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.webm -o output_dir/ -f mp4 --audio-bitrate 192`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.webm -od output_dir/ -f mp4 --audio-bitrate 192`
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f .mp3`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f mp3`
     """)
 def convert(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
@@ -107,13 +107,13 @@ def convert(
                                                )] = CONFIG["video-bitrate"],
 
     audio_codec: Annotated[str | None, typer.Option("--audio-codec", "-ac",
-                                                    help=f'{_("Audio codec. Available options are:")} {", ".join(FFmpegBackend.SUPPORTED_AUDIO_CODECS)}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
-                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_AUDIO_CODECS),
+                                                    help=f'{_("Audio codec. Available options are:")} {", ".join(FFmpegBackend.get_supported_audio_codecs())}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
+                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.get_supported_audio_codecs()),
                                                     )] = None,
 
     video_codec: Annotated[str | None, typer.Option("--video-codec", "-vc",
-                                                    help=f'{_("Video codec. Available options are:")} {", ".join(FFmpegBackend.SUPPORTED_VIDEO_CODECS)}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
-                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_VIDEO_CODECS),
+                                                    help=f'{_("Video codec. Available options are:")} {", ".join(FFmpegBackend.get_supported_video_codecs())}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
+                                                    callback=lambda x: check_valid_options(x, FFmpegBackend.get_supported_video_codecs()),
                                                     )] = None,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
@@ -125,28 +125,15 @@ def convert(
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        out_ext = output_file.suffix[1:]
-
-        in_options: list[BackendOption] = []
-        out_options: list[BackendOption] = []
-
-        # configure options
-        out_options.append(BackendOption("-b:a", f"{audio_bitrate}k"))
-        if out_ext in FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS:
-            out_options.append(BackendOption("-b:v", f"{video_bitrate}k"))
-
-        if audio_codec:
-            out_options.append(BackendOption("-c:a", audio_codec))
-        if video_codec:
-            out_options.append(BackendOption("-c:v", video_codec))
-
         # display current progress
         process = ffmpeg_backend.convert(
-            input_file,
-            output_file,
+            input_file=input_file,
+            output_file=output_file,
+            audio_bitrate=audio_bitrate,
+            video_bitrate=video_bitrate,
+            audio_codec=audio_codec,
+            video_codec=video_codec,
             overwrite_output=STATE["overwrite-output"],
-            in_options=in_options,
-            out_options=out_options,
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()
