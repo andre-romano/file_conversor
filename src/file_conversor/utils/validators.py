@@ -89,7 +89,7 @@ def check_file_format(filename_or_iter: list | dict | set | str | Path | None, f
         file_path = Path(filename)
         file_format = file_path.suffix[1:].lower()
         if format_dict and file_format not in format_dict:
-            raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join(format_dict)}.")
+            raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join([str(f) for f in format_dict])}.")
         if exists:
             check_file_exists(file_path)
     return filename_or_iter
@@ -99,5 +99,5 @@ def check_valid_options(data: Any | None, valid_options: Iterable):
     if not data:
         return data
     if data not in valid_options:
-        raise typer.BadParameter(f"'{data}' {_('is invalid.  Valid options are')} {', '.join(valid_options)}.")
+        raise typer.BadParameter(f"'{data}' {_('is invalid.  Valid options are')} {', '.join([str(v) for v in valid_options])}.")
     return data

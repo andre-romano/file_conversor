@@ -221,6 +221,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            rotate: int | None = None,
     ) -> list[str]:
         """
         Set the output file and check if it has a supported format.
@@ -230,6 +231,7 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
 
         :return: out options
 
@@ -257,6 +259,17 @@ class FFmpegBackend(AbstractBackend):
             container.video.codec = VideoCodec.from_str(video_codec)
         if video_bitrate:
             container.video.codec.set_bitrate(video_bitrate)
+        if rotate:
+            video_filter = ""
+            if rotate in (90, -270):
+                video_filter += "transpose=1"  # 90deg rot clockwise
+            elif rotate in (180, -180):
+                video_filter += "transpose=1,transpose=1"  # 180deg rot clockwise
+            elif rotate in (270, -90):
+                video_filter += "transpose=2"  # -90deg rot clockwise
+            else:
+                raise ValueError(f"Invalid rotation '{rotate}'. Valid options are: -270, -180, -90, 90, 180, 270.")
+            container.video.codec.set("-vf", video_filter)
 
         # get options
         return container.get_options()
@@ -269,6 +282,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            rotate: int | None = None,
             overwrite_output: bool = True,
             stats: bool = False,
             progress_callback: Callable[[float], Any] | None = None,
@@ -282,6 +296,7 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
         :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
         :param stats: Show progress stats. Defaults to False.      
         :param progress_callback: Progress callback (0-100). Defaults to None.
@@ -299,6 +314,7 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate=video_bitrate,
             audio_codec=audio_codec,
             video_codec=video_codec,
+            rotate=rotate,
         )
 
         # set global options

@@ -30,7 +30,7 @@ class _Codec:
         self._invalid_prefix = invalid_prefix
         self._prefix = prefix
         self._name = name
-        self._options = {}
+        self._options: dict[str, str | int | None] = {}
         self._valid_options = set(valid_options or [])
         self.update(kwargs)
 
@@ -55,7 +55,10 @@ class _Codec:
     def set(self, option: str, value: Any = None):
         if option not in self._valid_options:
             raise KeyError(f"{_('Invalid option')} '{option}' {_('for codec')} '{self._name}'. {_('Valid options are:')} {', '.join(self._valid_options)}")
-        self._options[option] = value
+        if option in self._options and value:
+            self._options[option] = f"{self._options[option]},{value}"
+        else:
+            self._options[option] = value
 
     def set_bitrate(self, bitrate: int):
         raise NotImplementedError("not implemented")
@@ -65,9 +68,11 @@ class _Codec:
             self.set(opt, val)
 
     def get_options(self) -> list[str]:
+        res = [self._prefix, self._name]
         if not self._name or self._name.lower() == "null":
             return [self._invalid_prefix]
-        res = [self._prefix, self._name]
+        if self._name.lower() == "copy":
+            return res
         for key, value in self._options.items():
             if value:
                 res.extend([str(key), str(value)])
@@ -93,6 +98,7 @@ class VideoCodec(_Codec):
     def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
         super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, **kwargs)
         self._valid_options.add("-b:v")
+        self._valid_options.add("-vf")
 
     def set_bitrate(self, bitrate: int):
         self.set("-b:v", f"{bitrate}k")
@@ -100,6 +106,7 @@ class VideoCodec(_Codec):
 
 # register AUDIO codecs
 AudioCodec.register("null")
+AudioCodec.register("copy")
 AudioCodec.register("aac")
 AudioCodec.register("ac3")
 AudioCodec.register("flac")
@@ -111,6 +118,7 @@ AudioCodec.register("pcm_s16le")
 
 # register AUDIO codecs
 VideoCodec.register("null")
+VideoCodec.register("copy")
 VideoCodec.register("h264_nvenc", valid_options={
     "-preset": [
         "medium"

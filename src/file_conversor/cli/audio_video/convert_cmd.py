@@ -69,6 +69,12 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "m4a"',
                 icon=str(icons_folder_path / 'm4a.ico'),
             ),
+            WinContextCommand(
+                name="to_webm",
+                description="To WEBM",
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "webm"',
+                icon=str(icons_folder_path / 'webm.ico'),
+            ),
         ])
 
 
@@ -116,6 +122,11 @@ def convert(
                                                     callback=lambda x: check_valid_options(x, FFmpegBackend.get_supported_video_codecs()),
                                                     )] = None,
 
+    rotation: Annotated[int | None, typer.Option("--rotation", "-r",
+                                                 help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
+                                                 callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
+                                                 )] = None,
+
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     # init ffmpeg
@@ -133,6 +144,7 @@ def convert(
             video_bitrate=video_bitrate,
             audio_codec=audio_codec,
             video_codec=video_codec,
+            rotate=rotation,
             overwrite_output=STATE["overwrite-output"],
             progress_callback=progress_mgr.update_progress
         )
