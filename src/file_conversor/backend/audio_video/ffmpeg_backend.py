@@ -221,6 +221,8 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            width: int | None = None,
+            height: int | None = None,
             fps: int | None = None,
             rotate: int | None = None,
             mirror_axis: str | None = None,
@@ -233,6 +235,8 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param width: Target width (in pixels). Defaults to None (use the same as source).      
+        :param height: Target height (in pixels). Defaults to None (use the same as source).      
         :param fps: Video FPS. Defaults to None (use the same as source).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
         :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
@@ -269,6 +273,11 @@ class FFmpegBackend(AbstractBackend):
         if fps:
             container.video.codec.set("-r", fps)
 
+        if width and height:
+            container.video.codec.set("-vf", rf"scale={width}:{height}")
+        elif not width or not height:
+            raise ValueError(f"{_('Invalid width or height')} '{width} x {height}'. {_('Video resizer requires both options to work')}.")
+
         if rotate:
             video_filter = ""
             if rotate in (90, -270):
@@ -278,7 +287,7 @@ class FFmpegBackend(AbstractBackend):
             elif rotate in (270, -90):
                 video_filter += "transpose=2"  # -90deg rot clockwise
             else:
-                raise ValueError(f"Invalid rotation '{rotate}'. Valid options are: -270, -180, -90, 90, 180, 270.")
+                raise ValueError(f"{_('Invalid rotation')} '{rotate}'. {_('Valid options are:')} -270, -180, -90, 90, 180, 270.")
             container.video.codec.set("-vf", video_filter)
 
         if mirror_axis:
@@ -295,6 +304,8 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate: int | None = None,
             audio_codec: str | None = None,
             video_codec: str | None = None,
+            width: int | None = None,
+            height: int | None = None,
             fps: int | None = None,
             rotate: int | None = None,
             mirror_axis: str | None = None,
@@ -311,6 +322,8 @@ class FFmpegBackend(AbstractBackend):
         :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
+        :param width: Target width (in pixels). Defaults to None (use the same as source).      
+        :param height: Target height (in pixels). Defaults to None (use the same as source).      
         :param fps: Video FPS. Defaults to None (use the same as source).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
         :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
@@ -331,6 +344,8 @@ class FFmpegBackend(AbstractBackend):
             video_bitrate=video_bitrate,
             audio_codec=audio_codec,
             video_codec=video_codec,
+            width=width,
+            height=height,
             fps=fps,
             rotate=rotate,
             mirror_axis=mirror_axis,

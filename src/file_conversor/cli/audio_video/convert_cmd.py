@@ -16,6 +16,7 @@ from file_conversor.cli.audio_video._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.formatters import parse_video_resize
 from file_conversor.utils.validators import check_positive_integer, check_valid_options
 from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption
 
@@ -96,6 +97,10 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.webm -od output_dir/ -f mp4 --audio-bitrate 192`
 
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f mp3`
+
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mp4 -f mkv -r 90`
+
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.mkv -f avi -rs 1280x720`
     """)
 def convert(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
@@ -122,6 +127,10 @@ def convert(
                                                     callback=lambda x: check_valid_options(x, FFmpegBackend.get_supported_video_codecs()),
                                                     )] = None,
 
+    resolution: Annotated[str | None, typer.Option("--resolution", "-rs",
+                                                   help=f'{_("Video target resolution. Format WIDTHxHEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
+                                                   )] = None,
+
     fps: Annotated[int | None, typer.Option("--fps", "-fp",
                                             help=f'{_("Target video FPS (frames per second). Defaults to None (use same fps as video source)")}',
                                             min=1,
@@ -142,6 +151,9 @@ def convert(
         verbose=STATE["verbose"],
     )
 
+    # parse width , height
+    width, height = parse_video_resize(resolution, prompt=True, quiet=STATE["quiet"])
+
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         # display current progress
         process = ffmpeg_backend.convert(
@@ -152,6 +164,8 @@ def convert(
             audio_codec=audio_codec,
             video_codec=video_codec,
             fps=fps,
+            width=width,
+            height=height,
             rotate=rotation,
             mirror_axis=mirror_axis,
             overwrite_output=STATE["overwrite-output"],
