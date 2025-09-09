@@ -21,15 +21,15 @@ SCOOP_DEPS = {
     "mozjpeg": "",
 }
 
-# # DOCKER
-# DOCKER_APT_DEPS = [
-#     "ffmpeg",
-#     "ghostscript",
-#     "libreoffice-nogui",
-# ]
-# DOCKER_IMAGE_DEPS = {
-#     f"{DOCKER_REPOSITORY}/oxipng": "latest",
-#     f"{DOCKER_REPOSITORY}/mozjpeg": "latest",
-#     f"{DOCKER_REPOSITORY}/gifsicle": "latest",
-# }
-# DOCKER_PY_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
+# DOCKER
+DOCKER_APT_DEPS = [
+    "ffmpeg",
+    "ghostscript",
+    "libreoffice-nogui",
+]
+DOCKER_IMAGE_DEPS = {
+    f"{DOCKER_REPOSITORY}/oxipng": "latest",
+    f"{DOCKER_REPOSITORY}/mozjpeg": "latest",
+    f"{DOCKER_REPOSITORY}/gifsicle": "latest",
+}
+DOCKER_PY_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
