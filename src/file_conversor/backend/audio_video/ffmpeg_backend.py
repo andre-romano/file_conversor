@@ -8,7 +8,6 @@ import json
 import re
 
 from pathlib import Path
-from datetime import timedelta
 from typing import Any, Callable, Iterable
 
 # user-provided imports
@@ -76,7 +75,7 @@ class FFmpegBackend(AbstractBackend):
         res: set[str] = set()
         for cont_ext, container in supported_format.items():
             if not ext or (ext == cont_ext):
-                res.update([str(c) for c in (container.audio.available_codecs if is_audio else container.video.available_codecs)])
+                res.update([str(c) for c in (container.available_audio_codecs if is_audio else container.available_video_codecs)])
         return sorted(res)
 
     @classmethod
@@ -135,18 +134,6 @@ class FFmpegBackend(AbstractBackend):
         duration_str = process.stdout.strip()
         return float(duration_str if duration_str else "0")
 
-    def calculate_file_formatted_duration(self, file_path: str | Path) -> str:
-        """
-        Calculate file duration (formatted), using `ffprobe`.
-
-        :return: Total duration  (format HH:MM:SS).
-        """
-        duration_secs = self.calculate_file_total_duration(file_path)
-
-        # Convert seconds to timedelta and format as HH:MM:SS
-        td = timedelta(seconds=int(duration_secs))
-        return str(td)
-
     def get_file_info(self, file_path: str | Path) -> dict:
         """
         Executa ffprobe e retorna os metadados no formato JSON
@@ -187,6 +174,19 @@ class FFmpegBackend(AbstractBackend):
             f"{file_path}",
         )
         return json.loads(result.stdout)
+
+    def get_resolution(self, file_path: str | Path):
+        metadata = self.get_file_info(file_path)
+        if "streams" in metadata:
+            for stream in metadata["streams"]:
+                stream: dict[str, str]
+                stream_type = stream.get("codec_type", "unknown").lower()
+                if stream_type != "video":
+                    continue
+                width = int(stream.get('width', '0'))
+                height = int(stream.get('height', '0'))
+                return width, height if width > 0 and height > 0 else None, None
+        return None, None
 
     def _get_input_options(self, input_file: str | Path) -> list[str]:
         """
@@ -258,40 +258,31 @@ class FFmpegBackend(AbstractBackend):
 
         # audio codec
         if audio_codec:
-            container.audio.codec = AudioCodec.from_str(audio_codec)
+            container.audio_codec = AudioCodec.from_str(audio_codec)
 
         if audio_bitrate:
-            container.audio.codec.set_bitrate(audio_bitrate)
+            container.audio_codec.set_bitrate(audio_bitrate)
 
         # video codec
         if video_codec:
-            container.video.codec = VideoCodec.from_str(video_codec)
+            container.video_codec = VideoCodec.from_str(video_codec)
 
         if video_bitrate:
-            container.video.codec.set_bitrate(video_bitrate)
+            container.video_codec.set_bitrate(video_bitrate)
 
         if fps:
-            container.video.codec.set("-r", fps)
+            container.video_codec.set_fps(fps)
 
         if width and height:
-            container.video.codec.set("-vf", rf"scale={width}:{height}")
-        elif not width or not height:
+            container.video_codec.set_resolution(width=width, height=height)
+        elif (width and not height) or (not width and height):
             raise ValueError(f"{_('Invalid width or height')} '{width} x {height}'. {_('Video resizer requires both options to work')}.")
 
         if rotate:
-            video_filter = ""
-            if rotate in (90, -270):
-                video_filter += "transpose=1"  # 90deg rot clockwise
-            elif rotate in (180, -180):
-                video_filter += "transpose=1,transpose=1"  # 180deg rot clockwise
-            elif rotate in (270, -90):
-                video_filter += "transpose=2"  # -90deg rot clockwise
-            else:
-                raise ValueError(f"{_('Invalid rotation')} '{rotate}'. {_('Valid options are:')} -270, -180, -90, 90, 180, 270.")
-            container.video.codec.set("-vf", video_filter)
+            container.video_codec.set_rotation(rotate)
 
         if mirror_axis:
-            container.video.codec.set("-vf", "hflip" if mirror_axis.lower() == "x" else "vflip")
+            container.video_codec.set_mirror(mirror_axis)
 
         # get options
         return container.get_options()

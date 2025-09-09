@@ -151,8 +151,8 @@ def convert(
         verbose=STATE["verbose"],
     )
 
-    # parse width , height
-    width, height = parse_video_resize(resolution, prompt=True, quiet=STATE["quiet"])
+    # parse width, height
+    width, height = parse_video_resize(resolution, prompt=False, quiet=STATE["quiet"])
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         # display current progress
