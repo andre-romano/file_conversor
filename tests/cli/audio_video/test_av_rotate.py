@@ -13,7 +13,7 @@ from tests.utils import Test, DATA_PATH, app_cmd
 class TestAudioVideoRotate:
     def test_audio_video_rotate(self, tmp_path):
         test_cases = [
-            (DATA_PATH / "test.mp4", tmp_path / "test.mp3"),
+            (DATA_PATH / "test.mp4", tmp_path / "test_rotated.mp4"),
         ]
 
         for in_path, out_path in test_cases:

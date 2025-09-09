@@ -1,5 +1,7 @@
 # src\file_conversor\backend\audio_video\codec.py
 
+import copy
+
 from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
@@ -25,7 +27,7 @@ class _Codec:
     def from_str(cls, name: str) -> Self:
         if name not in cls.AVAILABLE_CODECS:
             raise ValueError(f"Invalid codec '{name}'. Available codecs: {', '.join(cls.AVAILABLE_CODECS)}")
-        return cls.AVAILABLE_CODECS[name]
+        return copy.deepcopy(cls.AVAILABLE_CODECS[name])
 
     def __init__(
         self,

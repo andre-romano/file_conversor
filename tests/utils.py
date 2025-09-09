@@ -11,7 +11,7 @@ from file_conversor.cli import app_cmd
 from file_conversor.config.environment import Environment
 
 
-DATA_PATH = Path(f"tests/.data")
+DATA_PATH = Path(f"tests/.data").resolve()
 
 
 class Test:

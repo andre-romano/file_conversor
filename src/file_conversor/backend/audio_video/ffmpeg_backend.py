@@ -4,6 +4,7 @@
 This module provides functionalities for handling audio and video files using FFmpeg.
 """
 
+import copy
 import subprocess
 import json
 import re
@@ -183,7 +184,7 @@ class FFmpegBackend(AbstractBackend):
 
         # set the output format options based on the file extension
         out_ext = output_path.suffix[1:]
-        container = self.SUPPORTED_OUT_FORMATS[out_ext]
+        container = copy.deepcopy(self.SUPPORTED_OUT_FORMATS[out_ext])
 
         # audio codec
         if audio_codec:
