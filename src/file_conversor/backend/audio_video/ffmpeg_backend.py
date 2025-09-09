@@ -222,6 +222,7 @@ class FFmpegBackend(AbstractBackend):
             audio_codec: str | None = None,
             video_codec: str | None = None,
             rotate: int | None = None,
+            mirror_axis: str | None = None,
     ) -> list[str]:
         """
         Set the output file and check if it has a supported format.
@@ -232,6 +233,7 @@ class FFmpegBackend(AbstractBackend):
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
+        :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
 
         :return: out options
 
@@ -251,14 +253,17 @@ class FFmpegBackend(AbstractBackend):
         # audio codec
         if audio_codec:
             container.audio.codec = AudioCodec.from_str(audio_codec)
+
         if audio_bitrate:
             container.audio.codec.set_bitrate(audio_bitrate)
 
         # video codec
         if video_codec:
             container.video.codec = VideoCodec.from_str(video_codec)
+
         if video_bitrate:
             container.video.codec.set_bitrate(video_bitrate)
+
         if rotate:
             video_filter = ""
             if rotate in (90, -270):
@@ -270,6 +275,9 @@ class FFmpegBackend(AbstractBackend):
             else:
                 raise ValueError(f"Invalid rotation '{rotate}'. Valid options are: -270, -180, -90, 90, 180, 270.")
             container.video.codec.set("-vf", video_filter)
+
+        if mirror_axis:
+            container.video.codec.set("-vf", "hflip" if mirror_axis.lower() == "x" else "vflip")
 
         # get options
         return container.get_options()
@@ -283,6 +291,7 @@ class FFmpegBackend(AbstractBackend):
             audio_codec: str | None = None,
             video_codec: str | None = None,
             rotate: int | None = None,
+            mirror_axis: str | None = None,
             overwrite_output: bool = True,
             stats: bool = False,
             progress_callback: Callable[[float], Any] | None = None,
@@ -297,6 +306,7 @@ class FFmpegBackend(AbstractBackend):
         :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
         :param video_codec: Video codec to use. Defaults to None (use container default codec).      
         :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
+        :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
         :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
         :param stats: Show progress stats. Defaults to False.      
         :param progress_callback: Progress callback (0-100). Defaults to None.
@@ -315,6 +325,7 @@ class FFmpegBackend(AbstractBackend):
             audio_codec=audio_codec,
             video_codec=video_codec,
             rotate=rotate,
+            mirror_axis=mirror_axis,
         )
 
         # set global options

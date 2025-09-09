@@ -16,7 +16,7 @@ from file_conversor.cli.image._typer import COMMAND_NAME, MIRROR_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import AxisOption, InputFilesArgument, OutputDirOption
 from file_conversor.utils.validators import check_valid_options
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -76,10 +76,7 @@ ctx_menu.register_callback(register_ctx_menu)
     """)
 def mirror(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
-    axis: Annotated[str, typer.Option("--axis", "-a",
-                                      help=_("Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
-                                      callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
-                                      )],
+    axis: Annotated[str, AxisOption],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])

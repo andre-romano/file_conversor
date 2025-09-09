@@ -17,7 +17,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer, check_valid_options
-from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -46,16 +46,16 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 icon=str(icons_folder_path / 'avi.ico'),
             ),
             WinContextCommand(
-                name="to_mp4",
-                description="To MP4",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mp4"',
-                icon=str(icons_folder_path / 'mp4.ico'),
-            ),
-            WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mkv"',
                 icon=str(icons_folder_path / 'mkv.ico'),
+            ),
+            WinContextCommand(
+                name="to_mp4",
+                description="To MP4",
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "mp4"',
+                icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
@@ -127,6 +127,8 @@ def convert(
                                                  callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
                                                  )] = None,
 
+    mirror_axis: Annotated[str | None, AxisOption()] = None,
+
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     # init ffmpeg
@@ -145,6 +147,7 @@ def convert(
             audio_codec=audio_codec,
             video_codec=video_codec,
             rotate=rotation,
+            mirror_axis=mirror_axis,
             overwrite_output=STATE["overwrite-output"],
             progress_callback=progress_mgr.update_progress
         )

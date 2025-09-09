@@ -60,6 +60,15 @@ def QualityOption():
     )
 
 
+def AxisOption():
+    """--axis, -a"""
+    return typer.Option(
+        "--axis", "-a",
+        help=_("Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
+        callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
+    )
+
+
 def DPIOption():
     """--dpi, -d"""
     return typer.Option(
