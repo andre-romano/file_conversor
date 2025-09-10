@@ -6,22 +6,21 @@ This module provides functionalities for handling audio and video files using FF
 
 import copy
 import subprocess
-import json
 import re
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
 # user-provided imports
-from file_conversor.backend.audio_video.format_container import AudioCodec, VideoCodec, FormatContainer, AVAILABLE_VIDEO_CONTAINERS, AVAILABLE_AUDIO_CONTAINERS
-from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
+from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
+
+from file_conversor.backend.audio_video.codec import AudioCodec, VideoCodec
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
-
-from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -29,64 +28,16 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class FFmpegBackend(AbstractBackend):
+class FFmpegBackend(AbstractFFmpegBackend):
     """
     FFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
-
-    SUPPORTED_IN_AUDIO_FORMATS = {
-        'aac': {},
-        'ac3': {},
-        'flac': {},
-        'm4a': {},
-        'mp3': {},
-        'ogg': {},
-        'opus': {},
-        'wav': {},
-    }
-    SUPPORTED_IN_VIDEO_FORMATS = {
-        '3gp': {},
-        'asf': {},
-        'avi': {},
-        'flv': {},
-        'h264': {},
-        'hevc': {},
-        'm4v': {},
-        'mkv': {},
-        'mov': {},
-        'mp4': {},
-        'mpeg': {},
-        'mpg': {},
-        'webm': {},
-    }
-    SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
-
-    SUPPORTED_OUT_AUDIO_FORMATS = AVAILABLE_AUDIO_CONTAINERS
-    SUPPORTED_OUT_VIDEO_FORMATS = AVAILABLE_VIDEO_CONTAINERS
-    SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
     EXTERNAL_DEPENDENCIES = set([
         "ffmpeg",
-        "ffprobe",
     ])
-
-    @classmethod
-    def __get_supported_codecs(cls, supported_format: dict[str, FormatContainer], is_audio: bool, ext: str | None = None) -> Iterable[str]:
-        res: set[str] = set()
-        for cont_ext, container in supported_format.items():
-            if not ext or (ext == cont_ext):
-                res.update([str(c) for c in (container.available_audio_codecs if is_audio else container.available_video_codecs)])
-        return sorted(res)
-
-    @classmethod
-    def get_supported_audio_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_AUDIO_FORMATS, is_audio=True, ext=ext)
-
-    @classmethod
-    def get_supported_video_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_VIDEO_FORMATS, is_audio=False, ext=ext)
 
     def __init__(
         self,
@@ -102,20 +53,11 @@ class FFmpegBackend(AbstractBackend):
         :raises RuntimeError: if ffmpeg dependency is not found
         """
         super().__init__(
-            pkg_managers={
-                ScoopPackageManager({
-                    "ffmpeg": "ffmpeg"
-                }),
-                BrewPackageManager({
-                    "ffmpeg": "ffmpeg"
-                }),
-            },
-            install_answer=install_deps,
+            install_deps=install_deps,
+            verbose=verbose,
         )
-        self._verbose = verbose
 
-        # check ffprobe / ffmpeg
-        self._ffprobe_bin = self.find_in_path("ffprobe")
+        # check ffmpeg
         self._ffmpeg_bin = self.find_in_path("ffmpeg")
 
     def _get_input_options(self, input_file: str | Path) -> list[str]:
@@ -217,26 +159,15 @@ class FFmpegBackend(AbstractBackend):
         # get options
         return container.get_options()
 
-    def _get_resolution(self, file_path: str | Path):
-        metadata = self.info(file_path)
-        if "streams" in metadata:
-            for stream in metadata["streams"]:
-                stream: dict[str, str]
-                stream_type = stream.get("codec_type", "unknown").lower()
-                if stream_type != "video":
-                    continue
-                width = int(stream.get('width', '0'))
-                height = int(stream.get('height', '0'))
-                return width, height if width > 0 and height > 0 else None, None
-        return None, None
-
     def _execute_progress_callback(
         self,
         input_file: str | Path,
         process: subprocess.Popen,
         progress_callback: Callable[[float], Any] | None = None,
     ):
-        file_duration_secs = self._calculate_file_total_duration(input_file)
+        ffprobe_backend = FFprobeBackend(install_deps=self._install_deps, verbose=self._verbose)
+
+        file_duration_secs = ffprobe_backend.get_duration(input_file)
         while process.poll() is None:
             if not process.stdout:
                 continue
@@ -252,65 +183,6 @@ class FFmpegBackend(AbstractBackend):
             progress = 100.0 * (float(current_time) / file_duration_secs)
             if progress_callback:
                 progress_callback(progress)
-
-    def _calculate_file_total_duration(self, file_path: str | Path) -> float:
-        """
-        Calculate file total duration (in secs), using `ffprobe`.
-
-        :return: Total duration in seconds.
-        """
-        process = Environment.run(
-            f'{self._ffprobe_bin}',
-            f'-v',
-            f'error',
-            f'-show_entries',
-            f'format=duration', '-of',
-            f'default=noprint_wrappers=1:nokey=1',
-            f'{file_path}',
-        )
-        duration_str = process.stdout.strip()
-        return float(duration_str if duration_str else "0")
-
-    def info(self, file_path: str | Path) -> dict:
-        """
-        Executa ffprobe e retorna os metadados no formato JSON
-
-        result = {
-            streams: [],
-            chapters: [],
-            format: {},
-        }
-
-        stream = {
-            index,
-            codec_name,
-            codec_long_name,
-            codec_type: audio|video,
-            sampling_rate,
-            channels,
-            channel_layout: stereo|mono,
-        }
-
-        format = {
-            format_name,
-            format_long_name,
-            duration,
-            size,
-        }
-
-        :return: JSON object
-        """
-        result = Environment.run(
-            f"{self._ffprobe_bin}",
-            "-v", "quiet",
-            "-print_format", "json",
-            "-show_format",
-            "-show_streams",
-            "-show_chapters",
-            "-show_error",
-            f"{file_path}",
-        )
-        return json.loads(result.stdout)
 
     def check(
         self,

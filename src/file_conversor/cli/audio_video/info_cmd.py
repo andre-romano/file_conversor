@@ -15,7 +15,7 @@ from rich.panel import Panel
 from rich.console import Group
 
 # user-provided modules
-from file_conversor.backend import FFmpegBackend
+from file_conversor.backend import FFprobeBackend
 
 from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, INFO_NAME
@@ -37,13 +37,13 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
     icons_folder_path = Environment.get_icons_folder()
-    for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
+    for ext in FFprobeBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="info",
@@ -81,17 +81,17 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp3`
     """)
 def info(
-    input_files: Annotated[List[str], InputFilesArgument(FFmpegBackend)],
+    input_files: Annotated[List[str], InputFilesArgument(FFprobeBackend)],
 ):
 
-    ffmpeg_backend = FFmpegBackend(
+    ffprobe_backend = FFprobeBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
     for filename in input_files:
         formatted = []
         logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")
-        metadata = ffmpeg_backend.info(filename)
+        metadata = ffprobe_backend.info(filename)
         # 📁 General file information
         if "format" in metadata:
             format_info: dict = metadata["format"]
