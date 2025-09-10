@@ -15,7 +15,9 @@ from typing import Any, Callable, Iterable
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
 
-from file_conversor.backend.audio_video.codec import AudioCodec, VideoCodec
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
+from file_conversor.backend.audio_video.ffmpeg_codec import FFmpegAudioCodec, FFmpegVideoCodec
+from file_conversor.backend.audio_video.format_container import FormatContainer
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
@@ -33,8 +35,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
     FFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
-    PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
-
     EXTERNAL_DEPENDENCIES = set([
         "ffmpeg",
     ])
@@ -43,6 +43,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self,
         install_deps: bool | None,
         verbose: bool = False,
+        overwrite_output: bool = False,
+        stats: bool = False,
     ):
         """
         Initialize the FFMpeg backend.
@@ -56,123 +58,35 @@ class FFmpegBackend(AbstractFFmpegBackend):
             install_deps=install_deps,
             verbose=verbose,
         )
+        self._stats = stats
+        self._overwrite_output = overwrite_output
 
-        # check ffmpeg
-        self._ffmpeg_bin = self.find_in_path("ffmpeg")
+        self._input_file: Path | None = None
+        self._output_file: Path | None = None
 
-    def _get_input_options(self, input_file: str | Path) -> list[str]:
-        """
-        Set the input file and check if it has a supported format.
+        self._global_options: list[str] = []
+        self._in_opts: list[str] = []
+        self._out_opts: list[str] = []
 
-        :param input_file: Input file path.
-
-        :return:  in options
-
-        :raises FileNotFoundError: If the input file does not exist.
-        :raises ValueError: If the input file format is not supported.
-        """
-        res: list[str] = []
-        # check file is found
-        input_path = Path(input_file)
-        if not input_path.exists() and not input_path.is_file():
-            raise FileNotFoundError(f"Input file '{input_file}' not found")
-
-        # check if the input file has a supported format
-        check_file_format(input_path, self.SUPPORTED_IN_FORMATS)
-
-        # set the input format options based on the file extension
-        in_ext = input_path.suffix[1:]
-        for k, v in self.SUPPORTED_IN_FORMATS[in_ext].items():
-            res.extend([str(k), str(v)])
-        return res
-
-    def _get_output_options(
-            self,
-            output_file: str | Path,
-            audio_bitrate: int | None = None,
-            video_bitrate: int | None = None,
-            audio_codec: str | None = None,
-            video_codec: str | None = None,
-            width: int | None = None,
-            height: int | None = None,
-            fps: int | None = None,
-            rotate: int | None = None,
-            mirror_axis: str | None = None,
-    ) -> list[str]:
-        """
-        Set the output file and check if it has a supported format.
-
-        :param output_file: Output file path.
-        :param audio_bitrate: Audio bitrate to use. Defaults to None (use source bitrate).      
-        :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
-        :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
-        :param video_codec: Video codec to use. Defaults to None (use container default codec).      
-        :param width: Target width (in pixels). Defaults to None (use the same as source).      
-        :param height: Target height (in pixels). Defaults to None (use the same as source).      
-        :param fps: Video FPS. Defaults to None (use the same as source).      
-        :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
-        :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
-
-        :return: out options
-
-        :raises typer.BadParameter: Unsupported format, or file not found.
-        """
-        # create out dir (if it does not exists)
-        output_path = Path(output_file)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # check if the output file has a supported format
-        check_file_format(output_path, self.SUPPORTED_OUT_FORMATS)
-
-        # set the output format options based on the file extension
-        out_ext = output_path.suffix[1:]
-        container = copy.deepcopy(self.SUPPORTED_OUT_FORMATS[out_ext])
-
-        # audio codec
-        if audio_codec:
-            container.audio_codec = AudioCodec.from_str(audio_codec)
-
-        if audio_bitrate:
-            container.audio_codec.set_bitrate(audio_bitrate)
-
-        # video codec
-        if video_codec:
-            container.video_codec = VideoCodec.from_str(video_codec)
-
-        if video_bitrate:
-            container.video_codec.set_bitrate(video_bitrate)
-
-        if fps:
-            container.video_codec.set_fps(fps)
-
-        if width and height:
-            container.video_codec.set_resolution(width=width, height=height)
-        elif (width and not height) or (not width and height):
-            raise ValueError(f"{_('Invalid width or height')} '{width} x {height}'. {_('Video resizer requires both options to work')}.")
-
-        if rotate:
-            container.video_codec.set_rotation(rotate)
-
-        if mirror_axis:
-            container.video_codec.set_mirror(mirror_axis)
-
-        # get options
-        return container.get_options()
+        self._out_container: FormatContainer | None = None
 
     def _execute_progress_callback(
         self,
-        input_file: str | Path,
         process: subprocess.Popen,
         progress_callback: Callable[[float], Any] | None = None,
     ):
-        ffprobe_backend = FFprobeBackend(install_deps=self._install_deps, verbose=self._verbose)
+        PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
-        file_duration_secs = ffprobe_backend.get_duration(input_file)
+        ffprobe_backend = FFprobeBackend(install_deps=self._install_deps, verbose=self._verbose)
+        if not self._input_file:
+            raise RuntimeError(f"{_('Input file not set')}")
+
+        file_duration_secs = ffprobe_backend.get_duration(self._input_file)
         while process.poll() is None:
             if not process.stdout:
                 continue
 
-            match = FFmpegBackend.PROGRESS_RE.search(process.stdout.readline())
+            match = PROGRESS_RE.search(process.stdout.readline())
             if not match:
                 continue
             hours = int(match.group(1))
@@ -184,104 +98,147 @@ class FFmpegBackend(AbstractFFmpegBackend):
             if progress_callback:
                 progress_callback(progress)
 
-    def check(
-        self,
-        file_path: str | Path,
-        progress_callback: Callable[[float], Any] | None = None,
-    ):
-        """
-        Check file integrity
+    def _set_global_options(self):
+        """Set default global options"""
+        global_options = {}
+        global_options["-y" if self._overwrite_output else "-n"] = ""
+        if self._verbose:
+            global_options["-v"] = ""  # verbose output
+        if self._stats:
+            global_options["-stats"] = ""  # print progress stats
 
-        :raises subprocess.CalledProcessError: if file is corrupted
-        """
-        try:
-            process = Environment.run_nowait(
-                f"{self._ffmpeg_bin}",
-                "-v", "error",
-                "-i", str(file_path),
-                "-f", "null", "-"
-            )
-            self._execute_progress_callback(
-                input_file=file_path,
-                process=process,
-                progress_callback=progress_callback,
-            )
-            logger.info(rf"'{file_path}': [bold green]OK[/]")
-        except subprocess.CalledProcessError as e:
-            logger.error(rf"'{file_path}': [bold red]FAILED[/]")
-            raise
+        # create global options list
+        self._global_options = []
+        for k, v in global_options.items():
+            self._global_options.extend([str(k), str(v)])
 
-    def convert(
-        self,
-            input_file: str | Path,
+    def _set_input_file(self, input_file: str | Path):
+        """
+        Set the input file and check if it has a supported format.
+
+        :param input_file: Input file path.
+
+        :raises FileNotFoundError: If the input file does not exist.
+        :raises ValueError: If the input file format is not supported.
+        """
+        self._in_opts = []
+
+        # check file is found
+        self._input_file = Path(input_file)
+        if not self._input_file.exists() and not self._input_file.is_file():
+            raise FileNotFoundError(f"Input file '{input_file}' not found")
+
+        # check if the input file has a supported format
+        check_file_format(self._input_file, self.SUPPORTED_IN_FORMATS)
+
+        # set the input format options based on the file extension
+        in_ext = self._input_file.suffix[1:]
+        for k, v in self.SUPPORTED_IN_FORMATS[in_ext].items():
+            self._in_opts.extend([str(k), str(v)])
+
+    def _set_output_file(
+            self,
             output_file: str | Path,
-            audio_bitrate: int | None = None,
-            video_bitrate: int | None = None,
-            audio_codec: str | None = None,
-            video_codec: str | None = None,
-            width: int | None = None,
-            height: int | None = None,
-            fps: int | None = None,
-            rotate: int | None = None,
-            mirror_axis: str | None = None,
-            overwrite_output: bool = True,
-            stats: bool = False,
-            progress_callback: Callable[[float], Any] | None = None,
     ):
         """
-        Execute the FFmpeg command to convert the input file to the output file.
+        Set the output file and check if it has a supported format.
+
+        :param output_file: Output file path.
+
+        :raises typer.BadParameter: Unsupported format.
+        """
+        self._out_opts = []
+
+        # create out dir (if it does not exists)
+        self._output_file = Path(output_file)
+        if self._output_file.name == "-":
+            logger.warning("Null container selected. No output file will be created.")
+            out_ext = "null"
+        else:
+            self._output_file.parent.mkdir(parents=True, exist_ok=True)
+
+            # check if the output file has a supported format
+            check_file_format(self._output_file, self.SUPPORTED_OUT_FORMATS)
+
+            # set the output format options based on the file extension
+            out_ext = self._output_file.suffix[1:]
+        self._out_container = copy.deepcopy(self.SUPPORTED_OUT_FORMATS[out_ext])
+
+    def set_files(self, input_file: str | Path, output_file: str | Path):
+        """
+        Set input/output files, and default global options
 
         :param input_file: Input file path.
         :param output_file: Output file path.      
-        :param audio_bitrate: Audio bitrate to use. Defaults to None (use source bitrate).      
-        :param video_bitrate: Video bitrate to use. Defaults to None (use source bitrate).      
-        :param audio_codec: Audio codec to use. Defaults to None (use container default codec).      
-        :param video_codec: Video codec to use. Defaults to None (use container default codec).      
-        :param width: Target width (in pixels). Defaults to None (use the same as source).      
-        :param height: Target height (in pixels). Defaults to None (use the same as source).      
-        :param fps: Video FPS. Defaults to None (use the same as source).      
-        :param rotate: Rotate video (clockwise). Defaults to None (do not rotate).      
-        :param mirror_axis: Mirror axis. Valid options are: x, y. Defaults to None (do not mirror).      
-        :param overwrite_output: Overwrite output file (no user confirmation prompt). Defaults to True.      
-        :param stats: Show progress stats. Defaults to False.      
-        :param progress_callback: Progress callback (0-100). Defaults to None.
+        """
+        self._set_global_options()
+        self._set_input_file(input_file)
+        self._set_output_file(output_file)
+
+    def set_audio_codec(self, codec: str | None = None, bitrate: int | None = None, filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None):
+        """
+        Seet audio codec and bitrate
+
+        :param codec: Codec to use. Defaults to None (use container default codec).      
+        :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
+        :param filters: Filters to use. Defaults to None (do not use any filter).      
+
+        :raises RuntimeErrors: if output container not set
+        """
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+        if codec:
+            self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
+        if bitrate:
+            self._out_container.audio_codec.set_bitrate(bitrate)
+        if filters:
+            if isinstance(filters, FFmpegFilter):
+                filters = [filters]
+            self._out_container.video_codec.set_filters(*filters)
+
+    def set_video_codec(self, codec: str | None = None, bitrate: int | None = None, filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None):
+        """
+        Seet video codec and bitrate
+
+        :param codec: Codec to use. Defaults to None (use container default codec).      
+        :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
+
+        :raises RuntimeErrors: if output container not set
+        """
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+        if codec:
+            self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
+        if bitrate:
+            self._out_container.video_codec.set_bitrate(bitrate)
+        if filters:
+            if isinstance(filters, FFmpegFilter):
+                filters = [filters]
+            self._out_container.video_codec.set_filters(*filters)
+
+    def execute(
+        self,
+        progress_callback: Callable[[float], Any] | None = None,
+    ):
+        """
+        Execute the FFmpeg command to convert the input file to the output file.
 
         :return: Subprocess.Popen object
 
         :raises RuntimeError: If FFmpeg encounters an error during execution.
         """
-        # set input/output files and options
-        in_opts = self._get_input_options(input_file)
-
-        out_opts = self._get_output_options(
-            output_file,
-            audio_bitrate=audio_bitrate,
-            video_bitrate=video_bitrate,
-            audio_codec=audio_codec,
-            video_codec=video_codec,
-            width=width,
-            height=height,
-            fps=fps,
-            rotate=rotate,
-            mirror_axis=mirror_axis,
-        )
-
-        # set global options
-        global_options = [
-            # overwrite output (no confirm)
-            "-y" if overwrite_output else "-n",
-            "-v" if self._verbose else "",  # verbose output
-            "-stats" if stats else "",  # print progress stats
-        ]
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+        self._out_opts = self._out_container.get_options()
 
         # build ffmpeg command
         ffmpeg_command = []
         ffmpeg_command.extend([str(self._ffmpeg_bin)])  # ffmpeg CLI
-        ffmpeg_command.extend(global_options)    # set global options
-        ffmpeg_command.extend(in_opts)           # set in options
-        ffmpeg_command.extend(["-i", str(input_file)])   # set input
-        ffmpeg_command.extend(out_opts)          # set out options
-        ffmpeg_command.extend([str(output_file)])        # set output
+        ffmpeg_command.extend(self._global_options)    # set global options
+        ffmpeg_command.extend(self._in_opts)           # set in options
+        ffmpeg_command.extend(["-i", str(self._input_file)])   # set input
+        ffmpeg_command.extend(self._out_opts)          # set out options
+        ffmpeg_command.extend([str(self._output_file)])        # set output
 
         # remove empty strings
         ffmpeg_command = [arg for arg in ffmpeg_command if arg != ""]
@@ -292,7 +249,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
         )
 
         self._execute_progress_callback(
-            input_file=input_file,
             process=process,
             progress_callback=progress_callback,
         )

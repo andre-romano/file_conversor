@@ -10,9 +10,11 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterTranspose
 
 from file_conversor.cli.audio_video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, ROTATE_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
@@ -83,20 +85,15 @@ ctx_menu.register_callback(register_ctx_menu)
 def rotate(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
 
-    audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help=_("Audio bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["audio-bitrate"],
+    rotation: Annotated[int, typer.Option("--rotation", "-r",
+                                          help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
+                                          callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
+                                          )],
 
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
-
-    rotation: Annotated[int | None, typer.Option("--rotation", "-r",
-                                                 help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
-                                                 callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
-                                                 )] = None,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
@@ -104,17 +101,25 @@ def rotate(
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
     )
 
+    video_filters: list[FFmpegFilter] = list()
+
+    if rotation in (90, -90):
+        direction = {90: 1, -90: 2}[rotation]
+        video_filters.append(FFmpegFilterTranspose(direction=direction))
+    else:
+        video_filters.append(FFmpegFilterTranspose(direction=1))
+        video_filters.append(FFmpegFilterTranspose(direction=1))
+
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
+        ffmpeg_backend.set_audio_codec(codec="copy")
+        ffmpeg_backend.set_video_codec(bitrate=video_bitrate, filters=video_filters)
+
         # display current progress
-        process = ffmpeg_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            audio_bitrate=audio_bitrate,
-            video_bitrate=video_bitrate,
-            rotate=rotation,
-            overwrite_output=STATE["overwrite-output"],
+        process = ffmpeg_backend.execute(
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()

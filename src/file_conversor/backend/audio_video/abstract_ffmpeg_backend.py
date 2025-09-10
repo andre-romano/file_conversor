@@ -5,7 +5,7 @@
 from typing import Iterable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-from file_conversor.backend.audio_video.format_container import FormatContainer, AVAILABLE_VIDEO_CONTAINERS, AVAILABLE_AUDIO_CONTAINERS
+from file_conversor.backend.audio_video.format_container import FormatContainer, AVAILABLE_NULL_CONTAINERS, AVAILABLE_VIDEO_CONTAINERS, AVAILABLE_AUDIO_CONTAINERS
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
@@ -50,8 +50,8 @@ class AbstractFFmpegBackend(AbstractBackend):
     }
     SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
 
-    SUPPORTED_OUT_AUDIO_FORMATS = AVAILABLE_AUDIO_CONTAINERS
-    SUPPORTED_OUT_VIDEO_FORMATS = AVAILABLE_VIDEO_CONTAINERS
+    SUPPORTED_OUT_AUDIO_FORMATS = AVAILABLE_NULL_CONTAINERS | AVAILABLE_AUDIO_CONTAINERS
+    SUPPORTED_OUT_VIDEO_FORMATS = AVAILABLE_NULL_CONTAINERS | AVAILABLE_VIDEO_CONTAINERS
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     @classmethod
@@ -96,3 +96,7 @@ class AbstractFFmpegBackend(AbstractBackend):
         )
         self._install_deps = install_deps
         self._verbose = verbose
+
+        # check ffmpeg
+        self._ffmpeg_bin = self.find_in_path("ffmpeg")
+        self._ffprobe_bin = self.find_in_path("ffprobe")

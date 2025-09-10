@@ -10,15 +10,16 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterScale
 
 from file_conversor.cli.audio_video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, RESIZE_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.formatters import parse_video_resize
-from file_conversor.utils.validators import check_positive_integer, check_valid_options
-from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.validators import check_positive_integer, check_video_resolution
+from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -65,26 +66,23 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.webm -rs 1024x768 -od output_dir/ -f mp4 --audio-bitrate 192`
+        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.webm -rs 1024:768 -od output_dir/ -f mp4 --audio-bitrate 192`
 
-        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.mp4 -rs 1280x720`
+        - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.mp4 -rs 1280:720`
     """)
 def resize(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
 
-    audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help=_("Audio bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["audio-bitrate"],
+    resolution: Annotated[str, typer.Option("--resolution", "-rs",
+                                            help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
+                                            prompt=f"{_('Enter target resolution (WIDTH:HEIGHT)')}",
+                                            callback=check_video_resolution,
+                                            )],
 
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
                                                help=_("Video bitrate in kbps"),
                                                callback=check_positive_integer,
                                                )] = CONFIG["video-bitrate"],
-
-    resolution: Annotated[str | None, typer.Option("--resolution", "-rs",
-                                                   help=f'{_("Video target resolution. Format WIDTHxHEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
-                                                   )] = None,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
@@ -92,21 +90,19 @@ def resize(
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
     )
 
-    # parse width, height
-    width, height = parse_video_resize(resolution, prompt=True, quiet=STATE["quiet"])
+    video_filters: list[FFmpegFilter] = list()
+    video_filters.append(FFmpegFilterScale(*resolution.split(":")))
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
+        ffmpeg_backend.set_audio_codec(codec="copy")
+        ffmpeg_backend.set_video_codec(bitrate=video_bitrate, filters=video_filters)
+
         # display current progress
-        process = ffmpeg_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            audio_bitrate=audio_bitrate,
-            video_bitrate=video_bitrate,
-            width=width,
-            height=height,
-            overwrite_output=STATE["overwrite-output"],
+        process = ffmpeg_backend.execute(
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()

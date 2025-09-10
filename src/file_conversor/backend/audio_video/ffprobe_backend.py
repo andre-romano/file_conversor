@@ -51,9 +51,6 @@ class FFprobeBackend(AbstractFFmpegBackend):
         """
         super().__init__(install_deps=install_deps, verbose=verbose)
 
-        # check ffprobe / ffmpeg
-        self._ffprobe_bin = self.find_in_path("ffprobe")
-
     def get_resolution(self, file_path: str | Path):
         metadata = self.info(file_path)
         if "streams" in metadata:
@@ -83,7 +80,10 @@ class FFprobeBackend(AbstractFFmpegBackend):
             f'{file_path}',
         )
         duration_str = process.stdout.strip()
-        return float(duration_str if duration_str else "0")
+        try:
+            return float(duration_str if duration_str else "0")
+        except ValueError:
+            return 0
 
     def info(self, file_path: str | Path) -> dict:
         """

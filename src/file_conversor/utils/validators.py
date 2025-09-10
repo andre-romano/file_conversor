@@ -11,6 +11,17 @@ from file_conversor.config.locale import get_translation
 _ = get_translation()
 
 
+def check_video_resolution(data: str | None) -> str | None:
+    if not data:
+        return data
+    if ":" not in data:
+        raise typer.BadParameter(f"{_('Invalid format for video resolution')} '{data}'. {_('Valid format is WIDTH:HEIGHT')}.")
+    width_height = data.split(":")
+    if len(width_height) != 2:
+        raise typer.BadParameter(f"{_('Invalid format for video resolution')} '{data}'. {_('Valid format is WIDTH:HEIGHT')}.")
+    return data
+
+
 def check_path_exists(data: str | Path | None, exists: bool = True):
     if not data:
         return data

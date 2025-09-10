@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
 # user-provided imports
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
+
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
@@ -15,7 +17,7 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class _Codec:
+class _FFmpegCodec:
     AVAILABLE_CODECS: dict[str, Self] = {}
 
     @classmethod
@@ -52,7 +54,7 @@ class _Codec:
 
     # DUNDER METHODS
     def __eq__(self, value: object) -> bool:
-        if isinstance(value, _Codec):
+        if isinstance(value, _FFmpegCodec):
             return (self._name == value._name)
         return False
 
@@ -78,6 +80,12 @@ class _Codec:
         else:
             self._options[option] = value
 
+    def set_bitrate(self, bitrate: int):
+        raise NotImplementedError("not implemented")
+
+    def set_filters(self, *filters: FFmpegFilter):
+        raise NotImplementedError("not implemented")
+
     def get_options(self) -> list[str]:
         res = [self._prefix, self._name]
         if not self._name or self._name.lower() == "null":
@@ -92,7 +100,7 @@ class _Codec:
         return res
 
 
-class AudioCodec(_Codec):
+class FFmpegAudioCodec(_FFmpegCodec):
     AVAILABLE_CODECS: dict[str, Self] = {}
 
     def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
@@ -102,76 +110,62 @@ class AudioCodec(_Codec):
     def set_bitrate(self, bitrate: int):
         self._set("-b:a", f"{bitrate}k")
 
+    def set_filters(self, *filters: FFmpegFilter):
+        for filter in filters:
+            self._set("-af", filter.get())
 
-class VideoCodec(_Codec):
+
+class FFmpegVideoCodec(_FFmpegCodec):
     AVAILABLE_CODECS: dict[str, Self] = {}
 
     def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
         super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, **kwargs)
         self._valid_options.add("-b:v")
-        self._valid_options.add("-r")
         self._valid_options.add("-vf")
 
     def set_bitrate(self, bitrate: int):
         self._set("-b:v", f"{bitrate}k")
 
-    def set_fps(self, fps: int):
-        self._set("-r", f"{fps}")
-
-    def set_resolution(self, width: int, height: int):
-        self._set("-vf", rf"scale={width}:{height}")
-
-    def set_rotation(self, rotation: int):
-        video_filter = ""
-        if rotation in (90, -270):
-            video_filter = "transpose=1"  # 90deg rot clockwise
-        elif rotation in (180, -180):
-            video_filter = "transpose=1,transpose=1"  # 180deg rot clockwise
-        elif rotation in (270, -90):
-            video_filter = "transpose=2"  # -90deg rot clockwise
-        else:
-            raise ValueError(f"{_('Invalid rotation')} '{rotation}'. {_('Valid options are:')} -270, -180, -90, 90, 180, 270.")
-        self._set("-vf", video_filter)
-
-    def set_mirror(self, mirror_axis: str):
-        self._set("-vf", "hflip" if mirror_axis.lower() == "x" else "vflip")
+    def set_filters(self, *filters: FFmpegFilter):
+        for filter in filters:
+            self._set("-vf", filter.get())
 
 
 # register AUDIO codecs
-AudioCodec.register("null")
-AudioCodec.register("copy")
-AudioCodec.register("aac")
-AudioCodec.register("ac3")
-AudioCodec.register("flac")
-AudioCodec.register("libfdk_aac")
-AudioCodec.register("libmp3lame")
-AudioCodec.register("libopus")
-AudioCodec.register("libvorbis")
-AudioCodec.register("pcm_s16le")
+FFmpegAudioCodec.register("null")
+FFmpegAudioCodec.register("copy")
+FFmpegAudioCodec.register("aac")
+FFmpegAudioCodec.register("ac3")
+FFmpegAudioCodec.register("flac")
+FFmpegAudioCodec.register("libfdk_aac")
+FFmpegAudioCodec.register("libmp3lame")
+FFmpegAudioCodec.register("libopus")
+FFmpegAudioCodec.register("libvorbis")
+FFmpegAudioCodec.register("pcm_s16le")
 
 # register AUDIO codecs
-VideoCodec.register("null")
-VideoCodec.register("copy")
-VideoCodec.register("h264_nvenc", valid_options={
+FFmpegVideoCodec.register("null")
+FFmpegVideoCodec.register("copy")
+FFmpegVideoCodec.register("h264_nvenc", valid_options={
     "-preset": [
         "medium"
     ]
 })
-VideoCodec.register("hevc_nvenc", valid_options={
+FFmpegVideoCodec.register("hevc_nvenc", valid_options={
     "-preset": [
         "medium"
     ]
 })
-VideoCodec.register("libx264", valid_options={
+FFmpegVideoCodec.register("libx264", valid_options={
     "-preset": [
         "medium"
     ]
 })
-VideoCodec.register("libx265", valid_options={
+FFmpegVideoCodec.register("libx265", valid_options={
     "-preset": [
         "medium"
     ]
 })
-VideoCodec.register("libvpx")
-VideoCodec.register("libvpx-vp9")
-VideoCodec.register("mpeg4")
+FFmpegVideoCodec.register("libvpx")
+FFmpegVideoCodec.register("libvpx-vp9")
+FFmpegVideoCodec.register("mpeg4")

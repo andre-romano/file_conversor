@@ -1,6 +1,7 @@
 
 # src\file_conversor\cli\audio_video\check_cmd.py
 
+import subprocess
 import typer
 
 from rich import print
@@ -16,8 +17,7 @@ from file_conversor.cli.audio_video._typer import COMMAND_NAME, CHECK_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.validators import check_positive_integer, check_valid_options
-from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -71,14 +71,19 @@ def check(
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         # display current progress
-        ffmpeg_backend.check(
-            file_path=input_file,
-            progress_callback=progress_mgr.update_progress
-        )
+        ffmpeg_backend.set_files(input_file=input_file, output_file="-")
+        try:
+            ffmpeg_backend.execute(
+                progress_callback=progress_mgr.update_progress
+            )
+        except subprocess.CalledProcessError:
+            logger.error(f"{_('FFMpeg check')}: [red][bold]{_('FAILED')}[/bold][/red]")
+            raise RuntimeError(f"{_('File')} '{input_file}' {_('is corrupted or has inconsistencies')}")
         progress_mgr.complete_step()
 
     cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])

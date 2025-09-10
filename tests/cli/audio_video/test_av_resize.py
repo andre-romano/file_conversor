@@ -20,7 +20,7 @@ class TestAudioVideoResize:
             result = Test.invoke(
                 COMMAND_NAME, RESIZE_NAME,
                 str(in_path),
-                "-rs", "1024x768",
+                "-rs", "1024:768",
                 *Test.get_out_dir_params(out_path),
             )
             assert result.exit_code == 0

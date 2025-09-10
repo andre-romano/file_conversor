@@ -11,19 +11,13 @@ from file_conversor.config.locale import get_translation
 _ = get_translation()
 
 
-def parse_video_resize(resolution: str | None, prompt: bool, quiet: bool):
-    if not resolution:
-        if quiet and prompt:
-            raise RuntimeError(f"{_('Resolution not provided')}")
-        if prompt:
-            userinput = str(typer.prompt(f"{_('Output video resolution (e.g., 1280x720)')}"))
-            resolution = userinput
-    if resolution:
-        temp = [v.strip() for v in resolution.split("x")]
-        if len(temp) != 2:
-            raise ValueError(f"{_('Invalid resolution format. Valid format are: WIDTHxHEIGHT (in pixels).')}")
-        return int(temp[0]), int(temp[1])
-    return None, None
+def parse_ffmpeg_filter(filter: str | None):
+    if not filter:
+        return "", []
+    splitted = filter.split("=", maxsplit=1)
+    name = splitted[0]
+    args = splitted[1].split(":") if len(splitted) > 1 else []
+    return name, args
 
 
 def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool):

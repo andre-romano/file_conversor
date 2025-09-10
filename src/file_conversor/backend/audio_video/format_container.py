@@ -7,7 +7,7 @@ from typing import Iterable
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.backend.audio_video.codec import _Codec, AudioCodec, VideoCodec
+from file_conversor.backend.audio_video.ffmpeg_codec import _FFmpegCodec, FFmpegAudioCodec, FFmpegVideoCodec
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -17,7 +17,7 @@ logger = LOG.getLogger(__name__)
 
 class FormatContainer:
     @staticmethod
-    def _check_available_codec(codec: _Codec, available_codecs: Iterable[str]):
+    def _check_available_codec(codec: _FFmpegCodec, available_codecs: Iterable[str]):
         if codec.name in available_codecs:
             return codec
         raise ValueError(f"Codec '{codec}' {_('not available. Available codecs are:')} {' '.join(available_codecs)}")
@@ -42,8 +42,8 @@ class FormatContainer:
         self._available_video_codecs.add("null")
         self._available_video_codecs.add("copy")
 
-        self.audio_codec = AudioCodec.from_str(audio_codec)
-        self.video_codec = VideoCodec.from_str(video_codec)
+        self.audio_codec = FFmpegAudioCodec.from_str(audio_codec)
+        self.video_codec = FFmpegVideoCodec.from_str(video_codec)
 
     # PROPERTIES
     @property
@@ -60,7 +60,7 @@ class FormatContainer:
 
     @audio_codec.setter
     def audio_codec(self, value):
-        if not isinstance(value, AudioCodec):
+        if not isinstance(value, FFmpegAudioCodec):
             raise ValueError(f"Cannot set '{type(value)}({value})' as audio codec.")
         self._check_available_codec(value, self._available_audio_codecs)
         self._audio_codec = value
@@ -71,7 +71,7 @@ class FormatContainer:
 
     @video_codec.setter
     def video_codec(self, value):
-        if not isinstance(value, VideoCodec):
+        if not isinstance(value, FFmpegVideoCodec):
             raise ValueError(f"Cannot set '{type(value)}({value})' as video codec.")
         self._check_available_codec(value, self._available_video_codecs)
         self._video_codec = value
@@ -95,10 +95,17 @@ class FormatContainer:
 
     def get_options(self) -> list[str]:
         res = ["-f", self._name]
-        res.extend(self.audio_codec.get_options())
-        res.extend(self.video_codec.get_options())
+        if self._name.lower() != "null":
+            res.extend(self.audio_codec.get_options())
+            res.extend(self.video_codec.get_options())
         return res
 
+
+AVAILABLE_NULL_CONTAINERS = {
+    "null": FormatContainer(
+        name="null"
+    )
+}
 
 AVAILABLE_AUDIO_CONTAINERS = {
     # AUDIO
