@@ -94,7 +94,12 @@ class _FFmpegCodec(AbstractRegisterManager):
 class FFmpegAudioCodec(_FFmpegCodec):
     _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
-    def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
+    def __init__(
+            self,
+            name: str,
+            valid_options: Iterable[str] | None = None,
+            **kwargs,
+    ) -> None:
         super().__init__(invalid_prefix="-an", prefix="-c:a", name=name, valid_options=valid_options, **kwargs)
         self._valid_options.add("-b:a")
 
@@ -109,7 +114,12 @@ class FFmpegAudioCodec(_FFmpegCodec):
 class FFmpegVideoCodec(_FFmpegCodec):
     _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
-    def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
+    def __init__(
+            self,
+            name: str,
+            valid_options: Iterable[str] | None = None,
+            **kwargs,
+    ) -> None:
         super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, **kwargs)
         self._valid_options.add("-b:v")
         self._valid_options.add("-vf")

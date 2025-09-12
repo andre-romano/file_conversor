@@ -65,13 +65,13 @@ def check_is_bool_or_none(data: str | bool | None) -> bool | None:
     raise typer.BadParameter(_("Must be a bool or None."))
 
 
-def check_positive_integer(num: int | float | None):
+def check_positive_integer(num: int | float | None, allow_zero: bool = False):
     """
     Checks if the provided number is a positive integer.
     """
     if not num:
         return num
-    if num <= 0:
+    if num < 0 or (not allow_zero and num == 0):
         raise typer.BadParameter(_("Must be a positive integer."))
     return num
 

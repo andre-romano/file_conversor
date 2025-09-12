@@ -155,9 +155,9 @@ def AudioBitrateOption(prompt: bool | str = False):
     """--audio-bitrate, -ab"""
     return typer.Option(
         "--audio-bitrate", "-ab",
-        help=_("Audio bitrate in kbps"),
+        help=f"{_("Audio bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
         prompt=prompt,
-        callback=check_positive_integer,
+        callback=lambda x: check_positive_integer(x, allow_zero=True),
     )
 
 
@@ -165,9 +165,9 @@ def VideoBitrateOption(prompt: bool | str = False):
     """--video-bitrate, -vb"""
     return typer.Option(
         "--video-bitrate", "-vb",
-        help=_("Video bitrate in kbps"),
+        help=f"{_("Video bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
         prompt=prompt,
-        callback=check_positive_integer,
+        callback=lambda x: check_positive_integer(x, allow_zero=True),
     )
 
 

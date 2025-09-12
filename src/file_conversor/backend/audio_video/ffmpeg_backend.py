@@ -189,7 +189,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output container not set')}")
         if codec:
             self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
-        if bitrate:
+        if bitrate is not None and bitrate >= 0:
             self._out_container.audio_codec.set_bitrate(bitrate)
         if filters:
             if isinstance(filters, FFmpegFilter):
@@ -209,7 +209,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output container not set')}")
         if codec:
             self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
-        if bitrate:
+        if bitrate is not None and bitrate >= 0:
             self._out_container.video_codec.set_bitrate(bitrate)
         if filters:
             if isinstance(filters, FFmpegFilter):

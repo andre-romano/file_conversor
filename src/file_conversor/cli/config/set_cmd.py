@@ -55,13 +55,13 @@ def set(
                                                      )] = CONFIG["install-deps"],
 
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help=_("Audio bitrate in kbps"),
-                                               callback=check_positive_integer,
+                                               help=f"{_("Audio bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
+                                               callback=lambda x: check_positive_integer(x, allow_zero=True),
                                                )] = CONFIG["audio-bitrate"],
 
     video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help=_("Video bitrate in kbps"),
-                                               callback=check_positive_integer,
+                                               help=f"{_("Video bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
+                                               callback=lambda x: check_positive_integer(x, allow_zero=True),
                                                )] = CONFIG["video-bitrate"],
 
     image_quality: Annotated[int, typer.Option("--image-quality", "-iq",

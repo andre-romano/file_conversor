@@ -30,8 +30,8 @@ class Configuration:
         self.__data = {
             "language": language,    # Default: system language or "en_US"
             "install-deps": True,    # Default: ask user to confirm dependency installation
-            "audio-bitrate": 192,    # Default audio bitrate in kbps
-            "video-bitrate": 6000,   # Default video bitrate in kbps
+            "audio-bitrate": 0,      # Default audio bitrate in kbps
+            "video-bitrate": 0,      # Default video bitrate in kbps
             "image-quality": 90,     # Default image quality 90%
             "image-dpi": 200,        # Default image => PDF dpi
             "image-fit": 'into',     # Default image => PDF fit mode
@@ -62,6 +62,9 @@ class Configuration:
 
     def __len__(self):
         return len(self.__data)
+
+    def get_path(self) -> Path:
+        return self.__config_path
 
     def to_dict(self):
         return self.__data.copy()

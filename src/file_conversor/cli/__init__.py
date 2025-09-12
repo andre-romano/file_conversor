@@ -112,3 +112,4 @@ def main_callback(
     })
     logger.debug(f"Command: {sys.argv}")
     Environment.get_executable()
+    logger.debug(f"Config file: {CONFIG.get_path()}")
