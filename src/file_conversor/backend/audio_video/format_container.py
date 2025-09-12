@@ -125,7 +125,7 @@ AudioFormatContainer.register(
     video_codec="null",
     available_audio_codecs={
         "libmp3lame",
-        "null", "copy",
+        "copy",
     },
     available_video_codecs={
         "null",
@@ -138,7 +138,7 @@ AudioFormatContainer.register(
     video_codec="null",
     available_audio_codecs={
         "aac",
-        "null", "copy",
+        "copy",
     },
     available_video_codecs={
         "null",
@@ -151,7 +151,7 @@ AudioFormatContainer.register(
     video_codec="null",
     available_audio_codecs={
         "libvorbis",
-        "null", "copy",
+        "copy",
     },
     available_video_codecs={
         "null",
@@ -164,7 +164,7 @@ AudioFormatContainer.register(
     video_codec="null",
     available_audio_codecs={
         "libopus",
-        "null", "copy",
+        "copy",
     },
     available_video_codecs={
         "null",
@@ -177,7 +177,7 @@ AudioFormatContainer.register(
     video_codec="null",
     available_audio_codecs={
         "flac",
-        "null", "copy",
+        "copy",
     },
     available_video_codecs={
         "null",
@@ -213,7 +213,7 @@ VideoFormatContainer.register(
         "libx265",
         "h264_nvenc",
         "hevc_nvenc",
-        "null", "copy",
+        "copy",
     },
 )
 VideoFormatContainer.register(
@@ -228,7 +228,7 @@ VideoFormatContainer.register(
     },
     available_video_codecs={
         "mpeg4",
-        "null", "copy",
+        "copy",
     },
 )
 VideoFormatContainer.register(
@@ -252,7 +252,7 @@ VideoFormatContainer.register(
         "hevc_nvenc",
         "libvpx",
         "libvpx-vp9",
-        "null", "copy",
+        "copy",
     },
 )
 VideoFormatContainer.register(
@@ -268,6 +268,6 @@ VideoFormatContainer.register(
     available_video_codecs={
         "libvpx",
         "libvpx-vp9",
-        "null", "copy",
+        "copy",
     },
 )
