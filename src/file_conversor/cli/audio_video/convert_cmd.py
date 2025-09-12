@@ -19,7 +19,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.formatters import parse_ffmpeg_filter
 from file_conversor.utils.validators import check_positive_integer, check_valid_options, check_video_resolution
-from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import AudioBitrateOption, AxisOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoRotationOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -89,7 +89,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=CONVERT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Convert a audio/video file to a different format.')}
+        {_('Convert a audio/video file to a different format, adjusting many parameters.')}
 
         {_('This command can be used to convert audio or video files to the specified format.')}
     """,
@@ -109,15 +109,9 @@ def convert(
 
     format: Annotated[str, FormatOption(FFmpegBackend)],
 
-    audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
-                                               help=_("Audio bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["audio-bitrate"],
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
 
-    video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help=_("Video bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["video-bitrate"],
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     audio_codec: Annotated[str | None, typer.Option("--audio-codec", "-ac",
                                                     help=f'{_("Audio codec. Available options are:")} {", ".join(FFmpegBackend.get_supported_audio_codecs())}. Not all codecs are available for all file formats (check FFmpeg for supportted containers). Defaults to None (use the default for the file container).',
@@ -137,52 +131,25 @@ def convert(
                                                      help=f'{_("Apply a custom FFmpeg video filter (advanced option, use with caution). Uses the same format as FFmpeg filters (e.g., filter=option1=value1:option2=value2:...). Filters are applied in the order they appear in the command.")}. {_('Defaults to None (do not apply custom filters)')}.',
                                                      )] = [],
 
-    resolution: Annotated[str | None, typer.Option("--resolution", "-rs",
-                                                   help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
-                                                   callback=check_video_resolution,
-                                                   )] = None,
+    resolution: Annotated[str | None, ResolutionOption()] = None,
 
-    fps: Annotated[int | None, typer.Option("--fps", "-fp",
-                                            help=f'{_("Target video FPS (frames per second). Uses ``minterpolate`` filter to adjust fps. Defaults to None (use same fps as video source)")}',
-                                            min=1,
-                                            )] = None,
+    fps: Annotated[int | None, FPSOption()] = None,
 
-    brightness: Annotated[float, typer.Option("--brightness", "-b",
-                                              help=f'{_("Adjust brightness")}. {_('Defaults to 1.0 (do not adjust)')}.',
-                                              min=1.0, max=3.0,
-                                              )] = 1.0,
+    brightness: Annotated[float, BrightnessOption()] = 1.0,
 
-    contrast: Annotated[float, typer.Option("--contrast", "-c",
-                                            help=f'{_("Adjust contrast")}. {_('Defaults to 1.0 (do not adjust)')}.',
-                                            min=1.0, max=3.0,
-                                            )] = 1.0,
+    contrast: Annotated[float, ContrastOption()] = 1.0,
 
-    saturation: Annotated[float, typer.Option("--saturation", "-s",
-                                              help=f'{_("Adjust saturation")}. {_('Defaults to 1.0 (do not adjust)')}.',
-                                              min=1.0, max=3.0,
-                                              )] = 1.0,
+    color: Annotated[float, ColorOption()] = 1.0,
 
-    gamma: Annotated[float, typer.Option("--gamma", "-g",
-                                         help=f'{_("Adjust gamma")}. {_('Defaults to 1.0 (do not adjust)')}.',
-                                         min=1.0, max=3.0,
-                                         )] = 1.0,
+    gamma: Annotated[float, GammaOption()] = 1.0,
 
-    rotation: Annotated[int | None, typer.Option("--rotation", "-r",
-                                                 help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. {_('Defaults to None (do not rotate)')}.',
-                                                 callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
-                                                 )] = None,
+    rotation: Annotated[int | None, VideoRotationOption()] = None,
 
     mirror_axis: Annotated[str | None, AxisOption()] = None,
 
-    deshake: Annotated[bool, typer.Option("--deshake", "-d",
-                                          help=f'{_("Deshake video (attempt to fix vertical/horizontal span from handrecoding)")}. {_('Defaults to False (do not apply filter)')}.',
-                                          is_flag=True,
-                                          )] = False,
+    deshake: Annotated[bool, DeshakeOption()] = False,
 
-    unsharp: Annotated[bool, typer.Option("--unsharp", "-u",
-                                          help=f'{_("Increase video sharpness (using unsharp mask). May increase image noise.")}. {_('Defaults to False (do not apply filter)')}.',
-                                          is_flag=True,
-                                          )] = False,
+    unsharp: Annotated[bool, UnsharpOption()] = False,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
@@ -212,8 +179,8 @@ def convert(
     if fps is not None:
         video_filters_obj.append(FFmpegFilterMInterpolate(fps=fps))
 
-    if brightness != 1.0 or contrast != 1.0 or saturation != 1.0 or gamma != 1.0:
-        video_filters_obj.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=saturation, gamma=gamma))
+    if brightness != 1.0 or contrast != 1.0 or color != 1.0 or gamma != 1.0:
+        video_filters_obj.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=color, gamma=gamma))
 
     if rotation is not None:
         if rotation in (90, -90):

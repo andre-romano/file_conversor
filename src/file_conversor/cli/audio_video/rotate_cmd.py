@@ -19,7 +19,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer, check_valid_options
-from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoRotationOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -83,17 +83,11 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.mp4 -r 180`
     """)
 def rotate(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
-    rotation: Annotated[int, typer.Option("--rotation", "-r",
-                                          help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
-                                          callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
-                                          )],
+    rotation: Annotated[int, VideoRotationOption()],
 
-    video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help=_("Video bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["video-bitrate"],
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

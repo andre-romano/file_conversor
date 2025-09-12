@@ -14,6 +14,7 @@ COMMAND_NAME = "audio-video"
 # SUBCOMMANDS
 CHECK_NAME = "check"
 CONVERT_NAME = "convert"
+ENHANCE_NAME = "enhance"
 INFO_NAME = "info"
 MIRROR_NAME = "mirror"
 RESIZE_NAME = "resize"

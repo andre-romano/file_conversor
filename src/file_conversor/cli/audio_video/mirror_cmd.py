@@ -19,7 +19,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer
-from file_conversor.utils.typer_utils import AxisOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import AxisOption, InputFilesArgument, OutputDirOption, VideoBitrateOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -77,14 +77,11 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {MIRROR_NAME} input_file.mp4 -a y`
     """)
 def mirror(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
     mirror_axis: Annotated[str, AxisOption()],
 
-    video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help=_("Video bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["video-bitrate"],
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

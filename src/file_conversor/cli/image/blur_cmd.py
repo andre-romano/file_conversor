@@ -16,7 +16,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption, RadiusOption
 from file_conversor.utils.validators import check_is_bool_or_none, check_path_exists, check_valid_options
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -50,10 +50,7 @@ EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
 def blur(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
 
-    radius: Annotated[int, typer.Option("--radius", "-r",
-                                        help=f'{_("Box radius (in pixels) to blur.")}',
-                                        min=1,
-                                        )] = 3,
+    radius: Annotated[int, RadiusOption()] = 3,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

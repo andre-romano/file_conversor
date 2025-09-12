@@ -19,7 +19,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer, check_video_resolution
-from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption, ResolutionOption, VideoBitrateOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -59,7 +59,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=RESIZE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Resize a audio/video file.')}
+        {_('Resize a audio/video file (downscaling / upscaling).')}
 
         {_('Outputs a audio/video file with _resized at the end.')}
     """,
@@ -71,18 +71,11 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.mp4 -rs 1280:720`
     """)
 def resize(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
-    resolution: Annotated[str, typer.Option("--resolution", "-rs",
-                                            help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
-                                            prompt=f"{_('Enter target resolution (WIDTH:HEIGHT)')}",
-                                            callback=check_video_resolution,
-                                            )],
+    resolution: Annotated[str, ResolutionOption(prompt=f"{_('Enter target resolution (WIDTH:HEIGHT)')}")],
 
-    video_bitrate: Annotated[int, typer.Option("--video-bitrate", "-vb",
-                                               help=_("Video bitrate in kbps"),
-                                               callback=check_positive_integer,
-                                               )] = CONFIG["video-bitrate"],
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

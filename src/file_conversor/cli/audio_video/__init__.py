@@ -11,6 +11,7 @@ from file_conversor.cli.audio_video._typer import COMMAND_NAME
 
 from file_conversor.cli.audio_video.check_cmd import typer_cmd as check_cmd
 from file_conversor.cli.audio_video.convert_cmd import typer_cmd as convert_cmd
+from file_conversor.cli.audio_video.enhance_cmd import typer_cmd as enhance_cmd
 from file_conversor.cli.audio_video.info_cmd import typer_cmd as info_cmd
 from file_conversor.cli.audio_video.mirror_cmd import typer_cmd as mirror_cmd
 from file_conversor.cli.audio_video.resize_cmd import typer_cmd as resize_cmd
@@ -25,6 +26,7 @@ audio_video_cmd = typer.Typer(
 
 # TRANSFORMATION_PANEL
 audio_video_cmd.add_typer(convert_cmd)
+audio_video_cmd.add_typer(enhance_cmd)
 audio_video_cmd.add_typer(mirror_cmd)
 audio_video_cmd.add_typer(rotate_cmd)
 audio_video_cmd.add_typer(resize_cmd)

@@ -16,8 +16,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
-from file_conversor.utils.validators import check_is_bool_or_none, check_path_exists, check_valid_options
+from file_conversor.utils.typer_utils import BrightnessOption, ColorOption, ContrastOption, InputFilesArgument, OutputDirOption, SharpnessOption
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -48,7 +47,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="contrast",
                 description="Contrast Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --constrast 1.20',
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --contrast 1.20',
                 icon=str(icons_folder_path / "contrast.ico"),
             ),
             WinContextCommand(
@@ -89,21 +88,13 @@ ctx_menu.register_callback(register_ctx_menu)
 def enhance(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
 
-    brightness: Annotated[float, typer.Option("--brightness", "-b",
-                                              help=_("Adjust image brightness. brightness = 1.00 means no change. brightness < 1.00 makes image black. brightness > 1.00 makes image lighter."),
-                                              )] = 1.00,
+    brightness: Annotated[float, BrightnessOption()] = 1.00,
 
-    contrast: Annotated[float, typer.Option("--contrast", "-ct",
-                                            help=_("Adjust image contrast. contrast = 1.00 means no change. contrast < 1.00 reduces contrast (grayish image). contrast > 1.00 increases contrast."),
-                                            )] = 1.00,
+    contrast: Annotated[float, ContrastOption()] = 1.00,
 
-    color: Annotated[float, typer.Option("--color", "-cl",
-                                         help=_("Adjust image color. color = 1.00 means no change. color < 1.00 reduces color saturation. color > 1.00 increases color saturation."),
-                                         )] = 1.00,
+    color: Annotated[float, ColorOption()] = 1.00,
 
-    sharpness: Annotated[float, typer.Option("--sharpness", "-s",
-                                             help=_("Adjust image sharpness. sharpness = 1.00 means no change. sharpness < 1.00 makes image more blurry. sharpness > 1.00 increases image crispness (and noise as well)."),
-                                             )] = 1.00,
+    sharpness: Annotated[float, SharpnessOption()] = 1.00,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
