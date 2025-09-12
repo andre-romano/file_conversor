@@ -2,10 +2,10 @@
 
 
 # user-provided imports
-from typing import Iterable
+from typing import Any, Iterable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-from file_conversor.backend.audio_video.format_container import FormatContainer, AVAILABLE_NULL_CONTAINERS, AVAILABLE_VIDEO_CONTAINERS, AVAILABLE_AUDIO_CONTAINERS
+from file_conversor.backend.audio_video.format_container import AudioFormatContainer, VideoFormatContainer
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
@@ -50,16 +50,18 @@ class AbstractFFmpegBackend(AbstractBackend):
     }
     SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
 
-    SUPPORTED_OUT_AUDIO_FORMATS = AVAILABLE_NULL_CONTAINERS | AVAILABLE_AUDIO_CONTAINERS
-    SUPPORTED_OUT_VIDEO_FORMATS = AVAILABLE_NULL_CONTAINERS | AVAILABLE_VIDEO_CONTAINERS
+    SUPPORTED_OUT_AUDIO_FORMATS = AudioFormatContainer.get_registered()
+    SUPPORTED_OUT_VIDEO_FORMATS = VideoFormatContainer.get_registered()
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     @classmethod
-    def __get_supported_codecs(cls, supported_format: dict[str, FormatContainer], is_audio: bool, ext: str | None = None) -> Iterable[str]:
+    def __get_supported_codecs(cls, supported_format: dict[str, tuple[tuple, dict[str, Any]]], is_audio: bool, ext: str | None = None) -> Iterable[str]:
         res: set[str] = set()
-        for cont_ext, container in supported_format.items():
+        codecs_kwarg = "available_audio_codecs" if is_audio else "available_video_codecs"
+        for cont_ext, data in supported_format.items():
             if not ext or (ext == cont_ext):
-                res.update([str(c) for c in (container.available_audio_codecs if is_audio else container.available_video_codecs)])
+                _, kwargs = data
+                res.update(kwargs[codecs_kwarg])
         return sorted(res)
 
     @classmethod

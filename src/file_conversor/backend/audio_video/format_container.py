@@ -1,7 +1,7 @@
 # src\file_conversor\backend\audio_video\format_container.py
 
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable, Self
 
 # user-provided imports
 from file_conversor.config import Log
@@ -9,38 +9,34 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.audio_video.ffmpeg_codec import _FFmpegCodec, FFmpegAudioCodec, FFmpegVideoCodec
 
+from file_conversor.utils import AbstractRegisterManager
+
 _ = get_translation()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 
 
-class FormatContainer:
+class FormatContainer(AbstractRegisterManager):
     @staticmethod
     def _check_available_codec(codec: _FFmpegCodec, available_codecs: Iterable[str]):
         if codec.name in available_codecs:
             return codec
-        raise ValueError(f"Codec '{codec}' {_('not available. Available codecs are:')} {' '.join(available_codecs)}")
+        raise ValueError(f"Codec '{codec}' {_('not available. Available codecs are:')} {', '.join(available_codecs)}")
 
     def __init__(
         self,
         name: str,
-        audio_codec: str = "null",
-        video_codec: str = "null",
-        available_audio_codecs: set[str] | None = None,
-        available_video_codecs: set[str] | None = None,
+        audio_codec: str,
+        video_codec: str,
+        available_audio_codecs: set[str],
+        available_video_codecs: set[str],
 
     ) -> None:
         super().__init__()
         self._name = name
-        self._available_audio_codecs = available_audio_codecs or set()
-        self._available_video_codecs = available_video_codecs or set()
-
-        self._available_audio_codecs.add("null")
-        self._available_audio_codecs.add("copy")
-
-        self._available_video_codecs.add("null")
-        self._available_video_codecs.add("copy")
+        self._available_audio_codecs = available_audio_codecs
+        self._available_video_codecs = available_video_codecs
 
         self.audio_codec = FFmpegAudioCodec.from_str(audio_codec)
         self.video_codec = FFmpegVideoCodec.from_str(video_codec)
@@ -101,113 +97,177 @@ class FormatContainer:
         return res
 
 
-AVAILABLE_NULL_CONTAINERS = {
-    "null": FormatContainer(
-        name="null"
-    )
-}
+class VideoFormatContainer(FormatContainer):
+    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
-AVAILABLE_AUDIO_CONTAINERS = {
-    # AUDIO
-    'mp3': FormatContainer(
-        name="mp3",
-        audio_codec="libmp3lame",
-        available_audio_codecs={
-            "libmp3lame"
-        }
-    ),
-    'm4a': FormatContainer(
-        name="ipod",
-        audio_codec="aac",
-        available_audio_codecs={
-            "aac"
-        }
-    ),
-    'ogg': FormatContainer(
-        name="ogg",
-        audio_codec="libvorbis",
-        available_audio_codecs={
-            "libvorbis"
-        }
-    ),
-    'opus': FormatContainer(
-        name="opus",
-        audio_codec="libopus",
-        available_audio_codecs={
-            "libopus"
-        }
-    ),
-    'flac': FormatContainer(
-        name="flac",
-        audio_codec="flac",
-        available_audio_codecs={
-            "flac"
-        }
-    ),
-}
 
-AVAILABLE_VIDEO_CONTAINERS = {
-    # VIDEO
-    'mp4': FormatContainer(
-        name="mp4",
-        audio_codec="aac",
-        video_codec="libx264",
-        available_audio_codecs={
-            "aac",
-            "ac3",
-            "libmp3lame",
-        },
-        available_video_codecs={
-            "libx264",
-            "libx265",
-            "h264_nvenc",
-            "hevc_nvenc",
-        },
-    ),
-    'avi': FormatContainer(
-        name="avi",
-        audio_codec="libmp3lame",
-        video_codec="mpeg4",
-        available_audio_codecs={
-            "libmp3lame",
-            "pcm_s16le",
-        },
-        available_video_codecs={
-            "mpeg4",
-        },
-    ),
-    'mkv': FormatContainer(
-        name="matroska",
-        audio_codec="aac",
-        video_codec="libx264",
-        available_audio_codecs={
-            "aac",
-            "ac3",
-            "libmp3lame",
-            "libopus",
-            "libvorbis",
-            "flac",
-        },
-        available_video_codecs={
-            "libx264",
-            "libx265",
-            "h264_nvenc",
-            "hevc_nvenc",
-            "libvpx",
-            "libvpx-vp9",
-        },
-    ),
-    'webm': FormatContainer(
-        name="webm",
-        audio_codec="libvorbis",
-        video_codec="libvpx",
-        available_audio_codecs={
-            "libvorbis",
-            "libopus",
-        },
-        available_video_codecs={
-            "libvpx",
-            "libvpx-vp9",
-        },
-    ),
-}
+class AudioFormatContainer(FormatContainer):
+    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
+
+
+# AUDIO CONTAINERS
+AudioFormatContainer.register(
+    "null",
+    name="null",
+    audio_codec="null",
+    video_codec="null",
+    available_audio_codecs={
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null", "copy",
+    },
+)
+AudioFormatContainer.register(
+    'mp3',
+    name="mp3",
+    audio_codec="libmp3lame",
+    video_codec="null",
+    available_audio_codecs={
+        "libmp3lame",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null",
+    },
+)
+AudioFormatContainer.register(
+    'm4a',
+    name="ipod",
+    audio_codec="aac",
+    video_codec="null",
+    available_audio_codecs={
+        "aac",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null",
+    },
+)
+AudioFormatContainer.register(
+    'ogg',
+    name="ogg",
+    audio_codec="libvorbis",
+    video_codec="null",
+    available_audio_codecs={
+        "libvorbis",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null",
+    },
+)
+AudioFormatContainer.register(
+    'opus',
+    name="opus",
+    audio_codec="libopus",
+    video_codec="null",
+    available_audio_codecs={
+        "libopus",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null",
+    },
+)
+AudioFormatContainer.register(
+    'flac',
+    name="flac",
+    audio_codec="flac",
+    video_codec="null",
+    available_audio_codecs={
+        "flac",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null",
+    },
+)
+
+# VIDEO CONTAINERS
+VideoFormatContainer.register(
+    "null",
+    name="null",
+    audio_codec="null",
+    video_codec="null",
+    available_audio_codecs={
+        "null", "copy",
+    },
+    available_video_codecs={
+        "null", "copy",
+    },
+)
+VideoFormatContainer.register(
+    'mp4',
+    name="mp4",
+    audio_codec="aac",
+    video_codec="libx264",
+    available_audio_codecs={
+        "aac",
+        "ac3",
+        "libmp3lame",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "libx264",
+        "libx265",
+        "h264_nvenc",
+        "hevc_nvenc",
+        "null", "copy",
+    },
+)
+VideoFormatContainer.register(
+    'avi',
+    name="avi",
+    audio_codec="libmp3lame",
+    video_codec="mpeg4",
+    available_audio_codecs={
+        "libmp3lame",
+        "pcm_s16le",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "mpeg4",
+        "null", "copy",
+    },
+)
+VideoFormatContainer.register(
+    'mkv',
+    name="matroska",
+    audio_codec="aac",
+    video_codec="libx264",
+    available_audio_codecs={
+        "aac",
+        "ac3",
+        "libmp3lame",
+        "libopus",
+        "libvorbis",
+        "flac",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "libx264",
+        "libx265",
+        "h264_nvenc",
+        "hevc_nvenc",
+        "libvpx",
+        "libvpx-vp9",
+        "null", "copy",
+    },
+)
+VideoFormatContainer.register(
+    'webm',
+    name="webm",
+    audio_codec="libvorbis",
+    video_codec="libvpx",
+    available_audio_codecs={
+        "libvorbis",
+        "libopus",
+        "null", "copy",
+    },
+    available_video_codecs={
+        "libvpx",
+        "libvpx-vp9",
+        "null", "copy",
+    },
+)

@@ -9,17 +9,15 @@ from file_conversor.config.config import Configuration
 
 CONFIG = Configuration.get_instance()
 
+AVAILABLE_LANGUAGES = set([str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()])
+
 
 def get_default_language():
     return "en_US"
 
 
-def get_available_languages() -> set[str]:
-    return set([str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()])
-
-
 def normalize_lang_code(lang: str | None):
-    if not lang or lang not in get_available_languages():
+    if not lang or lang not in AVAILABLE_LANGUAGES:
         return None  # empty language code (force fallback in translation)
     return lang
 

@@ -1,7 +1,5 @@
 # src\file_conversor\backend\audio_video\codec.py
 
-import copy
-
 from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
@@ -11,25 +9,18 @@ from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
+from file_conversor.utils import AbstractRegisterManager
+
 _ = get_translation()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 
 
-class _FFmpegCodec:
-    AVAILABLE_CODECS: dict[str, Self] = {}
-
+class _FFmpegCodec(AbstractRegisterManager):
     @classmethod
-    def register(cls, name: str, *args, **kwargs):
-        codec = cls(name=name, *args, **kwargs)
-        cls.AVAILABLE_CODECS[name] = codec
-
-    @classmethod
-    def from_str(cls, name: str) -> Self:
-        if name not in cls.AVAILABLE_CODECS:
-            raise ValueError(f"Invalid codec '{name}'. Available codecs: {', '.join(cls.AVAILABLE_CODECS)}")
-        return copy.deepcopy(cls.AVAILABLE_CODECS[name])
+    def get_available_codecs(cls) -> dict[str, Any]:
+        return cls.get_registered()
 
     def __init__(
         self,
@@ -101,7 +92,7 @@ class _FFmpegCodec:
 
 
 class FFmpegAudioCodec(_FFmpegCodec):
-    AVAILABLE_CODECS: dict[str, Self] = {}
+    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
     def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
         super().__init__(invalid_prefix="-an", prefix="-c:a", name=name, valid_options=valid_options, **kwargs)
@@ -116,7 +107,7 @@ class FFmpegAudioCodec(_FFmpegCodec):
 
 
 class FFmpegVideoCodec(_FFmpegCodec):
-    AVAILABLE_CODECS: dict[str, Self] = {}
+    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
     def __init__(self, name: str, valid_options: Iterable[str] | None = None, **kwargs) -> None:
         super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, **kwargs)
@@ -132,40 +123,48 @@ class FFmpegVideoCodec(_FFmpegCodec):
 
 
 # register AUDIO codecs
-FFmpegAudioCodec.register("null")
-FFmpegAudioCodec.register("copy")
-FFmpegAudioCodec.register("aac")
-FFmpegAudioCodec.register("ac3")
-FFmpegAudioCodec.register("flac")
-FFmpegAudioCodec.register("libfdk_aac")
-FFmpegAudioCodec.register("libmp3lame")
-FFmpegAudioCodec.register("libopus")
-FFmpegAudioCodec.register("libvorbis")
-FFmpegAudioCodec.register("pcm_s16le")
+FFmpegAudioCodec.register("null", name="null")
+FFmpegAudioCodec.register("copy", name="copy")
+FFmpegAudioCodec.register("aac", name="aac")
+FFmpegAudioCodec.register("ac3", name="ac3")
+FFmpegAudioCodec.register("flac", name="flac")
+FFmpegAudioCodec.register("libfdk_aac", name="libfdk_aac")
+FFmpegAudioCodec.register("libmp3lame", name="libmp3lame")
+FFmpegAudioCodec.register("libopus", name="libopus")
+FFmpegAudioCodec.register("libvorbis", name="libvorbis")
+FFmpegAudioCodec.register("pcm_s16le", name="pcm_s16le")
 
 # register AUDIO codecs
-FFmpegVideoCodec.register("null")
-FFmpegVideoCodec.register("copy")
-FFmpegVideoCodec.register("h264_nvenc", valid_options={
-    "-preset": [
-        "medium"
-    ]
-})
-FFmpegVideoCodec.register("hevc_nvenc", valid_options={
-    "-preset": [
-        "medium"
-    ]
-})
-FFmpegVideoCodec.register("libx264", valid_options={
-    "-preset": [
-        "medium"
-    ]
-})
-FFmpegVideoCodec.register("libx265", valid_options={
-    "-preset": [
-        "medium"
-    ]
-})
-FFmpegVideoCodec.register("libvpx")
-FFmpegVideoCodec.register("libvpx-vp9")
-FFmpegVideoCodec.register("mpeg4")
+FFmpegVideoCodec.register("null", name="null")
+FFmpegVideoCodec.register("copy", name="copy")
+FFmpegVideoCodec.register("h264_nvenc",
+                          name="h264_nvenc",
+                          valid_options={
+                              "-preset": [
+                                  "medium"
+                              ]
+                          })
+FFmpegVideoCodec.register("hevc_nvenc",
+                          name="hevc_nvenc",
+                          valid_options={
+                              "-preset": [
+                                  "medium"
+                              ]
+                          })
+FFmpegVideoCodec.register("libx264",
+                          name="libx264",
+                          valid_options={
+                              "-preset": [
+                                  "medium"
+                              ]
+                          })
+FFmpegVideoCodec.register("libx265",
+                          name="libx265",
+                          valid_options={
+                              "-preset": [
+                                  "medium"
+                              ]
+                          })
+FFmpegVideoCodec.register("libvpx", name="libvpx")
+FFmpegVideoCodec.register("libvpx-vp9", name="libvpx-vp9")
+FFmpegVideoCodec.register("mpeg4", name="mpeg4")
