@@ -32,6 +32,7 @@ class Configuration:
             "install-deps": True,    # Default: ask user to confirm dependency installation
             "audio-bitrate": 0,      # Default audio bitrate in kbps
             "video-bitrate": 0,      # Default video bitrate in kbps
+            "video-format": "mp4",   # Default video format
             "image-quality": 90,     # Default image quality 90%
             "image-dpi": 200,        # Default image => PDF dpi
             "image-fit": 'into',     # Default image => PDF fit mode

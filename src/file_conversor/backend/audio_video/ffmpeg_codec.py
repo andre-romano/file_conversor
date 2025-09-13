@@ -147,29 +147,25 @@ FFmpegAudioCodec.register("pcm_s16le", name="pcm_s16le")
 # register AUDIO codecs
 FFmpegVideoCodec.register("null", name="null")
 FFmpegVideoCodec.register("copy", name="copy")
-FFmpegVideoCodec.register("h264_nvenc",
-                          name="h264_nvenc",
+FFmpegVideoCodec.register("h264_nvenc", name="h264_nvenc",
                           valid_options={
                               "-preset": [
                                   "medium"
                               ]
                           })
-FFmpegVideoCodec.register("hevc_nvenc",
-                          name="hevc_nvenc",
+FFmpegVideoCodec.register("hevc_nvenc", name="hevc_nvenc",
                           valid_options={
                               "-preset": [
                                   "medium"
                               ]
                           })
-FFmpegVideoCodec.register("libx264",
-                          name="libx264",
+FFmpegVideoCodec.register("libx264", name="libx264",
                           valid_options={
                               "-preset": [
                                   "medium"
                               ]
                           })
-FFmpegVideoCodec.register("libx265",
-                          name="libx265",
+FFmpegVideoCodec.register("libx265", name="libx265",
                           valid_options={
                               "-preset": [
                                   "medium"

@@ -6,6 +6,7 @@ from typing import Any, Callable, Iterable
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
+from file_conversor.utils.formatters import parse_ffmpeg_filter
 from file_conversor.utils.validators import check_valid_options
 
 _ = get_translation()
@@ -15,6 +16,12 @@ logger = LOG.getLogger(__name__)
 
 
 class FFmpegFilter:
+
+    @classmethod
+    def from_str(cls, filter: str):
+        name, args, kwargs = parse_ffmpeg_filter(filter)
+        return cls(name, *args, **kwargs)
+
     def __init__(self, name: str, *args: str, **options: str) -> None:
         super().__init__()
         self._name = name
@@ -29,14 +36,16 @@ class FFmpegFilter:
             return (self._name == value._name) and (self._args == value._args) and (self._options == value._options)
         return False
 
+    def __repr__(self) -> str:
+        return self.get()
+
+    def __str__(self) -> str:
+        return f"{self._name}({", ".join(self._args)}{", ".join(f"{k}={v}" for k, v in self._options.items())})"
+
     def get(self) -> str:
         res = f"{self._name}" + ("=" if (self._args or self._options) else "")
-        if self._args:
-            res += ":".join(self._args)
-        if self._options:
-            if self._args:
-                res += ","
-            res += ":".join(f"{k}={v}" for k, v in self._options.items())
+        res += ":".join(self._args) + ("," if self._args and self._options else "")
+        res += ":".join(f"{k}={v}" for k, v in self._options.items())
         return res
 
 

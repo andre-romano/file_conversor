@@ -10,16 +10,15 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
-from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterHflip, FFmpegFilterVflip
 
-from file_conversor.cli.audio_video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.audio_video._typer import VIDEO_TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.audio_video._typer import COMMAND_NAME, MIRROR_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer
-from file_conversor.utils.typer_utils import AxisOption, InputFilesArgument, OutputDirOption, VideoBitrateOption
+from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -39,7 +38,7 @@ EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
     icons_folder_path = Environment.get_icons_folder()
-    for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
+    for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="mirror_x",
@@ -65,9 +64,9 @@ ctx_menu.register_callback(register_ctx_menu)
     name=MIRROR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Mirror an audio/video file (vertically or horizontally).')}
+        {_('Mirror a video file (vertically or horizontally).')}
 
-        {_('Outputs an audio/video file with _mirrored at the end.')}
+        {_('Outputs a video file with _mirrored at the end.')}
     """,
     epilog=f"""
         **{_('Examples')}:** 
@@ -81,6 +80,8 @@ def mirror(
 
     mirror_axis: Annotated[str, AxisOption()],
 
+    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG["video-format"],
+
     video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
@@ -92,9 +93,11 @@ def mirror(
         overwrite_output=STATE["overwrite-output"],
     )
 
-    video_filters: list[FFmpegFilter] = list()
-    video_filters.append(FFmpegFilterHflip() if mirror_axis == "x" else
-                         FFmpegFilterVflip())
+    two_pass = video_bitrate > 0
+
+    video_filters = ffmpeg_backend.build_video_filters(
+        mirror_axis=mirror_axis
+    )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
@@ -103,11 +106,20 @@ def mirror(
 
         # display current progress
         process = ffmpeg_backend.execute(
-            progress_callback=progress_mgr.update_progress
+            progress_callback=progress_mgr.update_progress,
+            pass_num=1 if two_pass else 0,
         )
         progress_mgr.complete_step()
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_mirrored")
+        if two_pass:
+            # display current progress
+            process = ffmpeg_backend.execute(
+                progress_callback=progress_mgr.update_progress,
+                pass_num=2,
+            )
+            progress_mgr.complete_step()
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_mirrored", out_suffix=f".{file_format}")
 
     logger.info(f"{_('FFMpeg convertion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

@@ -14,14 +14,16 @@ from typing import Any, Callable, Iterable
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
 
-from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterDeshake, FFmpegFilterEq, FFmpegFilterHflip, FFmpegFilterMInterpolate, FFmpegFilterScale, FFmpegFilterTranspose, FFmpegFilterUnsharp, FFmpegFilterVflip
 from file_conversor.backend.audio_video.ffmpeg_codec import FFmpegAudioCodec, FFmpegVideoCodec
 from file_conversor.backend.audio_video.format_container import FormatContainer
 
-from file_conversor.config import Environment, Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Environment, Log, get_translation
 
 from file_conversor.utils.validators import check_file_format
+from file_conversor.utils.command_manager import CommandManager
+
+from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -37,6 +39,16 @@ class FFmpegBackend(AbstractFFmpegBackend):
     EXTERNAL_DEPENDENCIES = set([
         "ffmpeg",
     ])
+
+    @staticmethod
+    def _clean_two_pass_log_file(logfile: Path):
+        for filepath in logfile.parent.glob(logfile.name + "-0.log*"):
+            try:
+                if not filepath.exists():
+                    continue
+                filepath.unlink()
+            except Exception as e:
+                logger.warning(f"Failed to remove log file '{filepath}': {e}")
 
     def __init__(
         self,
@@ -63,16 +75,20 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._input_file: Path | None = None
         self._output_file: Path | None = None
 
+        self._audio_bitrate: int | None = None
+        self._video_bitrate: int | None = None
+
         self._global_options: list[str] = []
         self._in_opts: list[str] = []
         self._out_opts: list[str] = []
 
         self._out_container: FormatContainer | None = None
 
+        self._progress_callback: Callable[[float], Any] | None = None
+
     def _execute_progress_callback(
         self,
         process: subprocess.Popen,
-        progress_callback: Callable[[float], Any] | None = None,
     ):
         PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
@@ -94,8 +110,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
             current_time = hours * 3600 + minutes * 60 + seconds
             progress = 100.0 * (float(current_time) / file_duration_secs)
-            if progress_callback:
-                progress_callback(progress)
+            if self._progress_callback:
+                self._progress_callback(progress)
 
     def _set_global_options(self):
         """Set default global options"""
@@ -123,7 +139,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._in_opts = []
 
         # check file is found
-        self._input_file = Path(input_file)
+        self._input_file = Path(input_file).resolve()
         if not self._input_file.exists() and not self._input_file.is_file():
             raise FileNotFoundError(f"Input file '{input_file}' not found")
 
@@ -149,7 +165,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._out_opts = []
 
         # create out dir (if it does not exists)
-        self._output_file = Path(output_file)
+        self._output_file = Path(output_file).resolve()
         if self._output_file.name == "-":
             logger.warning("Null container selected. No output file will be created.")
             out_ext = "null"
@@ -189,7 +205,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output container not set')}")
         if codec:
             self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
-        if bitrate is not None and bitrate >= 0:
+        if bitrate is not None and bitrate > 0:
+            self._audio_bitrate = bitrate
             self._out_container.audio_codec.set_bitrate(bitrate)
         if filters:
             if isinstance(filters, FFmpegFilter):
@@ -209,28 +226,15 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output container not set')}")
         if codec:
             self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
-        if bitrate is not None and bitrate >= 0:
+        if bitrate is not None and bitrate > 0:
+            self._video_bitrate = bitrate
             self._out_container.video_codec.set_bitrate(bitrate)
         if filters:
             if isinstance(filters, FFmpegFilter):
                 filters = [filters]
             self._out_container.video_codec.set_filters(*filters)
 
-    def execute(
-        self,
-        progress_callback: Callable[[float], Any] | None = None,
-    ):
-        """
-        Execute the FFmpeg command to convert the input file to the output file.
-
-        :return: Subprocess.Popen object
-
-        :raises RuntimeError: If FFmpeg encounters an error during execution.
-        """
-        if not self._out_container:
-            raise RuntimeError(f"{_('Output container not set')}")
-        self._out_opts = self._out_container.get_options()
-
+    def _execute(self):
         # build ffmpeg command
         ffmpeg_command = []
         ffmpeg_command.extend([str(self._ffmpeg_bin)])  # ffmpeg CLI
@@ -250,8 +254,125 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         self._execute_progress_callback(
             process=process,
-            progress_callback=progress_callback,
         )
 
         Environment.check_returncode(process)
         return process
+
+    def execute(
+        self,
+        progress_callback: Callable[[float], Any] | None = None,
+        pass_num: int = 0,
+        out_opts: list[str] | None = None,
+    ):
+        """
+        Execute the FFmpeg command to convert the input file to the output file.
+
+        :param pass_num: Pass number for multi-pass encoding (0 for single pass, 1 for first pass, 2 for second pass). Defaults to 0.
+        :param out_opts: FFmpeg custom out options. Defaults to None.
+
+        :return: Subprocess.Popen object
+
+        :raises RuntimeError: If FFmpeg encounters an error during execution.
+        """
+        self._progress_callback = progress_callback
+
+        if pass_num not in (0, 1, 2):
+            raise ValueError(f"{_('Invalid number of passes:')} {pass_num}. {_('Must be 0 (single-pass), 1 (first pass) or 2 (second pass).')}")
+
+        if not self._input_file or not self._output_file:
+            raise RuntimeError(f"{_('Input/output files not set')}")
+
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+
+        self._out_opts = []
+
+        logdir = self._output_file.parent
+
+        logfile = logdir / CommandManager.get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
+
+        if pass_num > 0:
+            logger.debug(f"{_('Temporary 2-pass log file')}: {logfile}")
+            # add 2-pass encoding options
+            self._out_opts.extend([
+                "-pass", str(pass_num),
+                "-passlogfile", str(logfile),
+            ])
+            if not self._audio_bitrate or self._audio_bitrate <= 0:
+                raise ValueError(f"{_('Audio bitrate cannot be 0 when using two-pass mode.')}")
+            if not self._video_bitrate or self._video_bitrate <= 0:
+                raise ValueError(f"{_('Video bitrate cannot be 0 when using two-pass mode.')}")
+
+        self._out_opts.extend(self._out_container.get_options())
+        self._out_opts.extend(out_opts if out_opts else [])
+
+        original_output_file = self._output_file
+        if pass_num == 1:
+            self._output_file = Path("NUL" if CURR_PLATFORM == PLATFORM_WINDOWS else "/dev/null")
+
+        try:
+            process = self._execute()
+        except:
+            self._clean_two_pass_log_file(logfile)
+
+        self._output_file = original_output_file
+
+        if pass_num in (0, 2):
+            self._clean_two_pass_log_file(logfile)
+
+    def build_audio_filters(
+        self,
+    ):
+        audio_filters: list[FFmpegFilter] = list()
+        # complete when audio filters are implemented
+        return audio_filters
+
+    def build_video_filters(
+        self,
+        resolution: str | None = None,
+        fps: int | None = None,
+        # eq filter
+        brightness: float = 1.0,
+        contrast: float = 1.0,
+        color: float = 1.0,
+        gamma: float = 1.0,
+        # transformation filters
+        rotation: int | None = None,
+        mirror_axis: str | None = None,
+        # other
+        deshake: bool = False,
+        unsharp: bool = False,
+    ):
+        video_filters: list[FFmpegFilter] = list()
+
+        if resolution is not None:
+            video_filters.append(FFmpegFilterScale(*resolution.split(":")))
+
+        if fps is not None:
+            video_filters.append(FFmpegFilterMInterpolate(fps=fps))
+
+        if brightness != 1.0 or contrast != 1.0 or color != 1.0 or gamma != 1.0:
+            video_filters.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=color, gamma=gamma))
+
+        if rotation is not None:
+            if rotation in (90, -90):
+                direction = {90: 1, -90: 2}[rotation]
+                video_filters.append(FFmpegFilterTranspose(direction=direction))
+            else:
+                video_filters.append(FFmpegFilterTranspose(direction=1))
+                video_filters.append(FFmpegFilterTranspose(direction=1))
+
+        if mirror_axis is not None:
+            if mirror_axis == "x":
+                video_filters.append(FFmpegFilterHflip())
+            else:
+                video_filters.append(FFmpegFilterVflip())
+
+        if deshake:
+            video_filters.append(FFmpegFilterDeshake())
+
+        if unsharp:
+            video_filters.append(FFmpegFilterUnsharp())
+
+        return video_filters

@@ -66,11 +66,11 @@ class AbstractFFmpegBackend(AbstractBackend):
 
     @classmethod
     def get_supported_audio_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_AUDIO_FORMATS, is_audio=True, ext=ext)
+        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_FORMATS, is_audio=True, ext=ext)
 
     @classmethod
     def get_supported_video_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_VIDEO_FORMATS, is_audio=False, ext=ext)
+        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_FORMATS, is_audio=False, ext=ext)
 
     def __init__(
         self,

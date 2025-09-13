@@ -28,12 +28,16 @@ def InputFilesArgument(backend_or_iterable: type | dict | list | None = None):
     )
 
 
-def FormatOption(backend: type):
+def FormatOption(backend_or_iterable: type | dict | list):
     """--format, -f"""
+    if isinstance(backend_or_iterable, (dict, list)):
+        list_formats: list[str] | dict[str, Any] = backend_or_iterable
+    else:
+        list_formats: list[str] | dict[str, Any] = backend_or_iterable.SUPPORTED_OUT_FORMATS
     return typer.Option(
         "--format", "-f",
-        help=f"{_('Output format')} ({', '.join(backend.SUPPORTED_OUT_FORMATS)})",
-        callback=lambda x: check_valid_options(x, backend.SUPPORTED_OUT_FORMATS),
+        help=f"{_('Output format')} ({', '.join(list_formats)})",
+        callback=lambda x: check_valid_options(x, list_formats),
     )
 
 
@@ -168,6 +172,26 @@ def VideoBitrateOption(prompt: bool | str = False):
         help=f"{_("Video bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
         prompt=prompt,
         callback=lambda x: check_positive_integer(x, allow_zero=True),
+    )
+
+
+def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = False):
+    """--audio-codec, -ac"""
+    return typer.Option(
+        "--audio-codec", "-ac",
+        help=f'{_("Audio codec. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        prompt=prompt,
+        callback=lambda x: check_valid_options(x, available_options),
+    )
+
+
+def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = False):
+    """--video-codec, -vc"""
+    return typer.Option(
+        "--video-codec", "-vc",
+        help=f'{_("Video codec. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        prompt=prompt,
+        callback=lambda x: check_valid_options(x, available_options),
     )
 
 

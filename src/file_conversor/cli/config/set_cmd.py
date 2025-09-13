@@ -11,7 +11,7 @@ from rich import print
 from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
 import file_conversor.cli.config.show_cmd as show_cmd
 
-from file_conversor.backend import Img2PDFBackend, PillowBackend
+from file_conversor.backend import Img2PDFBackend, PillowBackend, FFmpegBackend
 from file_conversor.config import Configuration, State, Log, locale, get_translation, AVAILABLE_LANGUAGES
 
 from file_conversor.utils.validators import check_is_bool_or_none, check_positive_integer, check_valid_options
@@ -64,6 +64,11 @@ def set(
                                                callback=lambda x: check_positive_integer(x, allow_zero=True),
                                                )] = CONFIG["video-bitrate"],
 
+    video_format: Annotated[int, typer.Option("--video-format", "-vf",
+                                              help=f"{_("Video format.")} {_('Available formats:')} {", ".join(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)}",
+                                              callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS),
+                                              )] = CONFIG["video-format"],
+
     image_quality: Annotated[int, typer.Option("--image-quality", "-iq",
                                                help=_("Image quality (for ``image convert`` command). Valid values are between 1-100."),
                                                min=1, max=100,
@@ -100,6 +105,7 @@ def set(
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
         "audio-bitrate": audio_bitrate,
         "video-bitrate": video_bitrate,
+        "video-format": video_format,
         "image-quality": image_quality,
         "image-dpi": image_dpi,
         "image-fit": image_fit,

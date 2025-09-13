@@ -11,13 +11,23 @@ from file_conversor.config.locale import get_translation
 _ = get_translation()
 
 
-def parse_ffmpeg_filter(filter: str | None):
+def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
+    """return (name, args, kwargs)"""
     if not filter:
-        return "", []
+        return "", [], {}
     splitted = filter.split("=", maxsplit=1)
     name = splitted[0]
     args = splitted[1].split(":") if len(splitted) > 1 else []
-    return name, args
+    kwargs = {}
+    for arg in args.copy():
+        arg_splitted = arg.split("=")
+        arg_name = arg_splitted[0]
+        arg_data = arg_splitted[1] if len(arg_splitted) > 1 else ""
+        if not arg_data:
+            continue
+        kwargs[arg_name] = arg_data
+        args.remove(arg)
+    return name, args, kwargs
 
 
 def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool):

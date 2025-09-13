@@ -16,15 +16,15 @@ class CommandManager:
     def get_output_file(
             output_file: str | Path,
             stem: str = "",
-            suffix: str = "",
+            suffix: str | None = None,
     ):
         """
         Get output file based on input
         """
         output_file = Path(output_file)
         output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem}")
-        output_name = output_name.with_suffix(suffix if suffix else output_file.suffix)
-        return output_name.name
+        output_name = output_name.with_suffix(suffix if suffix is not None else output_file.suffix)
+        return Path(output_name.name)
 
     def __init__(self, input_files: List[str] | List[Path] | str | Path, output_dir: Path, overwrite: bool, steps: int = 1) -> None:
         super().__init__()

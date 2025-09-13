@@ -5,7 +5,8 @@ from file_conversor.config import get_translation
 
 _ = get_translation()
 
-TRANSFORMATION_PANEL = _("Transformations")
+VIDEO_TRANSFORMATION_PANEL = _("Video transformations")
+CONVERSION_PANEL = _("Conversion")
 OTHERS_PANEL = _("Other commands")
 
 # command
@@ -13,9 +14,10 @@ COMMAND_NAME = "audio-video"
 
 # SUBCOMMANDS
 CHECK_NAME = "check"
-CONVERT_NAME = "convert"
 ENHANCE_NAME = "enhance"
+EXECUTE_NAME = "execute"
 INFO_NAME = "info"
 MIRROR_NAME = "mirror"
 RESIZE_NAME = "resize"
 ROTATE_NAME = "rotate"
+TO_AVI_NAME = "to-avi"
