@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\audio_video\info_cmd.py
+# src\file_conversor\cli\audio\info_cmd.py
 
 import typer
 
@@ -17,8 +17,7 @@ from rich.console import Group
 # user-provided modules
 from file_conversor.backend import FFprobeBackend
 
-from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.audio_video._typer import COMMAND_NAME, INFO_NAME
+from file_conversor.cli.audio._typer import COMMAND_NAME, INFO_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
@@ -43,7 +42,7 @@ EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
     icons_folder_path = Environment.get_icons_folder()
-    for ext in FFprobeBackend.SUPPORTED_IN_FORMATS:
+    for ext in FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="info",
@@ -61,13 +60,12 @@ ctx_menu.register_callback(register_ctx_menu)
 
 @typer_cmd.command(
     name=INFO_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Get information about a audio/video file.')}
+        {_('Get information about a audio file.')}
 
-        {_('This command retrieves metadata and other information about the audio / video file')}:
+        {_('This command retrieves metadata and other information about the audio file')}:
 
-        - {_('Format')} (mp3, mp4, mov, etc)
+        - {_('Format')} (mp3, m4a, etc)
 
         - {_('Duration')} (HH:MM:SS)
 
@@ -76,12 +74,12 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.webm`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.m4a`
 
         - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp3`
     """)
 def info(
-    input_files: Annotated[List[str], InputFilesArgument(FFprobeBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS)],
 ):
 
     ffprobe_backend = FFprobeBackend(

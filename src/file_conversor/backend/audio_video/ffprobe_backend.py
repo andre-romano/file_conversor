@@ -4,17 +4,13 @@
 This module provides functionalities for handling audio and video files using FFprobe.
 """
 
-import copy
-import subprocess
 import json
-import re
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
-from file_conversor.backend.abstract_backend import AbstractBackend
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation

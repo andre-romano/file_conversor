@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\audio_video\check_cmd.py
+# src\file_conversor\cli\video\check_cmd.py
 
 import subprocess
 import typer
@@ -12,8 +12,8 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.audio_video._typer import COMMAND_NAME, CHECK_NAME
+from file_conversor.cli.video._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.video._typer import COMMAND_NAME, CHECK_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager

@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\audio_video\enhance_cmd.py
+# src\file_conversor\cli\video\enhance_cmd.py
 import typer
 
 from pathlib import Path
@@ -10,8 +10,10 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.audio_video._typer import VIDEO_TRANSFORMATION_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.audio_video._typer import COMMAND_NAME, ENHANCE_NAME
+from file_conversor.cli.video._ffmpeg_cmd import _ffmpeg_cli_cmd
+
+from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.video._typer import COMMAND_NAME, ENHANCE_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -112,7 +114,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ENHANCE_NAME} input_file.mkv -cl 0.85 -b 1.10`        
     """)
 def enhance(
-    input_files: Annotated[List[str], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
     file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG["video-format"],
 
@@ -132,51 +134,19 @@ def enhance(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    # init ffmpeg
-    ffmpeg_backend = FFmpegBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
-    )
-
-    # set filters
-    audio_filters = ffmpeg_backend.build_audio_filters()
-    video_filters = ffmpeg_backend.build_video_filters(
-        # eq
-        brightness=brightness,
-        contrast=contrast,
-        color=color,
-        gamma=gamma,
-        # image
+    _ffmpeg_cli_cmd(
+        input_files,
+        file_format=file_format,
+        out_stem="_enhanced",
+        audio_bitrate=audio_bitrate,
+        video_bitrate=video_bitrate,
         resolution=resolution,
         fps=fps,
+        color=color,
+        brightness=brightness,
+        contrast=contrast,
+        gamma=gamma,
         deshake=deshake,
         unsharp=unsharp,
+        output_dir=output_dir,
     )
-
-    two_pass = (video_bitrate > 0) or (audio_bitrate > 0)
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
-        ffmpeg_backend.set_audio_codec(bitrate=audio_bitrate, filters=audio_filters)
-        ffmpeg_backend.set_video_codec(bitrate=video_bitrate, filters=video_filters)
-
-        # display current progress
-        process = ffmpeg_backend.execute(
-            progress_callback=progress_mgr.update_progress,
-            pass_num=1 if two_pass else 0,
-        )
-        progress_mgr.complete_step()
-
-        if two_pass:
-            # display current progress
-            process = ffmpeg_backend.execute(
-                progress_callback=progress_mgr.update_progress,
-                pass_num=2,
-            )
-            progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_enhanced", out_suffix=f".{file_format}")
-
-    logger.info(f"{_('FFMpeg enhance')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

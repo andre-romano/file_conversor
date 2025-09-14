@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\audio_video\execute_cmd.py
+# src\file_conversor\cli\video\execute_cmd.py
 
 import shlex
 import typer
@@ -13,8 +13,8 @@ from pathlib import Path
 from file_conversor.backend import FFmpegBackend
 from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 
-from file_conversor.cli.audio_video._typer import OTHERS_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.audio_video._typer import COMMAND_NAME, EXECUTE_NAME
+from file_conversor.cli.video._typer import OTHERS_PANEL as RICH_HELP_PANEL
+from file_conversor.cli.video._typer import COMMAND_NAME, EXECUTE_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager

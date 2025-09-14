@@ -179,7 +179,7 @@ def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     """--audio-codec, -ac"""
     return typer.Option(
         "--audio-codec", "-ac",
-        help=f'{_("Audio codec. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        help=f'{_("Audio codec. Not all codecs are supported in a given format container (check FFmpeg docs for more information). Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
         prompt=prompt,
         callback=lambda x: check_valid_options(x, available_options),
     )
@@ -189,7 +189,17 @@ def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     """--video-codec, -vc"""
     return typer.Option(
         "--video-codec", "-vc",
-        help=f'{_("Video codec. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        help=f'{_("Video codec. Not all codecs are supported in a given format container (check FFmpeg docs for more information). Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        prompt=prompt,
+        callback=lambda x: check_valid_options(x, available_options),
+    )
+
+
+def SpeedPresetOption(available_options: Iterable[str], prompt: bool | str = False):
+    """--speed-preset, -sp"""
+    return typer.Option(
+        "--speed-preset", "-sp",
+        help=f'{_("Video codec speed preset. Slower speed = Higher quality. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
         prompt=prompt,
         callback=lambda x: check_valid_options(x, available_options),
     )

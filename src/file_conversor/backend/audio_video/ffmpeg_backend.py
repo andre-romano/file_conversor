@@ -191,9 +191,49 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._set_input_file(input_file)
         self._set_output_file(output_file)
 
-    def set_audio_codec(self, codec: str | None = None, bitrate: int | None = None, filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None):
+    def _set_codec(
+            self,
+            is_audio: bool,
+            codec: str | None = None,
+            bitrate: int | None = None,
+            filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
+            options: dict[str, Any] | None = None,
+    ):
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+
+        if codec:
+            if is_audio:
+                self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
+            else:
+                self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
+
+        codec_obj = self._out_container.audio_codec if is_audio else self._out_container.video_codec
+
+        if bitrate is not None and bitrate > 0:
+            if is_audio:
+                self._audio_bitrate = bitrate
+            else:
+                self._video_bitrate = bitrate
+            codec_obj.set_bitrate(bitrate)
+
+        if filters:
+            if isinstance(filters, FFmpegFilter):
+                filters = [filters]
+            codec_obj.set_filters(*filters)
+
+        if options:
+            codec_obj.update(options)
+
+    def set_audio_codec(
+        self,
+        codec: str | None = None,
+        bitrate: int | None = None,
+        filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
+        options: dict[str, Any] | None = None,
+    ):
         """
-        Seet audio codec and bitrate
+        Set audio codec and bitrate
 
         :param codec: Codec to use. Defaults to None (use container default codec).      
         :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
@@ -201,19 +241,15 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         :raises RuntimeErrors: if output container not set
         """
-        if not self._out_container:
-            raise RuntimeError(f"{_('Output container not set')}")
-        if codec:
-            self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
-        if bitrate is not None and bitrate > 0:
-            self._audio_bitrate = bitrate
-            self._out_container.audio_codec.set_bitrate(bitrate)
-        if filters:
-            if isinstance(filters, FFmpegFilter):
-                filters = [filters]
-            self._out_container.video_codec.set_filters(*filters)
+        self._set_codec(is_audio=True, codec=codec, bitrate=bitrate, filters=filters, options=options)
 
-    def set_video_codec(self, codec: str | None = None, bitrate: int | None = None, filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None):
+    def set_video_codec(
+        self,
+        codec: str | None = None,
+        bitrate: int | None = None,
+        filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
+        options: dict[str, Any] | None = None,
+    ):
         """
         Seet video codec and bitrate
 
@@ -222,17 +258,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         :raises RuntimeErrors: if output container not set
         """
-        if not self._out_container:
-            raise RuntimeError(f"{_('Output container not set')}")
-        if codec:
-            self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
-        if bitrate is not None and bitrate > 0:
-            self._video_bitrate = bitrate
-            self._out_container.video_codec.set_bitrate(bitrate)
-        if filters:
-            if isinstance(filters, FFmpegFilter):
-                filters = [filters]
-            self._out_container.video_codec.set_filters(*filters)
+        self._set_codec(is_audio=False, codec=codec, bitrate=bitrate, filters=filters, options=options)
 
     def _execute(self):
         # build ffmpeg command
@@ -299,9 +325,9 @@ class FFmpegBackend(AbstractFFmpegBackend):
                 "-pass", str(pass_num),
                 "-passlogfile", str(logfile),
             ])
-            if not self._audio_bitrate or self._audio_bitrate <= 0:
+            if self._audio_bitrate and self._audio_bitrate <= 0:
                 raise ValueError(f"{_('Audio bitrate cannot be 0 when using two-pass mode.')}")
-            if not self._video_bitrate or self._video_bitrate <= 0:
+            if self._video_bitrate and self._video_bitrate <= 0:
                 raise ValueError(f"{_('Video bitrate cannot be 0 when using two-pass mode.')}")
 
         self._out_opts.extend(self._out_container.get_options())
@@ -320,59 +346,3 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         if pass_num in (0, 2):
             self._clean_two_pass_log_file(logfile)
-
-    def build_audio_filters(
-        self,
-    ):
-        audio_filters: list[FFmpegFilter] = list()
-        # complete when audio filters are implemented
-        return audio_filters
-
-    def build_video_filters(
-        self,
-        resolution: str | None = None,
-        fps: int | None = None,
-        # eq filter
-        brightness: float = 1.0,
-        contrast: float = 1.0,
-        color: float = 1.0,
-        gamma: float = 1.0,
-        # transformation filters
-        rotation: int | None = None,
-        mirror_axis: str | None = None,
-        # other
-        deshake: bool = False,
-        unsharp: bool = False,
-    ):
-        video_filters: list[FFmpegFilter] = list()
-
-        if resolution is not None:
-            video_filters.append(FFmpegFilterScale(*resolution.split(":")))
-
-        if fps is not None:
-            video_filters.append(FFmpegFilterMInterpolate(fps=fps))
-
-        if brightness != 1.0 or contrast != 1.0 or color != 1.0 or gamma != 1.0:
-            video_filters.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=color, gamma=gamma))
-
-        if rotation is not None:
-            if rotation in (90, -90):
-                direction = {90: 1, -90: 2}[rotation]
-                video_filters.append(FFmpegFilterTranspose(direction=direction))
-            else:
-                video_filters.append(FFmpegFilterTranspose(direction=1))
-                video_filters.append(FFmpegFilterTranspose(direction=1))
-
-        if mirror_axis is not None:
-            if mirror_axis == "x":
-                video_filters.append(FFmpegFilterHflip())
-            else:
-                video_filters.append(FFmpegFilterVflip())
-
-        if deshake:
-            video_filters.append(FFmpegFilterDeshake())
-
-        if unsharp:
-            video_filters.append(FFmpegFilterUnsharp())
-
-        return video_filters

@@ -15,14 +15,14 @@ class CommandManager:
     @staticmethod
     def get_output_file(
             output_file: str | Path,
-            stem: str = "",
+            stem: str | None = None,
             suffix: str | None = None,
     ):
         """
         Get output file based on input
         """
         output_file = Path(output_file)
-        output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem}")
+        output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem or ""}")
         output_name = output_name.with_suffix(suffix if suffix is not None else output_file.suffix)
         return Path(output_name.name)
 
@@ -38,7 +38,7 @@ class CommandManager:
         else:
             self._input_files.append(Path(input_files))
 
-    def run(self, callback: Callable[[Path, Path, ProgressManager], Any], out_stem: str = "", out_suffix: str = ""):
+    def run(self, callback: Callable[[Path, Path, ProgressManager], Any], out_stem: str | None = None, out_suffix: str | None = None):
         """
         Run batch command
 

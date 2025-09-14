@@ -8,7 +8,8 @@ from file_conversor.config import get_translation
 from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
 # CLI
-from file_conversor.cli.audio_video import audio_video_cmd
+from file_conversor.cli.audio import audio_cmd
+from file_conversor.cli.video import video_cmd
 from file_conversor.cli.config import config_cmd
 from file_conversor.cli.doc import doc_cmd
 from file_conversor.cli.hash import hash_cmd
@@ -53,7 +54,11 @@ COMMANDS_LIST.extend([
 ################
 COMMANDS_LIST.extend([
     {
-        "typer_instance": audio_video_cmd,
+        "typer_instance": audio_cmd,
+        "rich_help_panel": FILE_PANEL
+    },
+    {
+        "typer_instance": video_cmd,
         "rich_help_panel": FILE_PANEL
     },
     {
