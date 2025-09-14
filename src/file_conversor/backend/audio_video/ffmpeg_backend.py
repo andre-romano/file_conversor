@@ -90,6 +90,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self,
         process: subprocess.Popen,
     ):
+        """returns output lines read"""
+        lines: list[str] = []
         PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
         ffprobe_backend = FFprobeBackend(install_deps=self._install_deps, verbose=self._verbose)
@@ -101,8 +103,10 @@ class FFmpegBackend(AbstractFFmpegBackend):
             if not process.stdout:
                 continue
 
-            match = PROGRESS_RE.search(process.stdout.readline())
+            line = process.stdout.readline()
+            match = PROGRESS_RE.search(line)
             if not match:
+                lines.append(line)
                 continue
             hours = int(match.group(1))
             minutes = int(match.group(2))
@@ -112,6 +116,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
             progress = 100.0 * (float(current_time) / file_duration_secs)
             if self._progress_callback:
                 self._progress_callback(progress)
+        return lines
 
     def _set_global_options(self):
         """Set default global options"""
@@ -278,11 +283,11 @@ class FFmpegBackend(AbstractFFmpegBackend):
             *ffmpeg_command,
         )
 
-        self._execute_progress_callback(
+        out_lines = self._execute_progress_callback(
             process=process,
         )
 
-        Environment.check_returncode(process)
+        Environment.check_returncode(process, out_lines=out_lines)
         return process
 
     def execute(
@@ -341,6 +346,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
             process = self._execute()
         except:
             self._clean_two_pass_log_file(logfile)
+            raise
 
         self._output_file = original_output_file
 

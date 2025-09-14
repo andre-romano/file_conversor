@@ -266,6 +266,7 @@ class GhostscriptBackend(AbstractBackend):
             *command,
         )
 
+        out_lines: list[str] = []
         num_pages = 0
         while process.poll() is None:
             if not process.stdout:
@@ -280,11 +281,12 @@ class GhostscriptBackend(AbstractBackend):
 
             match = GhostscriptBackend.PROGRESS_RE.search(line)
             if not match:
+                out_lines.append(line)
                 continue
             pages = int(match.group(1))
             progress = 100.0 * (float(pages) / num_pages)
             if progress_callback:
                 progress_callback(progress)
 
-        Environment.check_returncode(process)
+        Environment.check_returncode(process, out_lines=out_lines)
         return process

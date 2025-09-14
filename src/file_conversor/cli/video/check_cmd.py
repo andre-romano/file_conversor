@@ -37,7 +37,7 @@ EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
     icons_folder_path = Environment.get_icons_folder()
-    for ext in FFmpegBackend.SUPPORTED_IN_FORMATS:
+    for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="check",

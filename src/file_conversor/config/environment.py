@@ -162,14 +162,21 @@ class Environment:
         )
 
     @classmethod
-    def check_returncode(cls, process: subprocess.Popen | subprocess.CompletedProcess):
+    def check_returncode(
+        cls,
+        process: subprocess.Popen | subprocess.CompletedProcess,
+        out_lines: list[str] | None = None,
+        err_lines: list[str] | None = None,
+    ):
         """Raises subprocess.CalledProcessError if process.returncode != 0"""
         if process.returncode != 0:
+            stdout: list[str] = (out_lines or []) + (process.stdout.readlines() if process.stdout else [])
+            stderr: list[str] = (err_lines or []) + (process.stderr.readlines() if process.stderr else [])
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,
                 cmd=process.args,
-                output="\n".join(process.stdout.readlines()) if process.stdout else "",
-                stderr="\n".join(process.stderr.readlines()) if process.stderr else "",
+                output="\n".join([line.strip() for line in stdout if line.strip() != ""]),
+                stderr="\n".join([line.strip() for line in stderr if line.strip() != ""]),
             )
 
     def __init__(self) -> None:
