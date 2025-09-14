@@ -14,6 +14,7 @@ from file_conversor.cli.video.convert_cmd import typer_cmd as convert_cmd
 from file_conversor.cli.video.enhance_cmd import typer_cmd as enhance_cmd
 from file_conversor.cli.video.execute_cmd import typer_cmd as execute_cmd
 from file_conversor.cli.video.info_cmd import typer_cmd as info_cmd
+from file_conversor.cli.video.list_formats_cmd import typer_cmd as list_formats_cmd
 from file_conversor.cli.video.mirror_cmd import typer_cmd as mirror_cmd
 from file_conversor.cli.video.resize_cmd import typer_cmd as resize_cmd
 from file_conversor.cli.video.rotate_cmd import typer_cmd as rotate_cmd
@@ -34,6 +35,7 @@ video_cmd.add_typer(resize_cmd)
 
 
 # OTHERS_PANEL
-video_cmd.add_typer(info_cmd)
 video_cmd.add_typer(check_cmd)
+video_cmd.add_typer(info_cmd)
+video_cmd.add_typer(list_formats_cmd)
 video_cmd.add_typer(execute_cmd)
