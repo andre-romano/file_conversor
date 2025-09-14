@@ -11,6 +11,10 @@ class AbstractRegisterManager:
         return dict(cls._REGISTERED)
 
     @classmethod
+    def is_registered(cls, n: str) -> bool:
+        return n in cls._REGISTERED
+
+    @classmethod
     def register(cls, n: str, *args, **kwargs):
         cls._REGISTERED[n] = (args, kwargs)
 
