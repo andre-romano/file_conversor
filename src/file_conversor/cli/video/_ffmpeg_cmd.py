@@ -37,6 +37,9 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     audio_codec: str | None = None,
     video_codec: str | None = None,
 
+    video_encoding_speed: str | None = None,
+    video_quality: str | None = None,
+
     resolution: str | None = None,
     fps: int | None = None,
 
@@ -49,9 +52,6 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     mirror_axis: str | None = None,
     deshake: bool = False,
     unsharp: bool = False,
-
-    audio_codec_options: dict[str, Any] = {},
-    video_codec_options: dict[str, Any] = {},
 
     output_dir: Path = Path(),
 ):
@@ -99,8 +99,18 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
-        ffmpeg_backend.set_audio_codec(codec=audio_codec, bitrate=audio_bitrate, filters=audio_filters, options=audio_codec_options)
-        ffmpeg_backend.set_video_codec(codec=video_codec, bitrate=video_bitrate, filters=video_filters, options=video_codec_options)
+        ffmpeg_backend.set_audio_codec(
+            codec=audio_codec,
+            bitrate=audio_bitrate,
+            filters=audio_filters,
+        )
+        ffmpeg_backend.set_video_codec(
+            codec=video_codec,
+            bitrate=video_bitrate,
+            filters=video_filters,
+            encoding_speed=video_encoding_speed,
+            quality_setting=video_quality,
+        )
 
         # display current progress
         process = ffmpeg_backend.execute(

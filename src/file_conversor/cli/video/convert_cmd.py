@@ -20,7 +20,14 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_valid_options
-from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOption, AxisOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoCodecOption, VideoRotationOption
+from file_conversor.utils.typer_utils import (InputFilesArgument, FormatOption, OutputDirOption,
+                                              AudioBitrateOption, VideoBitrateOption,
+                                              AudioCodecOption, VideoCodecOption,
+                                              AxisOption,
+                                              BrightnessOption, ColorOption, ContrastOption, GammaOption,
+                                              VideoRotationOption, DeshakeOption, UnsharpOption,
+                                              FPSOption, ResolutionOption,
+                                              VideoEncodingSpeedOption, VideoQualityOption)
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -100,6 +107,9 @@ def convert(
     audio_codec: Annotated[str | None, AudioCodecOption(FFmpegBackend.get_supported_audio_codecs())] = None,
     video_codec: Annotated[str | None, VideoCodecOption(FFmpegBackend.get_supported_video_codecs())] = None,
 
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
+    video_quality: Annotated[str | None, VideoQualityOption()] = CONFIG["video-quality"],
+
     resolution: Annotated[str | None, ResolutionOption()] = None,
     fps: Annotated[int | None, FPSOption()] = None,
 
@@ -122,6 +132,8 @@ def convert(
         video_bitrate=video_bitrate,
         audio_codec=audio_codec,
         video_codec=video_codec,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
         resolution=resolution,
         fps=fps,
         brightness=brightness,

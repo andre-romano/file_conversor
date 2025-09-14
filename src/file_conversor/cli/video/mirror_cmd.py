@@ -20,7 +20,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer
-from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption
+from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -86,6 +86,9 @@ def mirror(
 
     video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
+    video_quality: Annotated[str | None, VideoQualityOption()] = CONFIG["video-quality"],
+
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     _ffmpeg_cli_cmd(
@@ -94,5 +97,7 @@ def mirror(
         out_stem="_mirrored",
         mirror_axis=mirror_axis,
         video_bitrate=video_bitrate,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
         output_dir=output_dir,
     )

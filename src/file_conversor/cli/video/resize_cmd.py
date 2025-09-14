@@ -20,7 +20,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer, check_video_resolution
-from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption, ResolutionOption, VideoBitrateOption
+from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption, ResolutionOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -80,6 +80,9 @@ def resize(
 
     video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
+    video_quality: Annotated[str | None, VideoQualityOption()] = CONFIG["video-quality"],
+
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     _ffmpeg_cli_cmd(
@@ -88,5 +91,7 @@ def resize(
         out_stem="_resized",
         resolution=resolution,
         video_bitrate=video_bitrate,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
         output_dir=output_dir,
     )

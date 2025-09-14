@@ -33,7 +33,6 @@ def _ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
 
     audio_bitrate: int = 0,
     audio_codec: str | None = None,
-    audio_codec_options: dict[str, Any] = {},
 
     output_dir: Path = Path(),
 ):
@@ -51,7 +50,7 @@ def _ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
-        ffmpeg_backend.set_audio_codec(codec=audio_codec, bitrate=audio_bitrate, filters=audio_filters, options=audio_codec_options)
+        ffmpeg_backend.set_audio_codec(codec=audio_codec, bitrate=audio_bitrate, filters=audio_filters)
 
         # display current progress
         process = ffmpeg_backend.execute(

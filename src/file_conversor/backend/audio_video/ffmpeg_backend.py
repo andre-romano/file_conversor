@@ -14,7 +14,7 @@ from typing import Any, Callable, Iterable
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
 
-from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterDeshake, FFmpegFilterEq, FFmpegFilterHflip, FFmpegFilterMInterpolate, FFmpegFilterScale, FFmpegFilterTranspose, FFmpegFilterUnsharp, FFmpegFilterVflip
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 from file_conversor.backend.audio_video.ffmpeg_codec import FFmpegAudioCodec, FFmpegVideoCodec
 from file_conversor.backend.audio_video.format_container import FormatContainer
 
@@ -202,7 +202,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
             codec: str | None = None,
             bitrate: int | None = None,
             filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
-            options: dict[str, Any] | None = None,
     ):
         if not self._out_container:
             raise RuntimeError(f"{_('Output container not set')}")
@@ -227,15 +226,11 @@ class FFmpegBackend(AbstractFFmpegBackend):
                 filters = [filters]
             codec_obj.set_filters(*filters)
 
-        if options:
-            codec_obj.update(options)
-
     def set_audio_codec(
         self,
         codec: str | None = None,
         bitrate: int | None = None,
         filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
-        options: dict[str, Any] | None = None,
     ):
         """
         Set audio codec and bitrate
@@ -246,24 +241,36 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         :raises RuntimeErrors: if output container not set
         """
-        self._set_codec(is_audio=True, codec=codec, bitrate=bitrate, filters=filters, options=options)
+        self._set_codec(is_audio=True, codec=codec, bitrate=bitrate, filters=filters)
 
     def set_video_codec(
         self,
         codec: str | None = None,
         bitrate: int | None = None,
         filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
-        options: dict[str, Any] | None = None,
+        encoding_speed: str | None = None,
+        quality_setting: str | None = None,
     ):
         """
         Seet video codec and bitrate
 
         :param codec: Codec to use. Defaults to None (use container default codec).      
         :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
+        :param filters: Filters to use. Defaults to None (do not use any filter).      
+        :param encoding_speed: Encoding speed to use. Defaults to None (use codec default speed).      
+        :param quality_setting: Quality setting to use. Defaults to None (use codec default quality).
 
         :raises RuntimeErrors: if output container not set
         """
-        self._set_codec(is_audio=False, codec=codec, bitrate=bitrate, filters=filters, options=options)
+        self._set_codec(is_audio=False, codec=codec, bitrate=bitrate, filters=filters)
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+
+        if encoding_speed:
+            self._out_container.video_codec.set_encoding_speed(encoding_speed)
+
+        if (not bitrate or bitrate == 0) and quality_setting:
+            self._out_container.video_codec.set_quality_setting(quality_setting)
 
     def _execute(self):
         # build ffmpeg command

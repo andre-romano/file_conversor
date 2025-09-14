@@ -28,15 +28,17 @@ class Configuration:
         if locale.getlocale() and locale.getlocale()[0]:
             language = locale.getlocale()[0]
         self.__data = {
-            "language": language,    # Default: system language or "en_US"
-            "install-deps": True,    # Default: ask user to confirm dependency installation
-            "audio-bitrate": 0,      # Default audio bitrate in kbps
-            "video-bitrate": 0,      # Default video bitrate in kbps
-            "video-format": "mp4",   # Default video format
-            "image-quality": 90,     # Default image quality 90%
-            "image-dpi": 200,        # Default image => PDF dpi
-            "image-fit": 'into',     # Default image => PDF fit mode
-            "image-page-size": None,  # Default image => PDF page size
+            "language": language,      # Default: system language or "en_US"
+            "install-deps": True,      # Default: ask user to confirm dependency installation
+            "audio-bitrate": 0,        # Default audio bitrate in kbps
+            "video-bitrate": 0,        # Default video bitrate in kbps
+            "video-format": "mp4",     # Default video format
+            "video-encoding-speed": "medium",  # Default video encoding speed
+            "video-quality": "medium",  # Default video quality
+            "image-quality": 90,        # Default image quality 90%
+            "image-dpi": 200,           # Default image => PDF dpi
+            "image-fit": 'into',        # Default image => PDF fit mode
+            "image-page-size": None,    # Default image => PDF page size
             "image-resampling": "bicubic",  # Default image resampling algorithm
             "pdf-compression": "medium",  # Default PDF compression level
         }

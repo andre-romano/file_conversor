@@ -169,7 +169,7 @@ def VideoBitrateOption(prompt: bool | str = False):
     """--video-bitrate, -vb"""
     return typer.Option(
         "--video-bitrate", "-vb",
-        help=f"{_("Video bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
+        help=f"{_("Video bitrate in kbps.")} {_('Overrides video quality setting (if set). If 0, use video quality setting to encode video using variable bitrate (CRF) encoding (if supported by codec, otherwise use default bitrate for codec/container)')}.",
         prompt=prompt,
         callback=lambda x: check_positive_integer(x, allow_zero=True),
     )
@@ -195,13 +195,23 @@ def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     )
 
 
-def SpeedPresetOption(available_options: Iterable[str], prompt: bool | str = False):
-    """--speed-preset, -sp"""
+def VideoEncodingSpeedOption(prompt: bool | str = False):
+    """--video-encoding-speed, -ves"""
     return typer.Option(
-        "--speed-preset", "-sp",
-        help=f'{_("Video codec speed preset. Slower speed = Higher quality. Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        "--video-encoding-speed", "-ves",
+        help=f'{_("Video encoding speed/quality trade-off. Available options are:")} {", ".join(["fast", "medium", "slow"])}. {_("Faster encoding speed usually results in lower video quality and larger file size")}. {_("Defaults to 'medium'")}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, available_options),
+        callback=lambda x: check_valid_options(x, ["fast", "medium", "slow"]),
+    )
+
+
+def VideoQualityOption(prompt: bool | str = False):
+    """--video-quality, -vq"""
+    return typer.Option(
+        "--video-quality", "-vq",
+        help=f'{_("Video quality preset. Available options are:")} {", ".join(["high", "medium", "low"])}. {_("Higher quality usually results in larger file size. Video bitrate (if set) overrides this setting.")}. {_("Defaults to 'medium'")}.',
+        prompt=prompt,
+        callback=lambda x: check_valid_options(x, ["high", "medium", "low"]),
     )
 
 

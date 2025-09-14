@@ -1,5 +1,6 @@
 # src\file_conversor\backend\audio_video\codec.py
 
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
@@ -27,7 +28,6 @@ class _FFmpegCodec(AbstractRegisterManager):
         invalid_prefix: str,
         prefix: str,
         name: str,
-        valid_options: Iterable[str] | None = None,
         options: dict[str, Any] | None = None,
     ) -> None:
         super().__init__()
@@ -35,7 +35,6 @@ class _FFmpegCodec(AbstractRegisterManager):
         self._prefix = prefix
         self._name = name
         self._options: dict[str, str | int | None] = {}
-        self._valid_options = set(valid_options or [])
         self.update(options or {})
 
     # PROPERTIES
@@ -63,14 +62,19 @@ class _FFmpegCodec(AbstractRegisterManager):
         for opt, val in options.items():
             self.set(opt, val)
 
-    def set(self, option: str, value: Any = None):
-        if option not in self._valid_options:
-            logger.warning(f"Option '{option}' {_('not valid for codec')} '{self._name}'. {_('Valid options are:')} {', '.join(self._valid_options)}")
-            return
-        if option in self._options and value:
-            self._options[option] = f"{self._options[option]},{value}"
+    def add(self, option: str, value: Any = None):
+        if option in self._options:
+            if value:
+                self._options[option] = f"{self._options[option]},{value}"
         else:
-            self._options[option] = value
+            self.set(option, value)
+
+    def set(self, option: str, value: Any = None):
+        self._options[option] = value
+
+    def unset(self, option: str):
+        if option in self._options:
+            del self._options[option]
 
     def set_bitrate(self, bitrate: int):
         raise NotImplementedError("not implemented")
@@ -96,41 +100,67 @@ class FFmpegAudioCodec(_FFmpegCodec):
     _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
     def __init__(
-            self,
-            name: str,
-            valid_options: Iterable[str] | None = None,
-            options: dict[str, Any] | None = None,
+        self,
+        name: str,
+        options: dict[str, Any] | None = None,
     ) -> None:
-        super().__init__(invalid_prefix="-an", prefix="-c:a", name=name, valid_options=valid_options, options=options)
-        self._valid_options.add("-b:a")
+        super().__init__(invalid_prefix="-an", prefix="-c:a",
+                         name=name,
+                         options=options,
+                         )
 
     def set_bitrate(self, bitrate: int):
         self.set("-b:a", f"{bitrate}k")
 
     def set_filters(self, *filters: FFmpegFilter):
         for filter in filters:
-            self.set("-af", filter.get())
+            self.add("-af", filter.get())
 
 
 class FFmpegVideoCodec(_FFmpegCodec):
     _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
 
     def __init__(
-            self,
-            name: str,
-            valid_options: Iterable[str] | None = None,
-            options: dict[str, Any] | None = None,
+        self,
+        name: str,
+        options: dict[str, Any] | None = None,
+        encoding_speed_opts: dict[str, dict[str, Any]] | None = None,
+        quality_setting_opts: dict[str, dict[str, Any]] | None = None,
+        profile_opts: dict[str, dict[str, Any]] | None = None,
     ) -> None:
-        super().__init__(invalid_prefix="-vn", prefix="-c:v", name=name, valid_options=valid_options, options=options)
-        self._valid_options.add("-b:v")
-        self._valid_options.add("-vf")
+        super().__init__(invalid_prefix="-vn", prefix="-c:v",
+                         name=name,
+                         options=options,
+                         )
+        self._encoding_speed_opts = encoding_speed_opts or {}
+        self._quality_setting_opts = quality_setting_opts or {}
+        self._profile_opts = profile_opts or {}
+
+    def set_profile(self, profile: str):
+        if profile not in self._profile_opts:
+            logger.warning(f"'{profile}' {_("profile not available for codec")} '{self._name}'")
+            return
+        self.update(self._profile_opts[profile])
+
+    def set_encoding_speed(self, speed: str):
+        if speed not in self._encoding_speed_opts:
+            logger.warning(f"'{speed}' {_("speed not available for codec")} '{self._name}'")
+            return
+        self.update(self._encoding_speed_opts[speed])
+
+    def set_quality_setting(self, quality: str):
+        if quality not in self._quality_setting_opts:
+            logger.warning(f"'{quality}' {_("quality not available for codec")} '{self._name}'")
+            return
+        self.update(self._quality_setting_opts[quality])
+        self.unset("-b:v")  # remove bitrate if set
 
     def set_bitrate(self, bitrate: int):
         self.set("-b:v", f"{bitrate}k")
 
     def set_filters(self, *filters: FFmpegFilter):
         for filter in filters:
-            self.set("-vf", filter.get())
+            self.add("-vf", filter.get())
 
 
 # register AUDIO codecs
@@ -145,99 +175,110 @@ FFmpegAudioCodec.register("libopus", name="libopus")
 FFmpegAudioCodec.register("libvorbis", name="libvorbis")
 FFmpegAudioCodec.register("pcm_s16le", name="pcm_s16le")
 
+
 # register VIDEO codecs
+class QUALITY_OPTIONS:
+    def __init__(
+        self,
+        high: str,
+        medium: str,
+        low: str,
+    ):
+        super().__init__()
+        self.high = high
+        self.medium = medium
+        self.low = low
+
+    def _get_quality_lib(self) -> dict[str, dict[str, str]]:
+        return {
+            "high": {"-crf": self.high},
+            "medium": {"-crf": self.medium},
+            "low": {"-crf": self.low},
+        }
+
+    def _get_quality_nvenc(self) -> dict[str, dict[str, str]]:
+        return {
+            "high": {"-cq": self.high},
+            "medium": {"-cq": self.medium},
+            "low": {"-cq": self.low},
+        }
+
+    def _get_quality_vaapi(self) -> dict[str, dict[str, str]]:
+        return {
+            "high": {"-qp": self.high},
+            "medium": {"-qp": self.medium},
+            "low": {"-qp": self.low},
+        }
+
+    def _get_quality_qsv(self) -> dict[str, dict[str, str]]:
+        return {
+            "high": {"-global_quality": self.high},
+            "medium": {"-global_quality": self.medium},
+            "low": {"-global_quality": self.low},
+        }
+
+    def get_quality(self, impl: str) -> dict[str, dict[str, str]]:
+        if impl == "lib":
+            return self._get_quality_lib()
+        elif impl == "nvenc":
+            return self._get_quality_nvenc()
+        elif impl == "vaapi":
+            return self._get_quality_vaapi()
+        elif impl == "qsv":
+            return self._get_quality_qsv()
+        raise ValueError(f"Unknown implementation: {impl}")
+
+
 FFmpegVideoCodec.register("null", name="null")
 FFmpegVideoCodec.register("copy", name="copy")
 
-FFmpegVideoCodec.register("h264_nvenc", name="h264_nvenc",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-FFmpegVideoCodec.register("hevc_nvenc", name="hevc_nvenc",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
+for codec_name, impl in [("h264_nvenc", "nvenc"), ("hevc_nvenc", "nvenc"),
+                         ("h264_vaapi", "vaapi"), ("hevc_vaapi", "vaapi"),
+                         ("h264_qsv", "qsv"), ("hevc_qsv", "qsv"),
+                         ("libx264", "lib"), ("libx265", "lib"),
+                         ]:
+    FFmpegVideoCodec.register(codec_name, name=codec_name,
+                              quality_setting_opts=QUALITY_OPTIONS(**{
+                                  "high": "18",
+                                  "medium": "23",
+                                  "low": "28",
+                              }).get_quality(impl),
+                              encoding_speed_opts={
+                                  "fast": {"-preset": "fast"},
+                                  "medium": {"-preset": "medium"},
+                                  "slow": {"-preset": "slow"},
+                              },
+                              profile_opts={
+                                  "high": {"-profile:v": "high"},
+                                  "medium": {"-profile:v": "main"},
+                                  "low": {"-profile:v": "baseline"},
+                              },
+                              )
 
 
-FFmpegVideoCodec.register("h264_vaapi", name="h264_vaapi",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-FFmpegVideoCodec.register("hevc_vaapi", name="hevc_vaapi",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
+for codec_name, impl in [("vp8_vaapi", "vaapi"), ("vp9_vaapi", "vaapi"),
+                         ("vp8_qsv", "qsv"), ("vp9_qsv", "qsv"),
+                         ("libvpx", "lib"), ("libvpx-vp9", "lib"),
+                         ]:
+    FFmpegVideoCodec.register(codec_name, name=codec_name,
+                              quality_setting_opts=QUALITY_OPTIONS(**{
+                                  "high": "13",
+                                  "medium": "35",
+                                  "low": "55",
+                              }).get_quality(impl),
+                              )
 
-FFmpegVideoCodec.register("h264_qsv", name="h264_qsv",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-FFmpegVideoCodec.register("hevc_qsv", name="hevc_qsv",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-
-FFmpegVideoCodec.register("libx264", name="libx264",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-FFmpegVideoCodec.register("libx265", name="libx265",
-                          valid_options={
-                              "-preset",
-                              "-crf",
-                              "-profile:v",
-                          }, options={
-                              "-preset": "medium",
-                              "-profile:v": "high",
-                          })
-
-FFmpegVideoCodec.register("vp8_vaapi", name="vp8_vaapi")
-FFmpegVideoCodec.register("vp9_vaapi", name="vp9_vaapi")
-
-FFmpegVideoCodec.register("vp8_qsv", name="vp8_qsv")
-FFmpegVideoCodec.register("vp9_qsv", name="vp9_qsv")
-
-FFmpegVideoCodec.register("av1_nvenc", name="av1_nvenc")
-FFmpegVideoCodec.register("av1_vaapi", name="av1_vaapi")
-FFmpegVideoCodec.register("av1_qsv", name="av1_qsv")
-
-FFmpegVideoCodec.register("libvpx", name="libvpx")
-FFmpegVideoCodec.register("libvpx-vp9", name="libvpx-vp9")
-FFmpegVideoCodec.register("libaom-av1", name="libaom-av1")
+for codec_name, impl in [("av1_nvenc", "nvenc"),
+                         ("av1_vaapi", "vaapi"),
+                         ("av1_qsv", "qsv"),
+                         ("libaom-av1", "lib"),
+                         ]:
+    FFmpegVideoCodec.register(codec_name, name=codec_name,
+                              quality_setting_opts=QUALITY_OPTIONS(**{
+                                  "high": "19",
+                                  "medium": "29",
+                                  "low": "42",
+                              }).get_quality(impl),
+                              )
 
 FFmpegVideoCodec.register("mpeg4", name="mpeg4")
