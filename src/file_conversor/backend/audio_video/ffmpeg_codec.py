@@ -145,9 +145,10 @@ FFmpegAudioCodec.register("libopus", name="libopus")
 FFmpegAudioCodec.register("libvorbis", name="libvorbis")
 FFmpegAudioCodec.register("pcm_s16le", name="pcm_s16le")
 
-# register AUDIO codecs
+# register VIDEO codecs
 FFmpegVideoCodec.register("null", name="null")
 FFmpegVideoCodec.register("copy", name="copy")
+
 FFmpegVideoCodec.register("h264_nvenc", name="h264_nvenc",
                           valid_options={
                               "-preset",
@@ -166,6 +167,46 @@ FFmpegVideoCodec.register("hevc_nvenc", name="hevc_nvenc",
                               "-preset": "medium",
                               "-profile:v": "high",
                           })
+
+
+FFmpegVideoCodec.register("h264_vaapi", name="h264_vaapi",
+                          valid_options={
+                              "-preset",
+                              "-crf",
+                              "-profile:v",
+                          }, options={
+                              "-preset": "medium",
+                              "-profile:v": "high",
+                          })
+FFmpegVideoCodec.register("hevc_vaapi", name="hevc_vaapi",
+                          valid_options={
+                              "-preset",
+                              "-crf",
+                              "-profile:v",
+                          }, options={
+                              "-preset": "medium",
+                              "-profile:v": "high",
+                          })
+
+FFmpegVideoCodec.register("h264_qsv", name="h264_qsv",
+                          valid_options={
+                              "-preset",
+                              "-crf",
+                              "-profile:v",
+                          }, options={
+                              "-preset": "medium",
+                              "-profile:v": "high",
+                          })
+FFmpegVideoCodec.register("hevc_qsv", name="hevc_qsv",
+                          valid_options={
+                              "-preset",
+                              "-crf",
+                              "-profile:v",
+                          }, options={
+                              "-preset": "medium",
+                              "-profile:v": "high",
+                          })
+
 FFmpegVideoCodec.register("libx264", name="libx264",
                           valid_options={
                               "-preset",
@@ -184,6 +225,19 @@ FFmpegVideoCodec.register("libx265", name="libx265",
                               "-preset": "medium",
                               "-profile:v": "high",
                           })
+
+FFmpegVideoCodec.register("vp8_vaapi", name="vp8_vaapi")
+FFmpegVideoCodec.register("vp9_vaapi", name="vp9_vaapi")
+
+FFmpegVideoCodec.register("vp8_qsv", name="vp8_qsv")
+FFmpegVideoCodec.register("vp9_qsv", name="vp9_qsv")
+
+FFmpegVideoCodec.register("av1_nvenc", name="av1_nvenc")
+FFmpegVideoCodec.register("av1_vaapi", name="av1_vaapi")
+FFmpegVideoCodec.register("av1_qsv", name="av1_qsv")
+
 FFmpegVideoCodec.register("libvpx", name="libvpx")
 FFmpegVideoCodec.register("libvpx-vp9", name="libvpx-vp9")
+FFmpegVideoCodec.register("libaom-av1", name="libaom-av1")
+
 FFmpegVideoCodec.register("mpeg4", name="mpeg4")

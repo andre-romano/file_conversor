@@ -211,8 +211,16 @@ VideoFormatContainer.register(
     available_video_codecs={
         "libx264",
         "libx265",
+
         "h264_nvenc",
         "hevc_nvenc",
+
+        "h264_vaapi",
+        "hevc_vaapi",
+
+        "h264_qsv",
+        "hevc_qsv",
+
         "copy",
     },
 )
@@ -248,10 +256,30 @@ VideoFormatContainer.register(
     available_video_codecs={
         "libx264",
         "libx265",
+
         "h264_nvenc",
         "hevc_nvenc",
+
+        "h264_vaapi",
+        "hevc_vaapi",
+
+        "h264_qsv",
+        "hevc_qsv",
+
         "libvpx",
         "libvpx-vp9",
+        "libaom-av1",
+
+        "vp8_vaapi",
+        "vp9_vaapi",
+
+        "vp8_qsv",
+        "vp9_qsv",
+
+        "av1_nvenc",
+        "av1_vaapi",
+        "av1_qsv",
+
         "copy",
     },
 )
@@ -268,6 +296,18 @@ VideoFormatContainer.register(
     available_video_codecs={
         "libvpx",
         "libvpx-vp9",
+        "libaom-av1",
+
+        "vp8_vaapi",
+        "vp9_vaapi",
+
+        "vp8_qsv",
+        "vp9_qsv",
+
+        "av1_nvenc",
+        "av1_vaapi",
+        "av1_qsv",
+
         "copy",
     },
 )

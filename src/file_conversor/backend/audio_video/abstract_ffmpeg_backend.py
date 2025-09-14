@@ -32,6 +32,7 @@ class AbstractFFmpegBackend(AbstractBackend):
         'ogg': {},
         'opus': {},
         'wav': {},
+        'wma': {},
     }
     SUPPORTED_IN_VIDEO_FORMATS = {
         '3gp': {},
@@ -47,6 +48,7 @@ class AbstractFFmpegBackend(AbstractBackend):
         'mpeg': {},
         'mpg': {},
         'webm': {},
+        'wmv': {},
     }
     SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
 
