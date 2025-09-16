@@ -42,7 +42,7 @@ def get_translation():
         ]
         languages = [lang for lang in languages if lang]  # Filter out None entries
         if not languages:
-            print(f"WARNING: No valid languages found")
+            print(f"WARNING: No valid languages found. Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
         translation = gettext.translation(
             'messages', Environment.get_locales_folder(),
             languages=languages,

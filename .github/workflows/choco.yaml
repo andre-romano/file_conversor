@@ -35,4 +35,4 @@ jobs:
 
       - name: Publish Choco package
         run: |
-          choco push dist/*.nupkg --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCO_API_KEY }}
+          pdm run invoke choco.publish --api-key ${{ secrets.CHOCO_API_KEY }}

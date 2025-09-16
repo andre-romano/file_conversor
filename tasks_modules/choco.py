@@ -207,9 +207,12 @@ def check(c: InvokeContext):
 
 
 @task(pre=[build,])
-def publish(c: InvokeContext):
+def publish(c: InvokeContext, api_key: str = ""):
     print(rf'[bold] Publihsing choco package ... [/]')
     nupkg_path = list(Path("dist").glob("*.nupkg"))[0]
-    result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/')
+    if api_key:
+        result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/ --apikey {api_key}')
+    else:
+        result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/')
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Publihsing choco package ... [/][bold green]OK[/]')
