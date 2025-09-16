@@ -110,7 +110,7 @@ elseif ($key.Count -gt 1) {{
     <version>{PROJECT_VERSION}</version>
     <title>{PROJECT_TITLE}</title>
     <authors>{", ".join(PROJECT_AUTHORS)}</authors>
-    <description>{_config.get_url(README_URL).decode("utf-8")}</description>
+    <description>{README_PATH.read_text(encoding="utf-8")}</description>
     <summary>{PROJECT_DESCRIPTION}</summary>
     <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
     <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>

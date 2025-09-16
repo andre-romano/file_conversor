@@ -39,6 +39,7 @@ I18N_TEMPLATE = Path(rf"{I18N_PATH}/messages.pot")
 
 MANIFEST_IN_PATH = Path("MANIFEST.in")
 RELEASE_NOTES_PATH = Path("RELEASE_NOTES.md")
+README_PATH = Path("README.md")
 
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
@@ -68,7 +69,6 @@ RELEASE_NOTES_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/ta
 SOURCE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/archive/refs/tags/{GIT_RELEASE}.zip"
 
 LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
-README_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/README.md"
 
 
 def copy(src: Path, dst: Path):
