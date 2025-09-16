@@ -46,7 +46,7 @@ EXTERNAL_DEPENDENCIES = set()
 )
 def set(
     language: Annotated[str, typer.Option("--language", "-l",
-                                          help=f'{_("Set preferred language for app (if available). Available languages:")} {", ".join(AVAILABLE_LANGUAGES)}. {_("Defaults to system preffered language or 'en_US' (English - United States)")}.',
+                                          help=f'{_("Set preferred language for app (if available). Available languages:")} {", ".join(sorted(AVAILABLE_LANGUAGES))}. {_("Defaults to system preffered language or 'en_US' (English - United States)")}.',
                                           callback=lambda x: check_valid_options(x, AVAILABLE_LANGUAGES),
                                           )] = locale.normalize_lang_code(CONFIG["language"]) or locale.get_default_language(),
 

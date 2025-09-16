@@ -9,8 +9,7 @@ from file_conversor.config.config import Configuration
 
 CONFIG = Configuration.get_instance()
 
-AVAILABLE_LANGUAGES = set([str(p.name) for p in Environment.get_locales_folder().glob("*") if p.is_dir()])
-MO_FILES = ["/".join([mo.parent.parent.name, mo.parent.name, mo.name]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")]
+AVAILABLE_LANGUAGES = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
 
 
 def get_default_language():
@@ -39,19 +38,19 @@ def get_translation():
         languages = [
             normalize_lang_code(CONFIG["language"]),
             normalize_lang_code(get_system_locale()),
-            get_default_language(),  # fallback
+            normalize_lang_code(get_default_language()),  # fallback
         ]
         languages = [lang for lang in languages if lang]  # Filter out None entries
+        if not languages:
+            print(f"WARNING: No valid languages found")
         translation = gettext.translation(
             'messages', Environment.get_locales_folder(),
             languages=languages,
-            fallback=False,
+            fallback=True,
         )
     except:
-        print("Locales folder:", Environment.get_locales_folder())
-        print("Available languages:", AVAILABLE_LANGUAGES, f"({len(AVAILABLE_LANGUAGES)} entries)")
-        print("Sys lang:", get_system_locale())
-        print("Languages tried:", languages, f"({len(languages)} entries)")
-        print(".MO Files found:", len(MO_FILES))
+        print(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
+        print(f"Config / sys lang: ({CONFIG['language']} / {get_system_locale()})")
+        print(f"Languages tried: {languages}")
         raise
     return translation.gettext

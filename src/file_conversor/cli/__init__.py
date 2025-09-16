@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Annotated, Any
 
 # user-provided imports
-from file_conversor.config import Configuration, Environment, Log, State, get_translation
+from file_conversor.config import Configuration, Environment, Log, State
+from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
 
 from file_conversor.cli._typer import COMMANDS_LIST
 
@@ -113,3 +114,5 @@ def main_callback(
     logger.debug(f"Command: {sys.argv}")
     Environment.get_executable()
     logger.debug(f"Config file: {CONFIG.get_path()}")
+    logger.debug(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
+    logger.debug(f"Language (config / sys): ({CONFIG['language']} / {get_system_locale()})")
