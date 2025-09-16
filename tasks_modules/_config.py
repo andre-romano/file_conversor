@@ -68,6 +68,8 @@ INSTALL_APP_HASH_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases
 RELEASE_NOTES_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/tag/{GIT_RELEASE}"
 SOURCE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/archive/refs/tags/{GIT_RELEASE}.zip"
 
+ICON_URL = f"http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{str(ICONS_PATH).replace("\\", "/")}/icon.png"
+
 LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
 
 

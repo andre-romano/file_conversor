@@ -15,6 +15,21 @@ CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
 
+def escape_xml(text: str | None) -> str:
+    """
+    Escape invalid characters for XML.
+    """
+    if text is None:
+        return ""
+    return (
+        text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+            .replace("'", "&apos;")
+    )
+
+
 @task
 def mkdirs(c: InvokeContext):
     _config.mkdir([
@@ -106,14 +121,16 @@ elseif ($key.Count -gt 1) {{
     CHOCO_NUSPEC.write_text(f"""<?xml version='1.0' encoding='utf-8'?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>{PROJECT_NAME}</id>
-    <version>{PROJECT_VERSION}</version>
-    <title>{PROJECT_TITLE}</title>
-    <authors>{", ".join(PROJECT_AUTHORS)}</authors>
-    <description>{README_PATH.read_text(encoding="utf-8")}</description>
-    <summary>{PROJECT_DESCRIPTION}</summary>
-    <tags>{" ".join(PROJECT_KEYWORDS)}</tags>
-    <iconUrl>http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{ICONS_PATH}/icon.png</iconUrl>
+    <id>{escape_xml(PROJECT_NAME)}</id>
+    <version>{escape_xml(PROJECT_VERSION)}</version>
+    <title>{escape_xml(PROJECT_TITLE)}</title>
+    <authors>{escape_xml(", ".join(PROJECT_AUTHORS))}</authors>
+    <description>
+        {escape_xml(README_PATH.read_text(encoding="utf-8"))}
+    </description>
+    <summary>{escape_xml(PROJECT_DESCRIPTION)}</summary>
+    <tags>{escape_xml(" ".join(PROJECT_KEYWORDS))}</tags>
+    <iconUrl>{ICON_URL}</iconUrl>
     <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
     <packageSourceUrl>{SOURCE_URL}</packageSourceUrl>
     <licenseUrl>{LICENSE_URL}</licenseUrl>
