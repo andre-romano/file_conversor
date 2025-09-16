@@ -126,7 +126,7 @@ elseif ($key.Count -gt 1) {{
     <title>{escape_xml(PROJECT_TITLE)}</title>
     <authors>{escape_xml(", ".join(PROJECT_AUTHORS))}</authors>
     <description>
-        {escape_xml(README_PATH.read_text(encoding="utf-8"))}
+        {escape_xml(README_PATH.read_text(encoding="utf-8"))[0:3999]}
     </description>
     <summary>{escape_xml(PROJECT_DESCRIPTION)}</summary>
     <tags>{escape_xml(" ".join(PROJECT_KEYWORDS))}</tags>
