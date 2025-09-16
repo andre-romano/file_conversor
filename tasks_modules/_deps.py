@@ -8,9 +8,6 @@ CHOCO_DEPS = {
     "chocolatey-core.extension": "1.3.3",
     "ffmpeg": "",
     "ghostscript": "",
-    "oxipng": "",
-    "gifsicle": "",
-    "mozjpeg": "",
 }
 
 SCOOP_DEPS = {
