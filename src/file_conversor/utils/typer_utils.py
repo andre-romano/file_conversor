@@ -14,18 +14,16 @@ _ = get_translation()
 
 
 def InputFilesArgument(backend_or_iterable: type | dict | list | None = None):
+    list_formats: list[str] | dict[str, Any]
     if not backend_or_iterable:
-        return typer.Argument(
-            help=f"{_('Input files')}",
-            callback=lambda x: check_file_format(x, [], exists=True),
-        )
+        list_formats = ["*"]
     elif isinstance(backend_or_iterable, (dict, list)):
-        list_formats: list[str] | dict[str, Any] = backend_or_iterable
+        list_formats = backend_or_iterable
     else:
-        list_formats: list[str] | dict[str, Any] = backend_or_iterable.SUPPORTED_IN_FORMATS
+        list_formats = backend_or_iterable.SUPPORTED_IN_FORMATS
     return typer.Argument(
         help=f"{_('Input files')} ({', '.join(list_formats)})",
-        callback=lambda x: check_file_format(x, list_formats, exists=True),
+        callback=lambda x: check_file_format(x, [] if "*" in list_formats else list_formats, exists=True),
     )
 
 
