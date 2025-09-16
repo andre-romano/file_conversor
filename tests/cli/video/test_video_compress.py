@@ -13,14 +13,14 @@ from tests.utils import Test, DATA_PATH, app_cmd
 class TestVideoCompress:
     def test_video_compress(self, tmp_path):
         test_cases = [
-            (DATA_PATH / "test.mp4", tmp_path / "test.mkv"),
+            (DATA_PATH / "test.mp4", tmp_path / "test_compressed.mkv"),
         ]
 
         for in_path, out_path in test_cases:
             result = Test.invoke(
                 COMMAND_NAME, COMPRESS_NAME,
                 str(in_path),
-                "-ts", " 200k",
+                "-ts", " 200K",
                 *Test.get_format_params(out_path),
                 *Test.get_out_dir_params(out_path),
             )

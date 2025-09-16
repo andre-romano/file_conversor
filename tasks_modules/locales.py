@@ -87,6 +87,13 @@ def translate(c: InvokeContext):
     if exception:
         print(f"[bold yellow] WARN:[/] need to rerun [bold white]'locales.update'[/] - {repr(exception)}")
         raise exception
+
+    try:
+        c.run(f"git add {I18N_PATH}")
+        c.run(f"git commit -m \"locales: automatic translation update\"")
+    except:
+        print(f"[bold yellow] WARN:[/] nothing to commit in locales")
+
     print(f"[bold] Translation i18N:[/] [bold green]SUCCESS[/]")
 
 
