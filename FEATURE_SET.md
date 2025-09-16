@@ -1,11 +1,12 @@
 
-# File Conversor v0.4.0
+# File Conversor v0.5.0
 
 **Summary**:
-- [File Conversor v0.4.0](#file-conversor-v040)
+- [File Conversor v0.5.0](#file-conversor-v050)
   - [Feature-set available](#feature-set-available)
     - [Office files (doc, xls, ppt, etc)](#office-files-doc-xls-ppt-etc)
-    - [Audio / Video files](#audio--video-files)
+    - [Audio  files](#audio--files)
+    - [Video  files](#video--files)
     - [Image files](#image-files)
     - [PDF files](#pdf-files)
     - [Text files (json, yaml, ini, etc)](#text-files-json-yaml-ini-etc)
@@ -24,26 +25,49 @@
 | ppt convert | Converts presentation file formats | ppt, pptx, odp | ppt, pptx, odp, pdf            |
 | xls convert | Converts spreadsheet file formats  | xls, xlsx, ods | xls, xlsx, ods, csv, pdf, html |
 
-### Audio / Video files
+### Audio  files
 
-| Command             | Description                       | Input formats                                                                                                 | Output formats                                 |
-| ------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| audio-video info    | Gets information about file       | aac, ac3, flac, m4a, mp3, ogg, opus, wav, 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | No output file                                 |
-| audio-video convert | Converts audio/video file formats | aac, ac3, flac, m4a, mp3, ogg, opus, wav, 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm, mp3, m4a, ogg, opus, flac |
+| Command       | Description                                  | Input formats                                                                                                      | Output formats            |
+| ------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+| audio info    | Gets information about file                  | aac, ac3, flac, m4a, mp3, ogg, opus, wav, wma wma                                                                  | No output file            |
+| audio check   | Check if input file is corrupted             | aac, ac3, flac, m4a, mp3, ogg, opus, wav, wma                                                                      | No output file            |
+| audio convert | Converts audio/video file to an audio format | aac, ac3, flac, m4a, mp3, ogg, opus, wav, wma, 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp3, m4a, ogg, opus, flac |
+
+
+### Video  files
+
+| Command            | Description                                                              | Input formats                                                       | Output formats                                                      |
+| ------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| video list-formats | Lists available formats and codecs                                       | No input file                                                       | No output file                                                      |
+| video info         | Gets information about file                                              | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | No output file                                                      |
+| video check        | Check if input file is corrupted                                         | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | No output file                                                      |
+| video execute      | Execute custom ffmpeg command (advanced, use with caution)               | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm |
+| video convert      | Converts video file formats                                              | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+| video compress     | Compress video file to a target file size                                | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+| video enhance      | Enhances video quality (bitrate, resolution, contrast, brightness, etc)  | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+| video mirror       | Mirrors video horizontally or vertically                                 | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+| video rotate       | Rotates video 90 degress (clockwise or anti-clockwise)                   | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+| video resize       | Resizes a video file, adjusting its resolution (upscaling / downscaling) | 3gp, asf, avi, flv, h264, hevc, m4v, mkv, mov, mp4, mpeg, mpg, webm | mp4, avi, mkv, webm                                                 |
+
 
 ### Image files
 
 
-| Command        | Description                                                 | Input formats                                                  | Output formats                                                 |
-| -------------- | ----------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| image info     | Get EXIF information about a image file                     | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | No output file                                                 |
-| image convert  | Converts image file formats                                 | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jpg, apng, png, pdf, tif, webp                  |
-| image render   | Render image vector file into bitmap image                  | svg                                                            | png, jpg                                                       |
-| image to-pdf   | Convert list of images into a PDF file (one image per page) | bmp, gif, jpeg, jpg, png, tiff, tif                            | pdf                                                            |
-| image compress | Compresses image files                                      | gif, jpg, jpeg, png                                            | gif, jpg, jpeg, png                                            |
-| image mirror   | Mirror an image file (vertically or horizontally)           | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
-| image resize   | Resize an image file.                                       | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
-| image rotate   | Rotate a image file (clockwise or anti-clockwise)           | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| Command         | Description                                                 | Input formats                                                  | Output formats                                                 |
+| --------------- | ----------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| image info      | Get EXIF information about a image file                     | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | No output file                                                 |
+| image convert   | Converts image file formats                                 | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jpg, apng, png, pdf, tif, webp                  |
+| image render    | Render image vector file into bitmap image                  | svg                                                            | png, jpg                                                       |
+| image to-pdf    | Convert list of images into a PDF file (one image per page) | bmp, gif, jpeg, jpg, png, tiff, tif                            | pdf                                                            |
+| image compress  | Compresses image files                                      | gif, jpg, jpeg, png                                            | gif, jpg, jpeg, png                                            |
+| image mirror    | Mirror an image file (vertically or horizontally)           | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image resize    | Resize an image file.                                       | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image rotate    | Rotate a image file (clockwise or anti-clockwise)           | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image antialias | Applies antialias filter in image file                      | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image blur      | Applies blur filter in image file                           | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image enhance   | Enhances image brightness, contrast, sharpness, etc         | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image filter    | Applies custom filters to image                             | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
+| image unsharp   | Applies strong unsharp filter to image                      | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp | bmp, gif, ico, jfif, jpg, jpeg, jpe, png, psd, tif, tiff, webp |
 
 
 ### PDF files

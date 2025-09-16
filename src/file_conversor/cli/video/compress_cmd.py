@@ -73,7 +73,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def compress(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
-    target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (<size>[K|M|G]) [0 = do not limit output file size]")}")],
+    target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (size[K|M|G]) [0 = do not limit output file size]")}")],
 
     video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
     video_quality: Annotated[str | None, VideoQualityOption()] = CONFIG["video-quality"],
