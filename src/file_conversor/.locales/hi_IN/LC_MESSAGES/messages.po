@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-30 21:49-0300\n"
+"POT-Creation-Date: 2025-09-16 15:18-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: hi_IN <LL@li.org>\n"
 "Language: hi_IN\n"
+"Language-Team: hi_IN <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: src/file_conversor/backend/abstract_backend.py:43
@@ -27,16 +27,18 @@ msgid "found"
 msgstr "मिला"
 
 #: src/file_conversor/backend/abstract_backend.py:56
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
+#: src/file_conversor/cli/audio/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:86
 #: src/file_conversor/utils/command_manager.py:51
-#: src/file_conversor/utils/validators.py:19
-#: src/file_conversor/utils/validators.py:21
+#: src/file_conversor/utils/validators.py:107
+#: src/file_conversor/utils/validators.py:109
 msgid "File"
 msgstr "फ़ाइल"
 
 #: src/file_conversor/backend/abstract_backend.py:56
 #: src/file_conversor/dependency/abstract_pkg_manager.py:57
-#: src/file_conversor/utils/validators.py:19
+#: src/file_conversor/utils/validators.py:107
 msgid "not found"
 msgstr "नहीं मिला"
 
@@ -54,37 +56,46 @@ msgstr "पैकेज प्रबंधक स्थापना"
 
 #: src/file_conversor/backend/abstract_backend.py:105
 #: src/file_conversor/backend/abstract_backend.py:117
-#: src/file_conversor/backend/batch_backend.py:125
-#: src/file_conversor/cli/audio_video/convert_cmd.py:134
-#: src/file_conversor/cli/doc/convert_cmd.py:86
-#: src/file_conversor/cli/hash/check_cmd.py:80
-#: src/file_conversor/cli/hash/create_cmd.py:66
-#: src/file_conversor/cli/image/compress_cmd.py:92
-#: src/file_conversor/cli/image/convert_cmd.py:99
-#: src/file_conversor/cli/image/mirror_cmd.py:96
-#: src/file_conversor/cli/image/render_cmd.py:93
-#: src/file_conversor/cli/image/resize_cmd.py:114
-#: src/file_conversor/cli/image/rotate_cmd.py:107
-#: src/file_conversor/cli/image/to_pdf_cmd.py:122
-#: src/file_conversor/cli/pdf/compress_cmd.py:110
-#: src/file_conversor/cli/pdf/convert_cmd.py:95
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:91
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:158
-#: src/file_conversor/cli/pdf/extract_cmd.py:93
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:87
-#: src/file_conversor/cli/pdf/merge_cmd.py:81
-#: src/file_conversor/cli/pdf/repair_cmd.py:90
-#: src/file_conversor/cli/pdf/rotate_cmd.py:106
-#: src/file_conversor/cli/pdf/split_cmd.py:97
-#: src/file_conversor/cli/pipeline/create_cmd.py:89
-#: src/file_conversor/cli/pipeline/execute_cmd.py:54
-#: src/file_conversor/cli/ppt/convert_cmd.py:84
-#: src/file_conversor/cli/text/check_cmd.py:77
-#: src/file_conversor/cli/text/compress_cmd.py:81
-#: src/file_conversor/cli/text/convert_cmd.py:104
-#: src/file_conversor/cli/win/install_menu_cmd.py:71
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:56
-#: src/file_conversor/cli/xls/convert_cmd.py:84
+#: src/file_conversor/backend/batch_backend.py:127
+#: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
+#: src/file_conversor/cli/audio/check_cmd.py:91
+#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/hash/check_cmd.py:82
+#: src/file_conversor/cli/hash/create_cmd.py:68
+#: src/file_conversor/cli/image/antialias_cmd.py:96
+#: src/file_conversor/cli/image/blur_cmd.py:71
+#: src/file_conversor/cli/image/compress_cmd.py:94
+#: src/file_conversor/cli/image/convert_cmd.py:95
+#: src/file_conversor/cli/image/enhance_cmd.py:106
+#: src/file_conversor/cli/image/filter_cmd.py:95
+#: src/file_conversor/cli/image/mirror_cmd.py:95
+#: src/file_conversor/cli/image/render_cmd.py:95
+#: src/file_conversor/cli/image/resize_cmd.py:116
+#: src/file_conversor/cli/image/rotate_cmd.py:109
+#: src/file_conversor/cli/image/to_pdf_cmd.py:124
+#: src/file_conversor/cli/image/unsharp_cmd.py:86
+#: src/file_conversor/cli/pdf/compress_cmd.py:115
+#: src/file_conversor/cli/pdf/convert_cmd.py:97
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:93
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:160
+#: src/file_conversor/cli/pdf/extract_cmd.py:95
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
+#: src/file_conversor/cli/pdf/merge_cmd.py:83
+#: src/file_conversor/cli/pdf/repair_cmd.py:92
+#: src/file_conversor/cli/pdf/rotate_cmd.py:108
+#: src/file_conversor/cli/pdf/split_cmd.py:99
+#: src/file_conversor/cli/pipeline/create_cmd.py:91
+#: src/file_conversor/cli/pipeline/execute_cmd.py:56
+#: src/file_conversor/cli/ppt/convert_cmd.py:87
+#: src/file_conversor/cli/text/check_cmd.py:80
+#: src/file_conversor/cli/text/compress_cmd.py:84
+#: src/file_conversor/cli/text/convert_cmd.py:107
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:168
+#: src/file_conversor/cli/video/check_cmd.py:92
+#: src/file_conversor/cli/video/execute_cmd.py:103
+#: src/file_conversor/cli/win/install_menu_cmd.py:73
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:58
+#: src/file_conversor/cli/xls/convert_cmd.py:87
 msgid "SUCCESS"
 msgstr "सफलता"
 
@@ -96,82 +107,134 @@ msgstr "वर्तमान उपयोगकर्ता के लिए �
 msgid "External Dependencies Installation"
 msgstr "बाहरी निर्भरताएं स्थापना"
 
-#: src/file_conversor/backend/batch_backend.py:70
+#: src/file_conversor/backend/batch_backend.py:72
 msgid "Pipeline stage created at"
 msgstr "पाइपलाइन स्टेज पर बनाया गया"
 
-#: src/file_conversor/backend/batch_backend.py:75
+#: src/file_conversor/backend/batch_backend.py:77
 msgid "Config file saved at"
 msgstr "कॉन्फ़िगर फ़ाइल पर सहेजा गया"
 
-#: src/file_conversor/backend/batch_backend.py:84
+#: src/file_conversor/backend/batch_backend.py:86
 msgid "Config file"
 msgstr "विन्यास फ़ाइल"
 
-#: src/file_conversor/backend/batch_backend.py:84
+#: src/file_conversor/backend/batch_backend.py:86
 msgid "does not exist"
 msgstr "मौजूद नहीं"
 
-#: src/file_conversor/backend/batch_backend.py:85
+#: src/file_conversor/backend/batch_backend.py:87
 msgid "Loading"
 msgstr "लोड करना"
 
-#: src/file_conversor/backend/batch_backend.py:89
+#: src/file_conversor/backend/batch_backend.py:91
 msgid "Found"
 msgstr "मिला"
 
-#: src/file_conversor/backend/batch_backend.py:89
+#: src/file_conversor/backend/batch_backend.py:91
 msgid "stages"
 msgstr "चरणों"
 
-#: src/file_conversor/backend/batch_backend.py:97
 #: src/file_conversor/backend/batch_backend.py:99
+#: src/file_conversor/backend/batch_backend.py:101
 msgid "Processing stage"
 msgstr "प्रक्रमन चरण"
 
-#: src/file_conversor/backend/batch_backend.py:113
+#: src/file_conversor/backend/batch_backend.py:115
 msgid "Executing batch stage"
 msgstr "बैच चरण निष्पादित करना"
 
-#: src/file_conversor/backend/batch_backend.py:115
+#: src/file_conversor/backend/batch_backend.py:117
 msgid "Stage"
 msgstr "अवस्था"
 
-#: src/file_conversor/backend/batch_backend.py:115
+#: src/file_conversor/backend/batch_backend.py:117
 msgid "Processing files"
 msgstr "प्रसंस्करण फ़ाइलें"
 
-#: src/file_conversor/backend/batch_backend.py:127
+#: src/file_conversor/backend/batch_backend.py:129
+#: src/file_conversor/cli/audio/check_cmd.py:84
+#: src/file_conversor/cli/video/check_cmd.py:85
 msgid "FAILED"
 msgstr "असफल"
 
-#: src/file_conversor/backend/batch_backend.py:139
+#: src/file_conversor/backend/batch_backend.py:141
 msgid "Finished batch stage"
 msgstr "समाप्त बैच मंच"
 
-#: src/file_conversor/backend/image/pillow_backend.py:115
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:99
+msgid "Input file not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:207
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:267
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:325
+msgid "Output container not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
+msgid "Invalid number of passes:"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
+msgid "Must be 0 (single-pass), 1 (first pass) or 2 (second pass)."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:322
+msgid "Input/output files not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:334
+msgid "Temporary 2-pass log file"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:341
+msgid "Audio bitrate cannot be 0 when using two-pass mode."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:343
+msgid "Video bitrate cannot be 0 when using two-pass mode."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:141
+msgid "profile not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:147
+msgid "speed not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:153
+msgid "quality not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/format_container.py:25
+msgid "not available. Available codecs are:"
+msgstr ""
+
+#: src/file_conversor/backend/image/pillow_backend.py:128
 msgid "Scale must be >0"
 msgstr "स्केल होना चाहिए> 0"
 
-#: src/file_conversor/backend/image/pillow_backend.py:118
+#: src/file_conversor/backend/image/pillow_backend.py:131
 msgid "Need either scale or width to resize an image"
 msgstr "एक छवि का आकार बदलने के लिए या तो पैमाने या चौड़ाई की आवश्यकता है"
 
-#: src/file_conversor/backend/image/pillow_backend.py:120
+#: src/file_conversor/backend/image/pillow_backend.py:133
 msgid "Width must be > 0"
 msgstr "चौड़ाई> 0 होनी चाहिए"
 
-#: src/file_conversor/backend/image/pillow_backend.py:155
+#: src/file_conversor/backend/image/pillow_backend.py:168
 msgid "Invalid quality level. Valid values are"
 msgstr "अमान्य गुणवत्ता स्तर। मान्य मान हैं"
 
-#: src/file_conversor/backend/image/pillow_backend.py:267
+#: src/file_conversor/backend/image/pillow_backend.py:485
 msgid "Image correction failed"
 msgstr "छवि सुधार विफल रहा"
 
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
 #: src/file_conversor/utils/command_manager.py:51
-#: src/file_conversor/utils/validators.py:21
+#: src/file_conversor/utils/validators.py:109
 msgid "exists"
 msgstr "मौजूद है"
 
@@ -207,169 +270,200 @@ msgstr "प्रदर्शन संस्करण"
 msgid "Overwrite output files"
 msgstr "आउटपुट फाइलों को अधिलेखित करें"
 
-#: src/file_conversor/cli/_typer.py:26
+#: src/file_conversor/cli/_typer.py:27
 msgid "Office files"
 msgstr "कार्यालय फ़ाइलें"
 
-#: src/file_conversor/cli/_typer.py:27
+#: src/file_conversor/cli/_typer.py:28
 msgid "Other files"
 msgstr "अन्य फ़ाइलें"
 
-#: src/file_conversor/cli/_typer.py:28
+#: src/file_conversor/cli/_typer.py:29
 msgid "Utils and Config"
 msgstr "उपयोग और विन्यास"
 
-#: src/file_conversor/cli/audio_video/__init__.py:19
-msgid "Audio / Video file manipulation (requires FFMpeg external library)"
-msgstr "ऑडियो / वीडियो फ़ाइल हेरफेर (FFMPEG बाहरी पुस्तकालय की आवश्यकता है)"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:80
-msgid "Convert a audio/video file to a different format."
-msgstr "एक ऑडियो/वीडियो फ़ाइल को एक अलग प्रारूप में बदलें।"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:82
-msgid ""
-"This command can be used to convert audio or video files to the specified "
-"format."
+#: src/file_conversor/cli/audio/__init__.py:20
+msgid "Audio file manipulation (requires FFMpeg external library)"
 msgstr ""
-"इस कमांड का उपयोग ऑडियो या वीडियो फ़ाइलों को निर्दिष्ट प्रारूप में बदलने के "
-"लिए किया जा सकता है।"
 
-#: src/file_conversor/cli/audio_video/convert_cmd.py:85
-#: src/file_conversor/cli/audio_video/info_cmd.py:72
-#: src/file_conversor/cli/config/set_cmd.py:37
-#: src/file_conversor/cli/config/show_cmd.py:34
-#: src/file_conversor/cli/doc/convert_cmd.py:62
-#: src/file_conversor/cli/hash/check_cmd.py:59
-#: src/file_conversor/cli/hash/create_cmd.py:40
-#: src/file_conversor/cli/image/compress_cmd.py:64
-#: src/file_conversor/cli/image/convert_cmd.py:73
-#: src/file_conversor/cli/image/info_cmd.py:65
-#: src/file_conversor/cli/image/mirror_cmd.py:69
-#: src/file_conversor/cli/image/render_cmd.py:67
-#: src/file_conversor/cli/image/resize_cmd.py:67
-#: src/file_conversor/cli/image/rotate_cmd.py:72
-#: src/file_conversor/cli/image/to_pdf_cmd.py:69
-#: src/file_conversor/cli/pdf/compress_cmd.py:66
-#: src/file_conversor/cli/pdf/convert_cmd.py:70
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:64
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:64
-#: src/file_conversor/cli/pdf/extract_cmd.py:64
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:66
-#: src/file_conversor/cli/pdf/merge_cmd.py:46
-#: src/file_conversor/cli/pdf/repair_cmd.py:64
-#: src/file_conversor/cli/pdf/rotate_cmd.py:71
-#: src/file_conversor/cli/pdf/split_cmd.py:65
-#: src/file_conversor/cli/pipeline/create_cmd.py:63
-#: src/file_conversor/cli/pipeline/execute_cmd.py:38
-#: src/file_conversor/cli/ppt/convert_cmd.py:60
-#: src/file_conversor/cli/text/check_cmd.py:59
-#: src/file_conversor/cli/text/compress_cmd.py:63
-#: src/file_conversor/cli/text/convert_cmd.py:85
-#: src/file_conversor/cli/win/install_menu_cmd.py:43
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:38
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:40
-#: src/file_conversor/cli/xls/convert_cmd.py:60
+#: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:168
+msgid "FFMpeg result"
+msgstr ""
+
+#: src/file_conversor/cli/audio/check_cmd.py:59
+msgid "Checks a audio file for corruption / inconsistencies."
+msgstr ""
+
+#: src/file_conversor/cli/audio/check_cmd.py:62
+#: src/file_conversor/cli/audio/convert_cmd.py:69
+#: src/file_conversor/cli/audio/info_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:40
+#: src/file_conversor/cli/config/show_cmd.py:36
+#: src/file_conversor/cli/doc/convert_cmd.py:65
+#: src/file_conversor/cli/hash/check_cmd.py:61
+#: src/file_conversor/cli/hash/create_cmd.py:42
+#: src/file_conversor/cli/image/antialias_cmd.py:63
+#: src/file_conversor/cli/image/blur_cmd.py:44
+#: src/file_conversor/cli/image/compress_cmd.py:66
+#: src/file_conversor/cli/image/convert_cmd.py:69
+#: src/file_conversor/cli/image/enhance_cmd.py:62
+#: src/file_conversor/cli/image/filter_cmd.py:63
+#: src/file_conversor/cli/image/info_cmd.py:67
+#: src/file_conversor/cli/image/mirror_cmd.py:71
+#: src/file_conversor/cli/image/render_cmd.py:69
+#: src/file_conversor/cli/image/resize_cmd.py:69
+#: src/file_conversor/cli/image/rotate_cmd.py:74
+#: src/file_conversor/cli/image/to_pdf_cmd.py:71
+#: src/file_conversor/cli/image/unsharp_cmd.py:44
+#: src/file_conversor/cli/pdf/compress_cmd.py:71
+#: src/file_conversor/cli/pdf/convert_cmd.py:72
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:66
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:66
+#: src/file_conversor/cli/pdf/extract_cmd.py:66
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:68
+#: src/file_conversor/cli/pdf/merge_cmd.py:48
+#: src/file_conversor/cli/pdf/repair_cmd.py:66
+#: src/file_conversor/cli/pdf/rotate_cmd.py:73
+#: src/file_conversor/cli/pdf/split_cmd.py:67
+#: src/file_conversor/cli/pipeline/create_cmd.py:65
+#: src/file_conversor/cli/pipeline/execute_cmd.py:40
+#: src/file_conversor/cli/ppt/convert_cmd.py:63
+#: src/file_conversor/cli/text/check_cmd.py:62
+#: src/file_conversor/cli/text/compress_cmd.py:66
+#: src/file_conversor/cli/text/convert_cmd.py:88
+#: src/file_conversor/cli/video/check_cmd.py:63
+#: src/file_conversor/cli/video/compress_cmd.py:67
+#: src/file_conversor/cli/video/convert_cmd.py:85
+#: src/file_conversor/cli/video/enhance_cmd.py:66
+#: src/file_conversor/cli/video/execute_cmd.py:44
+#: src/file_conversor/cli/video/info_cmd.py:77
+#: src/file_conversor/cli/video/list_formats_cmd.py:45
+#: src/file_conversor/cli/video/mirror_cmd.py:74
+#: src/file_conversor/cli/video/resize_cmd.py:68
+#: src/file_conversor/cli/video/rotate_cmd.py:74
+#: src/file_conversor/cli/win/install_menu_cmd.py:45
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:40
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:42
+#: src/file_conversor/cli/xls/convert_cmd.py:63
 msgid "Examples"
 msgstr "उदाहरण"
 
-#: src/file_conversor/cli/audio_video/convert_cmd.py:95
-#: src/file_conversor/cli/config/set_cmd.py:55
-msgid "Audio bitrate in kbps"
-msgstr "केबीपीएस में ऑडियो बिटरेट"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:99
-#: src/file_conversor/cli/config/set_cmd.py:60
-msgid "Video bitrate in kbps"
-msgstr "KBPS में वीडियो बिटरेट"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:134
-msgid "FFMpeg convertion"
-msgstr "FFMPEG कनवर्जन"
-
-#: src/file_conversor/cli/audio_video/info_cmd.py:61
-msgid "Get information about a audio/video file."
-msgstr "एक ऑडियो/वीडियो फ़ाइल के बारे में जानकारी प्राप्त करें।"
-
-#: src/file_conversor/cli/audio_video/info_cmd.py:63
-msgid ""
-"This command retrieves metadata and other information about the audio / "
-"video file"
+#: src/file_conversor/cli/audio/check_cmd.py:84
+#: src/file_conversor/cli/audio/check_cmd.py:91
+#: src/file_conversor/cli/video/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:92
+msgid "FFMpeg check"
 msgstr ""
-"यह कमांड मेटाडेटा और ऑडियो / वीडियो फ़ाइल के बारे में अन्य जानकारी प्राप्त "
-"करता है"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:65
-#: src/file_conversor/cli/audio_video/info_cmd.py:108
-#: src/file_conversor/cli/image/info_cmd.py:84
+#: src/file_conversor/cli/audio/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:86
+msgid "is corrupted or has inconsistencies"
+msgstr ""
+
+#: src/file_conversor/cli/audio/convert_cmd.py:66
+msgid "Convert a audio/video file to an audio format."
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:64
+msgid "Get information about a audio file."
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:66
+msgid "This command retrieves metadata and other information about the audio file"
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:68
+#: src/file_conversor/cli/audio/info_cmd.py:111
+#: src/file_conversor/cli/image/info_cmd.py:86
+#: src/file_conversor/cli/video/info_cmd.py:70
+#: src/file_conversor/cli/video/info_cmd.py:113
 msgid "Format"
 msgstr "प्रारूप"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:67
-#: src/file_conversor/cli/audio_video/info_cmd.py:109
+#: src/file_conversor/cli/audio/info_cmd.py:70
+#: src/file_conversor/cli/audio/info_cmd.py:112
+#: src/file_conversor/cli/video/info_cmd.py:72
+#: src/file_conversor/cli/video/info_cmd.py:114
 msgid "Duration"
 msgstr "अवधि"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:69
+#: src/file_conversor/cli/audio/info_cmd.py:72
+#: src/file_conversor/cli/video/info_cmd.py:74
 msgid "Other properties"
 msgstr "अन्य गुण"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:88
+#: src/file_conversor/cli/audio/info_cmd.py:91
+#: src/file_conversor/cli/video/info_cmd.py:93
 msgid "Parsing file metadata for"
 msgstr "के लिए फ़ाइल मेटाडेटा पार्सिंग"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:106
+#: src/file_conversor/cli/audio/info_cmd.py:109
+#: src/file_conversor/cli/video/info_cmd.py:111
 msgid "File Information"
 msgstr "फ़ाइल सूचना"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:107
-#: src/file_conversor/cli/image/info_cmd.py:83
+#: src/file_conversor/cli/audio/info_cmd.py:110
+#: src/file_conversor/cli/image/info_cmd.py:85
+#: src/file_conversor/cli/video/info_cmd.py:112
 msgid "Name"
 msgstr "नाम"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:110
+#: src/file_conversor/cli/audio/info_cmd.py:113
+#: src/file_conversor/cli/video/info_cmd.py:115
 msgid "Size"
 msgstr "आकार"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:111
-#: src/file_conversor/cli/audio_video/info_cmd.py:130
+#: src/file_conversor/cli/audio/info_cmd.py:114
+#: src/file_conversor/cli/audio/info_cmd.py:133
+#: src/file_conversor/cli/video/info_cmd.py:116
+#: src/file_conversor/cli/video/info_cmd.py:135
 msgid "Bitrate"
 msgstr "बिटरेट"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:116
+#: src/file_conversor/cli/audio/info_cmd.py:119
+#: src/file_conversor/cli/video/info_cmd.py:121
 msgid "Media Streams"
 msgstr "मीडिया धाराएँ"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:126
+#: src/file_conversor/cli/audio/info_cmd.py:129
+#: src/file_conversor/cli/video/info_cmd.py:131
 msgid "Stream"
 msgstr "धारा"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:127
+#: src/file_conversor/cli/audio/info_cmd.py:130
+#: src/file_conversor/cli/video/info_cmd.py:132
 msgid "Codec"
 msgstr "कोडेक"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:129
+#: src/file_conversor/cli/audio/info_cmd.py:132
+#: src/file_conversor/cli/video/info_cmd.py:134
 msgid "Resolution"
 msgstr "संकल्प"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:132
+#: src/file_conversor/cli/audio/info_cmd.py:135
+#: src/file_conversor/cli/video/info_cmd.py:137
 msgid "Sampling rate"
 msgstr "नमूना दर"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:133
+#: src/file_conversor/cli/audio/info_cmd.py:136
+#: src/file_conversor/cli/video/info_cmd.py:138
 msgid "Channels"
 msgstr "चैनल"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:138
+#: src/file_conversor/cli/audio/info_cmd.py:141
+#: src/file_conversor/cli/video/info_cmd.py:143
 msgid "Chapters"
 msgstr "अध्याय"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:142
+#: src/file_conversor/cli/audio/info_cmd.py:145
+#: src/file_conversor/cli/video/info_cmd.py:147
 msgid "Time"
 msgstr "समय"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:146
-#: src/file_conversor/cli/image/info_cmd.py:92
+#: src/file_conversor/cli/audio/info_cmd.py:149
+#: src/file_conversor/cli/image/info_cmd.py:94
+#: src/file_conversor/cli/video/info_cmd.py:151
 msgid "File Analysis"
 msgstr "संचिका विश्लेषण"
 
@@ -377,92 +471,115 @@ msgstr "संचिका विश्लेषण"
 msgid "Configure default options"
 msgstr "डिफ़ॉल्ट विकल्प कॉन्फ़िगर करें"
 
-#: src/file_conversor/cli/config/set_cmd.py:34
+#: src/file_conversor/cli/config/set_cmd.py:37
 msgid "Configure the default options for the file converter."
 msgstr "फ़ाइल कनवर्टर के लिए डिफ़ॉल्ट विकल्प कॉन्फ़िगर करें।"
 
-#: src/file_conversor/cli/config/set_cmd.py:46
-msgid ""
-"Set preferred language for app (if available). Format lang_COUNTRY. Defaults"
-" to system preffered language or 'en_US' (English - United States)."
+#: src/file_conversor/cli/config/set_cmd.py:49
+msgid "Set preferred language for app (if available). Available languages:"
 msgstr ""
-"ऐप के लिए पसंदीदा भाषा सेट करें (यदि उपलब्ध हो)। प्रारूप lang_country। "
-"सिस्टम से पहले की भाषा या 'en_us' (अंग्रेजी - संयुक्त राज्य अमेरिका) के लिए "
-"चूक।"
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:49
+msgid "Defaults to system preffered language or 'en_US' (English - United States)"
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:54
 msgid ""
 "Install missing external dependencies action. 'True' for auto install. "
-"'False' to not install missing dependencies. 'None' to ask user for action."
+"'False' to not install missing dependencies. 'None' to ask user for "
+"action."
 msgstr ""
-"लापता बाहरी निर्भरता कार्रवाई स्थापित करें। ऑटो इंस्टॉल के लिए 'ट्रू'। लापता"
-" निर्भरता को स्थापित नहीं करने के लिए 'गलत'। कार्रवाई के लिए उपयोगकर्ता से "
-"पूछने के लिए 'कोई नहीं'।"
+"लापता बाहरी निर्भरता कार्रवाई स्थापित करें। ऑटो इंस्टॉल के लिए 'ट्रू'। "
+"लापता निर्भरता को स्थापित नहीं करने के लिए 'गलत'। कार्रवाई के लिए "
+"उपयोगकर्ता से पूछने के लिए 'कोई नहीं'।"
 
-#: src/file_conversor/cli/config/set_cmd.py:65
+#: src/file_conversor/cli/config/set_cmd.py:59
+#: src/file_conversor/utils/typer_utils.py:171
+msgid "Audio bitrate in kbps."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:59
+#: src/file_conversor/cli/config/set_cmd.py:64
+#: src/file_conversor/utils/typer_utils.py:171
+msgid "If 0, let FFmpeg decide best bitrate."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:64
+#: src/file_conversor/utils/typer_utils.py:181
+msgid "Video bitrate in kbps."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:69
+msgid "Video format."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:69
+msgid "Available formats:"
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:78
 msgid ""
 "Image quality (for ``image convert`` command). Valid values are between "
 "1-100."
-msgstr ""
-"छवि गुणवत्ता (`` छवि कन्वर्ट`` कमांड के लिए)। मान्य मान 1-100 के बीच हैं।"
+msgstr "छवि गुणवत्ता (`` छवि कन्वर्ट`` कमांड के लिए)। मान्य मान 1-100 के बीच हैं।"
 
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:83
 msgid ""
-"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
-"values are between 40-3600."
+"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). "
+"Valid values are between 40-3600."
 msgstr ""
-"डॉट्स प्रति इंच (dpi) में छवि गुणवत्ता (`` छवि to_pdf`` कमांड के लिए)। मान्य"
-" मान 40-3600 के बीच हैं।"
+"डॉट्स प्रति इंच (dpi) में छवि गुणवत्ता (`` छवि to_pdf`` कमांड के लिए)। "
+"मान्य मान 40-3600 के बीच हैं।"
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:88
 msgid ""
-"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
-"defined. Valid values are"
+"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` "
+"is defined. Valid values are"
 msgstr ""
-"छवि फिट (`` छवि to_pdf`` कमांड के लिए)। यदि ``--पेज-आकार`` को परिभाषित किया "
-"गया है, तो मान्य है। मान्य मान हैं"
+"छवि फिट (`` छवि to_pdf`` कमांड के लिए)। यदि ``--पेज-आकार`` को परिभाषित "
+"किया गया है, तो मान्य है। मान्य मान हैं"
 
-#: src/file_conversor/cli/config/set_cmd.py:80
+#: src/file_conversor/cli/config/set_cmd.py:93
 msgid ""
 "Page size (for ``image to_pdf`` command). Format (width, height). Other "
 "valid values are:"
 msgstr ""
-"पृष्ठ का आकार (`` छवि to_pdf`` कमांड के लिए)। प्रारूप (चौड़ाई, ऊंचाई)। अन्य "
-"मान्य मान हैं:"
+"पृष्ठ का आकार (`` छवि to_pdf`` कमांड के लिए)। प्रारूप (चौड़ाई, ऊंचाई)। "
+"अन्य मान्य मान हैं:"
 
-#: src/file_conversor/cli/config/set_cmd.py:85
-#: src/file_conversor/cli/image/resize_cmd.py:94
-#: src/file_conversor/cli/image/rotate_cmd.py:86
+#: src/file_conversor/cli/config/set_cmd.py:98
+#: src/file_conversor/cli/image/resize_cmd.py:96
+#: src/file_conversor/cli/image/rotate_cmd.py:88
 msgid "Resampling algorithm. Valid values are"
 msgstr "पुनरुत्थान एल्गोरिथ्म। मान्य मान हैं"
 
-#: src/file_conversor/cli/config/set_cmd.py:85
-#: src/file_conversor/cli/config/set_cmd.py:90
-#: src/file_conversor/cli/image/resize_cmd.py:94
-#: src/file_conversor/cli/image/rotate_cmd.py:86
-#: src/file_conversor/cli/image/to_pdf_cmd.py:83
-#: src/file_conversor/cli/pdf/compress_cmd.py:77
+#: src/file_conversor/cli/config/set_cmd.py:98
+#: src/file_conversor/cli/config/set_cmd.py:103
+#: src/file_conversor/cli/image/resize_cmd.py:96
+#: src/file_conversor/cli/image/rotate_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:85
+#: src/file_conversor/cli/pdf/compress_cmd.py:82
 msgid "Defaults to"
 msgstr "के लिए चूक"
 
-#: src/file_conversor/cli/config/set_cmd.py:90
-#: src/file_conversor/cli/pdf/compress_cmd.py:77
+#: src/file_conversor/cli/config/set_cmd.py:103
+#: src/file_conversor/cli/pdf/compress_cmd.py:82
 msgid "Compression level (high compression = low quality). Valid values are"
 msgstr "संपीड़न स्तर (उच्च संपीड़न = निम्न गुणवत्ता)। मान्य मान हैं"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:125
 msgid "Configuration file"
 msgstr "विन्यास संचिका"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:125
 msgid "updated"
 msgstr "अद्यतन"
 
-#: src/file_conversor/cli/config/show_cmd.py:31
+#: src/file_conversor/cli/config/show_cmd.py:33
 msgid "Show the current configuration of the application"
 msgstr "एप्लिकेशन का वर्तमान कॉन्फ़िगरेशन दिखाएं"
 
-#: src/file_conversor/cli/config/show_cmd.py:40
+#: src/file_conversor/cli/config/show_cmd.py:42
 msgid "Configuration"
 msgstr "विन्यास"
 
@@ -476,7 +593,7 @@ msgstr "प्रलेख फ़ाइल हेरफुलेशन"
 msgid "(requires MS Office / LibreOffice)"
 msgstr "(एमएस ऑफिस / libreoffice की आवश्यकता है)"
 
-#: src/file_conversor/cli/doc/convert_cmd.py:59
+#: src/file_conversor/cli/doc/convert_cmd.py:62
 msgid ""
 "Convert document files into other formats (requires Microsoft Word / "
 "LibreOffice)."
@@ -484,10 +601,10 @@ msgstr ""
 "दस्तावेज़ फ़ाइलों को अन्य प्रारूपों में परिवर्तित करें (Microsoft Word / "
 "libreoffice की आवश्यकता होती है)।"
 
-#: src/file_conversor/cli/doc/convert_cmd.py:86
-#: src/file_conversor/cli/ppt/convert_cmd.py:84
-#: src/file_conversor/cli/text/convert_cmd.py:104
-#: src/file_conversor/cli/xls/convert_cmd.py:84
+#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/ppt/convert_cmd.py:87
+#: src/file_conversor/cli/text/convert_cmd.py:107
+#: src/file_conversor/cli/xls/convert_cmd.py:87
 msgid "File conversion"
 msgstr "संचिका रूपांतरण"
 
@@ -495,207 +612,263 @@ msgstr "संचिका रूपांतरण"
 msgid "Hashing manipulation (check, gen, etc)"
 msgstr "हैशिंग हेरफेर (चेक, जीन, आदि)"
 
-#: src/file_conversor/cli/hash/check_cmd.py:56
+#: src/file_conversor/cli/hash/check_cmd.py:58
 msgid "Checks a hash file (.sha256, .sha1, etc)."
 msgstr "एक हैश फ़ाइल (.sha256, .sha1, आदि) की जाँच करता है।"
 
-#: src/file_conversor/cli/hash/check_cmd.py:70
+#: src/file_conversor/cli/hash/check_cmd.py:72
 msgid "Checking file"
 msgstr "जाँच संचिका"
 
-#: src/file_conversor/cli/hash/check_cmd.py:80
+#: src/file_conversor/cli/hash/check_cmd.py:82
 msgid "Hash check"
 msgstr "हैश चेक"
 
-#: src/file_conversor/cli/hash/create_cmd.py:37
+#: src/file_conversor/cli/hash/create_cmd.py:39
 msgid "Creates hash file (.sha256, .sha1, etc)."
 msgstr "हैश फ़ाइल बनाता है (.sha256, .sha1, आदि)।"
 
-#: src/file_conversor/cli/hash/create_cmd.py:66
+#: src/file_conversor/cli/hash/create_cmd.py:68
 msgid "Hash creation"
 msgstr "हैश निर्माण"
 
-#: src/file_conversor/cli/image/__init__.py:23
+#: src/file_conversor/cli/image/__init__.py:28
 msgid "Image file manipulation"
 msgstr "छवि फ़ाइल हेरफुलेशन"
 
 #: src/file_conversor/cli/image/_typer.py:8
-msgid "Conversion"
-msgstr "परिवर्तन"
+msgid "Conversions"
+msgstr ""
 
 #: src/file_conversor/cli/image/_typer.py:9
-msgid "Transformation"
-msgstr "परिवर्तन"
+#: src/file_conversor/cli/pdf/_typer.py:9
+#: src/file_conversor/cli/video/_typer.py:8
+msgid "Transformations"
+msgstr "परिवर्तनों"
 
 #: src/file_conversor/cli/image/_typer.py:10
+msgid "Filters"
+msgstr ""
+
+#: src/file_conversor/cli/image/_typer.py:11
 #: src/file_conversor/cli/pdf/_typer.py:10
+#: src/file_conversor/cli/video/_typer.py:9
 #: src/file_conversor/cli/win/_typer.py:9
 msgid "Other commands"
 msgstr "अन्य आदेश"
 
-#: src/file_conversor/cli/image/compress_cmd.py:59
+#: src/file_conversor/cli/image/antialias_cmd.py:60
+msgid "Applies antialias filter to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/antialias_cmd.py:75
+msgid "Algorithm to use. Available algorihtms:"
+msgstr ""
+
+#: src/file_conversor/cli/image/antialias_cmd.py:96
+msgid "Image antialiasing"
+msgstr ""
+
+#: src/file_conversor/cli/image/blur_cmd.py:41
+msgid "Applies gaussian blur to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/blur_cmd.py:71
+msgid "Image blur"
+msgstr ""
+
+#: src/file_conversor/cli/image/compress_cmd.py:61
 msgid "Compress an image file (requires external libraries)."
 msgstr "एक छवि फ़ाइल को संपीड़ित करें (बाहरी पुस्तकालयों की आवश्यकता है)।"
 
-#: src/file_conversor/cli/image/compress_cmd.py:61
+#: src/file_conversor/cli/image/compress_cmd.py:63
 msgid "Outputs an image file with _compressed at the end."
 msgstr "अंत में _compressed के साथ एक छवि फ़ाइल आउटपुट करता है।"
 
-#: src/file_conversor/cli/image/compress_cmd.py:92
+#: src/file_conversor/cli/image/compress_cmd.py:94
 msgid "Image compression"
 msgstr "छवि संपीड़न"
 
-#: src/file_conversor/cli/image/convert_cmd.py:70
+#: src/file_conversor/cli/image/convert_cmd.py:66
 msgid "Convert a image file to a different format."
 msgstr "एक छवि फ़ाइल को एक अलग प्रारूप में बदलें।"
 
-#: src/file_conversor/cli/image/convert_cmd.py:99
+#: src/file_conversor/cli/image/convert_cmd.py:95
 msgid "Image convertion"
 msgstr "छवि अभिसरण"
 
-#: src/file_conversor/cli/image/info_cmd.py:60
+#: src/file_conversor/cli/image/enhance_cmd.py:59
+msgid "Enhance image file color, brightness, contrast, or sharpness."
+msgstr ""
+
+#: src/file_conversor/cli/image/enhance_cmd.py:106
+msgid "Image enhance"
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:60
+msgid "Applies filter to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:75
+msgid "Filter to apply. Available filters:"
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:95
+msgid "Image filter"
+msgstr ""
+
+#: src/file_conversor/cli/image/info_cmd.py:62
 msgid "Get EXIF information about a image file."
 msgstr "एक छवि फ़ाइल के बारे में EXIF जानकारी प्राप्त करें।"
 
-#: src/file_conversor/cli/image/info_cmd.py:62
-msgid ""
-"This command retrieves metadata and other information about the image file"
-msgstr ""
-"यह कमांड मेटाडेटा और छवि फ़ाइल के बारे में अन्य जानकारी प्राप्त करता है"
+#: src/file_conversor/cli/image/info_cmd.py:64
+msgid "This command retrieves metadata and other information about the image file"
+msgstr "यह कमांड मेटाडेटा और छवि फ़ाइल के बारे में अन्य जानकारी प्राप्त करता है"
 
-#: src/file_conversor/cli/image/info_cmd.py:79
+#: src/file_conversor/cli/image/info_cmd.py:81
 msgid "Parsing metadata for"
 msgstr "के लिए मेटाडेटा पार्सिंग"
 
-#: src/file_conversor/cli/image/mirror_cmd.py:64
+#: src/file_conversor/cli/image/mirror_cmd.py:66
 msgid "Mirror an image file (vertically or horizontally)."
 msgstr "एक छवि फ़ाइल (लंबवत या क्षैतिज रूप से) मिरर।"
 
-#: src/file_conversor/cli/image/mirror_cmd.py:66
+#: src/file_conversor/cli/image/mirror_cmd.py:68
 msgid "Outputs an image file with _mirrored at the end."
 msgstr "अंत में _mirred के साथ एक छवि फ़ाइल आउटपुट करता है।"
 
-#: src/file_conversor/cli/image/mirror_cmd.py:78
-msgid ""
-"Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."
-msgstr ""
-"अक्ष। मान्य मान 'x' (दर्पण क्षैतिज रूप से) या 'y' (लंबवत रूप से फ्लिप) हैं।"
-
-#: src/file_conversor/cli/image/mirror_cmd.py:96
+#: src/file_conversor/cli/image/mirror_cmd.py:95
 msgid "Image mirroring"
 msgstr "छवि मिररिंग"
 
-#: src/file_conversor/cli/image/render_cmd.py:64
+#: src/file_conversor/cli/image/render_cmd.py:66
 msgid "Render an image vector file into a different format."
 msgstr "एक छवि वेक्टर फ़ाइल को एक अलग प्रारूप में प्रस्तुत करें।"
 
-#: src/file_conversor/cli/image/render_cmd.py:93
+#: src/file_conversor/cli/image/render_cmd.py:95
 msgid "Image render"
 msgstr "छवि प्रतिपादन"
 
-#: src/file_conversor/cli/image/resize_cmd.py:62
+#: src/file_conversor/cli/image/resize_cmd.py:64
 msgid "Resize an image file."
 msgstr "एक छवि फ़ाइल का आकार बदलें।"
 
-#: src/file_conversor/cli/image/resize_cmd.py:64
+#: src/file_conversor/cli/image/resize_cmd.py:66
 msgid "Outputs an image file with _resized at the end."
 msgstr "अंत में _resized के साथ एक छवि फ़ाइल आउटपुट करता है।"
 
-#: src/file_conversor/cli/image/resize_cmd.py:71
+#: src/file_conversor/cli/image/resize_cmd.py:73
 msgid "Double the image size"
 msgstr "छवि आकार दोगुना"
 
-#: src/file_conversor/cli/image/resize_cmd.py:77
+#: src/file_conversor/cli/image/resize_cmd.py:79
 msgid "Set the image width to 1024px"
 msgstr "छवि चौड़ाई को 1024px पर सेट करें"
 
-#: src/file_conversor/cli/image/resize_cmd.py:84
+#: src/file_conversor/cli/image/resize_cmd.py:86
 msgid "Scale image proportion. Valid values start at 0.1. Defaults to"
 msgstr "स्केल छवि अनुपात। वैध मान 0.1 से शुरू होता है। के लिए चूक"
 
-#: src/file_conversor/cli/image/resize_cmd.py:89
+#: src/file_conversor/cli/image/resize_cmd.py:91
 msgid ""
 "Width in pixels (height is calculated based on width to keep image "
 "proportions). Defaults to"
 msgstr ""
-"पिक्सेल में चौड़ाई (छवि अनुपात रखने के लिए चौड़ाई के आधार पर ऊंचाई की गणना "
-"की जाती है)। के लिए चूक"
+"पिक्सेल में चौड़ाई (छवि अनुपात रखने के लिए चौड़ाई के आधार पर ऊंचाई की "
+"गणना की जाती है)। के लिए चूक"
 
-#: src/file_conversor/cli/image/resize_cmd.py:89
+#: src/file_conversor/cli/image/resize_cmd.py:91
 msgid "use scale to resize image"
 msgstr "छवि का आकार बदलने के लिए पैमाने का उपयोग करें"
 
-#: src/file_conversor/cli/image/resize_cmd.py:114
+#: src/file_conversor/cli/image/resize_cmd.py:116
 msgid "Image resize"
 msgstr "छवि का आकार बदलें"
 
-#: src/file_conversor/cli/image/rotate_cmd.py:67
+#: src/file_conversor/cli/image/rotate_cmd.py:69
 msgid "Rotate a image file (clockwise or anti-clockwise)."
 msgstr "एक छवि फ़ाइल (क्लॉकवाइज या एंटी-क्लॉकवाइज) घुमाएं।"
 
-#: src/file_conversor/cli/image/rotate_cmd.py:69
+#: src/file_conversor/cli/image/rotate_cmd.py:71
 msgid "Outputs an image file with _rotated at the end."
 msgstr "अंत में _rotated के साथ एक छवि फ़ाइल आउटपुट करता है।"
 
-#: src/file_conversor/cli/image/rotate_cmd.py:81
+#: src/file_conversor/cli/image/rotate_cmd.py:83
 msgid ""
-"Rotation in degrees. Valid values are between -360 (anti-clockwise rotation)"
-" and 360 (clockwise rotation)."
+"Rotation in degrees. Valid values are between -360 (anti-clockwise "
+"rotation) and 360 (clockwise rotation)."
 msgstr ""
-"डिग्री में रोटेशन। मान्य मान -360 (एंटी -क्लॉकवाइज रोटेशन) और 360 (क्लॉकवाइज"
-" रोटेशन) के बीच हैं।"
+"डिग्री में रोटेशन। मान्य मान -360 (एंटी -क्लॉकवाइज रोटेशन) और 360 "
+"(क्लॉकवाइज रोटेशन) के बीच हैं।"
 
-#: src/file_conversor/cli/image/rotate_cmd.py:107
+#: src/file_conversor/cli/image/rotate_cmd.py:109
 msgid "Image rotation"
 msgstr "छवि रोटेशन"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:60
+#: src/file_conversor/cli/image/to_pdf_cmd.py:62
 msgid "Convert a list of image files to one PDF file, one image per page."
 msgstr ""
-"छवि फ़ाइलों की एक सूची को एक पीडीएफ फ़ाइल, प्रति पृष्ठ एक छवि में परिवर्तित "
-"करें।"
-
-#: src/file_conversor/cli/image/to_pdf_cmd.py:62
-msgid ""
-"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure size."
-msgstr ""
-"यदि ``--पेज-आकार`` को परिभाषित किया गया है, तो मान्य है। अन्यथा, पीडीएफ आकार"
-" = चित्रा आकार।"
+"छवि फ़ाइलों की एक सूची को एक पीडीएफ फ़ाइल, प्रति पृष्ठ एक छवि में "
+"परिवर्तित करें।"
 
 #: src/file_conversor/cli/image/to_pdf_cmd.py:64
+msgid ""
+"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure "
+"size."
+msgstr ""
+"यदि ``--पेज-आकार`` को परिभाषित किया गया है, तो मान्य है। अन्यथा, पीडीएफ "
+"आकार = चित्रा आकार।"
+
 #: src/file_conversor/cli/image/to_pdf_cmd.py:66
+#: src/file_conversor/cli/image/to_pdf_cmd.py:68
 msgid "Figure adjusted to fit in PDF size"
 msgstr "पीडीएफ आकार में फिट होने के लिए समायोजित चित्र"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:66
+#: src/file_conversor/cli/image/to_pdf_cmd.py:68
 msgid "without any empty borders (cut figure if needed)"
 msgstr "किसी भी खाली सीमाओं के बिना (यदि आवश्यक हो तो कट आंकड़ा)"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:83
+#: src/file_conversor/cli/image/to_pdf_cmd.py:85
 msgid "Image fit. Valid only if ``--page-size`` is defined. Valid values are"
 msgstr ""
-"छवि फिट। यदि ``--पेज-आकार`` को परिभाषित किया गया है, तो मान्य है। मान्य मान "
-"हैं"
+"छवि फिट। यदि ``--पेज-आकार`` को परिभाषित किया गया है, तो मान्य है। मान्य "
+"मान हैं"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:90
 msgid "Page size. Format '(width, height)'. Other valid values are:"
 msgstr "पृष्ठ का आकार। प्रारूप '(चौड़ाई, ऊंचाई)'। अन्य मान्य मान हैं:"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:90
 msgid "Defaults to None (PDF size = image size)."
 msgstr "कोई नहीं (पीडीएफ आकार = छवि आकार) के लिए चूक।"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:93
+#: src/file_conversor/cli/image/to_pdf_cmd.py:95
 msgid ""
 "Set PDF metadata. Defaults to False (do not set creator, producer, "
 "modification date, etc)."
 msgstr ""
-"पीडीएफ मेटाडेटा सेट करें। FALSE के लिए चूक (निर्माता, निर्माता, संशोधन तिथि,"
-" आदि सेट न करें)।"
+"पीडीएफ मेटाडेटा सेट करें। FALSE के लिए चूक (निर्माता, निर्माता, संशोधन "
+"तिथि, आदि सेट न करें)।"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:122
+#: src/file_conversor/cli/image/to_pdf_cmd.py:124
 msgid "PDF generation"
 msgstr "पीडीएफ पीढ़ी"
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:41
+msgid "Applies unsharp mask to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:58
+msgid "Unsharp strength, in percent"
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:64
+msgid "Threshold controls the minimum brightness change that will be sharpened"
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:86
+msgid "Image unsharp"
+msgstr ""
 
 #: src/file_conversor/cli/pdf/__init__.py:25
 msgid "PDF file manipulation"
@@ -705,80 +878,75 @@ msgstr "पीडीएफ फाइल हेरफेर"
 msgid "Security commands"
 msgstr "सुरक्षा आज्ञाएँ"
 
-#: src/file_conversor/cli/pdf/_typer.py:9
-msgid "Transformations"
-msgstr "परिवर्तनों"
-
-#: src/file_conversor/cli/pdf/compress_cmd.py:61
+#: src/file_conversor/cli/pdf/compress_cmd.py:66
 msgid "Compress a PDF file (requires Ghostscript external library)."
 msgstr ""
-"एक पीडीएफ फाइल को संपीड़ित करें (घोस्टस्क्रिप्ट बाहरी लाइब्रेरी की आवश्यकता "
-"है)।"
+"एक पीडीएफ फाइल को संपीड़ित करें (घोस्टस्क्रिप्ट बाहरी लाइब्रेरी की "
+"आवश्यकता है)।"
 
-#: src/file_conversor/cli/pdf/compress_cmd.py:63
+#: src/file_conversor/cli/pdf/compress_cmd.py:68
 msgid "Outputs a file with _compressed at the end."
 msgstr "अंत में _compressed के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/compress_cmd.py:110
+#: src/file_conversor/cli/pdf/compress_cmd.py:115
 msgid "File compression"
 msgstr "संचिका संपीड़न"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:65
+#: src/file_conversor/cli/pdf/convert_cmd.py:67
 msgid "Convert a PDF file to a different format."
 msgstr "एक पीडीएफ फ़ाइल को एक अलग प्रारूप में बदलें।"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:67
+#: src/file_conversor/cli/pdf/convert_cmd.py:69
 msgid "Outputs a file with the PDF page number at the end."
 msgstr "अंत में पीडीएफ पेज नंबर के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:95
+#: src/file_conversor/cli/pdf/convert_cmd.py:97
 msgid "File convertion"
 msgstr "संचिका अभिसरण"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:59
-msgid ""
-"Remove password protection from a PDF file  (create decrypted PDF file)."
-msgstr ""
-"एक पीडीएफ फ़ाइल से पासवर्ड सुरक्षा निकालें (डिक्रिप्टेड पीडीएफ फाइल बनाएं)।"
-
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:61
+msgid "Remove password protection from a PDF file  (create decrypted PDF file)."
+msgstr ""
+"एक पीडीएफ फ़ाइल से पासवर्ड सुरक्षा निकालें (डिक्रिप्टेड पीडीएफ फाइल "
+"बनाएं)।"
+
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:63
 msgid "Outputs a file with _decrypted at the end."
 msgstr "अंत में _decrypted के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:73
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:75
 msgid "Password used for decryption."
 msgstr "डिक्रिप्शन के लिए उपयोग किया गया पासवर्ड।"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:74
-msgid ""
-"Password for decryption (password will not be displayed, for your safety)"
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:76
+msgid "Password for decryption (password will not be displayed, for your safety)"
 msgstr ""
-"डिक्रिप्शन के लिए पासवर्ड (पासवर्ड प्रदर्शित नहीं किया जाएगा, आपकी सुरक्षा "
-"के लिए)"
+"डिक्रिप्शन के लिए पासवर्ड (पासवर्ड प्रदर्शित नहीं किया जाएगा, आपकी "
+"सुरक्षा के लिए)"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:91
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 msgid "Decryption"
 msgstr "डिक्रिप्शन"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:59
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:61
 msgid "Protect PDF file with a password (create encrypted PDF file)."
 msgstr ""
 "एक पासवर्ड के साथ पीडीएफ फाइल को सुरक्षित रखें (एन्क्रिप्टेड पीडीएफ फाइल "
 "बनाएं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:61
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:63
 msgid "Outputs a file with _encrypted at the end."
 msgstr "अंत में _encrypted के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:73
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:75
 msgid ""
-"Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF "
-"file."
+"Owner password for encryption. Owner has ALL PERMISSIONS in the output "
+"PDF file."
 msgstr ""
-"एन्क्रिप्शन के लिए मालिक पासवर्ड। मालिक के पास आउटपुट पीडीएफ फाइल में सभी "
-"अनुमतियाँ हैं।"
+"एन्क्रिप्शन के लिए मालिक पासवर्ड। मालिक के पास आउटपुट पीडीएफ फाइल में सभी"
+" अनुमतियाँ हैं।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:74
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:76
 msgid ""
 "Owner password for encryption (password will not be displayed, for your "
 "safety)"
@@ -786,24 +954,24 @@ msgstr ""
 "एन्क्रिप्शन के लिए स्वामी पासवर्ड (पासवर्ड आपकी सुरक्षा के लिए प्रदर्शित "
 "नहीं किया जाएगा)"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:79
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:81
 msgid ""
-"User password for encryption. User has ONLY THE PERMISSIONS specified in the"
-" arguments. Defaults to None (user and owner password are the same)."
+"User password for encryption. User has ONLY THE PERMISSIONS specified in "
+"the arguments. Defaults to None (user and owner password are the same)."
 msgstr ""
 "एन्क्रिप्शन के लिए उपयोगकर्ता पासवर्ड। उपयोगकर्ता के पास केवल तर्कों में "
 "निर्दिष्ट अनुमतियाँ हैं। कोई भी नहीं (उपयोगकर्ता और स्वामी पासवर्ड समान "
 "हैं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:82
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:84
 msgid ""
 "Decrypt password used to open protected file. Defaults to None (do not "
 "decrypt)."
 msgstr ""
-"डिक्रिप्ट पासवर्ड को संरक्षित फ़ाइल खोलने के लिए उपयोग किया जाता है। किसी को"
-" भी चूक (डिक्रिप्ट न करें)।"
+"डिक्रिप्ट पासवर्ड को संरक्षित फ़ाइल खोलने के लिए उपयोग किया जाता है। किसी"
+" को भी चूक (डिक्रिप्ट न करें)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:86
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:88
 msgid ""
 "User can add/modify annotations (comments, highlight text, etc) and "
 "interactive forms. Default to False (not set)."
@@ -811,103 +979,102 @@ msgstr ""
 "उपयोगकर्ता एनोटेशन (टिप्पणियों, हाइलाइट पाठ, आदि) और इंटरैक्टिव रूपों को "
 "जोड़/संशोधित कर सकता है। FALSE के लिए डिफ़ॉल्ट (सेट नहीं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:90
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:92
 msgid ""
 "User can fill form fields (subset permission of --annotate). Default to "
 "False (not set)."
 msgstr ""
-"उपयोगकर्ता फॉर्म फ़ील्ड (सबसेट की अनुमति -Annotate) को भर सकता है। FALSE के "
-"लिए डिफ़ॉल्ट (सेट नहीं)।"
+"उपयोगकर्ता फॉर्म फ़ील्ड (सबसेट की अनुमति -Annotate) को भर सकता है। FALSE "
+"के लिए डिफ़ॉल्ट (सेट नहीं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:94
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:96
 msgid ""
 "User can modify the document (e.g., add / edit text, add / edit images, "
 "etc). Default to False (not set)."
 msgstr ""
-"उपयोगकर्ता दस्तावेज़ को संशोधित कर सकता है (जैसे, पाठ जोड़ें / संपादित करें,"
-" छवियों को जोड़ें / संपादित करें, आदि)। FALSE के लिए डिफ़ॉल्ट (सेट नहीं)।"
+"उपयोगकर्ता दस्तावेज़ को संशोधित कर सकता है (जैसे, पाठ जोड़ें / संपादित "
+"करें, छवियों को जोड़ें / संपादित करें, आदि)। FALSE के लिए डिफ़ॉल्ट (सेट "
+"नहीं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:98
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:100
 msgid ""
-"User can insert, delete, or rotate pages (subset of --modify). Default to "
-"False (not set)."
+"User can insert, delete, or rotate pages (subset of --modify). Default to"
+" False (not set)."
 msgstr ""
 "उपयोगकर्ता पृष्ठों को सम्मिलित, हटा या घुमा सकता है (सबसेट का सबसेट - "
 "-मॉडिफाई)। FALSE के लिए डिफ़ॉल्ट (सेट नहीं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:102
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:104
 msgid "User can copy text/images. Default to False (not set)."
 msgstr ""
-"उपयोगकर्ता पाठ/छवियों की प्रतिलिपि बना सकता है। FALSE के लिए डिफ़ॉल्ट (सेट "
-"नहीं)।"
+"उपयोगकर्ता पाठ/छवियों की प्रतिलिपि बना सकता है। FALSE के लिए डिफ़ॉल्ट "
+"(सेट नहीं)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:106
-msgid ""
-"User can use screen readers for accessibility. Default to True (allow)."
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:108
+msgid "User can use screen readers for accessibility. Default to True (allow)."
 msgstr ""
 "उपयोगकर्ता पहुंच के लिए स्क्रीन पाठकों का उपयोग कर सकते हैं। TRUE के लिए "
 "डिफ़ॉल्ट (अनुमति)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:110
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:112
 msgid "User can print (low quality). Defaults to True (allow)."
-msgstr ""
-"उपयोगकर्ता प्रिंट कर सकता है (कम गुणवत्ता)। सच करने के लिए चूक (अनुमति)।"
+msgstr "उपयोगकर्ता प्रिंट कर सकता है (कम गुणवत्ता)। सच करने के लिए चूक (अनुमति)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:114
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:116
 msgid ""
 "User can print (high quality). Requires --allow-print. Defaults to True "
 "(allow)."
 msgstr ""
-"उपयोगकर्ता प्रिंट कर सकता है (उच्च गुणवत्ता)। आवश्यकता है--प्रिंट। सच करने "
-"के लिए चूक (अनुमति)।"
+"उपयोगकर्ता प्रिंट कर सकता है (उच्च गुणवत्ता)। आवश्यकता है--प्रिंट। सच "
+"करने के लिए चूक (अनुमति)।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:118
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:120
 msgid ""
 "User has ALL PERMISSIONS. If set, it overrides all other permissions. "
 "Defaults to False (not set)."
 msgstr ""
-"उपयोगकर्ता के पास सभी अनुमतियाँ हैं। यदि सेट किया जाता है, तो यह अन्य सभी "
-"अनुमतियों को ओवरराइड करता है। FALSE (सेट नहीं) के लिए चूक।"
+"उपयोगकर्ता के पास सभी अनुमतियाँ हैं। यदि सेट किया जाता है, तो यह अन्य सभी"
+" अनुमतियों को ओवरराइड करता है। FALSE (सेट नहीं) के लिए चूक।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:122
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:124
 msgid ""
 "Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, "
 "AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and "
 "compatibility)."
 msgstr ""
 "एन्क्रिप्शन एल्गोरिथ्म का उपयोग किया गया। वैध विकल्प RC4-40, RC4-128, "
-"AES-128, AES-256-R5, या AES-256 हैं। AES-256 (बढ़ी हुई सुरक्षा और संगतता के "
-"लिए) के लिए चूक।"
+"AES-128, AES-256-R5, या AES-256 हैं। AES-256 (बढ़ी हुई सुरक्षा और संगतता "
+"के लिए) के लिए चूक।"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:158
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:160
 msgid "Encryption"
 msgstr "कूटलेखन"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:59
+#: src/file_conversor/cli/pdf/extract_cmd.py:61
 msgid "Extract specific pages from a PDF."
 msgstr "एक पीडीएफ से विशिष्ट पृष्ठ निकालें।"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:61
+#: src/file_conversor/cli/pdf/extract_cmd.py:63
 msgid "Outputs a file with _extracted at the end."
 msgstr "अंत में _extracted के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:68
+#: src/file_conversor/cli/pdf/extract_cmd.py:70
 msgid "Extract pages 1 to 2, 4 and 6"
 msgstr "पृष्ठ 1 से 2, 4 और 6 निकालें"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:75
+#: src/file_conversor/cli/pdf/extract_cmd.py:77
 msgid "Pages to extract (comma-separated list). Format \"start-end\"."
 msgstr "पृष्ठ निकालने के लिए (अल्पविराम-अलग सूची)। प्रारूप \"स्टार्ट-एंड\"।"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:93
+#: src/file_conversor/cli/pdf/extract_cmd.py:95
 msgid "Extract pages"
 msgstr "पृष्ठ निकालें"
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:61
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:63
 msgid "Extract images from a PDF."
 msgstr "एक पीडीएफ से छवियां निकालें।"
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:63
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:65
 msgid ""
 "For every PDF page, a new image file will be created using the format "
 "`input_file_X`, where X is the page number."
@@ -915,63 +1082,67 @@ msgstr ""
 "प्रत्येक पीडीएफ पृष्ठ के लिए, एक नई छवि फ़ाइल `input_file_x` प्रारूप का "
 "उपयोग करके बनाई जाएगी, जहां x पृष्ठ संख्या है।"
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:87
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
 msgid "Extract images"
 msgstr "छवियों को निकालें"
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:41
+#: src/file_conversor/cli/pdf/merge_cmd.py:43
 msgid "Merge (join) input PDFs into a single PDF file."
 msgstr "एकल पीडीएफ फाइल में मर्ज (जुड़ें) इनपुट पीडीएफएस।"
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:43
+#: src/file_conversor/cli/pdf/merge_cmd.py:45
 msgid "Outputs a file with _merged at the end."
 msgstr "अंत में _merged के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:50
-msgid "Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into \"output_file.pdf\""
-msgstr "मर्ज फाइलें \"input_file1.pdf\" और \"input_file2.pdf\" \"आउटपुट_फाइल.पीडीएफ\" में"
+#: src/file_conversor/cli/pdf/merge_cmd.py:52
+msgid ""
+"Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into "
+"\"output_file.pdf\""
+msgstr ""
+"मर्ज फाइलें \"input_file1.pdf\" और \"input_file2.pdf\" "
+"\"आउटपुट_फाइल.पीडीएफ\" में"
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:56
+#: src/file_conversor/cli/pdf/merge_cmd.py:58
 msgid ""
 "Merge protected PDFs \"input_file1.pdf\" and \"input_file2.pdf\" with "
 "password \"unlock_password\""
 msgstr ""
-"मर्ज संरक्षित pdfs \"input_file1.pdf\" और \"input_file2.pdf\" पासवर्ड के साथ"
-" \"अनलॉक_पासवर्ड\""
+"मर्ज संरक्षित pdfs \"input_file1.pdf\" और \"input_file2.pdf\" पासवर्ड के "
+"साथ \"अनलॉक_पासवर्ड\""
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:81
+#: src/file_conversor/cli/pdf/merge_cmd.py:83
 msgid "Merge pages"
 msgstr "पृष्ठों को मर्ज करें"
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:59
+#: src/file_conversor/cli/pdf/repair_cmd.py:61
 msgid "Repair (lightly) corrupted PDF files."
 msgstr "मरम्मत (हल्के से) पीडीएफ फ़ाइलों को दूषित।"
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:61
+#: src/file_conversor/cli/pdf/repair_cmd.py:63
 msgid "Outputs a file with _repaired at the end."
 msgstr "अंत में _repaired के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:90
+#: src/file_conversor/cli/pdf/repair_cmd.py:92
 msgid "Repair PDF"
 msgstr "मरम्मत पीडीएफ"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:66
+#: src/file_conversor/cli/pdf/rotate_cmd.py:68
 msgid "Rotate PDF pages (clockwise or anti-clockwise)."
 msgstr "पीडीएफ पृष्ठों (दक्षिणावर्त या एंटी-क्लॉकवाइज) को घुमाएं।"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:68
+#: src/file_conversor/cli/pdf/rotate_cmd.py:70
 msgid "Outputs a file with _rotated at the end."
 msgstr "अंत में _rotated के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:75
+#: src/file_conversor/cli/pdf/rotate_cmd.py:77
 msgid "Rotate page 1 by 180 degress"
 msgstr "पृष्ठ 1 को 180 डीग्रेस द्वारा घुमाएं"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:81
+#: src/file_conversor/cli/pdf/rotate_cmd.py:83
 msgid "Rotate page 5-7 by 90 degress, 9 by -90 degrees, 10-15 by 180 degrees"
 msgstr "पेज 5-7 को 90 डिग्रेस, 9 -90 डिग्री, 10-15 से 180 डिग्री तक घुमाएं"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:88
+#: src/file_conversor/cli/pdf/rotate_cmd.py:90
 msgid ""
 "List of pages to rotate. Format ``\"page:rotation\"`` or ``\"start-"
 "end:rotation\"`` or ``\"start-:rotation\"`` ..."
@@ -979,32 +1150,31 @@ msgstr ""
 "घूमने के लिए पृष्ठों की सूची। प्रारूप `` \"पृष्ठ: रोटेशन\" `` या `` `\" "
 "स्टार्ट-एंड: रोटेशन \"` `या` `\" प्रारंभ-: रोटेशन \"` `..."
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:106
+#: src/file_conversor/cli/pdf/rotate_cmd.py:108
 msgid "Rotate pages"
 msgstr "पृष्ठों को घुमाएं"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:60
+#: src/file_conversor/cli/pdf/split_cmd.py:62
 msgid "Split PDF pages into several 1-page PDFs."
 msgstr "पीडीएफ पृष्ठों को कई 1-पेज पीडीएफ में विभाजित करें।"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:62
+#: src/file_conversor/cli/pdf/split_cmd.py:64
 msgid ""
-"For every PDF page, a new single page PDF will be created using the format "
-"`input_file_X.pdf`, where X is the page number."
+"For every PDF page, a new single page PDF will be created using the "
+"format `input_file_X.pdf`, where X is the page number."
 msgstr ""
 "प्रत्येक पीडीएफ पेज के लिए, एक नया सिंगल पेज पीडीएफ प्रारूप "
 "`input_file_x.pdf` का उपयोग करके बनाया जाएगा, जहां x पेज नंबर है।"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:69
+#: src/file_conversor/cli/pdf/split_cmd.py:71
 msgid "Split pages of input_file.pdf into output_file_X.pdf files"
-msgstr ""
-"आउटपुट_फाइल_एक्स.पीडीएफ फाइलों में इनपुट_फाइल.पीडीएफ के पेज स्प्लिट पेज"
+msgstr "आउटपुट_फाइल_एक्स.पीडीएफ फाइलों में इनपुट_फाइल.पीडीएफ के पेज स्प्लिट पेज"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:75
+#: src/file_conversor/cli/pdf/split_cmd.py:77
 msgid "For every PDF page, generate a \"input_file_X.pdf\" file"
 msgstr "प्रत्येक पीडीएफ पृष्ठ के लिए, एक \"input_file_x.pdf\" फ़ाइल उत्पन्न करें"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:97
+#: src/file_conversor/cli/pdf/split_cmd.py:99
 msgid "Split pages"
 msgstr "विभाजित पृष्ठ"
 
@@ -1014,15 +1184,15 @@ msgstr "पाइपलाइन फ़ाइल प्रसंस्करण"
 
 #: src/file_conversor/cli/pipeline/__init__.py:19
 msgid ""
-"The pipeline processsing by processing an input folder, passing those files "
-"to the next pipeline stage, and processing them inside that stage. This "
-"process continues (output of the current stage is the input of the next "
-"stage), until those files reach the end of the pipeline."
+"The pipeline processsing by processing an input folder, passing those "
+"files to the next pipeline stage, and processing them inside that stage. "
+"This process continues (output of the current stage is the input of the "
+"next stage), until those files reach the end of the pipeline."
 msgstr ""
-"पाइपलाइन एक इनपुट फ़ोल्डर को संसाधित करके, उन फ़ाइलों को अगली पाइपलाइन चरण "
-"में पारित करके, और उन्हें उस चरण के अंदर संसाधित करके प्रोसेसिंग करता है। यह"
-" प्रक्रिया जारी है (वर्तमान चरण का आउटपुट अगले चरण का इनपुट है), जब तक कि वे"
-" फाइलें पाइपलाइन के अंत तक नहीं पहुंचती।"
+"पाइपलाइन एक इनपुट फ़ोल्डर को संसाधित करके, उन फ़ाइलों को अगली पाइपलाइन "
+"चरण में पारित करके, और उन्हें उस चरण के अंदर संसाधित करके प्रोसेसिंग करता"
+" है। यह प्रक्रिया जारी है (वर्तमान चरण का आउटपुट अगले चरण का इनपुट है), "
+"जब तक कि वे फाइलें पाइपलाइन के अंत तक नहीं पहुंचती।"
 
 #: src/file_conversor/cli/pipeline/__init__.py:23
 msgid "Example"
@@ -1044,46 +1214,45 @@ msgstr "स्टेज 2"
 msgid "Output Folder"
 msgstr "भेजी गयी चीजों का फोल्डर"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:36
-msgid "Creates a file processing pipeline (for tasks automation)."
-msgstr ""
-"एक फ़ाइल प्रसंस्करण पाइपलाइन बनाता है (कार्यों के लिए स्वचालन के लिए)।"
-
 #: src/file_conversor/cli/pipeline/create_cmd.py:38
-msgid ""
-"Will ask questions interactively to create the file processing pipeline."
-msgstr ""
-"फ़ाइल प्रसंस्करण पाइपलाइन बनाने के लिए अंतःक्रियात्मक रूप से प्रश्न पूछेंगे।"
+msgid "Creates a file processing pipeline (for tasks automation)."
+msgstr "एक फ़ाइल प्रसंस्करण पाइपलाइन बनाता है (कार्यों के लिए स्वचालन के लिए)।"
 
 #: src/file_conversor/cli/pipeline/create_cmd.py:40
+msgid "Will ask questions interactively to create the file processing pipeline."
+msgstr ""
+"फ़ाइल प्रसंस्करण पाइपलाइन बनाने के लिए अंतःक्रियात्मक रूप से प्रश्न "
+"पूछेंगे।"
+
+#: src/file_conversor/cli/pipeline/create_cmd.py:42
 msgid "Placeholders available for commands"
 msgstr "कमांड के लिए उपलब्ध प्लेसहोल्डर"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:42
+#: src/file_conversor/cli/pipeline/create_cmd.py:44
 msgid "Replaced by the first file path found in pipeline stage."
 msgstr "पाइपलाइन चरण में पाए गए पहले फ़ाइल पथ द्वारा प्रतिस्थापित किया गया।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:46
+#: src/file_conversor/cli/pipeline/create_cmd.py:48
 msgid "The name of the input file."
 msgstr "इनपुट फ़ाइल का नाम।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:50
+#: src/file_conversor/cli/pipeline/create_cmd.py:52
 msgid "The extension of the input file."
 msgstr "इनपुट फ़ाइल का विस्तार।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:54
+#: src/file_conversor/cli/pipeline/create_cmd.py:56
 msgid "The directory of the input path (previous pipeline stage)."
 msgstr "इनपुट पथ (पिछली पाइपलाइन चरण) की निर्देशिका।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:58
+#: src/file_conversor/cli/pipeline/create_cmd.py:60
 msgid "The directory of the output path (current pipeline stage)."
 msgstr "आउटपुट पथ (वर्तमान पाइपलाइन चरण) की निर्देशिका।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:68
+#: src/file_conversor/cli/pipeline/create_cmd.py:70
 msgid "Creating batch pipeline"
 msgstr "बैच पाइपलाइन बनाना"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:69
+#: src/file_conversor/cli/pipeline/create_cmd.py:71
 msgid ""
 "Name of the batch pipeline folder (e.g., "
 "%USERPROFILE%/Desktop/pipeline_name_here)"
@@ -1091,35 +1260,35 @@ msgstr ""
 "बैच पाइपलाइन फ़ोल्डर का नाम (जैसे, %userProfile "
 "%/डेस्कटॉप/pipline_name_here)"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:75
+#: src/file_conversor/cli/pipeline/create_cmd.py:77
 msgid "Name of the processing stage (e.g., image_convert)"
 msgstr "प्रसंस्करण चरण का नाम (जैसे, image_convert)"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:77
+#: src/file_conversor/cli/pipeline/create_cmd.py:79
 msgid "Type command here"
 msgstr "यहाँ टाइप करें"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:77
+#: src/file_conversor/cli/pipeline/create_cmd.py:79
 msgid "e.g."
 msgstr "उदा।"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:80
+#: src/file_conversor/cli/pipeline/create_cmd.py:82
 msgid "Need another pipeline stage"
 msgstr "एक और पाइपलाइन चरण की आवश्यकता है"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:89
+#: src/file_conversor/cli/pipeline/create_cmd.py:91
 msgid "Pipeline creation"
 msgstr "पाइपलाइन निर्माण"
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:35
+#: src/file_conversor/cli/pipeline/execute_cmd.py:37
 msgid "Execute file processing pipeline."
 msgstr "फ़ाइल प्रसंस्करण पाइपलाइन निष्पादित करें।"
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:44
+#: src/file_conversor/cli/pipeline/execute_cmd.py:46
 msgid "Pipeline folder"
 msgstr "पाइपलाइन फ़ोल्डर"
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:54
+#: src/file_conversor/cli/pipeline/execute_cmd.py:56
 msgid "Pipeline execution"
 msgstr "पाइपलाइन निष्पादन"
 
@@ -1127,7 +1296,7 @@ msgstr "पाइपलाइन निष्पादन"
 msgid "Presentation file manipulation"
 msgstr "प्रस्तुति संचिका हेरफेर"
 
-#: src/file_conversor/cli/ppt/convert_cmd.py:57
+#: src/file_conversor/cli/ppt/convert_cmd.py:60
 msgid ""
 "Convert presentation files into other formats (requires Microsoft Word / "
 "LibreOffice)."
@@ -1139,33 +1308,215 @@ msgstr ""
 msgid "Text file manipulation (json, xml, etc)"
 msgstr "पाठ फ़ाइल हेरफेर (JSON, XML, आदि)"
 
-#: src/file_conversor/cli/text/check_cmd.py:56
+#: src/file_conversor/cli/text/check_cmd.py:59
 msgid "Checks a text file (json, xml, yaml, etc)."
 msgstr "एक पाठ फ़ाइल (JSON, XML, YAML, आदि) की जाँच करता है।"
 
-#: src/file_conversor/cli/text/check_cmd.py:69
+#: src/file_conversor/cli/text/check_cmd.py:72
 msgid "Checking files"
 msgstr "फ़ाइलों की जाँच करना"
 
-#: src/file_conversor/cli/text/check_cmd.py:77
+#: src/file_conversor/cli/text/check_cmd.py:80
 msgid "Check"
 msgstr "जाँच करना"
 
-#: src/file_conversor/cli/text/compress_cmd.py:58
+#: src/file_conversor/cli/text/compress_cmd.py:61
 msgid "Compress / minify text file formats (json, xml, yaml, etc)."
 msgstr "संपीड़ित / minify पाठ फ़ाइल प्रारूप (JSON, XML, YAML, आदि)।"
 
-#: src/file_conversor/cli/text/compress_cmd.py:60
+#: src/file_conversor/cli/text/compress_cmd.py:63
 msgid "Outputs a file with .min at the end."
 msgstr "अंत में .min के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/text/compress_cmd.py:81
+#: src/file_conversor/cli/text/compress_cmd.py:84
 msgid "Compression"
 msgstr "दबाव"
 
-#: src/file_conversor/cli/text/convert_cmd.py:82
+#: src/file_conversor/cli/text/convert_cmd.py:85
 msgid "Converts text file formats (json, xml, yaml, etc)."
 msgstr "टेक्स्ट फाइल फॉर्मेट (JSON, XML, YAML, आदि) को परिवर्तित करता है।"
+
+#: src/file_conversor/cli/video/__init__.py:27
+msgid "Video file manipulation (requires FFMpeg external library)"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:118
+msgid "Could not determine input file duration"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "Target size too small"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "Increase target size to at least"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "(might not be enougth to achieve good video quality)"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:133
+msgid "Audio bitrate"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:134
+msgid "Video bitrate"
+msgstr ""
+
+#: src/file_conversor/cli/video/check_cmd.py:60
+msgid "Checks a audio/video file for corruption / inconsistencies."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:62
+msgid "Compress a video file to a target file size."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:64
+msgid "Outputs an video file with _compressed at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:76
+msgid "Target file size (<size>[K|M|G]) [0 = do not limit output file size]"
+msgstr ""
+
+#: src/file_conversor/cli/video/convert_cmd.py:82
+msgid "Convert a video file to another video format."
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:63
+msgid "Enhance video bitrate, resolution, fps, color, brightness, etc."
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:102
+msgid "Target Resolution (width:height) [0:0 = do not change video resolution]"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:108
+msgid "Target FPS [0 = do not change FPS]"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:114
+msgid "Color adjustment (> 1.0 increases color, < 1.0 decreases color)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:118
+msgid ""
+"Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases "
+"brightness)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:122
+msgid "Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:126
+msgid "Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:131
+msgid "Apply deshake filter?"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:135
+msgid "Apply unsharp filter?"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:41
+msgid "Execute FFmpeg command (advanced, use with caution)."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+msgid "Apply a custom FFmpeg audio filter"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid ""
+"(advanced option, use with caution). Uses the same format as FFmpeg "
+"filters (e.g., filter=option1=value1:option2=value2:...). Filters are "
+"applied in the order they appear in the command."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid "Defaults to None (do not apply custom filters)"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid "Apply a custom FFmpeg video filter"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:72
+msgid ""
+"Apply a custom FFmpeg output arguments (advanced option, use with "
+"caution)."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:72
+#: src/file_conversor/utils/typer_utils.py:56
+msgid "Defaults to None"
+msgstr "कोई नहीं"
+
+#: src/file_conversor/cli/video/execute_cmd.py:103
+msgid "FFMpeg execution"
+msgstr ""
+
+#: src/file_conversor/cli/video/info_cmd.py:66
+msgid "Get information about a audio/video file."
+msgstr "एक ऑडियो/वीडियो फ़ाइल के बारे में जानकारी प्राप्त करें।"
+
+#: src/file_conversor/cli/video/info_cmd.py:68
+msgid ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+msgstr ""
+"यह कमांड मेटाडेटा और ऑडियो / वीडियो फ़ाइल के बारे में अन्य जानकारी "
+"प्राप्त करता है"
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:40
+msgid "List available video formats and codecs."
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:42
+msgid "If a video format is provided, only codecs for that format will be shown."
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:61
+msgid "Audio codecs"
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:62
+msgid "Video codecs"
+msgstr ""
+
+#: src/file_conversor/cli/video/mirror_cmd.py:69
+msgid "Mirror a video file (vertically or horizontally)."
+msgstr ""
+
+#: src/file_conversor/cli/video/mirror_cmd.py:71
+msgid "Outputs a video file with _mirrored at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:63
+msgid "Resize a video file (downscaling / upscaling)."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:65
+msgid "Outputs a video file with _resized at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:77
+msgid "Enter target resolution (WIDTH:HEIGHT)"
+msgstr ""
+
+#: src/file_conversor/cli/video/rotate_cmd.py:69
+msgid "Rotate a video file (clockwise or anti-clockwise)."
+msgstr ""
+
+#: src/file_conversor/cli/video/rotate_cmd.py:71
+msgid "Outputs an video file with _rotated at the end."
+msgstr ""
 
 #: src/file_conversor/cli/win/__init__.py:18
 msgid "Windows OS commands (for Windows ONLY)"
@@ -1175,46 +1526,45 @@ msgstr "Windows OS कमांड (केवल विंडोज के ल�
 msgid "Context menu"
 msgstr "संदर्भ मेनू"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:40
+#: src/file_conversor/cli/win/install_menu_cmd.py:42
 msgid "Installs app context menu (right click in Windows Explorer)."
 msgstr "ऐप संदर्भ मेनू इंस्टॉल करता है (विंडोज एक्सप्लोरर में राइट क्लिक)।"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:49
+#: src/file_conversor/cli/win/install_menu_cmd.py:51
 msgid ""
-"Restart explorer.exe (to make ctx menu effective immediately). Defaults to "
-"False (do not restart, user must log off/in to make ctx menu changes "
+"Restart explorer.exe (to make ctx menu effective immediately). Defaults "
+"to False (do not restart, user must log off/in to make ctx menu changes "
 "effective)"
 msgstr ""
 "Explorer.exe को पुनरारंभ करें (CTX मेनू को तुरंत प्रभावी बनाने के लिए)। "
 "FALSE के लिए डिफ़ॉल्ट (पुनरारंभ नहीं करते हैं, उपयोगकर्ता को लॉग ऑफ करना "
 "होगा/सीटीएक्स मेनू परिवर्तन को प्रभावी बनाने के लिए)"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:57
+#: src/file_conversor/cli/win/install_menu_cmd.py:59
 msgid "Installing app context menu in Windows Explorer"
 msgstr "Windows Explorer में ऐप संदर्भ मेनू स्थापित करना"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:71
+#: src/file_conversor/cli/win/install_menu_cmd.py:73
 msgid "Context Menu Install"
 msgstr "संदर्भ मेनू स्थापित करें"
 
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:35
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:37
 msgid "Restarts explorer.exe (to refresh ctx menus)."
 msgstr "RESTARTS Explorer.exe (CTX मेनू को ताज़ा करने के लिए)।"
 
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:43
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:45
 msgid "Restarting explorer.exe"
 msgstr "Explorer.exe को पुनरारंभ करना"
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:37
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:39
 msgid "Uninstalls app context menu (right click in Windows Explorer)."
-msgstr ""
-"ऐप संदर्भ मेनू को अनइंस्टॉल करता है (विंडोज एक्सप्लोरर में राइट क्लिक)।"
+msgstr "ऐप संदर्भ मेनू को अनइंस्टॉल करता है (विंडोज एक्सप्लोरर में राइट क्लिक)।"
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:47
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:49
 msgid "Removing app context menu from Windows Explorer"
 msgstr "विंडोज एक्सप्लोरर से ऐप संदर्भ मेनू को हटाना"
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:56
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:58
 msgid "Context Menu Uninstall"
 msgstr "संदर्भ मेनू अनइंस्टॉल"
 
@@ -1222,13 +1572,13 @@ msgstr "संदर्भ मेनू अनइंस्टॉल"
 msgid "Spreadsheet file manipulation"
 msgstr "स्प्रेडशीट फ़ाइल हेरफेर"
 
-#: src/file_conversor/cli/xls/convert_cmd.py:57
+#: src/file_conversor/cli/xls/convert_cmd.py:60
 msgid ""
 "Convert spreadsheet files into other formats (requires Microsoft Word / "
 "LibreOffice)."
 msgstr ""
-"स्प्रेडशीट फ़ाइलों को अन्य प्रारूपों में परिवर्तित करें (Microsoft Word / "
-"libreoffice की आवश्यकता होती है)।"
+"स्प्रेडशीट फ़ाइलों को अन्य प्रारूपों में परिवर्तित करें (Microsoft Word /"
+" libreoffice की आवश्यकता होती है)।"
 
 #: src/file_conversor/dependency/abstract_pkg_manager.py:57
 msgid "Executable"
@@ -1286,41 +1636,41 @@ msgstr "बाल्टी"
 msgid "added to scoop"
 msgstr "स्कूप में जोड़ा गया"
 
-#: src/file_conversor/utils/formatters.py:17
+#: src/file_conversor/utils/formatters.py:36
 msgid "Scale and width not provided"
 msgstr "स्केल और चौड़ाई प्रदान नहीं की"
 
-#: src/file_conversor/utils/formatters.py:18
+#: src/file_conversor/utils/formatters.py:37
 msgid "Output image scale (e.g., 1.5)"
 msgstr "आउटपुट इमेज स्केल (जैसे, 1.5)"
 
-#: src/file_conversor/utils/formatters.py:29
+#: src/file_conversor/utils/formatters.py:48
 msgid "Invalid rotation instruction"
 msgstr "अमान्य रोटेशन अनुदेश"
 
-#: src/file_conversor/utils/formatters.py:29
+#: src/file_conversor/utils/formatters.py:48
 msgid "Valid format is 'begin-end:degree' or 'page:degree'"
 msgstr "मान्य प्रारूप 'बिगिन-एंड: डिग्री' या 'पेज: डिग्री' है"
 
-#: src/file_conversor/utils/formatters.py:40
-#: src/file_conversor/utils/formatters.py:65
+#: src/file_conversor/utils/formatters.py:59
+#: src/file_conversor/utils/formatters.py:84
 msgid "Invalid begin-end page interval"
 msgstr "अमान्य शुरुआत-अंत पृष्ठ अंतराल"
 
-#: src/file_conversor/utils/formatters.py:40
-#: src/file_conversor/utils/formatters.py:65
+#: src/file_conversor/utils/formatters.py:59
+#: src/file_conversor/utils/formatters.py:84
 msgid "End Page < Begin Page"
 msgstr "अंतिम पृष्ठ <शुरू पृष्ठ"
 
-#: src/file_conversor/utils/formatters.py:50
+#: src/file_conversor/utils/formatters.py:69
 msgid "Pages to extract [comma-separated list] (e.g., 1-3, 7-7)"
 msgstr "पृष्ठ निकालने के लिए [अल्पविराम-अलग सूची] (जैसे, 1-3, 7-7)"
 
-#: src/file_conversor/utils/formatters.py:58
+#: src/file_conversor/utils/formatters.py:77
 msgid "Invalid page instruction"
 msgstr "अमान्य पृष्ठ अनुदेश"
 
-#: src/file_conversor/utils/formatters.py:58
+#: src/file_conversor/utils/formatters.py:77
 msgid "Valid format is 'begin-end'"
 msgstr "मान्य प्रारूप 'शुरुआत-अंत' है"
 
@@ -1328,92 +1678,241 @@ msgstr "मान्य प्रारूप 'शुरुआत-अंत' ह
 msgid "Processing files:"
 msgstr "प्रसंस्करण फ़ाइलें:"
 
-#: src/file_conversor/utils/typer_utils.py:18
-#: src/file_conversor/utils/typer_utils.py:22
+#: src/file_conversor/utils/typer_utils.py:25
 msgid "Input files"
 msgstr "इनपुट फ़ाइलें"
 
-#: src/file_conversor/utils/typer_utils.py:31
+#: src/file_conversor/utils/typer_utils.py:38
 msgid "Output format"
 msgstr "आउटपुट प्रारूप"
 
-#: src/file_conversor/utils/typer_utils.py:40
+#: src/file_conversor/utils/typer_utils.py:47
 msgid "Output directory"
 msgstr "निर्गम निर्देशिका"
 
-#: src/file_conversor/utils/typer_utils.py:40
+#: src/file_conversor/utils/typer_utils.py:47
 msgid "Defaults to current working directory"
 msgstr "वर्तमान कार्य निर्देशिका के लिए चूक"
 
-#: src/file_conversor/utils/typer_utils.py:49
+#: src/file_conversor/utils/typer_utils.py:56
 msgid "Output file"
 msgstr "आउटपुट फ़ाइल"
 
-#: src/file_conversor/utils/typer_utils.py:49
-msgid "Defaults to None"
-msgstr "कोई नहीं"
-
-#: src/file_conversor/utils/typer_utils.py:49
+#: src/file_conversor/utils/typer_utils.py:56
 msgid "use the same 1st input file as output name"
 msgstr "आउटपुट नाम के रूप में एक ही 1 इनपुट फ़ाइल का उपयोग करें"
 
-#: src/file_conversor/utils/typer_utils.py:58
+#: src/file_conversor/utils/typer_utils.py:69
 msgid "Image quality. Valid values are between 1-100."
 msgstr "छवि के गुणवत्ता। मान्य मान 1-100 के बीच हैं।"
 
-#: src/file_conversor/utils/typer_utils.py:67
+#: src/file_conversor/utils/typer_utils.py:79
 msgid ""
-"Image quality in dots per inch (DPI). Valid values are between 40-3600."
+"Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip "
+"vertically)."
 msgstr ""
-"डॉट्स प्रति इंच (DPI) में छवि की गुणवत्ता। मान्य मान 40-3600 के बीच हैं।"
 
-#: src/file_conversor/utils/typer_utils.py:76
+#: src/file_conversor/utils/typer_utils.py:89
+msgid "Image quality in dots per inch (DPI). Valid values are between 40-3600."
+msgstr "डॉट्स प्रति इंच (DPI) में छवि की गुणवत्ता। मान्य मान 40-3600 के बीच हैं।"
+
+#: src/file_conversor/utils/typer_utils.py:100
 msgid ""
-"Password used to open protected file. Defaults to None (do not decrypt)."
+"Adjust brightness. brightness = 1.00 means no change. brightness < 1.00 "
+"makes image black. brightness > 1.00 makes image lighter."
 msgstr ""
-"संरक्षित फ़ाइल खोलने के लिए उपयोग किया जाता है। किसी को भी चूक (डिक्रिप्ट न "
-"करें)।"
 
-#: src/file_conversor/utils/validators.py:28
-#: src/file_conversor/utils/validators.py:37
+#: src/file_conversor/utils/typer_utils.py:109
+msgid ""
+"Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces"
+" contrast (grayish image). contrast > 1.00 increases contrast."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:118
+msgid ""
+"Adjust color. color = 1.00 means no change. color < 1.00 reduces color "
+"saturation. color > 1.00 increases color saturation."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:127
+msgid ""
+"Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 "
+"makes image more blurry. sharpness > 1.00 increases image crispness (and "
+"noise as well)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:135
+msgid "Box radius (in pixels)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:149
+msgid "Password used to open protected file. Defaults to None (do not decrypt)."
+msgstr ""
+"संरक्षित फ़ाइल खोलने के लिए उपयोग किया जाता है। किसी को भी चूक (डिक्रिप्ट"
+" न करें)।"
+
+#: src/file_conversor/utils/typer_utils.py:161
+msgid "Target file size."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:161
+msgid ""
+"Format <size>[K|M|G]. If 0, do not limit output file size (use encoding "
+"speed and quality options to calculate output file size)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:181
+msgid ""
+"Overrides video quality setting (if set). If 0, use video quality setting"
+" to encode video using variable bitrate (CRF) encoding (if supported by "
+"codec, otherwise use default bitrate for codec/container)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:191
+msgid ""
+"Audio codec. Not all codecs are supported in a given format container "
+"(run `file_conversor video list-formats` for more information). Available"
+" options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:191
+#: src/file_conversor/utils/typer_utils.py:201
+msgid "Defaults to None (use the default for the file container)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:201
+msgid ""
+"Video codec. Not all codecs are supported in a given format container "
+"(run `file_conversor video list-formats` for more information). Available"
+" options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+msgid "Video encoding speed/quality trade-off. Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+msgid ""
+"Faster encoding speed usually results in lower video quality and larger "
+"file size"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+#: src/file_conversor/utils/typer_utils.py:221
+msgid "Defaults to 'medium'"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:221
+msgid "Video quality preset. Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:221
+msgid ""
+"Higher quality usually results in larger file size. Video bitrate (if "
+"set) overrides this setting."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:231
+msgid ""
+"Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to "
+"None (use same resolution as video source)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:241
+msgid ""
+"Target video FPS (frames per second). Uses ``minterpolate`` filter to "
+"adjust fps. Defaults to None (use same fps as video source)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:251
+msgid "Rotate video (clockwise). Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:262
+msgid "Adjust gamma"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:262
+msgid ""
+"gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma"
+" > 1.00 increases image lightenss"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:270
+msgid "Increase video sharpness (using unsharp mask). May increase image noise."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:270
+#: src/file_conversor/utils/typer_utils.py:279
+msgid "Defaults to False (do not apply filter)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:279
+msgid "Deshake video (attempt to fix vertical/horizontal span from handrecoding)"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:72
+msgid "Invalid file size"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:72
+msgid "Valid file size is <size>[K|M|G]"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:95
+#: src/file_conversor/utils/validators.py:98
+msgid "Invalid format for video resolution"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:95
+#: src/file_conversor/utils/validators.py:98
+msgid "Valid format is WIDTH:HEIGHT"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:116
+#: src/file_conversor/utils/validators.py:125
 msgid "Path"
 msgstr "पथ"
 
-#: src/file_conversor/utils/validators.py:28
+#: src/file_conversor/utils/validators.py:116
 msgid "is not a file"
 msgstr "एक फ़ाइल नहीं है"
 
-#: src/file_conversor/utils/validators.py:37
+#: src/file_conversor/utils/validators.py:125
 msgid "is not a directory"
 msgstr "एक निर्देशिका नहीं है"
 
-#: src/file_conversor/utils/validators.py:54
+#: src/file_conversor/utils/validators.py:142
 msgid "Must be a bool or None."
 msgstr "एक बूल होना चाहिए या कोई नहीं।"
 
-#: src/file_conversor/utils/validators.py:64
+#: src/file_conversor/utils/validators.py:152
 msgid "Must be a positive integer."
 msgstr "एक सकारात्मक पूर्णांक होना चाहिए।"
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "Invalid type"
 msgstr "अमान्य प्रकार"
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "for"
 msgstr "के लिए"
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "Valid values are Iterable | str | None"
 msgstr "मान्य मान Iterable हैं | str | कोई नहीं"
 
-#: src/file_conversor/utils/validators.py:92
+#: src/file_conversor/utils/validators.py:180
 msgid "Unsupported format"
 msgstr "असमर्थित प्रारूप"
 
-#: src/file_conversor/utils/validators.py:92
+#: src/file_conversor/utils/validators.py:180
 msgid "Supported formats are"
 msgstr "समर्थित प्रारूप हैं"
+
+#: src/file_conversor/utils/validators.py:190
+msgid "is invalid.  Valid options are"
+msgstr ""
 
 #~ msgid "Multimedia files"
 #~ msgstr "मल्टीमीडिया फाइलें"
@@ -1431,15 +1930,25 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgstr "बैच फ़ाइल प्रसंस्करण"
 
 #~ msgid ""
-#~ "The batch processing pipeline works by monitoring an input folder, passing "
-#~ "those files to the next pipeline stage, and processing them inside that "
-#~ "stage. This process continues (output of the current stage is the input of "
-#~ "the next stage), until those files reach the end of the pipeline."
+#~ "The batch processing pipeline works by"
+#~ " monitoring an input folder, passing "
+#~ "those files to the next pipeline "
+#~ "stage, and processing them inside that"
+#~ " stage. This process continues (output "
+#~ "of the current stage is the input"
+#~ " of the next stage), until those "
+#~ "files reach the end of the "
+#~ "pipeline."
 #~ msgstr ""
-#~ "बैच प्रोसेसिंग पाइपलाइन एक इनपुट फ़ोल्डर की निगरानी करके काम करती है, उन "
-#~ "फ़ाइलों को अगले पाइपलाइन चरण में पारित करती है, और उन्हें उस चरण के अंदर "
-#~ "संसाधित करती है। यह प्रक्रिया जारी है (वर्तमान चरण का आउटपुट अगले चरण का "
-#~ "इनपुट है), जब तक कि वे फाइलें पाइपलाइन के अंत तक नहीं पहुंचती।"
+#~ "बैच प्रोसेसिंग पाइपलाइन एक इनपुट फ़ोल्डर"
+#~ " की निगरानी करके काम करती है, "
+#~ "उन फ़ाइलों को अगले पाइपलाइन चरण "
+#~ "में पारित करती है, और उन्हें उस"
+#~ " चरण के अंदर संसाधित करती है। "
+#~ "यह प्रक्रिया जारी है (वर्तमान चरण "
+#~ "का आउटपुट अगले चरण का इनपुट है),"
+#~ " जब तक कि वे फाइलें पाइपलाइन के"
+#~ " अंत तक नहीं पहुंचती।"
 
 #~ msgid "Show the application help"
 #~ msgstr "आवेदन सहायता दिखाएं"
@@ -1464,8 +1973,9 @@ msgstr "समर्थित प्रारूप हैं"
 
 #~ msgid "Installs external dependencies automatically (using package managers)"
 #~ msgstr ""
-#~ "बाहरी निर्भरता स्वचालित रूप से स्थापित करता है (पैकेज प्रबंधकों का उपयोग "
-#~ "करके)"
+#~ "बाहरी निर्भरता स्वचालित रूप से स्थापित"
+#~ " करता है (पैकेज प्रबंधकों का उपयोग"
+#~ " करके)"
 
 #~ msgid "Parsing file metadata"
 #~ msgstr "पार्सिंग फ़ाइल मेटाडेटा"
@@ -1477,13 +1987,14 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgstr "प्रसंस्करण संचिका"
 
 #~ msgid "Creates a batch file processing pipeline (for tasks automation)."
-#~ msgstr ""
-#~ "एक बैच फ़ाइल प्रसंस्करण पाइपलाइन बनाता है (कार्यों के स्वचालन के लिए)।"
+#~ msgstr "एक बैच फ़ाइल प्रसंस्करण पाइपलाइन बनाता है (कार्यों के स्वचालन के लिए)।"
 
 #~ msgid ""
-#~ "Will ask questions interactively to create a batch file processing pipeline."
+#~ "Will ask questions interactively to "
+#~ "create a batch file processing pipeline."
 #~ msgstr ""
-#~ "बैच फ़ाइल प्रसंस्करण पाइपलाइन बनाने के लिए अंतःक्रियात्मक रूप से प्रश्न "
+#~ "बैच फ़ाइल प्रसंस्करण पाइपलाइन बनाने के"
+#~ " लिए अंतःक्रियात्मक रूप से प्रश्न "
 #~ "पूछेंगे।"
 
 #~ msgid "Batch creation"
@@ -1496,27 +2007,39 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgstr "बैच निष्पादन"
 
 #~ msgid ""
-#~ "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
-#~ "defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "
+#~ "Image fit (for ``image to_pdf`` "
+#~ "command). Valid only if ``--page-size``"
+#~ " is defined. Valid values are 'into',"
+#~ " or 'fill'. Defaults to 'into'. "
 #~ msgstr ""
-#~ "छवि फिट (`` छवि to_pdf`` कमांड के लिए)। यदि ``--पेज-आकार`` को परिभाषित किया "
-#~ "गया है, तो मान्य है। मान्य मान 'इन', या 'फिल' हैं। 'इन' में चूक।"
+#~ "छवि फिट (`` छवि to_pdf`` कमांड के"
+#~ " लिए)। यदि ``--पेज-आकार`` को परिभाषित "
+#~ "किया गया है, तो मान्य है। मान्य"
+#~ " मान 'इन', या 'फिल' हैं। 'इन' "
+#~ "में चूक।"
 
 #~ msgid ""
-#~ "Page size (for ``image to_pdf`` command). Format (width, height). Other "
-#~ "valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size "
-#~ "= image size)."
+#~ "Page size (for ``image to_pdf`` "
+#~ "command). Format (width, height). Other "
+#~ "valid values are: 'a4_portrait', "
+#~ "'a4_landscape'. Defaults to None (PDF "
+#~ "size = image size)."
 #~ msgstr ""
-#~ "पृष्ठ का आकार (`` छवि to_pdf`` कमांड के लिए)। प्रारूप (चौड़ाई, ऊंचाई)। अन्य "
-#~ "मान्य मान हैं: 'a4_portrait', 'a4_landscape'। कोई नहीं (पीडीएफ आकार = छवि "
-#~ "आकार) के लिए चूक।"
+#~ "पृष्ठ का आकार (`` छवि to_pdf`` "
+#~ "कमांड के लिए)। प्रारूप (चौड़ाई, ऊंचाई)।"
+#~ " अन्य मान्य मान हैं: 'a4_portrait', "
+#~ "'a4_landscape'। कोई नहीं (पीडीएफ आकार ="
+#~ " छवि आकार) के लिए चूक।"
 
 #~ msgid ""
-#~ "Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set "
+#~ "Set PDF metadata (for ``image to_pdf``"
+#~ " command). Defaults to True (set "
 #~ "creator, producer, modification date, etc)."
 #~ msgstr ""
-#~ "PDF मेटाडेटा सेट करें (`` छवि to_pdf`` कमांड के लिए)। TRUE के लिए डिफॉल्ट्स "
-#~ "(सेट क्रिएटर, प्रोड्यूसर, संशोधन तिथि, आदि)।"
+#~ "PDF मेटाडेटा सेट करें (`` छवि "
+#~ "to_pdf`` कमांड के लिए)। TRUE के "
+#~ "लिए डिफॉल्ट्स (सेट क्रिएटर, प्रोड्यूसर, "
+#~ "संशोधन तिथि, आदि)।"
 
 #~ msgid "use the same input file as output name"
 #~ msgstr "आउटपुट नाम के रूप में एक ही इनपुट फ़ाइल का उपयोग करें"
@@ -1528,24 +2051,34 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgstr "छवि गुणवत्ता (केवल JPG के लिए मान्य)। मान्य मान 1-100 के बीच हैं।"
 
 #~ msgid ""
-#~ "Image fit. Valid only if ``--page-size`` is defined. Valid values are "
-#~ "'into', or 'fill'. Defaults to 'into'. "
+#~ "Image fit. Valid only if ``--page-"
+#~ "size`` is defined. Valid values are "
+#~ "'into', or 'fill'. Defaults to 'into'."
+#~ " "
 #~ msgstr ""
-#~ "छवि फिट। यदि ``--पेज-आकार`` को परिभाषित किया गया है, तो मान्य है। मान्य मान "
-#~ "'इन', या 'फिल' हैं। 'इन' में चूक।"
+#~ "छवि फिट। यदि ``--पेज-आकार`` को परिभाषित"
+#~ " किया गया है, तो मान्य है। "
+#~ "मान्य मान 'इन', या 'फिल' हैं। 'इन'"
+#~ " में चूक।"
 
 #~ msgid ""
-#~ "Page size. Format '(width, height)'. Other valid values are: 'a4', "
-#~ "'a4_landscape'. Defaults to None (PDF size = image size)."
+#~ "Page size. Format '(width, height)'. "
+#~ "Other valid values are: 'a4', "
+#~ "'a4_landscape'. Defaults to None (PDF "
+#~ "size = image size)."
 #~ msgstr ""
-#~ "पृष्ठ का आकार। प्रारूप '(चौड़ाई, ऊंचाई)'। अन्य मान्य मान हैं: 'A4', "
-#~ "'A4_LANDSCAPE'। कोई नहीं (पीडीएफ आकार = छवि आकार) के लिए चूक।"
+#~ "पृष्ठ का आकार। प्रारूप '(चौड़ाई, "
+#~ "ऊंचाई)'। अन्य मान्य मान हैं: 'A4', "
+#~ "'A4_LANDSCAPE'। कोई नहीं (पीडीएफ आकार ="
+#~ " छवि आकार) के लिए चूक।"
 
 #~ msgid ""
-#~ "Set PDF metadata. Defaults to True (set creator, producer, modification "
-#~ "date, etc)."
+#~ "Set PDF metadata. Defaults to True "
+#~ "(set creator, producer, modification date, "
+#~ "etc)."
 #~ msgstr ""
-#~ "पीडीएफ मेटाडेटा सेट करें। TRUE के लिए डिफॉल्ट्स (सेट क्रिएटर, प्रोड्यूसर, "
+#~ "पीडीएफ मेटाडेटा सेट करें। TRUE के "
+#~ "लिए डिफॉल्ट्स (सेट क्रिएटर, प्रोड्यूसर, "
 #~ "संशोधन तिथि, आदि)।"
 
 #~ msgid "with _rotated at the end)"
@@ -1556,32 +2089,37 @@ msgstr "समर्थित प्रारूप हैं"
 
 #~ msgid "Repair (lightly) corrupted PDF files (optionally compressing them)."
 #~ msgstr ""
-#~ "मरम्मत (हल्के से) पीडीएफ फ़ाइलों को दूषित (वैकल्पिक रूप से उन्हें संकुचित "
-#~ "करना)।"
+#~ "मरम्मत (हल्के से) पीडीएफ फ़ाइलों को "
+#~ "दूषित (वैकल्पिक रूप से उन्हें संकुचित"
+#~ " करना)।"
 
 #~ msgid "with _repaired.pdf at the end)"
 #~ msgstr "अंत में _repaired.pdf के साथ)"
 
 #~ msgid "Compress output PDF file (losslessly). Defaults to True (compress)."
-#~ msgstr ""
-#~ "आउटपुट पीडीएफ फाइल (दोषरहित) संपीड़ित करें। TRUE (संपीड़ित) के लिए चूक।"
+#~ msgstr "आउटपुट पीडीएफ फाइल (दोषरहित) संपीड़ित करें। TRUE (संपीड़ित) के लिए चूक।"
 
 #~ msgid "with _compressed.pdf at the end)"
 #~ msgstr "अंत में _compressed.pdf के साथ)"
 
 #~ msgid ""
-#~ "Merge protected PDF \"input_file1.pdf\" with password \"unlock_password\" "
-#~ "with unprotected file \"input_file2.pdf\""
+#~ "Merge protected PDF \"input_file1.pdf\" with"
+#~ " password \"unlock_password\" with unprotected"
+#~ " file \"input_file2.pdf\""
 #~ msgstr ""
-#~ "पासवर्ड के साथ संरक्षित पीडीएफ \"input_file1.pdf\" मर्ज \"असुरक्षित फ़ाइल के"
-#~ " साथ\" अनलॉक_पासवर्ड \"\" input_file2.pdf \""
+#~ "पासवर्ड के साथ संरक्षित पीडीएफ "
+#~ "\"input_file1.pdf\" मर्ज \"असुरक्षित फ़ाइल के"
+#~ " साथ\" अनलॉक_पासवर्ड \"\" input_file2.pdf "
+#~ "\""
 
 #~ msgid ""
-#~ "If file is protected, provide its password using the format "
+#~ "If file is protected, provide its "
+#~ "password using the format "
 #~ "`\"filepath:password\"`"
 #~ msgstr ""
-#~ "यदि फ़ाइल संरक्षित है, तो प्रारूप `\" फ़ाइलपैथ: पासवर्ड \"का उपयोग करके अपना"
-#~ " पासवर्ड प्रदान करें"
+#~ "यदि फ़ाइल संरक्षित है, तो प्रारूप "
+#~ "`\" फ़ाइलपैथ: पासवर्ड \"का उपयोग करके"
+#~ " अपना पासवर्ड प्रदान करें"
 
 #~ msgid "use the same input file of 1st file as output name"
 #~ msgstr "आउटपुट नाम के रूप में पहली फ़ाइल की समान इनपुट फ़ाइल का उपयोग करें"
@@ -1596,11 +2134,15 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgstr "मान्य प्रारूप 'FilePath: पासवर्ड' या 'FilePath' है"
 
 #~ msgid ""
-#~ "For every PDF page, a new single page PDF will be created using the format "
-#~ "`output_file_X.pdf`, where X is the page number."
+#~ "For every PDF page, a new single"
+#~ " page PDF will be created using "
+#~ "the format `output_file_X.pdf`, where X "
+#~ "is the page number."
 #~ msgstr ""
-#~ "प्रत्येक पीडीएफ पेज के लिए, एक नया सिंगल पेज पीडीएफ प्रारूप "
-#~ "`आउटपुट_फाइल_एक्स.पीडीएफ` का उपयोग करके बनाया जाएगा, जहां एक्स पेज नंबर है।"
+#~ "प्रत्येक पीडीएफ पेज के लिए, एक नया"
+#~ " सिंगल पेज पीडीएफ प्रारूप "
+#~ "`आउटपुट_फाइल_एक्स.पीडीएफ` का उपयोग करके बनाया"
+#~ " जाएगा, जहां एक्स पेज नंबर है।"
 
 #~ msgid "Output file path"
 #~ msgstr "आउटपुट फ़ाइल पथ"
@@ -1608,9 +2150,12 @@ msgstr "समर्थित प्रारूप हैं"
 #~ msgid "with _extracted.pdf at the end)"
 #~ msgstr "अंत में _extracted.pdf के साथ)"
 
-#~ msgid "Pages to extract (comma-separated list). Format \"page_num\" or \"start-end\"."
+#~ msgid ""
+#~ "Pages to extract (comma-separated list)."
+#~ " Format \"page_num\" or \"start-end\"."
 #~ msgstr ""
-#~ "पृष्ठ निकालने के लिए (अल्पविराम-अलग सूची)। प्रारूप \"page_num\" या "
+#~ "पृष्ठ निकालने के लिए (अल्पविराम-अलग "
+#~ "सूची)। प्रारूप \"page_num\" या "
 #~ "\"स्टार्ट-एंड\"।"
 
 #~ msgid "Pages to extract [comma-separated list] (e.g., 1-3, 7)"
@@ -1627,3 +2172,54 @@ msgstr "समर्थित प्रारूप हैं"
 
 #~ msgid "with _decrypted.pdf at the end)"
 #~ msgstr "अंत में _decrypted.pdf के साथ)"
+
+#~ msgid "Audio / Video file manipulation (requires FFMpeg external library)"
+#~ msgstr "ऑडियो / वीडियो फ़ाइल हेरफेर (FFMPEG बाहरी पुस्तकालय की आवश्यकता है)"
+
+#~ msgid "Convert a audio/video file to a different format."
+#~ msgstr "एक ऑडियो/वीडियो फ़ाइल को एक अलग प्रारूप में बदलें।"
+
+#~ msgid ""
+#~ "This command can be used to "
+#~ "convert audio or video files to "
+#~ "the specified format."
+#~ msgstr ""
+#~ "इस कमांड का उपयोग ऑडियो या वीडियो"
+#~ " फ़ाइलों को निर्दिष्ट प्रारूप में "
+#~ "बदलने के लिए किया जा सकता है।"
+
+#~ msgid "Audio bitrate in kbps"
+#~ msgstr "केबीपीएस में ऑडियो बिटरेट"
+
+#~ msgid "Video bitrate in kbps"
+#~ msgstr "KBPS में वीडियो बिटरेट"
+
+#~ msgid "FFMpeg convertion"
+#~ msgstr "FFMPEG कनवर्जन"
+
+#~ msgid ""
+#~ "Set preferred language for app (if "
+#~ "available). Format lang_COUNTRY. Defaults to"
+#~ " system preffered language or 'en_US' "
+#~ "(English - United States)."
+#~ msgstr ""
+#~ "ऐप के लिए पसंदीदा भाषा सेट करें"
+#~ " (यदि उपलब्ध हो)। प्रारूप lang_country। "
+#~ "सिस्टम से पहले की भाषा या 'en_us'"
+#~ " (अंग्रेजी - संयुक्त राज्य अमेरिका) "
+#~ "के लिए चूक।"
+
+#~ msgid "Conversion"
+#~ msgstr "परिवर्तन"
+
+#~ msgid "Transformation"
+#~ msgstr "परिवर्तन"
+
+#~ msgid ""
+#~ "Axis. Valid values are 'x' (mirror "
+#~ "horizontally) or 'y' (flip vertically)."
+#~ msgstr ""
+#~ "अक्ष। मान्य मान 'x' (दर्पण क्षैतिज "
+#~ "रूप से) या 'y' (लंबवत रूप से "
+#~ "फ्लिप) हैं।"
+

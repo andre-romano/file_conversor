@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-30 21:49-0300\n"
+"POT-Creation-Date: 2025-09-16 15:18-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: de_DE <LL@li.org>\n"
 "Language: de_DE\n"
+"Language-Team: de_DE <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: src/file_conversor/backend/abstract_backend.py:43
@@ -27,16 +27,18 @@ msgid "found"
 msgstr "gefunden"
 
 #: src/file_conversor/backend/abstract_backend.py:56
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
+#: src/file_conversor/cli/audio/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:86
 #: src/file_conversor/utils/command_manager.py:51
-#: src/file_conversor/utils/validators.py:19
-#: src/file_conversor/utils/validators.py:21
+#: src/file_conversor/utils/validators.py:107
+#: src/file_conversor/utils/validators.py:109
 msgid "File"
 msgstr "Datei"
 
 #: src/file_conversor/backend/abstract_backend.py:56
 #: src/file_conversor/dependency/abstract_pkg_manager.py:57
-#: src/file_conversor/utils/validators.py:19
+#: src/file_conversor/utils/validators.py:107
 msgid "not found"
 msgstr "nicht gefunden"
 
@@ -54,37 +56,46 @@ msgstr "Paketmanagerinstallation"
 
 #: src/file_conversor/backend/abstract_backend.py:105
 #: src/file_conversor/backend/abstract_backend.py:117
-#: src/file_conversor/backend/batch_backend.py:125
-#: src/file_conversor/cli/audio_video/convert_cmd.py:134
-#: src/file_conversor/cli/doc/convert_cmd.py:86
-#: src/file_conversor/cli/hash/check_cmd.py:80
-#: src/file_conversor/cli/hash/create_cmd.py:66
-#: src/file_conversor/cli/image/compress_cmd.py:92
-#: src/file_conversor/cli/image/convert_cmd.py:99
-#: src/file_conversor/cli/image/mirror_cmd.py:96
-#: src/file_conversor/cli/image/render_cmd.py:93
-#: src/file_conversor/cli/image/resize_cmd.py:114
-#: src/file_conversor/cli/image/rotate_cmd.py:107
-#: src/file_conversor/cli/image/to_pdf_cmd.py:122
-#: src/file_conversor/cli/pdf/compress_cmd.py:110
-#: src/file_conversor/cli/pdf/convert_cmd.py:95
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:91
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:158
-#: src/file_conversor/cli/pdf/extract_cmd.py:93
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:87
-#: src/file_conversor/cli/pdf/merge_cmd.py:81
-#: src/file_conversor/cli/pdf/repair_cmd.py:90
-#: src/file_conversor/cli/pdf/rotate_cmd.py:106
-#: src/file_conversor/cli/pdf/split_cmd.py:97
-#: src/file_conversor/cli/pipeline/create_cmd.py:89
-#: src/file_conversor/cli/pipeline/execute_cmd.py:54
-#: src/file_conversor/cli/ppt/convert_cmd.py:84
-#: src/file_conversor/cli/text/check_cmd.py:77
-#: src/file_conversor/cli/text/compress_cmd.py:81
-#: src/file_conversor/cli/text/convert_cmd.py:104
-#: src/file_conversor/cli/win/install_menu_cmd.py:71
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:56
-#: src/file_conversor/cli/xls/convert_cmd.py:84
+#: src/file_conversor/backend/batch_backend.py:127
+#: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
+#: src/file_conversor/cli/audio/check_cmd.py:91
+#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/hash/check_cmd.py:82
+#: src/file_conversor/cli/hash/create_cmd.py:68
+#: src/file_conversor/cli/image/antialias_cmd.py:96
+#: src/file_conversor/cli/image/blur_cmd.py:71
+#: src/file_conversor/cli/image/compress_cmd.py:94
+#: src/file_conversor/cli/image/convert_cmd.py:95
+#: src/file_conversor/cli/image/enhance_cmd.py:106
+#: src/file_conversor/cli/image/filter_cmd.py:95
+#: src/file_conversor/cli/image/mirror_cmd.py:95
+#: src/file_conversor/cli/image/render_cmd.py:95
+#: src/file_conversor/cli/image/resize_cmd.py:116
+#: src/file_conversor/cli/image/rotate_cmd.py:109
+#: src/file_conversor/cli/image/to_pdf_cmd.py:124
+#: src/file_conversor/cli/image/unsharp_cmd.py:86
+#: src/file_conversor/cli/pdf/compress_cmd.py:115
+#: src/file_conversor/cli/pdf/convert_cmd.py:97
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:93
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:160
+#: src/file_conversor/cli/pdf/extract_cmd.py:95
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
+#: src/file_conversor/cli/pdf/merge_cmd.py:83
+#: src/file_conversor/cli/pdf/repair_cmd.py:92
+#: src/file_conversor/cli/pdf/rotate_cmd.py:108
+#: src/file_conversor/cli/pdf/split_cmd.py:99
+#: src/file_conversor/cli/pipeline/create_cmd.py:91
+#: src/file_conversor/cli/pipeline/execute_cmd.py:56
+#: src/file_conversor/cli/ppt/convert_cmd.py:87
+#: src/file_conversor/cli/text/check_cmd.py:80
+#: src/file_conversor/cli/text/compress_cmd.py:84
+#: src/file_conversor/cli/text/convert_cmd.py:107
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:168
+#: src/file_conversor/cli/video/check_cmd.py:92
+#: src/file_conversor/cli/video/execute_cmd.py:103
+#: src/file_conversor/cli/win/install_menu_cmd.py:73
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:58
+#: src/file_conversor/cli/xls/convert_cmd.py:87
 msgid "SUCCESS"
 msgstr "ERFOLG"
 
@@ -96,83 +107,134 @@ msgstr "Fehlende Abhängigkeiten für den aktuellen Benutzer installieren?"
 msgid "External Dependencies Installation"
 msgstr "Externe Abhängigkeiten Installation"
 
-#: src/file_conversor/backend/batch_backend.py:70
+#: src/file_conversor/backend/batch_backend.py:72
 msgid "Pipeline stage created at"
 msgstr "Pipeline -Stufe erstellt bei"
 
-#: src/file_conversor/backend/batch_backend.py:75
+#: src/file_conversor/backend/batch_backend.py:77
 msgid "Config file saved at"
 msgstr "Konfigurationsdatei gespeichert bei"
 
-#: src/file_conversor/backend/batch_backend.py:84
+#: src/file_conversor/backend/batch_backend.py:86
 msgid "Config file"
 msgstr "Konfigurationsdatei"
 
-#: src/file_conversor/backend/batch_backend.py:84
+#: src/file_conversor/backend/batch_backend.py:86
 msgid "does not exist"
 msgstr "existiert nicht"
 
-#: src/file_conversor/backend/batch_backend.py:85
+#: src/file_conversor/backend/batch_backend.py:87
 msgid "Loading"
 msgstr "Laden"
 
-#: src/file_conversor/backend/batch_backend.py:89
+#: src/file_conversor/backend/batch_backend.py:91
 msgid "Found"
 msgstr "Gefunden"
 
-#: src/file_conversor/backend/batch_backend.py:89
+#: src/file_conversor/backend/batch_backend.py:91
 msgid "stages"
 msgstr "Stufen"
 
-#: src/file_conversor/backend/batch_backend.py:97
 #: src/file_conversor/backend/batch_backend.py:99
+#: src/file_conversor/backend/batch_backend.py:101
 msgid "Processing stage"
 msgstr "Verarbeitungsstufe"
 
-#: src/file_conversor/backend/batch_backend.py:113
+#: src/file_conversor/backend/batch_backend.py:115
 msgid "Executing batch stage"
 msgstr "Ausführende Stapelstufe"
 
-#: src/file_conversor/backend/batch_backend.py:115
+#: src/file_conversor/backend/batch_backend.py:117
 msgid "Stage"
 msgstr "Bühne"
 
-#: src/file_conversor/backend/batch_backend.py:115
+#: src/file_conversor/backend/batch_backend.py:117
 msgid "Processing files"
 msgstr "Verarbeitungsdateien"
 
-#: src/file_conversor/backend/batch_backend.py:127
+#: src/file_conversor/backend/batch_backend.py:129
+#: src/file_conversor/cli/audio/check_cmd.py:84
+#: src/file_conversor/cli/video/check_cmd.py:85
 msgid "FAILED"
 msgstr "FEHLGESCHLAGEN"
 
-#: src/file_conversor/backend/batch_backend.py:139
+#: src/file_conversor/backend/batch_backend.py:141
 msgid "Finished batch stage"
 msgstr "Fertige Stapelstufe"
 
-#: src/file_conversor/backend/image/pillow_backend.py:115
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:99
+msgid "Input file not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:207
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:267
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:325
+msgid "Output container not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
+msgid "Invalid number of passes:"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
+msgid "Must be 0 (single-pass), 1 (first pass) or 2 (second pass)."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:322
+msgid "Input/output files not set"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:334
+msgid "Temporary 2-pass log file"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:341
+msgid "Audio bitrate cannot be 0 when using two-pass mode."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_backend.py:343
+msgid "Video bitrate cannot be 0 when using two-pass mode."
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:141
+msgid "profile not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:147
+msgid "speed not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/ffmpeg_codec.py:153
+msgid "quality not available for codec"
+msgstr ""
+
+#: src/file_conversor/backend/audio_video/format_container.py:25
+msgid "not available. Available codecs are:"
+msgstr ""
+
+#: src/file_conversor/backend/image/pillow_backend.py:128
 msgid "Scale must be >0"
 msgstr "Die Skala muss> 0 sein"
 
-#: src/file_conversor/backend/image/pillow_backend.py:118
+#: src/file_conversor/backend/image/pillow_backend.py:131
 msgid "Need either scale or width to resize an image"
-msgstr ""
-"Benötigen entweder Skala oder Breite, um die Größe eines Bildes zu ändern"
+msgstr "Benötigen entweder Skala oder Breite, um die Größe eines Bildes zu ändern"
 
-#: src/file_conversor/backend/image/pillow_backend.py:120
+#: src/file_conversor/backend/image/pillow_backend.py:133
 msgid "Width must be > 0"
 msgstr "Die Breite muss> 0 sein"
 
-#: src/file_conversor/backend/image/pillow_backend.py:155
+#: src/file_conversor/backend/image/pillow_backend.py:168
 msgid "Invalid quality level. Valid values are"
 msgstr "Ungültiges Qualitätsniveau. Gültige Werte sind"
 
-#: src/file_conversor/backend/image/pillow_backend.py:267
+#: src/file_conversor/backend/image/pillow_backend.py:485
 msgid "Image correction failed"
 msgstr "Bildkorrektur ist fehlgeschlagen"
 
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
 #: src/file_conversor/utils/command_manager.py:51
-#: src/file_conversor/utils/validators.py:21
+#: src/file_conversor/utils/validators.py:109
 msgid "exists"
 msgstr "existiert"
 
@@ -210,171 +272,200 @@ msgstr "Version anzeigen"
 msgid "Overwrite output files"
 msgstr "Überschreiben Sie die Ausgabedateien"
 
-#: src/file_conversor/cli/_typer.py:26
+#: src/file_conversor/cli/_typer.py:27
 msgid "Office files"
 msgstr "Office -Dateien"
 
-#: src/file_conversor/cli/_typer.py:27
+#: src/file_conversor/cli/_typer.py:28
 msgid "Other files"
 msgstr "Andere Dateien"
 
-#: src/file_conversor/cli/_typer.py:28
+#: src/file_conversor/cli/_typer.py:29
 msgid "Utils and Config"
 msgstr "Utils und Konfiguration"
 
-#: src/file_conversor/cli/audio_video/__init__.py:19
-msgid "Audio / Video file manipulation (requires FFMpeg external library)"
+#: src/file_conversor/cli/audio/__init__.py:20
+msgid "Audio file manipulation (requires FFMpeg external library)"
 msgstr ""
-"Audio / Videodatei Manipulation (erfordert die externe Bibliothek der "
-"FFMPEG)"
 
-#: src/file_conversor/cli/audio_video/convert_cmd.py:80
-msgid "Convert a audio/video file to a different format."
-msgstr "Konvertieren Sie eine Audio-/Videodatei in ein anderes Format."
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:82
-msgid ""
-"This command can be used to convert audio or video files to the specified "
-"format."
+#: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:168
+msgid "FFMpeg result"
 msgstr ""
-"Dieser Befehl kann verwendet werden, um Audio- oder Videodateien in das "
-"angegebene Format umzuwandeln."
 
-#: src/file_conversor/cli/audio_video/convert_cmd.py:85
-#: src/file_conversor/cli/audio_video/info_cmd.py:72
-#: src/file_conversor/cli/config/set_cmd.py:37
-#: src/file_conversor/cli/config/show_cmd.py:34
-#: src/file_conversor/cli/doc/convert_cmd.py:62
-#: src/file_conversor/cli/hash/check_cmd.py:59
-#: src/file_conversor/cli/hash/create_cmd.py:40
-#: src/file_conversor/cli/image/compress_cmd.py:64
-#: src/file_conversor/cli/image/convert_cmd.py:73
-#: src/file_conversor/cli/image/info_cmd.py:65
-#: src/file_conversor/cli/image/mirror_cmd.py:69
-#: src/file_conversor/cli/image/render_cmd.py:67
-#: src/file_conversor/cli/image/resize_cmd.py:67
-#: src/file_conversor/cli/image/rotate_cmd.py:72
-#: src/file_conversor/cli/image/to_pdf_cmd.py:69
-#: src/file_conversor/cli/pdf/compress_cmd.py:66
-#: src/file_conversor/cli/pdf/convert_cmd.py:70
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:64
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:64
-#: src/file_conversor/cli/pdf/extract_cmd.py:64
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:66
-#: src/file_conversor/cli/pdf/merge_cmd.py:46
-#: src/file_conversor/cli/pdf/repair_cmd.py:64
-#: src/file_conversor/cli/pdf/rotate_cmd.py:71
-#: src/file_conversor/cli/pdf/split_cmd.py:65
-#: src/file_conversor/cli/pipeline/create_cmd.py:63
-#: src/file_conversor/cli/pipeline/execute_cmd.py:38
-#: src/file_conversor/cli/ppt/convert_cmd.py:60
-#: src/file_conversor/cli/text/check_cmd.py:59
-#: src/file_conversor/cli/text/compress_cmd.py:63
-#: src/file_conversor/cli/text/convert_cmd.py:85
-#: src/file_conversor/cli/win/install_menu_cmd.py:43
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:38
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:40
-#: src/file_conversor/cli/xls/convert_cmd.py:60
+#: src/file_conversor/cli/audio/check_cmd.py:59
+msgid "Checks a audio file for corruption / inconsistencies."
+msgstr ""
+
+#: src/file_conversor/cli/audio/check_cmd.py:62
+#: src/file_conversor/cli/audio/convert_cmd.py:69
+#: src/file_conversor/cli/audio/info_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:40
+#: src/file_conversor/cli/config/show_cmd.py:36
+#: src/file_conversor/cli/doc/convert_cmd.py:65
+#: src/file_conversor/cli/hash/check_cmd.py:61
+#: src/file_conversor/cli/hash/create_cmd.py:42
+#: src/file_conversor/cli/image/antialias_cmd.py:63
+#: src/file_conversor/cli/image/blur_cmd.py:44
+#: src/file_conversor/cli/image/compress_cmd.py:66
+#: src/file_conversor/cli/image/convert_cmd.py:69
+#: src/file_conversor/cli/image/enhance_cmd.py:62
+#: src/file_conversor/cli/image/filter_cmd.py:63
+#: src/file_conversor/cli/image/info_cmd.py:67
+#: src/file_conversor/cli/image/mirror_cmd.py:71
+#: src/file_conversor/cli/image/render_cmd.py:69
+#: src/file_conversor/cli/image/resize_cmd.py:69
+#: src/file_conversor/cli/image/rotate_cmd.py:74
+#: src/file_conversor/cli/image/to_pdf_cmd.py:71
+#: src/file_conversor/cli/image/unsharp_cmd.py:44
+#: src/file_conversor/cli/pdf/compress_cmd.py:71
+#: src/file_conversor/cli/pdf/convert_cmd.py:72
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:66
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:66
+#: src/file_conversor/cli/pdf/extract_cmd.py:66
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:68
+#: src/file_conversor/cli/pdf/merge_cmd.py:48
+#: src/file_conversor/cli/pdf/repair_cmd.py:66
+#: src/file_conversor/cli/pdf/rotate_cmd.py:73
+#: src/file_conversor/cli/pdf/split_cmd.py:67
+#: src/file_conversor/cli/pipeline/create_cmd.py:65
+#: src/file_conversor/cli/pipeline/execute_cmd.py:40
+#: src/file_conversor/cli/ppt/convert_cmd.py:63
+#: src/file_conversor/cli/text/check_cmd.py:62
+#: src/file_conversor/cli/text/compress_cmd.py:66
+#: src/file_conversor/cli/text/convert_cmd.py:88
+#: src/file_conversor/cli/video/check_cmd.py:63
+#: src/file_conversor/cli/video/compress_cmd.py:67
+#: src/file_conversor/cli/video/convert_cmd.py:85
+#: src/file_conversor/cli/video/enhance_cmd.py:66
+#: src/file_conversor/cli/video/execute_cmd.py:44
+#: src/file_conversor/cli/video/info_cmd.py:77
+#: src/file_conversor/cli/video/list_formats_cmd.py:45
+#: src/file_conversor/cli/video/mirror_cmd.py:74
+#: src/file_conversor/cli/video/resize_cmd.py:68
+#: src/file_conversor/cli/video/rotate_cmd.py:74
+#: src/file_conversor/cli/win/install_menu_cmd.py:45
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:40
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:42
+#: src/file_conversor/cli/xls/convert_cmd.py:63
 msgid "Examples"
 msgstr "Beispiele"
 
-#: src/file_conversor/cli/audio_video/convert_cmd.py:95
-#: src/file_conversor/cli/config/set_cmd.py:55
-msgid "Audio bitrate in kbps"
-msgstr "Audio -Bitrate in KBPS"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:99
-#: src/file_conversor/cli/config/set_cmd.py:60
-msgid "Video bitrate in kbps"
-msgstr "Video -Bitrate in KBPS"
-
-#: src/file_conversor/cli/audio_video/convert_cmd.py:134
-msgid "FFMpeg convertion"
-msgstr "FFMPEG -Konvertion"
-
-#: src/file_conversor/cli/audio_video/info_cmd.py:61
-msgid "Get information about a audio/video file."
-msgstr "Informieren Sie sich über eine Audio-/Videodatei."
-
-#: src/file_conversor/cli/audio_video/info_cmd.py:63
-msgid ""
-"This command retrieves metadata and other information about the audio / "
-"video file"
+#: src/file_conversor/cli/audio/check_cmd.py:84
+#: src/file_conversor/cli/audio/check_cmd.py:91
+#: src/file_conversor/cli/video/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:92
+msgid "FFMpeg check"
 msgstr ""
-"In diesem Befehl werden Metadaten und andere Informationen zur Audio- / "
-"Videodatei abgerufen"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:65
-#: src/file_conversor/cli/audio_video/info_cmd.py:108
-#: src/file_conversor/cli/image/info_cmd.py:84
+#: src/file_conversor/cli/audio/check_cmd.py:85
+#: src/file_conversor/cli/video/check_cmd.py:86
+msgid "is corrupted or has inconsistencies"
+msgstr ""
+
+#: src/file_conversor/cli/audio/convert_cmd.py:66
+msgid "Convert a audio/video file to an audio format."
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:64
+msgid "Get information about a audio file."
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:66
+msgid "This command retrieves metadata and other information about the audio file"
+msgstr ""
+
+#: src/file_conversor/cli/audio/info_cmd.py:68
+#: src/file_conversor/cli/audio/info_cmd.py:111
+#: src/file_conversor/cli/image/info_cmd.py:86
+#: src/file_conversor/cli/video/info_cmd.py:70
+#: src/file_conversor/cli/video/info_cmd.py:113
 msgid "Format"
 msgstr "Format"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:67
-#: src/file_conversor/cli/audio_video/info_cmd.py:109
+#: src/file_conversor/cli/audio/info_cmd.py:70
+#: src/file_conversor/cli/audio/info_cmd.py:112
+#: src/file_conversor/cli/video/info_cmd.py:72
+#: src/file_conversor/cli/video/info_cmd.py:114
 msgid "Duration"
 msgstr "Dauer"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:69
+#: src/file_conversor/cli/audio/info_cmd.py:72
+#: src/file_conversor/cli/video/info_cmd.py:74
 msgid "Other properties"
 msgstr "Andere Eigenschaften"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:88
+#: src/file_conversor/cli/audio/info_cmd.py:91
+#: src/file_conversor/cli/video/info_cmd.py:93
 msgid "Parsing file metadata for"
 msgstr "Analyse von Dateimetadaten für"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:106
+#: src/file_conversor/cli/audio/info_cmd.py:109
+#: src/file_conversor/cli/video/info_cmd.py:111
 msgid "File Information"
 msgstr "Dateiinformationen"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:107
-#: src/file_conversor/cli/image/info_cmd.py:83
+#: src/file_conversor/cli/audio/info_cmd.py:110
+#: src/file_conversor/cli/image/info_cmd.py:85
+#: src/file_conversor/cli/video/info_cmd.py:112
 msgid "Name"
 msgstr "Name"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:110
+#: src/file_conversor/cli/audio/info_cmd.py:113
+#: src/file_conversor/cli/video/info_cmd.py:115
 msgid "Size"
 msgstr "Größe"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:111
-#: src/file_conversor/cli/audio_video/info_cmd.py:130
+#: src/file_conversor/cli/audio/info_cmd.py:114
+#: src/file_conversor/cli/audio/info_cmd.py:133
+#: src/file_conversor/cli/video/info_cmd.py:116
+#: src/file_conversor/cli/video/info_cmd.py:135
 msgid "Bitrate"
 msgstr "Bitrate"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:116
+#: src/file_conversor/cli/audio/info_cmd.py:119
+#: src/file_conversor/cli/video/info_cmd.py:121
 msgid "Media Streams"
 msgstr "Medienströme"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:126
+#: src/file_conversor/cli/audio/info_cmd.py:129
+#: src/file_conversor/cli/video/info_cmd.py:131
 msgid "Stream"
 msgstr "Strom"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:127
+#: src/file_conversor/cli/audio/info_cmd.py:130
+#: src/file_conversor/cli/video/info_cmd.py:132
 msgid "Codec"
 msgstr "Codec"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:129
+#: src/file_conversor/cli/audio/info_cmd.py:132
+#: src/file_conversor/cli/video/info_cmd.py:134
 msgid "Resolution"
 msgstr "Auflösung"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:132
+#: src/file_conversor/cli/audio/info_cmd.py:135
+#: src/file_conversor/cli/video/info_cmd.py:137
 msgid "Sampling rate"
 msgstr "Stichprobenrate"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:133
+#: src/file_conversor/cli/audio/info_cmd.py:136
+#: src/file_conversor/cli/video/info_cmd.py:138
 msgid "Channels"
 msgstr "Kanäle"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:138
+#: src/file_conversor/cli/audio/info_cmd.py:141
+#: src/file_conversor/cli/video/info_cmd.py:143
 msgid "Chapters"
 msgstr "Kapitel"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:142
+#: src/file_conversor/cli/audio/info_cmd.py:145
+#: src/file_conversor/cli/video/info_cmd.py:147
 msgid "Time"
 msgstr "Zeit"
 
-#: src/file_conversor/cli/audio_video/info_cmd.py:146
-#: src/file_conversor/cli/image/info_cmd.py:92
+#: src/file_conversor/cli/audio/info_cmd.py:149
+#: src/file_conversor/cli/image/info_cmd.py:94
+#: src/file_conversor/cli/video/info_cmd.py:151
 msgid "File Analysis"
 msgstr "Dateianalyse"
 
@@ -382,29 +473,53 @@ msgstr "Dateianalyse"
 msgid "Configure default options"
 msgstr "Konfigurieren Sie Standardoptionen"
 
-#: src/file_conversor/cli/config/set_cmd.py:34
+#: src/file_conversor/cli/config/set_cmd.py:37
 msgid "Configure the default options for the file converter."
 msgstr "Konfigurieren Sie die Standardoptionen für den Dateikonverter."
 
-#: src/file_conversor/cli/config/set_cmd.py:46
-msgid ""
-"Set preferred language for app (if available). Format lang_COUNTRY. Defaults"
-" to system preffered language or 'en_US' (English - United States)."
+#: src/file_conversor/cli/config/set_cmd.py:49
+msgid "Set preferred language for app (if available). Available languages:"
 msgstr ""
-"Setzen Sie die bevorzugte Sprache für App (falls verfügbar). Format "
-"Lang_country. Standardeinstellungen zu Systems bevorzugtes Sprache oder "
-"'en_us' (Englisch - Vereinigte Staaten)."
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:49
+msgid "Defaults to system preffered language or 'en_US' (English - United States)"
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:54
 msgid ""
 "Install missing external dependencies action. 'True' for auto install. "
-"'False' to not install missing dependencies. 'None' to ask user for action."
+"'False' to not install missing dependencies. 'None' to ask user for "
+"action."
 msgstr ""
-"Installieren Sie fehlende Aktion für externe Abhängigkeiten. 'True' für die "
-"automatische Installation. 'Falsch', um fehlende Abhängigkeiten nicht zu "
-"installieren. \"Keine\", um Benutzer um Aktion zu bitten."
+"Installieren Sie fehlende Aktion für externe Abhängigkeiten. 'True' für "
+"die automatische Installation. 'Falsch', um fehlende Abhängigkeiten nicht"
+" zu installieren. \"Keine\", um Benutzer um Aktion zu bitten."
 
-#: src/file_conversor/cli/config/set_cmd.py:65
+#: src/file_conversor/cli/config/set_cmd.py:59
+#: src/file_conversor/utils/typer_utils.py:171
+msgid "Audio bitrate in kbps."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:59
+#: src/file_conversor/cli/config/set_cmd.py:64
+#: src/file_conversor/utils/typer_utils.py:171
+msgid "If 0, let FFmpeg decide best bitrate."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:64
+#: src/file_conversor/utils/typer_utils.py:181
+msgid "Video bitrate in kbps."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:69
+msgid "Video format."
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:69
+msgid "Available formats:"
+msgstr ""
+
+#: src/file_conversor/cli/config/set_cmd.py:78
 msgid ""
 "Image quality (for ``image convert`` command). Valid values are between "
 "1-100."
@@ -412,23 +527,23 @@ msgstr ""
 "Bildqualität (für den Befehl `` bild convert``). Gültige Werte liegen "
 "zwischen 1-100."
 
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:83
 msgid ""
-"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
-"values are between 40-3600."
+"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). "
+"Valid values are between 40-3600."
 msgstr ""
-"Bildqualität in Punkten pro Zoll (DPI) (für `` Bild to_pdf``). Gültige Werte"
-" liegen zwischen 40 und 3600."
+"Bildqualität in Punkten pro Zoll (DPI) (für `` Bild to_pdf``). Gültige "
+"Werte liegen zwischen 40 und 3600."
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:88
 msgid ""
-"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
-"defined. Valid values are"
+"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` "
+"is defined. Valid values are"
 msgstr ""
 "Image Fit (für den Befehl `` image to_pdf``). Nur gültig, wenn ``--PAGE-"
 "Size`` definiert ist. Gültige Werte sind"
 
-#: src/file_conversor/cli/config/set_cmd.py:80
+#: src/file_conversor/cli/config/set_cmd.py:93
 msgid ""
 "Page size (for ``image to_pdf`` command). Format (width, height). Other "
 "valid values are:"
@@ -436,40 +551,41 @@ msgstr ""
 "Seitengröße (für den Befehl `` image to_pdf``). Format (Breite, Höhe). "
 "Andere gültige Werte sind:"
 
-#: src/file_conversor/cli/config/set_cmd.py:85
-#: src/file_conversor/cli/image/resize_cmd.py:94
-#: src/file_conversor/cli/image/rotate_cmd.py:86
+#: src/file_conversor/cli/config/set_cmd.py:98
+#: src/file_conversor/cli/image/resize_cmd.py:96
+#: src/file_conversor/cli/image/rotate_cmd.py:88
 msgid "Resampling algorithm. Valid values are"
 msgstr "Resampling -Algorithmus. Gültige Werte sind"
 
-#: src/file_conversor/cli/config/set_cmd.py:85
-#: src/file_conversor/cli/config/set_cmd.py:90
-#: src/file_conversor/cli/image/resize_cmd.py:94
-#: src/file_conversor/cli/image/rotate_cmd.py:86
-#: src/file_conversor/cli/image/to_pdf_cmd.py:83
-#: src/file_conversor/cli/pdf/compress_cmd.py:77
+#: src/file_conversor/cli/config/set_cmd.py:98
+#: src/file_conversor/cli/config/set_cmd.py:103
+#: src/file_conversor/cli/image/resize_cmd.py:96
+#: src/file_conversor/cli/image/rotate_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:85
+#: src/file_conversor/cli/pdf/compress_cmd.py:82
 msgid "Defaults to"
 msgstr "Standardmäßig an"
 
-#: src/file_conversor/cli/config/set_cmd.py:90
-#: src/file_conversor/cli/pdf/compress_cmd.py:77
+#: src/file_conversor/cli/config/set_cmd.py:103
+#: src/file_conversor/cli/pdf/compress_cmd.py:82
 msgid "Compression level (high compression = low quality). Valid values are"
 msgstr ""
-"Kompressionsniveau (hohe Kompression = geringe Qualität). Gültige Werte sind"
+"Kompressionsniveau (hohe Kompression = geringe Qualität). Gültige Werte "
+"sind"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:125
 msgid "Configuration file"
 msgstr "Konfigurationsdatei"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:125
 msgid "updated"
 msgstr "aktualisiert"
 
-#: src/file_conversor/cli/config/show_cmd.py:31
+#: src/file_conversor/cli/config/show_cmd.py:33
 msgid "Show the current configuration of the application"
 msgstr "Zeigen Sie die aktuelle Konfiguration der Anwendung an"
 
-#: src/file_conversor/cli/config/show_cmd.py:40
+#: src/file_conversor/cli/config/show_cmd.py:42
 msgid "Configuration"
 msgstr "Konfiguration"
 
@@ -483,18 +599,18 @@ msgstr "Manipulation der Dokumentdatei"
 msgid "(requires MS Office / LibreOffice)"
 msgstr "(Erfordert MS Office / LibreOffice)"
 
-#: src/file_conversor/cli/doc/convert_cmd.py:59
+#: src/file_conversor/cli/doc/convert_cmd.py:62
 msgid ""
 "Convert document files into other formats (requires Microsoft Word / "
 "LibreOffice)."
 msgstr ""
-"Konvertieren Sie Dokumentdateien in andere Formate (erfordert Microsoft Word"
-" / LibreOffice)."
+"Konvertieren Sie Dokumentdateien in andere Formate (erfordert Microsoft "
+"Word / LibreOffice)."
 
-#: src/file_conversor/cli/doc/convert_cmd.py:86
-#: src/file_conversor/cli/ppt/convert_cmd.py:84
-#: src/file_conversor/cli/text/convert_cmd.py:104
-#: src/file_conversor/cli/xls/convert_cmd.py:84
+#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/ppt/convert_cmd.py:87
+#: src/file_conversor/cli/text/convert_cmd.py:107
+#: src/file_conversor/cli/xls/convert_cmd.py:87
 msgid "File conversion"
 msgstr "Dateikonvertierung"
 
@@ -502,126 +618,164 @@ msgstr "Dateikonvertierung"
 msgid "Hashing manipulation (check, gen, etc)"
 msgstr "Hashing Manipulation (Check, Gen usw.)"
 
-#: src/file_conversor/cli/hash/check_cmd.py:56
+#: src/file_conversor/cli/hash/check_cmd.py:58
 msgid "Checks a hash file (.sha256, .sha1, etc)."
 msgstr "Überprüft eine Hash -Datei (.SHA256, .SHA1 usw.)."
 
-#: src/file_conversor/cli/hash/check_cmd.py:70
+#: src/file_conversor/cli/hash/check_cmd.py:72
 msgid "Checking file"
 msgstr "Datei überprüfen"
 
-#: src/file_conversor/cli/hash/check_cmd.py:80
+#: src/file_conversor/cli/hash/check_cmd.py:82
 msgid "Hash check"
 msgstr "Hash -Check"
 
-#: src/file_conversor/cli/hash/create_cmd.py:37
+#: src/file_conversor/cli/hash/create_cmd.py:39
 msgid "Creates hash file (.sha256, .sha1, etc)."
 msgstr "Erstellt Hash -Datei (.SHA256, .SHA1 usw.)."
 
-#: src/file_conversor/cli/hash/create_cmd.py:66
+#: src/file_conversor/cli/hash/create_cmd.py:68
 msgid "Hash creation"
 msgstr "Hash -Schöpfung"
 
-#: src/file_conversor/cli/image/__init__.py:23
+#: src/file_conversor/cli/image/__init__.py:28
 msgid "Image file manipulation"
 msgstr "Bilddateimanipulation"
 
 #: src/file_conversor/cli/image/_typer.py:8
-msgid "Conversion"
-msgstr "Konvertierung"
+msgid "Conversions"
+msgstr ""
 
 #: src/file_conversor/cli/image/_typer.py:9
-msgid "Transformation"
-msgstr "Transformation"
+#: src/file_conversor/cli/pdf/_typer.py:9
+#: src/file_conversor/cli/video/_typer.py:8
+msgid "Transformations"
+msgstr "Transformationen"
 
 #: src/file_conversor/cli/image/_typer.py:10
+msgid "Filters"
+msgstr ""
+
+#: src/file_conversor/cli/image/_typer.py:11
 #: src/file_conversor/cli/pdf/_typer.py:10
+#: src/file_conversor/cli/video/_typer.py:9
 #: src/file_conversor/cli/win/_typer.py:9
 msgid "Other commands"
 msgstr "Andere Befehle"
 
-#: src/file_conversor/cli/image/compress_cmd.py:59
+#: src/file_conversor/cli/image/antialias_cmd.py:60
+msgid "Applies antialias filter to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/antialias_cmd.py:75
+msgid "Algorithm to use. Available algorihtms:"
+msgstr ""
+
+#: src/file_conversor/cli/image/antialias_cmd.py:96
+msgid "Image antialiasing"
+msgstr ""
+
+#: src/file_conversor/cli/image/blur_cmd.py:41
+msgid "Applies gaussian blur to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/blur_cmd.py:71
+msgid "Image blur"
+msgstr ""
+
+#: src/file_conversor/cli/image/compress_cmd.py:61
 msgid "Compress an image file (requires external libraries)."
 msgstr "Komprimieren Sie eine Bilddatei (erfordert externe Bibliotheken)."
 
-#: src/file_conversor/cli/image/compress_cmd.py:61
+#: src/file_conversor/cli/image/compress_cmd.py:63
 msgid "Outputs an image file with _compressed at the end."
 msgstr "Gibt eine Bilddatei mit _kompressed am Ende aus."
 
-#: src/file_conversor/cli/image/compress_cmd.py:92
+#: src/file_conversor/cli/image/compress_cmd.py:94
 msgid "Image compression"
 msgstr "Bildkomprimierung"
 
-#: src/file_conversor/cli/image/convert_cmd.py:70
+#: src/file_conversor/cli/image/convert_cmd.py:66
 msgid "Convert a image file to a different format."
 msgstr "Konvertieren Sie eine Bilddatei in ein anderes Format."
 
-#: src/file_conversor/cli/image/convert_cmd.py:99
+#: src/file_conversor/cli/image/convert_cmd.py:95
 msgid "Image convertion"
 msgstr "Bildkonvertion"
 
-#: src/file_conversor/cli/image/info_cmd.py:60
+#: src/file_conversor/cli/image/enhance_cmd.py:59
+msgid "Enhance image file color, brightness, contrast, or sharpness."
+msgstr ""
+
+#: src/file_conversor/cli/image/enhance_cmd.py:106
+msgid "Image enhance"
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:60
+msgid "Applies filter to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:75
+msgid "Filter to apply. Available filters:"
+msgstr ""
+
+#: src/file_conversor/cli/image/filter_cmd.py:95
+msgid "Image filter"
+msgstr ""
+
+#: src/file_conversor/cli/image/info_cmd.py:62
 msgid "Get EXIF information about a image file."
 msgstr "Holen Sie sich exif -Informationen zu einer Bilddatei."
 
-#: src/file_conversor/cli/image/info_cmd.py:62
-msgid ""
-"This command retrieves metadata and other information about the image file"
-msgstr ""
-"Dieser Befehl ruft Metadaten und andere Informationen zur Bilddatei ab"
+#: src/file_conversor/cli/image/info_cmd.py:64
+msgid "This command retrieves metadata and other information about the image file"
+msgstr "Dieser Befehl ruft Metadaten und andere Informationen zur Bilddatei ab"
 
-#: src/file_conversor/cli/image/info_cmd.py:79
+#: src/file_conversor/cli/image/info_cmd.py:81
 msgid "Parsing metadata for"
 msgstr "Analyse von Metadaten für"
 
-#: src/file_conversor/cli/image/mirror_cmd.py:64
+#: src/file_conversor/cli/image/mirror_cmd.py:66
 msgid "Mirror an image file (vertically or horizontally)."
 msgstr "Spiegeln Sie eine Bilddatei (vertikal oder horizontal) wider."
 
-#: src/file_conversor/cli/image/mirror_cmd.py:66
+#: src/file_conversor/cli/image/mirror_cmd.py:68
 msgid "Outputs an image file with _mirrored at the end."
 msgstr "Gibt eine Bilddatei mit _mirrored am Ende aus."
 
-#: src/file_conversor/cli/image/mirror_cmd.py:78
-msgid ""
-"Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."
-msgstr ""
-"Achse. Gültige Werte sind 'x' (spiegel horizontal) oder 'y' (vertikal Flip)."
-
-#: src/file_conversor/cli/image/mirror_cmd.py:96
+#: src/file_conversor/cli/image/mirror_cmd.py:95
 msgid "Image mirroring"
 msgstr "Bildspiegelung"
 
-#: src/file_conversor/cli/image/render_cmd.py:64
+#: src/file_conversor/cli/image/render_cmd.py:66
 msgid "Render an image vector file into a different format."
 msgstr "Rendern Sie eine Bildvektordatei in ein anderes Format."
 
-#: src/file_conversor/cli/image/render_cmd.py:93
+#: src/file_conversor/cli/image/render_cmd.py:95
 msgid "Image render"
 msgstr "Bildrender"
 
-#: src/file_conversor/cli/image/resize_cmd.py:62
+#: src/file_conversor/cli/image/resize_cmd.py:64
 msgid "Resize an image file."
 msgstr "Größen Sie die Größe einer Bilddatei."
 
-#: src/file_conversor/cli/image/resize_cmd.py:64
+#: src/file_conversor/cli/image/resize_cmd.py:66
 msgid "Outputs an image file with _resized at the end."
 msgstr "Gibt eine Bilddatei mit _resized am Ende aus."
 
-#: src/file_conversor/cli/image/resize_cmd.py:71
+#: src/file_conversor/cli/image/resize_cmd.py:73
 msgid "Double the image size"
 msgstr "Verdoppeln Sie die Bildgröße"
 
-#: src/file_conversor/cli/image/resize_cmd.py:77
+#: src/file_conversor/cli/image/resize_cmd.py:79
 msgid "Set the image width to 1024px"
 msgstr "Stellen Sie die Bildbreite auf 1024px ein"
 
-#: src/file_conversor/cli/image/resize_cmd.py:84
+#: src/file_conversor/cli/image/resize_cmd.py:86
 msgid "Scale image proportion. Valid values start at 0.1. Defaults to"
-msgstr ""
-"Skalieren Bildanteil. Gültige Werte beginnen bei 0,1. Standardmäßig an"
+msgstr "Skalieren Bildanteil. Gültige Werte beginnen bei 0,1. Standardmäßig an"
 
-#: src/file_conversor/cli/image/resize_cmd.py:89
+#: src/file_conversor/cli/image/resize_cmd.py:91
 msgid ""
 "Width in pixels (height is calculated based on width to keep image "
 "proportions). Defaults to"
@@ -629,82 +783,98 @@ msgstr ""
 "Breite in Pixeln (die Höhe wird basierend auf der Breite berechnet, um "
 "Bildanteile zu halten). Standardmäßig an"
 
-#: src/file_conversor/cli/image/resize_cmd.py:89
+#: src/file_conversor/cli/image/resize_cmd.py:91
 msgid "use scale to resize image"
 msgstr "Verwenden Sie die Skala, um die Größe des Bildes zu ändern"
 
-#: src/file_conversor/cli/image/resize_cmd.py:114
+#: src/file_conversor/cli/image/resize_cmd.py:116
 msgid "Image resize"
 msgstr "Bildänderung"
 
-#: src/file_conversor/cli/image/rotate_cmd.py:67
-msgid "Rotate a image file (clockwise or anti-clockwise)."
-msgstr ""
-"Drehen Sie eine Bilddatei (im Uhrzeigersinn oder gegen den Uhrzeigersinn)."
-
 #: src/file_conversor/cli/image/rotate_cmd.py:69
+msgid "Rotate a image file (clockwise or anti-clockwise)."
+msgstr "Drehen Sie eine Bilddatei (im Uhrzeigersinn oder gegen den Uhrzeigersinn)."
+
+#: src/file_conversor/cli/image/rotate_cmd.py:71
 msgid "Outputs an image file with _rotated at the end."
 msgstr "Gibt eine Bilddatei mit _rotiert am Ende aus."
 
-#: src/file_conversor/cli/image/rotate_cmd.py:81
+#: src/file_conversor/cli/image/rotate_cmd.py:83
 msgid ""
-"Rotation in degrees. Valid values are between -360 (anti-clockwise rotation)"
-" and 360 (clockwise rotation)."
+"Rotation in degrees. Valid values are between -360 (anti-clockwise "
+"rotation) and 360 (clockwise rotation)."
 msgstr ""
 "Rotation in Grad. Gültige Werte liegen zwischen -360 (Rotation gegen den "
 "Uhrzeigersinn) und 360 (Drehung im Uhrzeigersinn)."
 
-#: src/file_conversor/cli/image/rotate_cmd.py:107
+#: src/file_conversor/cli/image/rotate_cmd.py:109
 msgid "Image rotation"
 msgstr "Bildrotation"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:60
+#: src/file_conversor/cli/image/to_pdf_cmd.py:62
 msgid "Convert a list of image files to one PDF file, one image per page."
 msgstr ""
-"Konvertieren Sie eine Liste von Bilddateien in eine PDF -Datei, ein Bild pro"
-" Seite."
+"Konvertieren Sie eine Liste von Bilddateien in eine PDF -Datei, ein Bild "
+"pro Seite."
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:62
+#: src/file_conversor/cli/image/to_pdf_cmd.py:64
 msgid ""
-"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure size."
+"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure "
+"size."
 msgstr ""
 "Nur gültig, wenn ``--PAGE-Size`` definiert ist. Andernfalls PDF -Größe = "
 "Figurengröße."
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:64
 #: src/file_conversor/cli/image/to_pdf_cmd.py:66
+#: src/file_conversor/cli/image/to_pdf_cmd.py:68
 msgid "Figure adjusted to fit in PDF size"
 msgstr "Abbildung eingestellt, um in die PDF -Größe einzupassen"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:66
+#: src/file_conversor/cli/image/to_pdf_cmd.py:68
 msgid "without any empty borders (cut figure if needed)"
 msgstr "ohne leere Grenzen (falls erforderlich)"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:83
+#: src/file_conversor/cli/image/to_pdf_cmd.py:85
 msgid "Image fit. Valid only if ``--page-size`` is defined. Valid values are"
 msgstr ""
-"Bildanpassung. Nur gültig, wenn ``--PAGE-Size`` definiert ist. Gültige Werte"
-" sind"
+"Bildanpassung. Nur gültig, wenn ``--PAGE-Size`` definiert ist. Gültige "
+"Werte sind"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:90
 msgid "Page size. Format '(width, height)'. Other valid values are:"
 msgstr "Seitengröße. Format '(Breite, Höhe)'. Andere gültige Werte sind:"
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:88
+#: src/file_conversor/cli/image/to_pdf_cmd.py:90
 msgid "Defaults to None (PDF size = image size)."
 msgstr "Standardeinstellungen nicht (PDF -Größe = Bildgröße)."
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:93
+#: src/file_conversor/cli/image/to_pdf_cmd.py:95
 msgid ""
 "Set PDF metadata. Defaults to False (do not set creator, producer, "
 "modification date, etc)."
 msgstr ""
-"Stellen Sie PDF -Metadaten ein. Standardeinstellungen zu False (Schöpfer, "
-"Produzent, Änderungsdatum usw. nicht festlegen)."
+"Stellen Sie PDF -Metadaten ein. Standardeinstellungen zu False (Schöpfer,"
+" Produzent, Änderungsdatum usw. nicht festlegen)."
 
-#: src/file_conversor/cli/image/to_pdf_cmd.py:122
+#: src/file_conversor/cli/image/to_pdf_cmd.py:124
 msgid "PDF generation"
 msgstr "PDF -Generation"
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:41
+msgid "Applies unsharp mask to an image file."
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:58
+msgid "Unsharp strength, in percent"
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:64
+msgid "Threshold controls the minimum brightness change that will be sharpened"
+msgstr ""
+
+#: src/file_conversor/cli/image/unsharp_cmd.py:86
+msgid "Image unsharp"
+msgstr ""
 
 #: src/file_conversor/cli/pdf/__init__.py:25
 msgid "PDF file manipulation"
@@ -714,81 +884,75 @@ msgstr "PDF -Datei Manipulation"
 msgid "Security commands"
 msgstr "Sicherheitsbefehle"
 
-#: src/file_conversor/cli/pdf/_typer.py:9
-msgid "Transformations"
-msgstr "Transformationen"
-
-#: src/file_conversor/cli/pdf/compress_cmd.py:61
+#: src/file_conversor/cli/pdf/compress_cmd.py:66
 msgid "Compress a PDF file (requires Ghostscript external library)."
 msgstr ""
 "Komprimieren Sie eine PDF -Datei (erfordert die externe Bibliothek von "
 "Ghostscript)."
 
-#: src/file_conversor/cli/pdf/compress_cmd.py:63
+#: src/file_conversor/cli/pdf/compress_cmd.py:68
 msgid "Outputs a file with _compressed at the end."
 msgstr "Gibt am Ende eine Datei mit _komprimiert aus."
 
-#: src/file_conversor/cli/pdf/compress_cmd.py:110
+#: src/file_conversor/cli/pdf/compress_cmd.py:115
 msgid "File compression"
 msgstr "Dateikomprimierung"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:65
+#: src/file_conversor/cli/pdf/convert_cmd.py:67
 msgid "Convert a PDF file to a different format."
 msgstr "Konvertieren Sie eine PDF -Datei in ein anderes Format."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:67
+#: src/file_conversor/cli/pdf/convert_cmd.py:69
 msgid "Outputs a file with the PDF page number at the end."
 msgstr "Gibt eine Datei mit der PDF -Seitennummer am Ende aus."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:95
+#: src/file_conversor/cli/pdf/convert_cmd.py:97
 msgid "File convertion"
 msgstr "Dateikonvertion"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:59
-msgid ""
-"Remove password protection from a PDF file  (create decrypted PDF file)."
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:61
+msgid "Remove password protection from a PDF file  (create decrypted PDF file)."
 msgstr ""
 "Entfernen Sie den Kennwortschutz aus einer PDF -Datei (erstellen Sie "
 "entschlüsselte PDF -Datei)."
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:61
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:63
 msgid "Outputs a file with _decrypted at the end."
 msgstr "Gibt am Ende eine Datei mit _decrypted aus."
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:73
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:75
 msgid "Password used for decryption."
 msgstr "Passwort für die Entschlüsselung."
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:74
-msgid ""
-"Password for decryption (password will not be displayed, for your safety)"
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:76
+msgid "Password for decryption (password will not be displayed, for your safety)"
 msgstr ""
-"Passwort für die Entschlüsselung (Passwort wird nicht für Ihre Sicherheit "
-"angezeigt)"
+"Passwort für die Entschlüsselung (Passwort wird nicht für Ihre Sicherheit"
+" angezeigt)"
 
-#: src/file_conversor/cli/pdf/decrypt_cmd.py:91
+#: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 msgid "Decryption"
 msgstr "Entschlüsseln"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:59
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:61
 msgid "Protect PDF file with a password (create encrypted PDF file)."
 msgstr ""
-"Schützen Sie die PDF -Datei mit einem Kennwort (erstellen Sie verschlüsselte"
-" PDF -Datei)."
+"Schützen Sie die PDF -Datei mit einem Kennwort (erstellen Sie "
+"verschlüsselte PDF -Datei)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:61
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:63
 msgid "Outputs a file with _encrypted at the end."
 msgstr "Gibt eine Datei mit _encrypted am Ende aus."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:73
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:75
 msgid ""
-"Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF "
-"file."
+"Owner password for encryption. Owner has ALL PERMISSIONS in the output "
+"PDF file."
 msgstr ""
 "Eigentümer Passwort zur Verschlüsselung. Der Eigentümer hat alle "
 "Berechtigungen in der Ausgabe -PDF -Datei."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:74
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:76
 msgid ""
 "Owner password for encryption (password will not be displayed, for your "
 "safety)"
@@ -796,16 +960,16 @@ msgstr ""
 "Eigentümerkennwort für die Verschlüsselung (Passwort wird nicht für Ihre "
 "Sicherheit angezeigt)"
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:79
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:81
 msgid ""
-"User password for encryption. User has ONLY THE PERMISSIONS specified in the"
-" arguments. Defaults to None (user and owner password are the same)."
+"User password for encryption. User has ONLY THE PERMISSIONS specified in "
+"the arguments. Defaults to None (user and owner password are the same)."
 msgstr ""
 "Benutzerkennwort zur Verschlüsselung. Der Benutzer hat nur die in den "
 "Argumenten angegebenen Berechtigungen. Standardeinstellungen nicht "
 "(Benutzer- und Eigentümerkennwort sind gleich)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:82
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:84
 msgid ""
 "Decrypt password used to open protected file. Defaults to None (do not "
 "decrypt)."
@@ -813,7 +977,7 @@ msgstr ""
 "Entschlüsseln Sie das Passwort zum Öffnen der geschützten Datei. "
 "Standardmäßig keine (nicht entschlüsseln)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:86
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:88
 msgid ""
 "User can add/modify annotations (comments, highlight text, etc) and "
 "interactive forms. Default to False (not set)."
@@ -821,7 +985,7 @@ msgstr ""
 "Der Benutzer kann Annotationen (Kommentare, Texte usw.) und interaktive "
 "Formulare hinzufügen/ändern. Standard zu falsch (nicht festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:90
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:92
 msgid ""
 "User can fill form fields (subset permission of --annotate). Default to "
 "False (not set)."
@@ -829,122 +993,125 @@ msgstr ""
 "Der Benutzer kann Formularfelder ausfüllen (Teilmenge Erlaubnis von "
 "-Annotate). Standard zu falsch (nicht festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:94
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:96
 msgid ""
 "User can modify the document (e.g., add / edit text, add / edit images, "
 "etc). Default to False (not set)."
 msgstr ""
-"Der Benutzer kann das Dokument ändern (z. B. Text hinzufügen / bearbeiten, "
-"Bilder hinzufügen / bearbeiten usw.). Standard zu falsch (nicht festgelegt)."
+"Der Benutzer kann das Dokument ändern (z. B. Text hinzufügen / "
+"bearbeiten, Bilder hinzufügen / bearbeiten usw.). Standard zu falsch "
+"(nicht festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:98
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:100
 msgid ""
-"User can insert, delete, or rotate pages (subset of --modify). Default to "
-"False (not set)."
+"User can insert, delete, or rotate pages (subset of --modify). Default to"
+" False (not set)."
 msgstr ""
 "Der Benutzer kann Seiten einfügen, löschen oder drehen (Teilmenge von - "
 "-modify). Standard zu falsch (nicht festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:102
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:104
 msgid "User can copy text/images. Default to False (not set)."
 msgstr ""
 "Der Benutzer kann Text/Bilder kopieren. Standard zu falsch (nicht "
 "festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:106
-msgid ""
-"User can use screen readers for accessibility. Default to True (allow)."
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:108
+msgid "User can use screen readers for accessibility. Default to True (allow)."
 msgstr ""
-"Der Benutzer kann Bildschirmleser für die Zugänglichkeit verwenden. Standard"
-" zu True (erlauben)."
+"Der Benutzer kann Bildschirmleser für die Zugänglichkeit verwenden. "
+"Standard zu True (erlauben)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:110
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:112
 msgid "User can print (low quality). Defaults to True (allow)."
 msgstr ""
 "Der Benutzer kann drucken (geringer Qualität). Standardmäßig true "
 "(erlauben)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:114
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:116
 msgid ""
 "User can print (high quality). Requires --allow-print. Defaults to True "
 "(allow)."
 msgstr ""
-"Benutzer kann drucken (hohe Qualität). Benötigt-Allow-Print. Standardmäßig "
-"true (erlauben)."
+"Benutzer kann drucken (hohe Qualität). Benötigt-Allow-Print. "
+"Standardmäßig true (erlauben)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:118
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:120
 msgid ""
 "User has ALL PERMISSIONS. If set, it overrides all other permissions. "
 "Defaults to False (not set)."
 msgstr ""
-"Der Benutzer hat alle Berechtigungen. Wenn festgelegt, überschreibt es alle "
-"anderen Berechtigungen. Standardeinstellungen zu False (nicht festgelegt)."
+"Der Benutzer hat alle Berechtigungen. Wenn festgelegt, überschreibt es "
+"alle anderen Berechtigungen. Standardeinstellungen zu False (nicht "
+"festgelegt)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:122
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:124
 msgid ""
 "Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, "
 "AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and "
 "compatibility)."
 msgstr ""
 "Verschlüsselungsalgorithmus verwendet. Gültige Optionen sind RC4-40, "
-"RC4-128, AES-128, AES-256-R5 oder AES-256. Standardeinstellungen zu AES-256 "
-"(für erweiterte Sicherheit und Kompatibilität)."
+"RC4-128, AES-128, AES-256-R5 oder AES-256. Standardeinstellungen zu "
+"AES-256 (für erweiterte Sicherheit und Kompatibilität)."
 
-#: src/file_conversor/cli/pdf/encrypt_cmd.py:158
+#: src/file_conversor/cli/pdf/encrypt_cmd.py:160
 msgid "Encryption"
 msgstr "Verschlüsselung"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:59
+#: src/file_conversor/cli/pdf/extract_cmd.py:61
 msgid "Extract specific pages from a PDF."
 msgstr "Extrahieren Sie bestimmte Seiten aus einem PDF."
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:61
+#: src/file_conversor/cli/pdf/extract_cmd.py:63
 msgid "Outputs a file with _extracted at the end."
 msgstr "Gibt eine Datei mit _extracted am Ende aus."
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:68
+#: src/file_conversor/cli/pdf/extract_cmd.py:70
 msgid "Extract pages 1 to 2, 4 and 6"
 msgstr "Seiten 1 bis 2, 4 und 6 extrahieren"
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:75
+#: src/file_conversor/cli/pdf/extract_cmd.py:77
 msgid "Pages to extract (comma-separated list). Format \"start-end\"."
 msgstr "Seiten zum Extrahieren (Komma-getrennte Liste). Format \"Startend\"."
 
-#: src/file_conversor/cli/pdf/extract_cmd.py:93
+#: src/file_conversor/cli/pdf/extract_cmd.py:95
 msgid "Extract pages"
 msgstr "Seiten extrahieren"
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:61
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:63
 msgid "Extract images from a PDF."
 msgstr "Extrahieren Sie Bilder aus einem PDF."
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:63
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:65
 msgid ""
 "For every PDF page, a new image file will be created using the format "
 "`input_file_X`, where X is the page number."
 msgstr ""
-"Für jede PDF -Seite wird eine neue Bilddatei mit dem Format `input_file_x` "
-"erstellt, wobei x die Seitennummer ist."
+"Für jede PDF -Seite wird eine neue Bilddatei mit dem Format "
+"`input_file_x` erstellt, wobei x die Seitennummer ist."
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:87
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
 msgid "Extract images"
 msgstr "Bilder extrahieren"
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:41
+#: src/file_conversor/cli/pdf/merge_cmd.py:43
 msgid "Merge (join) input PDFs into a single PDF file."
 msgstr "Merge (join) PDFs in eine einzelne PDF -Datei eingeben."
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:43
+#: src/file_conversor/cli/pdf/merge_cmd.py:45
 msgid "Outputs a file with _merged at the end."
 msgstr "Gibt eine Datei mit _Merged am Ende aus."
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:50
-msgid "Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into \"output_file.pdf\""
+#: src/file_conversor/cli/pdf/merge_cmd.py:52
+msgid ""
+"Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into "
+"\"output_file.pdf\""
 msgstr ""
 "Führen Sie die Dateien \"input_file1.pdf\" und \"input_file2.pdf\" in "
 "\"output_file.pdf\" zusammen."
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:56
+#: src/file_conversor/cli/pdf/merge_cmd.py:58
 msgid ""
 "Merge protected PDFs \"input_file1.pdf\" and \"input_file2.pdf\" with "
 "password \"unlock_password\""
@@ -952,73 +1119,72 @@ msgstr ""
 "Merge Protected PDFs \"input_file1.pdf\" und \"input_file2.pdf\" mit "
 "Passwort \"Unlock_password\""
 
-#: src/file_conversor/cli/pdf/merge_cmd.py:81
+#: src/file_conversor/cli/pdf/merge_cmd.py:83
 msgid "Merge pages"
 msgstr "Seiten verschmelzen"
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:59
+#: src/file_conversor/cli/pdf/repair_cmd.py:61
 msgid "Repair (lightly) corrupted PDF files."
 msgstr "Reparatur (leicht) beschädigte PDF -Dateien."
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:61
+#: src/file_conversor/cli/pdf/repair_cmd.py:63
 msgid "Outputs a file with _repaired at the end."
 msgstr "Gibt eine Datei mit _repaired am Ende aus."
 
-#: src/file_conversor/cli/pdf/repair_cmd.py:90
+#: src/file_conversor/cli/pdf/repair_cmd.py:92
 msgid "Repair PDF"
 msgstr "PDF reparieren"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:66
-msgid "Rotate PDF pages (clockwise or anti-clockwise)."
-msgstr ""
-"Drehen Sie PDF-Seiten (im Uhrzeigersinn oder gegen den Uhrzeigersinn)."
-
 #: src/file_conversor/cli/pdf/rotate_cmd.py:68
+msgid "Rotate PDF pages (clockwise or anti-clockwise)."
+msgstr "Drehen Sie PDF-Seiten (im Uhrzeigersinn oder gegen den Uhrzeigersinn)."
+
+#: src/file_conversor/cli/pdf/rotate_cmd.py:70
 msgid "Outputs a file with _rotated at the end."
 msgstr "Gibt eine Datei mit _rotiert am Ende aus."
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:75
+#: src/file_conversor/cli/pdf/rotate_cmd.py:77
 msgid "Rotate page 1 by 180 degress"
 msgstr "Drehen Sie Seite 1 nach 180 Degress"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:81
+#: src/file_conversor/cli/pdf/rotate_cmd.py:83
 msgid "Rotate page 5-7 by 90 degress, 9 by -90 degrees, 10-15 by 180 degrees"
 msgstr "Drehen Sie Seite 5-7 um 90 Degress, 9 x -90 Grad, 10-15 x 180 Grad"
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:88
+#: src/file_conversor/cli/pdf/rotate_cmd.py:90
 msgid ""
 "List of pages to rotate. Format ``\"page:rotation\"`` or ``\"start-"
 "end:rotation\"`` or ``\"start-:rotation\"`` ..."
 msgstr ""
-"Liste der Seiten zu drehen. Format \"\" \"Seite: Rotation\" \"\" oder \"\" "
-"\"Start-End: Rotation\" \"\" oder \"\" Start-: Rotation \"\" ... \"..."
+"Liste der Seiten zu drehen. Format \"\" \"Seite: Rotation\" \"\" oder "
+"\"\" \"Start-End: Rotation\" \"\" oder \"\" Start-: Rotation \"\" ... "
+"\"..."
 
-#: src/file_conversor/cli/pdf/rotate_cmd.py:106
+#: src/file_conversor/cli/pdf/rotate_cmd.py:108
 msgid "Rotate pages"
 msgstr "Seiten drehen"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:60
+#: src/file_conversor/cli/pdf/split_cmd.py:62
 msgid "Split PDF pages into several 1-page PDFs."
 msgstr "Teilen Sie PDF-Seiten in mehrere 1-seitige PDFs."
 
-#: src/file_conversor/cli/pdf/split_cmd.py:62
+#: src/file_conversor/cli/pdf/split_cmd.py:64
 msgid ""
-"For every PDF page, a new single page PDF will be created using the format "
-"`input_file_X.pdf`, where X is the page number."
+"For every PDF page, a new single page PDF will be created using the "
+"format `input_file_X.pdf`, where X is the page number."
 msgstr ""
 "Für jede PDF -Seite wird eine neue einzelne Seite PDF mit dem Format "
 "`input_file_x.pdf` erstellt, wobei x die Seitennummer ist."
 
-#: src/file_conversor/cli/pdf/split_cmd.py:69
+#: src/file_conversor/cli/pdf/split_cmd.py:71
 msgid "Split pages of input_file.pdf into output_file_X.pdf files"
-msgstr ""
-"Splitseiten von input_file.pdf in option_file_x.pdf -Dateien aufgeteilt"
+msgstr "Splitseiten von input_file.pdf in option_file_x.pdf -Dateien aufgeteilt"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:75
+#: src/file_conversor/cli/pdf/split_cmd.py:77
 msgid "For every PDF page, generate a \"input_file_X.pdf\" file"
 msgstr "Generieren Sie für jede PDF -Seite eine \"input_file_x.pdf\" -Datei"
 
-#: src/file_conversor/cli/pdf/split_cmd.py:97
+#: src/file_conversor/cli/pdf/split_cmd.py:99
 msgid "Split pages"
 msgstr "Seiten aufgeteilt"
 
@@ -1028,16 +1194,16 @@ msgstr "Pipeline -Dateiverarbeitung (Aufgabenautomatisierung)"
 
 #: src/file_conversor/cli/pipeline/__init__.py:19
 msgid ""
-"The pipeline processsing by processing an input folder, passing those files "
-"to the next pipeline stage, and processing them inside that stage. This "
-"process continues (output of the current stage is the input of the next "
-"stage), until those files reach the end of the pipeline."
+"The pipeline processsing by processing an input folder, passing those "
+"files to the next pipeline stage, and processing them inside that stage. "
+"This process continues (output of the current stage is the input of the "
+"next stage), until those files reach the end of the pipeline."
 msgstr ""
 "Die Pipeline verarbeitet sich durch Verarbeitung eines Eingabedordners, "
-"überträgt diese Dateien an die nächste Pipeline -Stufe und verarbeitet sie "
-"in dieser Phase. Dieser Prozess wird fortgesetzt (Ausgabe der aktuellen "
-"Stufe ist die Eingabe der nächsten Stufe), bis diese Dateien das Ende der "
-"Pipeline erreichen."
+"überträgt diese Dateien an die nächste Pipeline -Stufe und verarbeitet "
+"sie in dieser Phase. Dieser Prozess wird fortgesetzt (Ausgabe der "
+"aktuellen Stufe ist die Eingabe der nächsten Stufe), bis diese Dateien "
+"das Ende der Pipeline erreichen."
 
 #: src/file_conversor/cli/pipeline/__init__.py:23
 msgid "Example"
@@ -1059,46 +1225,45 @@ msgstr "Stufe 2"
 msgid "Output Folder"
 msgstr "Ausgangsordner"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:36
+#: src/file_conversor/cli/pipeline/create_cmd.py:38
 msgid "Creates a file processing pipeline (for tasks automation)."
 msgstr "Erstellt eine Dateiverarbeitungspipeline (für Aufgabenautomation)."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:38
-msgid ""
-"Will ask questions interactively to create the file processing pipeline."
+#: src/file_conversor/cli/pipeline/create_cmd.py:40
+msgid "Will ask questions interactively to create the file processing pipeline."
 msgstr ""
 "Wird interaktiv Fragen stellen, um die Dateiverarbeitungspipeline zu "
 "erstellen."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:40
+#: src/file_conversor/cli/pipeline/create_cmd.py:42
 msgid "Placeholders available for commands"
 msgstr "Platzhalter für Befehle zur Verfügung stehen"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:42
+#: src/file_conversor/cli/pipeline/create_cmd.py:44
 msgid "Replaced by the first file path found in pipeline stage."
 msgstr "Ersetzt durch den ersten Dateipfad in der Pipeline -Stufe."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:46
+#: src/file_conversor/cli/pipeline/create_cmd.py:48
 msgid "The name of the input file."
 msgstr "Der Name der Eingabedatei."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:50
+#: src/file_conversor/cli/pipeline/create_cmd.py:52
 msgid "The extension of the input file."
 msgstr "Die Erweiterung der Eingabedatei."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:54
+#: src/file_conversor/cli/pipeline/create_cmd.py:56
 msgid "The directory of the input path (previous pipeline stage)."
 msgstr "Das Verzeichnis des Eingangspfads (vorherige Pipeline -Stufe)."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:58
+#: src/file_conversor/cli/pipeline/create_cmd.py:60
 msgid "The directory of the output path (current pipeline stage)."
 msgstr "Das Verzeichnis des Ausgangspfads (aktuelle Pipeline -Stufe)."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:68
+#: src/file_conversor/cli/pipeline/create_cmd.py:70
 msgid "Creating batch pipeline"
 msgstr "Erstellen von Batch -Pipeline"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:69
+#: src/file_conversor/cli/pipeline/create_cmd.py:71
 msgid ""
 "Name of the batch pipeline folder (e.g., "
 "%USERPROFILE%/Desktop/pipeline_name_here)"
@@ -1106,35 +1271,35 @@ msgstr ""
 "Name des Batch -Pipeline -Ordners (z. B. %UserProfile "
 "%/Desktop/Pipeline_Name_here)"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:75
+#: src/file_conversor/cli/pipeline/create_cmd.py:77
 msgid "Name of the processing stage (e.g., image_convert)"
 msgstr "Name der Verarbeitungsphase (z. B. Image_Convert)"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:77
+#: src/file_conversor/cli/pipeline/create_cmd.py:79
 msgid "Type command here"
 msgstr "Geben Sie hier den Befehl ein"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:77
+#: src/file_conversor/cli/pipeline/create_cmd.py:79
 msgid "e.g."
 msgstr "z.B."
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:80
+#: src/file_conversor/cli/pipeline/create_cmd.py:82
 msgid "Need another pipeline stage"
 msgstr "Benötigen Sie eine andere Pipeline -Stufe"
 
-#: src/file_conversor/cli/pipeline/create_cmd.py:89
+#: src/file_conversor/cli/pipeline/create_cmd.py:91
 msgid "Pipeline creation"
 msgstr "Pipeline -Erstellung"
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:35
+#: src/file_conversor/cli/pipeline/execute_cmd.py:37
 msgid "Execute file processing pipeline."
 msgstr "Führen Sie die Dateiverarbeitungspipeline aus."
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:44
+#: src/file_conversor/cli/pipeline/execute_cmd.py:46
 msgid "Pipeline folder"
 msgstr "Pipeline -Ordner"
 
-#: src/file_conversor/cli/pipeline/execute_cmd.py:54
+#: src/file_conversor/cli/pipeline/execute_cmd.py:56
 msgid "Pipeline execution"
 msgstr "Pipeline -Ausführung"
 
@@ -1142,45 +1307,227 @@ msgstr "Pipeline -Ausführung"
 msgid "Presentation file manipulation"
 msgstr "Präsentationsdatei Manipulation"
 
-#: src/file_conversor/cli/ppt/convert_cmd.py:57
+#: src/file_conversor/cli/ppt/convert_cmd.py:60
 msgid ""
 "Convert presentation files into other formats (requires Microsoft Word / "
 "LibreOffice)."
 msgstr ""
-"Konvertieren Sie Präsentationsdateien in andere Formate (erfordert Microsoft"
-" Word / LibreOffice)."
+"Konvertieren Sie Präsentationsdateien in andere Formate (erfordert "
+"Microsoft Word / LibreOffice)."
 
 #: src/file_conversor/cli/text/__init__.py:18
 msgid "Text file manipulation (json, xml, etc)"
 msgstr "Textdateimanipulation (JSON, XML usw.)"
 
-#: src/file_conversor/cli/text/check_cmd.py:56
+#: src/file_conversor/cli/text/check_cmd.py:59
 msgid "Checks a text file (json, xml, yaml, etc)."
 msgstr "Überprüft eine Textdatei (JSON, XML, YAML usw.)."
 
-#: src/file_conversor/cli/text/check_cmd.py:69
+#: src/file_conversor/cli/text/check_cmd.py:72
 msgid "Checking files"
 msgstr "Dateien überprüfen"
 
-#: src/file_conversor/cli/text/check_cmd.py:77
+#: src/file_conversor/cli/text/check_cmd.py:80
 msgid "Check"
 msgstr "Überprüfen"
 
-#: src/file_conversor/cli/text/compress_cmd.py:58
+#: src/file_conversor/cli/text/compress_cmd.py:61
 msgid "Compress / minify text file formats (json, xml, yaml, etc)."
 msgstr "Textdateiformate komprimieren / minifieren (JSON, XML, YAML usw.)."
 
-#: src/file_conversor/cli/text/compress_cmd.py:60
+#: src/file_conversor/cli/text/compress_cmd.py:63
 msgid "Outputs a file with .min at the end."
 msgstr "Gibt eine Datei mit .min am Ende aus."
 
-#: src/file_conversor/cli/text/compress_cmd.py:81
+#: src/file_conversor/cli/text/compress_cmd.py:84
 msgid "Compression"
 msgstr "Kompression"
 
-#: src/file_conversor/cli/text/convert_cmd.py:82
+#: src/file_conversor/cli/text/convert_cmd.py:85
 msgid "Converts text file formats (json, xml, yaml, etc)."
 msgstr "Konvertiert Textdateiformate (JSON, XML, YAML usw.)."
+
+#: src/file_conversor/cli/video/__init__.py:27
+msgid "Video file manipulation (requires FFMpeg external library)"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:118
+msgid "Could not determine input file duration"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "Target size too small"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "Increase target size to at least"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
+msgid "(might not be enougth to achieve good video quality)"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:133
+msgid "Audio bitrate"
+msgstr ""
+
+#: src/file_conversor/cli/video/_ffmpeg_cmd.py:134
+msgid "Video bitrate"
+msgstr ""
+
+#: src/file_conversor/cli/video/check_cmd.py:60
+msgid "Checks a audio/video file for corruption / inconsistencies."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:62
+msgid "Compress a video file to a target file size."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:64
+msgid "Outputs an video file with _compressed at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/compress_cmd.py:76
+msgid "Target file size (<size>[K|M|G]) [0 = do not limit output file size]"
+msgstr ""
+
+#: src/file_conversor/cli/video/convert_cmd.py:82
+msgid "Convert a video file to another video format."
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:63
+msgid "Enhance video bitrate, resolution, fps, color, brightness, etc."
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:102
+msgid "Target Resolution (width:height) [0:0 = do not change video resolution]"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:108
+msgid "Target FPS [0 = do not change FPS]"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:114
+msgid "Color adjustment (> 1.0 increases color, < 1.0 decreases color)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:118
+msgid ""
+"Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases "
+"brightness)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:122
+msgid "Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:126
+msgid "Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:131
+msgid "Apply deshake filter?"
+msgstr ""
+
+#: src/file_conversor/cli/video/enhance_cmd.py:135
+msgid "Apply unsharp filter?"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:41
+msgid "Execute FFmpeg command (advanced, use with caution)."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+msgid "Apply a custom FFmpeg audio filter"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid ""
+"(advanced option, use with caution). Uses the same format as FFmpeg "
+"filters (e.g., filter=option1=value1:option2=value2:...). Filters are "
+"applied in the order they appear in the command."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:64
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid "Defaults to None (do not apply custom filters)"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:68
+msgid "Apply a custom FFmpeg video filter"
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:72
+msgid ""
+"Apply a custom FFmpeg output arguments (advanced option, use with "
+"caution)."
+msgstr ""
+
+#: src/file_conversor/cli/video/execute_cmd.py:72
+#: src/file_conversor/utils/typer_utils.py:56
+msgid "Defaults to None"
+msgstr "Standardmäßig keine"
+
+#: src/file_conversor/cli/video/execute_cmd.py:103
+msgid "FFMpeg execution"
+msgstr ""
+
+#: src/file_conversor/cli/video/info_cmd.py:66
+msgid "Get information about a audio/video file."
+msgstr "Informieren Sie sich über eine Audio-/Videodatei."
+
+#: src/file_conversor/cli/video/info_cmd.py:68
+msgid ""
+"This command retrieves metadata and other information about the audio / "
+"video file"
+msgstr ""
+"In diesem Befehl werden Metadaten und andere Informationen zur Audio- / "
+"Videodatei abgerufen"
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:40
+msgid "List available video formats and codecs."
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:42
+msgid "If a video format is provided, only codecs for that format will be shown."
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:61
+msgid "Audio codecs"
+msgstr ""
+
+#: src/file_conversor/cli/video/list_formats_cmd.py:62
+msgid "Video codecs"
+msgstr ""
+
+#: src/file_conversor/cli/video/mirror_cmd.py:69
+msgid "Mirror a video file (vertically or horizontally)."
+msgstr ""
+
+#: src/file_conversor/cli/video/mirror_cmd.py:71
+msgid "Outputs a video file with _mirrored at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:63
+msgid "Resize a video file (downscaling / upscaling)."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:65
+msgid "Outputs a video file with _resized at the end."
+msgstr ""
+
+#: src/file_conversor/cli/video/resize_cmd.py:77
+msgid "Enter target resolution (WIDTH:HEIGHT)"
+msgstr ""
+
+#: src/file_conversor/cli/video/rotate_cmd.py:69
+msgid "Rotate a video file (clockwise or anti-clockwise)."
+msgstr ""
+
+#: src/file_conversor/cli/video/rotate_cmd.py:71
+msgid "Outputs an video file with _rotated at the end."
+msgstr ""
 
 #: src/file_conversor/cli/win/__init__.py:18
 msgid "Windows OS commands (for Windows ONLY)"
@@ -1190,49 +1537,49 @@ msgstr "Windows OS -Befehle (nur für Windows)"
 msgid "Context menu"
 msgstr "Kontextmenü"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:40
+#: src/file_conversor/cli/win/install_menu_cmd.py:42
 msgid "Installs app context menu (right click in Windows Explorer)."
 msgstr ""
-"Installiert das App -Kontext -Menü (klicken Sie mit der rechten Maustaste im"
-" Windows Explorer)."
+"Installiert das App -Kontext -Menü (klicken Sie mit der rechten Maustaste"
+" im Windows Explorer)."
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:49
+#: src/file_conversor/cli/win/install_menu_cmd.py:51
 msgid ""
-"Restart explorer.exe (to make ctx menu effective immediately). Defaults to "
-"False (do not restart, user must log off/in to make ctx menu changes "
+"Restart explorer.exe (to make ctx menu effective immediately). Defaults "
+"to False (do not restart, user must log off/in to make ctx menu changes "
 "effective)"
 msgstr ""
 "Neustart explorer.exe (um das CTX -Menü sofort effektiv zu machen). "
-"Standardeinstellungen zu FALSE (Nicht neu starten, der Benutzer muss sich "
-"anmelden, um das CTX -Menüänderungen effektiv zu machen)."
+"Standardeinstellungen zu FALSE (Nicht neu starten, der Benutzer muss sich"
+" anmelden, um das CTX -Menüänderungen effektiv zu machen)."
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:57
+#: src/file_conversor/cli/win/install_menu_cmd.py:59
 msgid "Installing app context menu in Windows Explorer"
 msgstr "Installieren von App -Kontextmenü in Windows Explorer"
 
-#: src/file_conversor/cli/win/install_menu_cmd.py:71
+#: src/file_conversor/cli/win/install_menu_cmd.py:73
 msgid "Context Menu Install"
 msgstr "Kontextmenü Installation"
 
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:35
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:37
 msgid "Restarts explorer.exe (to refresh ctx menus)."
 msgstr "Starten Sie explorer.exe neu (um die CTX -Menüs zu aktualisieren)."
 
-#: src/file_conversor/cli/win/restart_explorer_cmd.py:43
+#: src/file_conversor/cli/win/restart_explorer_cmd.py:45
 msgid "Restarting explorer.exe"
 msgstr "Neustarten von Explorer.exe"
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:37
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:39
 msgid "Uninstalls app context menu (right click in Windows Explorer)."
 msgstr ""
 "Deinstallieren Sie das App -Kontext -Menü (Klicken Sie mit der rechten "
 "Maustaste im Windows Explorer)."
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:47
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:49
 msgid "Removing app context menu from Windows Explorer"
 msgstr "Entfernen Sie das App -Kontextmenü vom Windows Explorer"
 
-#: src/file_conversor/cli/win/uninstall_menu_cmd.py:56
+#: src/file_conversor/cli/win/uninstall_menu_cmd.py:58
 msgid "Context Menu Uninstall"
 msgstr "Kontextmenü Deinstallation"
 
@@ -1240,7 +1587,7 @@ msgstr "Kontextmenü Deinstallation"
 msgid "Spreadsheet file manipulation"
 msgstr "Tabellenkalkulationsdatei Manipulation"
 
-#: src/file_conversor/cli/xls/convert_cmd.py:57
+#: src/file_conversor/cli/xls/convert_cmd.py:60
 msgid ""
 "Convert spreadsheet files into other formats (requires Microsoft Word / "
 "LibreOffice)."
@@ -1304,41 +1651,41 @@ msgstr "Eimer"
 msgid "added to scoop"
 msgstr "hinzugefügt zu Scoop"
 
-#: src/file_conversor/utils/formatters.py:17
+#: src/file_conversor/utils/formatters.py:36
 msgid "Scale and width not provided"
 msgstr "Skalierung und Breite nicht zur Verfügung gestellt"
 
-#: src/file_conversor/utils/formatters.py:18
+#: src/file_conversor/utils/formatters.py:37
 msgid "Output image scale (e.g., 1.5)"
 msgstr "Ausgangsbildskala (z. B. 1,5)"
 
-#: src/file_conversor/utils/formatters.py:29
+#: src/file_conversor/utils/formatters.py:48
 msgid "Invalid rotation instruction"
 msgstr "Ungültige Rotationsanweisung"
 
-#: src/file_conversor/utils/formatters.py:29
+#: src/file_conversor/utils/formatters.py:48
 msgid "Valid format is 'begin-end:degree' or 'page:degree'"
 msgstr "Das gültige Format ist 'Beginn-End: Grad' oder 'Seite: Grad'"
 
-#: src/file_conversor/utils/formatters.py:40
-#: src/file_conversor/utils/formatters.py:65
+#: src/file_conversor/utils/formatters.py:59
+#: src/file_conversor/utils/formatters.py:84
 msgid "Invalid begin-end page interval"
 msgstr "Ungültiges Intervall der Beginn-End-Seite"
 
-#: src/file_conversor/utils/formatters.py:40
-#: src/file_conversor/utils/formatters.py:65
+#: src/file_conversor/utils/formatters.py:59
+#: src/file_conversor/utils/formatters.py:84
 msgid "End Page < Begin Page"
 msgstr "Endseite <Begine Seite beginnen"
 
-#: src/file_conversor/utils/formatters.py:50
+#: src/file_conversor/utils/formatters.py:69
 msgid "Pages to extract [comma-separated list] (e.g., 1-3, 7-7)"
 msgstr "Seiten zum Extrahieren [Komma-getrennte Liste] (z. B. 1-3, 7-7)"
 
-#: src/file_conversor/utils/formatters.py:58
+#: src/file_conversor/utils/formatters.py:77
 msgid "Invalid page instruction"
 msgstr "Ungültige Seitenanweisung"
 
-#: src/file_conversor/utils/formatters.py:58
+#: src/file_conversor/utils/formatters.py:77
 msgid "Valid format is 'begin-end'"
 msgstr "Das gültige Format ist \"Beginn\""
 
@@ -1346,93 +1693,243 @@ msgstr "Das gültige Format ist \"Beginn\""
 msgid "Processing files:"
 msgstr "Verarbeitungsdateien:"
 
-#: src/file_conversor/utils/typer_utils.py:18
-#: src/file_conversor/utils/typer_utils.py:22
+#: src/file_conversor/utils/typer_utils.py:25
 msgid "Input files"
 msgstr "Eingabedateien"
 
-#: src/file_conversor/utils/typer_utils.py:31
+#: src/file_conversor/utils/typer_utils.py:38
 msgid "Output format"
 msgstr "Ausgangsformat"
 
-#: src/file_conversor/utils/typer_utils.py:40
+#: src/file_conversor/utils/typer_utils.py:47
 msgid "Output directory"
 msgstr "Ausgabeverzeichnis"
 
-#: src/file_conversor/utils/typer_utils.py:40
+#: src/file_conversor/utils/typer_utils.py:47
 msgid "Defaults to current working directory"
 msgstr "Standardeinstellungen zum aktuellen Arbeitsverzeichnis"
 
-#: src/file_conversor/utils/typer_utils.py:49
+#: src/file_conversor/utils/typer_utils.py:56
 msgid "Output file"
 msgstr "Ausgabedatei"
 
-#: src/file_conversor/utils/typer_utils.py:49
-msgid "Defaults to None"
-msgstr "Standardmäßig keine"
-
-#: src/file_conversor/utils/typer_utils.py:49
+#: src/file_conversor/utils/typer_utils.py:56
 msgid "use the same 1st input file as output name"
 msgstr "Verwenden Sie dieselbe erste Eingabedatei wie der Ausgabenname"
 
-#: src/file_conversor/utils/typer_utils.py:58
+#: src/file_conversor/utils/typer_utils.py:69
 msgid "Image quality. Valid values are between 1-100."
 msgstr "Bildqualität. Gültige Werte liegen zwischen 1-100."
 
-#: src/file_conversor/utils/typer_utils.py:67
+#: src/file_conversor/utils/typer_utils.py:79
 msgid ""
-"Image quality in dots per inch (DPI). Valid values are between 40-3600."
+"Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip "
+"vertically)."
 msgstr ""
-"Bildqualität in Punkten pro Zoll (DPI). Gültige Werte liegen zwischen 40 und"
-" 3600."
 
-#: src/file_conversor/utils/typer_utils.py:76
+#: src/file_conversor/utils/typer_utils.py:89
+msgid "Image quality in dots per inch (DPI). Valid values are between 40-3600."
+msgstr ""
+"Bildqualität in Punkten pro Zoll (DPI). Gültige Werte liegen zwischen 40 "
+"und 3600."
+
+#: src/file_conversor/utils/typer_utils.py:100
 msgid ""
-"Password used to open protected file. Defaults to None (do not decrypt)."
+"Adjust brightness. brightness = 1.00 means no change. brightness < 1.00 "
+"makes image black. brightness > 1.00 makes image lighter."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:109
+msgid ""
+"Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces"
+" contrast (grayish image). contrast > 1.00 increases contrast."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:118
+msgid ""
+"Adjust color. color = 1.00 means no change. color < 1.00 reduces color "
+"saturation. color > 1.00 increases color saturation."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:127
+msgid ""
+"Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 "
+"makes image more blurry. sharpness > 1.00 increases image crispness (and "
+"noise as well)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:135
+msgid "Box radius (in pixels)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:149
+msgid "Password used to open protected file. Defaults to None (do not decrypt)."
 msgstr ""
 "Passwort zum Öffnen der geschützten Datei. Standardmäßig keine (nicht "
 "entschlüsseln)."
 
-#: src/file_conversor/utils/validators.py:28
-#: src/file_conversor/utils/validators.py:37
+#: src/file_conversor/utils/typer_utils.py:161
+msgid "Target file size."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:161
+msgid ""
+"Format <size>[K|M|G]. If 0, do not limit output file size (use encoding "
+"speed and quality options to calculate output file size)."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:181
+msgid ""
+"Overrides video quality setting (if set). If 0, use video quality setting"
+" to encode video using variable bitrate (CRF) encoding (if supported by "
+"codec, otherwise use default bitrate for codec/container)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:191
+msgid ""
+"Audio codec. Not all codecs are supported in a given format container "
+"(run `file_conversor video list-formats` for more information). Available"
+" options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:191
+#: src/file_conversor/utils/typer_utils.py:201
+msgid "Defaults to None (use the default for the file container)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:201
+msgid ""
+"Video codec. Not all codecs are supported in a given format container "
+"(run `file_conversor video list-formats` for more information). Available"
+" options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+msgid "Video encoding speed/quality trade-off. Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+msgid ""
+"Faster encoding speed usually results in lower video quality and larger "
+"file size"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:211
+#: src/file_conversor/utils/typer_utils.py:221
+msgid "Defaults to 'medium'"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:221
+msgid "Video quality preset. Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:221
+msgid ""
+"Higher quality usually results in larger file size. Video bitrate (if "
+"set) overrides this setting."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:231
+msgid ""
+"Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to "
+"None (use same resolution as video source)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:241
+msgid ""
+"Target video FPS (frames per second). Uses ``minterpolate`` filter to "
+"adjust fps. Defaults to None (use same fps as video source)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:251
+msgid "Rotate video (clockwise). Available options are:"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:262
+msgid "Adjust gamma"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:262
+msgid ""
+"gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma"
+" > 1.00 increases image lightenss"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:270
+msgid "Increase video sharpness (using unsharp mask). May increase image noise."
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:270
+#: src/file_conversor/utils/typer_utils.py:279
+msgid "Defaults to False (do not apply filter)"
+msgstr ""
+
+#: src/file_conversor/utils/typer_utils.py:279
+msgid "Deshake video (attempt to fix vertical/horizontal span from handrecoding)"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:72
+msgid "Invalid file size"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:72
+msgid "Valid file size is <size>[K|M|G]"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:95
+#: src/file_conversor/utils/validators.py:98
+msgid "Invalid format for video resolution"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:95
+#: src/file_conversor/utils/validators.py:98
+msgid "Valid format is WIDTH:HEIGHT"
+msgstr ""
+
+#: src/file_conversor/utils/validators.py:116
+#: src/file_conversor/utils/validators.py:125
 msgid "Path"
 msgstr "Weg"
 
-#: src/file_conversor/utils/validators.py:28
+#: src/file_conversor/utils/validators.py:116
 msgid "is not a file"
 msgstr "ist keine Datei"
 
-#: src/file_conversor/utils/validators.py:37
+#: src/file_conversor/utils/validators.py:125
 msgid "is not a directory"
 msgstr "ist kein Verzeichnis"
 
-#: src/file_conversor/utils/validators.py:54
+#: src/file_conversor/utils/validators.py:142
 msgid "Must be a bool or None."
 msgstr "Muss ein Bool oder keine sein."
 
-#: src/file_conversor/utils/validators.py:64
+#: src/file_conversor/utils/validators.py:152
 msgid "Must be a positive integer."
 msgstr "Muss eine positive Ganzzahl sein."
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "Invalid type"
 msgstr "Ungültiger Typ"
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "for"
 msgstr "für"
 
-#: src/file_conversor/utils/validators.py:87
+#: src/file_conversor/utils/validators.py:175
 msgid "Valid values are Iterable | str | None"
 msgstr "Gültige Werte sind iterable | str | Keiner"
 
-#: src/file_conversor/utils/validators.py:92
+#: src/file_conversor/utils/validators.py:180
 msgid "Unsupported format"
 msgstr "Nicht unterstütztes Format"
 
-#: src/file_conversor/utils/validators.py:92
+#: src/file_conversor/utils/validators.py:180
 msgid "Supported formats are"
 msgstr "Unterstützte Formate sind"
+
+#: src/file_conversor/utils/validators.py:190
+msgid "is invalid.  Valid options are"
+msgstr ""
 
 #~ msgid "Multimedia files"
 #~ msgstr "Multimedia -Dateien"
@@ -1450,16 +1947,25 @@ msgstr "Unterstützte Formate sind"
 #~ msgstr "Batch -Dateiverarbeitung (Aufgabenautomatisierung)"
 
 #~ msgid ""
-#~ "The batch processing pipeline works by monitoring an input folder, passing "
-#~ "those files to the next pipeline stage, and processing them inside that "
-#~ "stage. This process continues (output of the current stage is the input of "
-#~ "the next stage), until those files reach the end of the pipeline."
+#~ "The batch processing pipeline works by"
+#~ " monitoring an input folder, passing "
+#~ "those files to the next pipeline "
+#~ "stage, and processing them inside that"
+#~ " stage. This process continues (output "
+#~ "of the current stage is the input"
+#~ " of the next stage), until those "
+#~ "files reach the end of the "
+#~ "pipeline."
 #~ msgstr ""
-#~ "Die Stapelverarbeitungspipeline funktioniert, indem ein Eingabefordner "
-#~ "überwacht, diese Dateien an die nächste Pipeline -Stufe weitergeleitet und "
-#~ "in dieser Phase verarbeitet werden. Dieser Prozess wird fortgesetzt (Ausgabe"
-#~ " der aktuellen Stufe ist die Eingabe der nächsten Stufe), bis diese Dateien "
-#~ "das Ende der Pipeline erreichen."
+#~ "Die Stapelverarbeitungspipeline funktioniert, indem"
+#~ " ein Eingabefordner überwacht, diese "
+#~ "Dateien an die nächste Pipeline -Stufe"
+#~ " weitergeleitet und in dieser Phase "
+#~ "verarbeitet werden. Dieser Prozess wird "
+#~ "fortgesetzt (Ausgabe der aktuellen Stufe "
+#~ "ist die Eingabe der nächsten Stufe), "
+#~ "bis diese Dateien das Ende der "
+#~ "Pipeline erreichen."
 
 #~ msgid "Show the application help"
 #~ msgstr "Zeigen Sie die Anwendungshilfe"
@@ -1475,7 +1981,8 @@ msgstr "Unterstützte Formate sind"
 
 #~ msgid "Batch file processing, for task automation using scripts"
 #~ msgstr ""
-#~ "Batch -Dateiverarbeitung für Aufgabenautomatisierung mithilfe von Skripten"
+#~ "Batch -Dateiverarbeitung für Aufgabenautomatisierung"
+#~ " mithilfe von Skripten"
 
 #~ msgid "Supports various input and output formats"
 #~ msgstr "Unterstützt verschiedene Eingangs- und Ausgangsformate"
@@ -1485,7 +1992,8 @@ msgstr "Unterstützte Formate sind"
 
 #~ msgid "Installs external dependencies automatically (using package managers)"
 #~ msgstr ""
-#~ "Installiert externe Abhängigkeiten automatisch (mithilfe von Paketmanagern)"
+#~ "Installiert externe Abhängigkeiten automatisch "
+#~ "(mithilfe von Paketmanagern)"
 
 #~ msgid "Parsing file metadata"
 #~ msgstr "Parsing -Dateimetadaten"
@@ -1498,13 +2006,15 @@ msgstr "Unterstützte Formate sind"
 
 #~ msgid "Creates a batch file processing pipeline (for tasks automation)."
 #~ msgstr ""
-#~ "Erstellt eine Stapeldatei -Verarbeitungspipeline (für Aufgabenautomation)."
+#~ "Erstellt eine Stapeldatei -Verarbeitungspipeline "
+#~ "(für Aufgabenautomation)."
 
 #~ msgid ""
-#~ "Will ask questions interactively to create a batch file processing pipeline."
+#~ "Will ask questions interactively to "
+#~ "create a batch file processing pipeline."
 #~ msgstr ""
-#~ "Fragen Sie interaktiv Fragen, um eine Stapeldatei -Verarbeitungspipeline zu "
-#~ "erstellen."
+#~ "Fragen Sie interaktiv Fragen, um eine"
+#~ " Stapeldatei -Verarbeitungspipeline zu erstellen."
 
 #~ msgid "Batch creation"
 #~ msgstr "Batch -Schöpfung"
@@ -1516,28 +2026,39 @@ msgstr "Unterstützte Formate sind"
 #~ msgstr "Batch -Ausführung"
 
 #~ msgid ""
-#~ "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
-#~ "defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "
+#~ "Image fit (for ``image to_pdf`` "
+#~ "command). Valid only if ``--page-size``"
+#~ " is defined. Valid values are 'into',"
+#~ " or 'fill'. Defaults to 'into'. "
 #~ msgstr ""
-#~ "Image Fit (für den Befehl `` image to_pdf``). Nur gültig, wenn ``--PAGE-"
-#~ "Size`` definiert ist. Gültige Werte sind in 'oder' füllen '. "
-#~ "Standardeinstellungen zu 'in'."
+#~ "Image Fit (für den Befehl `` image"
+#~ " to_pdf``). Nur gültig, wenn ``--PAGE-"
+#~ "Size`` definiert ist. Gültige Werte sind"
+#~ " in 'oder' füllen '. Standardeinstellungen"
+#~ " zu 'in'."
 
 #~ msgid ""
-#~ "Page size (for ``image to_pdf`` command). Format (width, height). Other "
-#~ "valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size "
-#~ "= image size)."
+#~ "Page size (for ``image to_pdf`` "
+#~ "command). Format (width, height). Other "
+#~ "valid values are: 'a4_portrait', "
+#~ "'a4_landscape'. Defaults to None (PDF "
+#~ "size = image size)."
 #~ msgstr ""
-#~ "Seitengröße (für den Befehl `` image to_pdf``). Format (Breite, Höhe). "
-#~ "Weitere gültige Werte sind: 'A4_Portrait', 'A4_landscape'. "
-#~ "Standardeinstellungen nicht (PDF -Größe = Bildgröße)."
+#~ "Seitengröße (für den Befehl `` image "
+#~ "to_pdf``). Format (Breite, Höhe). Weitere "
+#~ "gültige Werte sind: 'A4_Portrait', "
+#~ "'A4_landscape'. Standardeinstellungen nicht (PDF "
+#~ "-Größe = Bildgröße)."
 
 #~ msgid ""
-#~ "Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set "
+#~ "Set PDF metadata (for ``image to_pdf``"
+#~ " command). Defaults to True (set "
 #~ "creator, producer, modification date, etc)."
 #~ msgstr ""
-#~ "Setzen Sie PDF -Metadaten (für den Befehl `` image to_pdf``). "
-#~ "Standardeinstellungen zu True (Set Creator, Produzent, Änderungsdatum usw.)."
+#~ "Setzen Sie PDF -Metadaten (für den "
+#~ "Befehl `` image to_pdf``). "
+#~ "Standardeinstellungen zu True (Set Creator,"
+#~ " Produzent, Änderungsdatum usw.)."
 
 #~ msgid "use the same input file as output name"
 #~ msgstr "Verwenden Sie dieselbe Eingabedatei wie der Ausgabenname"
@@ -1546,29 +2067,38 @@ msgstr "Unterstützte Formate sind"
 #~ msgstr "mit _ komprimiert am Ende)"
 
 #~ msgid "Image quality (valid only for JPG). Valid values are between 1-100."
-#~ msgstr ""
-#~ "Bildqualität (nur für JPG gültig). Gültige Werte liegen zwischen 1-100."
+#~ msgstr "Bildqualität (nur für JPG gültig). Gültige Werte liegen zwischen 1-100."
 
 #~ msgid ""
-#~ "Image fit. Valid only if ``--page-size`` is defined. Valid values are "
-#~ "'into', or 'fill'. Defaults to 'into'. "
+#~ "Image fit. Valid only if ``--page-"
+#~ "size`` is defined. Valid values are "
+#~ "'into', or 'fill'. Defaults to 'into'."
+#~ " "
 #~ msgstr ""
-#~ "Bildanpassung. Nur gültig, wenn ``--PAGE-Size`` definiert ist. Gültige Werte"
-#~ " sind in 'oder' füllen '. Standardeinstellungen zu 'in'."
+#~ "Bildanpassung. Nur gültig, wenn ``--PAGE-"
+#~ "Size`` definiert ist. Gültige Werte sind"
+#~ " in 'oder' füllen '. Standardeinstellungen"
+#~ " zu 'in'."
 
 #~ msgid ""
-#~ "Page size. Format '(width, height)'. Other valid values are: 'a4', "
-#~ "'a4_landscape'. Defaults to None (PDF size = image size)."
+#~ "Page size. Format '(width, height)'. "
+#~ "Other valid values are: 'a4', "
+#~ "'a4_landscape'. Defaults to None (PDF "
+#~ "size = image size)."
 #~ msgstr ""
-#~ "Seitengröße. Format '(Breite, Höhe)'. Weitere gültige Werte sind: 'A4', "
-#~ "'A4_LANDSCAPE'. Standardeinstellungen nicht (PDF -Größe = Bildgröße)."
+#~ "Seitengröße. Format '(Breite, Höhe)'. Weitere"
+#~ " gültige Werte sind: 'A4', 'A4_LANDSCAPE'."
+#~ " Standardeinstellungen nicht (PDF -Größe ="
+#~ " Bildgröße)."
 
 #~ msgid ""
-#~ "Set PDF metadata. Defaults to True (set creator, producer, modification "
-#~ "date, etc)."
+#~ "Set PDF metadata. Defaults to True "
+#~ "(set creator, producer, modification date, "
+#~ "etc)."
 #~ msgstr ""
-#~ "Stellen Sie PDF -Metadaten ein. Standardeinstellungen zu True (Set Creator, "
-#~ "Produzent, Änderungsdatum usw.)."
+#~ "Stellen Sie PDF -Metadaten ein. "
+#~ "Standardeinstellungen zu True (Set Creator,"
+#~ " Produzent, Änderungsdatum usw.)."
 
 #~ msgid "with _rotated at the end)"
 #~ msgstr "mit _rotiert am Ende)"
@@ -1578,31 +2108,36 @@ msgstr "Unterstützte Formate sind"
 
 #~ msgid "Repair (lightly) corrupted PDF files (optionally compressing them)."
 #~ msgstr ""
-#~ "Reparatur (leicht) beschädigte PDF -Dateien (optional komprimieren sie)."
+#~ "Reparatur (leicht) beschädigte PDF -Dateien"
+#~ " (optional komprimieren sie)."
 
 #~ msgid "with _repaired.pdf at the end)"
 #~ msgstr "mit _repaired.pdf am Ende)"
 
 #~ msgid "Compress output PDF file (losslessly). Defaults to True (compress)."
 #~ msgstr ""
-#~ "PDF -Datei ausgabe (Verlustlos). Standardeinstellungen zu True "
-#~ "(Komprimierung)."
+#~ "PDF -Datei ausgabe (Verlustlos). "
+#~ "Standardeinstellungen zu True (Komprimierung)."
 
 #~ msgid "with _compressed.pdf at the end)"
 #~ msgstr "mit _compressed.pdf am Ende)"
 
 #~ msgid ""
-#~ "Merge protected PDF \"input_file1.pdf\" with password \"unlock_password\" "
-#~ "with unprotected file \"input_file2.pdf\""
+#~ "Merge protected PDF \"input_file1.pdf\" with"
+#~ " password \"unlock_password\" with unprotected"
+#~ " file \"input_file2.pdf\""
 #~ msgstr ""
-#~ "Merge Protected PDF \"input_file1.pdf\" mit Passwort \"Unlock_password\" mit"
-#~ " ungeschützter Datei \"input_file2.pdf\""
+#~ "Merge Protected PDF \"input_file1.pdf\" mit"
+#~ " Passwort \"Unlock_password\" mit ungeschützter"
+#~ " Datei \"input_file2.pdf\""
 
 #~ msgid ""
-#~ "If file is protected, provide its password using the format "
+#~ "If file is protected, provide its "
+#~ "password using the format "
 #~ "`\"filepath:password\"`"
 #~ msgstr ""
-#~ "Wenn die Datei geschützt ist, geben Sie ihr Passwort mit dem Format "
+#~ "Wenn die Datei geschützt ist, geben "
+#~ "Sie ihr Passwort mit dem Format "
 #~ "\"Filepath: Passwort\" `an"
 
 #~ msgid "use the same input file of 1st file as output name"
@@ -1618,11 +2153,15 @@ msgstr "Unterstützte Formate sind"
 #~ msgstr "Gültiges Format ist 'FilePath: Passwort' oder 'Filepath'"
 
 #~ msgid ""
-#~ "For every PDF page, a new single page PDF will be created using the format "
-#~ "`output_file_X.pdf`, where X is the page number."
+#~ "For every PDF page, a new single"
+#~ " page PDF will be created using "
+#~ "the format `output_file_X.pdf`, where X "
+#~ "is the page number."
 #~ msgstr ""
-#~ "Für jede PDF -Seite wird eine neue einzelne Seite PDF mit dem Format "
-#~ "`output_file_x.pdf` erstellt, wobei x die Seitennummer ist."
+#~ "Für jede PDF -Seite wird eine neue"
+#~ " einzelne Seite PDF mit dem Format"
+#~ " `output_file_x.pdf` erstellt, wobei x die"
+#~ " Seitennummer ist."
 
 #~ msgid "Output file path"
 #~ msgstr "Ausgabedateipfad"
@@ -1630,10 +2169,13 @@ msgstr "Unterstützte Formate sind"
 #~ msgid "with _extracted.pdf at the end)"
 #~ msgstr "mit _extracted.pdf am Ende)"
 
-#~ msgid "Pages to extract (comma-separated list). Format \"page_num\" or \"start-end\"."
+#~ msgid ""
+#~ "Pages to extract (comma-separated list)."
+#~ " Format \"page_num\" or \"start-end\"."
 #~ msgstr ""
-#~ "Seiten zum Extrahieren (Komma-getrennte Liste). Format \"page_num\" oder "
-#~ "\"Start-End\"."
+#~ "Seiten zum Extrahieren (Komma-getrennte "
+#~ "Liste). Format \"page_num\" oder \"Start-"
+#~ "End\"."
 
 #~ msgid "Pages to extract [comma-separated list] (e.g., 1-3, 7)"
 #~ msgstr "Seiten zum Extrahieren [Komma-getrennte Liste] (z. B. 1-3, 7)"
@@ -1649,3 +2191,55 @@ msgstr "Unterstützte Formate sind"
 
 #~ msgid "with _decrypted.pdf at the end)"
 #~ msgstr "mit _decrypted.pdf am Ende)"
+
+#~ msgid "Audio / Video file manipulation (requires FFMpeg external library)"
+#~ msgstr ""
+#~ "Audio / Videodatei Manipulation (erfordert "
+#~ "die externe Bibliothek der FFMPEG)"
+
+#~ msgid "Convert a audio/video file to a different format."
+#~ msgstr "Konvertieren Sie eine Audio-/Videodatei in ein anderes Format."
+
+#~ msgid ""
+#~ "This command can be used to "
+#~ "convert audio or video files to "
+#~ "the specified format."
+#~ msgstr ""
+#~ "Dieser Befehl kann verwendet werden, um"
+#~ " Audio- oder Videodateien in das "
+#~ "angegebene Format umzuwandeln."
+
+#~ msgid "Audio bitrate in kbps"
+#~ msgstr "Audio -Bitrate in KBPS"
+
+#~ msgid "Video bitrate in kbps"
+#~ msgstr "Video -Bitrate in KBPS"
+
+#~ msgid "FFMpeg convertion"
+#~ msgstr "FFMPEG -Konvertion"
+
+#~ msgid ""
+#~ "Set preferred language for app (if "
+#~ "available). Format lang_COUNTRY. Defaults to"
+#~ " system preffered language or 'en_US' "
+#~ "(English - United States)."
+#~ msgstr ""
+#~ "Setzen Sie die bevorzugte Sprache für"
+#~ " App (falls verfügbar). Format "
+#~ "Lang_country. Standardeinstellungen zu Systems "
+#~ "bevorzugtes Sprache oder 'en_us' (Englisch "
+#~ "- Vereinigte Staaten)."
+
+#~ msgid "Conversion"
+#~ msgstr "Konvertierung"
+
+#~ msgid "Transformation"
+#~ msgstr "Transformation"
+
+#~ msgid ""
+#~ "Axis. Valid values are 'x' (mirror "
+#~ "horizontally) or 'y' (flip vertically)."
+#~ msgstr ""
+#~ "Achse. Gültige Werte sind 'x' (spiegel"
+#~ " horizontal) oder 'y' (vertikal Flip)."
+

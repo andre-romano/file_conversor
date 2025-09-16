@@ -64,10 +64,10 @@ def release_notes(c: InvokeContext):
 @task(pre=[base.tests])
 def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [/]")
-    result = c.run(f"git tag {GIT_RELEASE}")
+    result = c.run(f"git push")
     assert (result is not None) and (result.return_code == 0)
 
-    result = c.run(f"git push")
+    result = c.run(f"git tag {GIT_RELEASE}")
     assert (result is not None) and (result.return_code == 0)
 
     result = c.run(f"git push --tags")
