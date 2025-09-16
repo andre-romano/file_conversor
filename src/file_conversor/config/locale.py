@@ -4,12 +4,22 @@
 import gettext  # app translations / locales
 import locale
 
+from typing import Callable
+
 from file_conversor.config.environment import Environment
 from file_conversor.config.config import Configuration
 
 CONFIG = Configuration.get_instance()
 
 AVAILABLE_LANGUAGES = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
+
+_gettext_instance: Callable[[str], str] | None = None
+
+
+def _print_debug():
+    print(f"Locales folder: {Environment.get_locales_folder()}")
+    print(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
+    print(f"Config / sys lang: ({CONFIG['language']} / {get_system_locale()})")
 
 
 def get_default_language():
@@ -33,6 +43,10 @@ def get_translation():
     """
     Get translation mechanism, based on user preferences.
     """
+    global _gettext_instance
+    if _gettext_instance:
+        return _gettext_instance
+
     languages: list[str] = []
     try:
         languages = [
@@ -42,15 +56,16 @@ def get_translation():
         ]
         languages = [lang for lang in languages if lang]  # Filter out None entries
         if not languages:
-            print(f"WARNING: No valid languages found. Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
+            print(f"WARNING: No valid languages found")
+            _print_debug()
         translation = gettext.translation(
             'messages', Environment.get_locales_folder(),
             languages=languages,
             fallback=True,
         )
+        _gettext_instance = translation.gettext
+        return _gettext_instance
     except:
-        print(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
-        print(f"Config / sys lang: ({CONFIG['language']} / {get_system_locale()})")
+        _print_debug()
         print(f"Languages tried: {languages}")
         raise
-    return translation.gettext
