@@ -51,12 +51,6 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png" -q 90',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
-            WinContextCommand(
-                name="to_webp",
-                description="To WEBP",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "webp" -q 90',
-                icon=str(icons_folder_path / 'webp.ico'),
-            ),
         ])
 
 

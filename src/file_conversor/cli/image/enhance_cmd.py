@@ -39,28 +39,10 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
     for ext in PillowBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
-                name="color",
-                description="Color Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --color 1.20',
+                name="enhance",
+                description="Enhance",
+                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1""',
                 icon=str(icons_folder_path / "color.ico"),
-            ),
-            WinContextCommand(
-                name="contrast",
-                description="Contrast Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --contrast 1.20',
-                icon=str(icons_folder_path / "contrast.ico"),
-            ),
-            WinContextCommand(
-                name="brightness",
-                description="Brightness Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --brightness 1.20',
-                icon=str(icons_folder_path / "brightness.ico"),
-            ),
-            WinContextCommand(
-                name="sharpness",
-                description="Sharpness Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --sharpness 1.20',
-                icon=str(icons_folder_path / "sharpener.ico"),
             ),
         ])
 
@@ -99,6 +81,12 @@ def enhance(
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    if brightness == 1.00 and contrast == 1.00 and color == 1.00 and sharpness == 1.00:
+        brightness = typer.prompt("Brightness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
+        contrast = typer.prompt("Contrast factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
+        color = typer.prompt("Color factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
+        sharpness = typer.prompt("Sharpness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         logger.info(f"Processing '{output_file}' ... ")

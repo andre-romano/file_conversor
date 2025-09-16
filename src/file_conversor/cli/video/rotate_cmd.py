@@ -54,12 +54,6 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r 90',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
-            WinContextCommand(
-                name="rotate_clock_180",
-                description="Rotate 180",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r 180',
-                icon=str(icons_folder_path / "180_degrees.ico"),
-            ),
         ])
 
 

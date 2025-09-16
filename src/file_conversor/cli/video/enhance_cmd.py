@@ -20,7 +20,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer_utils import AudioBitrateOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
-from file_conversor.utils.validators import check_positive_integer
+from file_conversor.utils.validators import check_positive_integer, check_video_resolution, prompt_retry_on_exception
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -43,52 +43,10 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
     for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
-                name="color",
-                description="Color Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --color 1.20',
+                name="enhance",
+                description="Enhance",
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1"',
                 icon=str(icons_folder_path / "color.ico"),
-            ),
-            WinContextCommand(
-                name="contrast",
-                description="Contrast Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --contrast 1.20',
-                icon=str(icons_folder_path / "contrast.ico"),
-            ),
-            WinContextCommand(
-                name="brightness",
-                description="Brightness Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --brightness 1.20',
-                icon=str(icons_folder_path / "brightness.ico"),
-            ),
-            WinContextCommand(
-                name="gamma",
-                description="Gamma Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --gamma 1.20',
-                icon=str(icons_folder_path / "gamma.ico"),
-            ),
-            WinContextCommand(
-                name="to_30fps",
-                description="To 30 FPS",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --fps 30',
-                icon=str(icons_folder_path / "30.ico"),
-            ),
-            WinContextCommand(
-                name="to_60fps",
-                description="To 60 FPS",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --fps 60',
-                icon=str(icons_folder_path / "60.ico"),
-            ),
-            WinContextCommand(
-                name="sharpness",
-                description="Sharpness Up",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --unsharp',
-                icon=str(icons_folder_path / "sharpener.ico"),
-            ),
-            WinContextCommand(
-                name="deshake",
-                description="Deshake",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ENHANCE_NAME}" "%1" --deshake',
-                icon=str(icons_folder_path / "shaking.ico"),
             ),
         ])
 
@@ -137,6 +95,47 @@ def enhance(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
+    if (not resolution and not fps and
+            color == 1.0 and brightness == 1.0 and contrast == 1.0 and gamma == 1.0 and
+            not deshake and not unsharp):
+        resolution = prompt_retry_on_exception(
+            text=f"{_("Target Resolution (width:height) [0:0 = do not change video resolution]")}",
+            default="0:0", type=str, check_callback=check_video_resolution,
+        )
+        resolution = None if resolution == "0:0" else resolution
+
+        fps = prompt_retry_on_exception(
+            text=f"{_("Target FPS [0 = do not change FPS]")}",
+            default=0, type=int, check_callback=check_positive_integer,
+        )
+        fps = None if fps == 0 else fps
+
+        color = prompt_retry_on_exception(
+            text=f"{_("Color adjustment (> 1.0 increases color, < 1.0 decreases color)")}",
+            default=1.0, type=float,
+        )
+        brightness = prompt_retry_on_exception(
+            text=f"{_("Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases brightness)")}",
+            default=1.0, type=float,
+        )
+        contrast = prompt_retry_on_exception(
+            text=f"{_("Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)")}",
+            default=1.0, type=float,
+        )
+        gamma = prompt_retry_on_exception(
+            text=f"{_("Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)")}",
+            default=1.0, type=float,
+        )
+
+        deshake = prompt_retry_on_exception(
+            text=f"{_('Apply deshake filter?')}",
+            default=False, type=bool,
+        )
+        unsharp = prompt_retry_on_exception(
+            text=f"{_('Apply unsharp filter?')}",
+            default=False, type=bool,
+        )
+
     _ffmpeg_cli_cmd(
         input_files,
         file_format=file_format,

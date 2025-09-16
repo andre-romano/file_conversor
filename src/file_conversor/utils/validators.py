@@ -1,14 +1,71 @@
 # src\file_conversor\utils\validators.py
 
+import sys
 import typer
 
 from pathlib import Path
-from typing import Any, Iterable, List
+from typing import Any, Callable, Iterable, List
 
 # user provided imports
 from file_conversor.config.locale import get_translation
 
 _ = get_translation()
+
+
+def prompt_retry_on_exception(
+        text: str,
+        default: Any | None = None,
+        hide_input: bool = False,
+        confirmation_prompt: bool | str = False,
+        type: Any | None = None,
+        show_choices: bool = True,
+        show_default: bool = True,
+        check_callback: Callable[[Any], Any] | None = None,
+        retries: int | None = None,
+        **prompt_kwargs,
+):
+    """
+    Prompts the user for input, retrying on exception.
+
+    :param text: The prompt text.
+    :param default: The default value.
+    :param hide_input: Whether to hide the input (for passwords).
+    :param confirmation_prompt: Whether to ask for confirmation.
+    :param type: The type of the input.
+    :param show_choices: Whether to show choices (for Enum types).
+    :param show_default: Whether to show the default value.
+    :param check_callback: A callback function to validate the input.
+    :param retries: The number of retries (None for infinite).
+    :param prompt_kwargs: Additional keyword arguments for typer.prompt.
+
+    :raises typer.Abort: If the user aborts the input or retries are exhausted.
+    :return: The user input, validated by the callback if provided.
+    """
+    for _ in range(retries if retries and retries > 0 else int(sys.maxsize)):
+        try:
+            if type == bool:
+                res = typer.confirm(
+                    text=text,
+                    default=default if isinstance(default, bool) else False,
+                    show_default=show_default,
+                )
+                return check_callback(res) if check_callback else res
+            res = typer.prompt(
+                text=text,
+                default=default,
+                hide_input=hide_input,
+                confirmation_prompt=confirmation_prompt,
+                type=type,
+                show_choices=show_choices,
+                show_default=show_default,
+                **prompt_kwargs,
+            )
+            return check_callback(res) if check_callback else res
+        except (typer.Abort, KeyboardInterrupt):
+            raise
+        except:
+            pass
+    raise typer.Abort()
 
 
 def check_video_resolution(data: str | None) -> str | None:

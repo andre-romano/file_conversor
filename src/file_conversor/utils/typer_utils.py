@@ -1,6 +1,7 @@
 # src\file_conversor\utils\typer.py
 
 import typer
+from typer.models import OptionInfo
 
 from pathlib import Path
 from typing import Annotated, Any, Iterable, List
@@ -28,7 +29,7 @@ def InputFilesArgument(backend_or_iterable: type | dict | list | None = None):
     )
 
 
-def FormatOption(backend_or_iterable: type | dict | list):
+def FormatOption(backend_or_iterable: type | dict | list) -> OptionInfo:
     """--format, -f"""
     if isinstance(backend_or_iterable, (dict, list)):
         list_formats: list[str] | dict[str, Any] = backend_or_iterable
@@ -41,7 +42,7 @@ def FormatOption(backend_or_iterable: type | dict | list):
     )
 
 
-def OutputDirOption():
+def OutputDirOption() -> OptionInfo:
     """--output-dir, -od"""
     return typer.Option(
         "--output-dir", "-od",
@@ -50,7 +51,7 @@ def OutputDirOption():
     )
 
 
-def OutputFileOption(backend: type):
+def OutputFileOption(backend: type) -> OptionInfo:
     """--output-file, -of"""
     return typer.Option(
         "--output-file", "-of",
@@ -63,7 +64,7 @@ def OutputFileOption(backend: type):
 #################
 
 
-def QualityOption(prompt: bool | str = False):
+def QualityOption(prompt: bool | str = False) -> OptionInfo:
     """--quality, -q"""
     return typer.Option(
         "--quality", "-q",
@@ -73,7 +74,7 @@ def QualityOption(prompt: bool | str = False):
     )
 
 
-def AxisOption(prompt: bool | str = False):
+def AxisOption(prompt: bool | str = False) -> OptionInfo:
     """--axis, -a"""
     return typer.Option(
         "--axis", "-a",
@@ -83,7 +84,7 @@ def AxisOption(prompt: bool | str = False):
     )
 
 
-def DPIOption(prompt: bool | str = False):
+def DPIOption(prompt: bool | str = False) -> OptionInfo:
     """--dpi, -d"""
     return typer.Option(
         "--dpi", "-d",
@@ -93,7 +94,7 @@ def DPIOption(prompt: bool | str = False):
     )
 
 
-def BrightnessOption(prompt: bool | str = False):
+def BrightnessOption(prompt: bool | str = False) -> OptionInfo:
     """--brightness, -b"""
     return typer.Option(
         "--brightness", "-b",
@@ -102,7 +103,7 @@ def BrightnessOption(prompt: bool | str = False):
     )
 
 
-def ContrastOption(prompt: bool | str = False):
+def ContrastOption(prompt: bool | str = False) -> OptionInfo:
     """--contrast, -ct"""
     return typer.Option(
         "--contrast", "-ct",
@@ -111,7 +112,7 @@ def ContrastOption(prompt: bool | str = False):
     )
 
 
-def ColorOption(prompt: bool | str = False):
+def ColorOption(prompt: bool | str = False) -> OptionInfo:
     """--color, -cl"""
     return typer.Option(
         "--color", "-cl",
@@ -120,7 +121,7 @@ def ColorOption(prompt: bool | str = False):
     )
 
 
-def SharpnessOption(prompt: bool | str = False):
+def SharpnessOption(prompt: bool | str = False) -> OptionInfo:
     """--sharpness, -s"""
     return typer.Option(
         "--sharpness", "-s",
@@ -129,7 +130,7 @@ def SharpnessOption(prompt: bool | str = False):
     )
 
 
-def RadiusOption(prompt: bool | str = False):
+def RadiusOption(prompt: bool | str = False) -> OptionInfo:
     """--radius, -r"""
     return typer.Option(
         "--radius", "-r",
@@ -143,7 +144,7 @@ def RadiusOption(prompt: bool | str = False):
 #################
 
 
-def PasswordOption():
+def PasswordOption() -> OptionInfo:
     """--password, -p"""
     return typer.Option(
         "--password", "-p",
@@ -155,7 +156,7 @@ def PasswordOption():
 #################
 
 
-def AudioBitrateOption(prompt: bool | str = False):
+def AudioBitrateOption(prompt: bool | str = False) -> OptionInfo:
     """--audio-bitrate, -ab"""
     return typer.Option(
         "--audio-bitrate", "-ab",
@@ -165,7 +166,7 @@ def AudioBitrateOption(prompt: bool | str = False):
     )
 
 
-def VideoBitrateOption(prompt: bool | str = False):
+def VideoBitrateOption(prompt: bool | str = False) -> OptionInfo:
     """--video-bitrate, -vb"""
     return typer.Option(
         "--video-bitrate", "-vb",
@@ -175,7 +176,7 @@ def VideoBitrateOption(prompt: bool | str = False):
     )
 
 
-def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = False):
+def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = False) -> OptionInfo:
     """--audio-codec, -ac"""
     return typer.Option(
         "--audio-codec", "-ac",
@@ -185,7 +186,7 @@ def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     )
 
 
-def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = False):
+def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = False) -> OptionInfo:
     """--video-codec, -vc"""
     return typer.Option(
         "--video-codec", "-vc",
@@ -195,7 +196,7 @@ def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     )
 
 
-def VideoEncodingSpeedOption(prompt: bool | str = False):
+def VideoEncodingSpeedOption(prompt: bool | str = False) -> OptionInfo:
     """--video-encoding-speed, -ves"""
     return typer.Option(
         "--video-encoding-speed", "-ves",
@@ -205,7 +206,7 @@ def VideoEncodingSpeedOption(prompt: bool | str = False):
     )
 
 
-def VideoQualityOption(prompt: bool | str = False):
+def VideoQualityOption(prompt: bool | str = False) -> OptionInfo:
     """--video-quality, -vq"""
     return typer.Option(
         "--video-quality", "-vq",
@@ -215,7 +216,7 @@ def VideoQualityOption(prompt: bool | str = False):
     )
 
 
-def ResolutionOption(prompt: bool | str = False):
+def ResolutionOption(prompt: bool | str = False) -> OptionInfo:
     """--resolution, -rs"""
     return typer.Option(
         "--resolution", "-rs",
@@ -225,7 +226,7 @@ def ResolutionOption(prompt: bool | str = False):
     )
 
 
-def FPSOption(prompt: bool | str = False):
+def FPSOption(prompt: bool | str = False) -> OptionInfo:
     """--fps, -fp"""
     return typer.Option(
         "--fps", "-fp",
@@ -235,7 +236,7 @@ def FPSOption(prompt: bool | str = False):
     )
 
 
-def VideoRotationOption(prompt: bool | str = False):
+def VideoRotationOption(prompt: bool | str = False) -> OptionInfo:
     """--rotation, -r"""
     return typer.Option(
         "--rotation", "-r",
@@ -245,7 +246,7 @@ def VideoRotationOption(prompt: bool | str = False):
     )
 
 
-def GammaOption(prompt: bool | str = False):
+def GammaOption(prompt: bool | str = False) -> OptionInfo:
     """--gamma, -g"""
     return typer.Option(
         "--gamma", "-g",
@@ -254,7 +255,7 @@ def GammaOption(prompt: bool | str = False):
     )
 
 
-def UnsharpOption():
+def UnsharpOption() -> OptionInfo:
     """--unsharp, -u"""
     return typer.Option(
         "--unsharp", "-u",
@@ -263,7 +264,7 @@ def UnsharpOption():
     )
 
 
-def DeshakeOption():
+def DeshakeOption() -> OptionInfo:
     """--deshake, -d"""
     return typer.Option(
         "--deshake", "-d",

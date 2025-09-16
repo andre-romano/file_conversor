@@ -50,12 +50,6 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
     for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
-                name="to_avi",
-                description="To AVI",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f avi "%1"',
-                icon=str(icons_folder_path / 'avi.ico'),
-            ),
-            WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mkv "%1" ',
