@@ -64,7 +64,7 @@ class FFprobeBackend(AbstractFFmpegBackend):
         """
         Calculate file total duration (in secs), using `ffprobe`.
 
-        :return: Total duration in seconds.
+        :return: Total duration in seconds. Returns 0 if duration cannot be determined.
         """
         process = Environment.run(
             f'{self._ffprobe_bin}',
@@ -79,7 +79,7 @@ class FFprobeBackend(AbstractFFmpegBackend):
         try:
             return float(duration_str if duration_str else "0")
         except ValueError:
-            return 0
+            return 0.0
 
     def info(self, file_path: str | Path) -> dict:
         """

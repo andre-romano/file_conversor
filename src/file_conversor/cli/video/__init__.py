@@ -10,6 +10,7 @@ from file_conversor.config.locale import get_translation
 from file_conversor.cli.video._typer import COMMAND_NAME
 
 from file_conversor.cli.video.check_cmd import typer_cmd as check_cmd
+from file_conversor.cli.video.compress_cmd import typer_cmd as compress_cmd
 from file_conversor.cli.video.convert_cmd import typer_cmd as convert_cmd
 from file_conversor.cli.video.enhance_cmd import typer_cmd as enhance_cmd
 from file_conversor.cli.video.execute_cmd import typer_cmd as execute_cmd
@@ -28,6 +29,7 @@ video_cmd = typer.Typer(
 
 # TRANSFORMATION_PANEL
 video_cmd.add_typer(convert_cmd)
+video_cmd.add_typer(compress_cmd)
 video_cmd.add_typer(enhance_cmd)
 video_cmd.add_typer(mirror_cmd)
 video_cmd.add_typer(rotate_cmd)

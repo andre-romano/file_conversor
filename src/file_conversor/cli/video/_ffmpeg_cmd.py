@@ -7,14 +7,14 @@ from typing import Annotated, Any, List
 from pathlib import Path
 
 # user-provided modules
-from file_conversor.backend import FFmpegBackend
+from file_conversor.backend import FFmpegBackend, FFprobeBackend
 from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterDeshake, FFmpegFilterEq, FFmpegFilterHflip, FFmpegFilterMInterpolate, FFmpegFilterScale, FFmpegFilterTranspose, FFmpegFilterUnsharp, FFmpegFilterVflip
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.formatters import parse_bytes
 from file_conversor.utils.validators import check_valid_options
-from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOption, AxisOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoCodecOption, VideoRotationOption
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -37,6 +37,7 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     audio_codec: str | None = None,
     video_codec: str | None = None,
 
+    target_size: str | None = None,
     video_encoding_speed: str | None = None,
     video_quality: str | None = None,
 
@@ -61,6 +62,15 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )
+
+    # target size
+    target_size_bytes = 0
+    if target_size and video_bitrate <= 0:
+        ffprobe_backend = FFprobeBackend(
+            install_deps=CONFIG['install-deps'],
+            verbose=STATE["verbose"],
+        )
+        target_size_bytes = parse_bytes(target_size)
 
     # set filters
     audio_filters: list[FFmpegFilter] = list()
@@ -98,6 +108,31 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     two_pass = (video_bitrate > 0) or (audio_bitrate > 0)
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        nonlocal audio_bitrate, video_bitrate, target_size_bytes
+        logger.debug(f"Input file: {input_file}")
+
+        # target size
+        if target_size_bytes > 0:
+            duration = ffprobe_backend.get_duration(input_file)
+            if duration < 0:
+                raise RuntimeError(_('Could not determine input file duration'))
+
+            # total size in kbit
+            target_size_kbit = int(target_size_bytes * 8.0 / 1024.0)
+            target_size_kbps = int(target_size_kbit / duration)
+
+            # audio size
+            audio_bitrate = 128 if audio_bitrate <= 0 else audio_bitrate
+            audio_kBps = audio_bitrate / 8.0
+            audio_MB = audio_kBps * duration / 1024.0
+
+            video_bitrate = target_size_kbps - audio_bitrate
+            if video_bitrate < 1:
+                raise RuntimeError(f"{_('Target size too small')}: {target_size}. {_(f'Increase target size to at least')} '{audio_MB + 0.100:.2f}M' {_('(might not be enougth to achieve good video quality)')}.")
+
+        logger.debug(f"{_('Audio bitrate')}: [green][bold]{audio_bitrate} kbps[/bold][/green]")
+        logger.debug(f"{_('Video bitrate')}: [green][bold]{video_bitrate} kbps[/bold][/green]")
+
         ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
         ffmpeg_backend.set_audio_codec(
             codec=audio_codec,

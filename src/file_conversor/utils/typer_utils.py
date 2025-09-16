@@ -8,7 +8,7 @@ from typing import Annotated, Any, Iterable, List
 
 # user-provided modules
 from file_conversor.config.locale import get_translation
-from file_conversor.utils.validators import check_file_exists, check_dir_exists, check_file_format, check_positive_integer, check_valid_options, check_video_resolution
+from file_conversor.utils.validators import check_file_exists, check_dir_exists, check_file_format, check_file_size_format, check_positive_integer, check_valid_options, check_video_resolution
 
 _ = get_translation()
 
@@ -152,6 +152,16 @@ def PasswordOption() -> OptionInfo:
 #################
 # VIDEO OPTIONS #
 #################
+
+
+def TargetFileSizeOption(prompt: bool | str = False) -> OptionInfo:
+    """--target-size, -ts"""
+    return typer.Option(
+        "--target-size", "-ts",
+        help=f"{_("Target file size.")} {_('Format <size>[K|M|G]. If 0, do not limit output file size (use encoding speed and quality options to calculate output file size).')}",
+        prompt=prompt,
+        callback=lambda x: check_file_size_format(x),
+    )
 
 
 def AudioBitrateOption(prompt: bool | str = False) -> OptionInfo:

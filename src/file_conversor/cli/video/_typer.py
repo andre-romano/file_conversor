@@ -13,6 +13,7 @@ COMMAND_NAME = "video"
 
 # SUBCOMMANDS
 CHECK_NAME = "check"
+COMPRESS_NAME = "compress"
 CONVERT_NAME = "convert"
 ENHANCE_NAME = "enhance"
 EXECUTE_NAME = "execute"

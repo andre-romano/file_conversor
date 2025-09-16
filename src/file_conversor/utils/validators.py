@@ -23,7 +23,7 @@ def prompt_retry_on_exception(
         check_callback: Callable[[Any], Any] | None = None,
         retries: int | None = None,
         **prompt_kwargs,
-):
+) -> Any:
     """
     Prompts the user for input, retrying on exception.
 
@@ -66,6 +66,26 @@ def prompt_retry_on_exception(
         except:
             pass
     raise typer.Abort()
+
+
+def check_file_size_format(data: str | None) -> str | None:
+    exception = typer.BadParameter(f"{_('Invalid file size')} '{data}'. {_('Valid file size is <size>[K|M|G]')}.")
+    if not data or data == "0":
+        return data
+
+    size_unit = data[-1].upper()
+    if size_unit not in ["K", "M", "G"]:
+        raise exception
+
+    size_value = -1
+    try:
+        size_value = float(data[:-1])
+    except ValueError:
+        raise exception
+
+    if size_value < 0:
+        raise exception
+    return data
 
 
 def check_video_resolution(data: str | None) -> str | None:

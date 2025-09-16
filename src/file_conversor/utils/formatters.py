@@ -97,6 +97,25 @@ def normalize_degree(deg: float | int) -> int:
     return degree
 
 
+def parse_bytes(target_size: str | None) -> int:
+    """
+    Parse file size string (e.g., 100.5M, 2G) to bytes. 
+
+    :return: Size in bytes.
+    """
+    if not target_size or target_size == "0":
+        return 0
+    size_unit = target_size[-1].upper()
+    size_value = float(target_size[:-1])
+    if size_unit == "K":
+        return round(size_value * 1024.0)
+    elif size_unit == "M":
+        return round(size_value * 1024.0 * 1024.0)
+    elif size_unit == "G":
+        return round(size_value * 1024.0 * 1024.0 * 1024.0)
+    return round(size_value)
+
+
 def format_bytes(size: float) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""
     # Size in bytes to a human-readable string
