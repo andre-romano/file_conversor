@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-16 15:36-0300\n"
+"POT-Creation-Date: 2025-09-16 15:59-0300\n"
 "PO-Revision-Date: 2025-08-20 16:30-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en_US\n"
 "Language-Team: en_US <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: src/file_conversor/backend/abstract_backend.py:43
@@ -164,53 +164,53 @@ msgstr "Finished batch stage"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:99
 msgid "Input file not set"
-msgstr ""
+msgstr "Input file not set"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:207
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:267
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:325
 msgid "Output container not set"
-msgstr ""
+msgstr "Output container not set"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
 msgid "Invalid number of passes:"
-msgstr ""
+msgstr "Invalid number of passes:"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:319
 msgid "Must be 0 (single-pass), 1 (first pass) or 2 (second pass)."
-msgstr ""
+msgstr "Must be 0 (single-pass), 1 (first pass) or 2 (second pass)."
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:322
 msgid "Input/output files not set"
-msgstr ""
+msgstr "Input/output files not set"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:334
 msgid "Temporary 2-pass log file"
-msgstr ""
+msgstr "Temporary 2-pass log file"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:341
 msgid "Audio bitrate cannot be 0 when using two-pass mode."
-msgstr ""
+msgstr "Audio bitrate cannot be 0 when using two-pass mode."
 
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:343
 msgid "Video bitrate cannot be 0 when using two-pass mode."
-msgstr ""
+msgstr "Video bitrate cannot be 0 when using two-pass mode."
 
 #: src/file_conversor/backend/audio_video/ffmpeg_codec.py:141
 msgid "profile not available for codec"
-msgstr ""
+msgstr "profile not available for codec"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_codec.py:147
 msgid "speed not available for codec"
-msgstr ""
+msgstr "speed not available for codec"
 
 #: src/file_conversor/backend/audio_video/ffmpeg_codec.py:153
 msgid "quality not available for codec"
-msgstr ""
+msgstr "quality not available for codec"
 
 #: src/file_conversor/backend/audio_video/format_container.py:25
 msgid "not available. Available codecs are:"
-msgstr ""
+msgstr "not available. Available codecs are:"
 
 #: src/file_conversor/backend/image/pillow_backend.py:128
 msgid "Scale must be >0"
@@ -284,16 +284,16 @@ msgstr "Utils and Config"
 
 #: src/file_conversor/cli/audio/__init__.py:20
 msgid "Audio file manipulation (requires FFMpeg external library)"
-msgstr ""
+msgstr "Audio file manipulation (requires FFMpeg external library)"
 
 #: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:168
 msgid "FFMpeg result"
-msgstr ""
+msgstr "FFMpeg result"
 
 #: src/file_conversor/cli/audio/check_cmd.py:59
 msgid "Checks a audio file for corruption / inconsistencies."
-msgstr ""
+msgstr "Checks a audio file for corruption / inconsistencies."
 
 #: src/file_conversor/cli/audio/check_cmd.py:62
 #: src/file_conversor/cli/audio/convert_cmd.py:69
@@ -354,24 +354,26 @@ msgstr "Examples"
 #: src/file_conversor/cli/video/check_cmd.py:85
 #: src/file_conversor/cli/video/check_cmd.py:92
 msgid "FFMpeg check"
-msgstr ""
+msgstr "FFMpeg check"
 
 #: src/file_conversor/cli/audio/check_cmd.py:85
 #: src/file_conversor/cli/video/check_cmd.py:86
 msgid "is corrupted or has inconsistencies"
-msgstr ""
+msgstr "is corrupted or has inconsistencies"
 
 #: src/file_conversor/cli/audio/convert_cmd.py:66
 msgid "Convert a audio/video file to an audio format."
-msgstr ""
+msgstr "Convert a audio/video file to an audio format."
 
 #: src/file_conversor/cli/audio/info_cmd.py:64
 msgid "Get information about a audio file."
-msgstr ""
+msgstr "Get information about a audio file."
 
 #: src/file_conversor/cli/audio/info_cmd.py:66
-msgid "This command retrieves metadata and other information about the audio file"
+msgid ""
+"This command retrieves metadata and other information about the audio file"
 msgstr ""
+"This command retrieves metadata and other information about the audio file"
 
 #: src/file_conversor/cli/audio/info_cmd.py:68
 #: src/file_conversor/cli/audio/info_cmd.py:111
@@ -477,45 +479,45 @@ msgstr "Configure the default options for the file converter."
 
 #: src/file_conversor/cli/config/set_cmd.py:49
 msgid "Set preferred language for app (if available). Available languages:"
-msgstr ""
+msgstr "Set preferred language for app (if available). Available languages:"
 
 #: src/file_conversor/cli/config/set_cmd.py:49
-msgid "Defaults to system preffered language or 'en_US' (English - United States)"
+msgid ""
+"Defaults to system preffered language or 'en_US' (English - United States)"
 msgstr ""
+"Defaults to system preffered language or 'en_US' (English - United States)"
 
 #: src/file_conversor/cli/config/set_cmd.py:54
 msgid ""
 "Install missing external dependencies action. 'True' for auto install. "
-"'False' to not install missing dependencies. 'None' to ask user for "
-"action."
+"'False' to not install missing dependencies. 'None' to ask user for action."
 msgstr ""
 "Install missing external dependencies action. 'True' for auto install. "
-"'False' to not install missing dependencies. 'None' to ask user for "
-"action."
+"'False' to not install missing dependencies. 'None' to ask user for action."
 
 #: src/file_conversor/cli/config/set_cmd.py:59
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "Audio bitrate in kbps."
-msgstr ""
+msgstr "Audio bitrate in kbps."
 
 #: src/file_conversor/cli/config/set_cmd.py:59
 #: src/file_conversor/cli/config/set_cmd.py:64
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "If 0, let FFmpeg decide best bitrate."
-msgstr ""
+msgstr "If 0, let FFmpeg decide best bitrate."
 
 #: src/file_conversor/cli/config/set_cmd.py:64
 #: src/file_conversor/utils/typer_utils.py:181
 msgid "Video bitrate in kbps."
-msgstr ""
+msgstr "Video bitrate in kbps."
 
 #: src/file_conversor/cli/config/set_cmd.py:69
 msgid "Video format."
-msgstr ""
+msgstr "Video format."
 
 #: src/file_conversor/cli/config/set_cmd.py:69
 msgid "Available formats:"
-msgstr ""
+msgstr "Available formats:"
 
 #: src/file_conversor/cli/config/set_cmd.py:78
 msgid ""
@@ -527,19 +529,19 @@ msgstr ""
 
 #: src/file_conversor/cli/config/set_cmd.py:83
 msgid ""
-"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). "
-"Valid values are between 40-3600."
+"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
+"values are between 40-3600."
 msgstr ""
-"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). "
-"Valid values are between 40-3600."
+"Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
+"values are between 40-3600."
 
 #: src/file_conversor/cli/config/set_cmd.py:88
 msgid ""
-"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` "
-"is defined. Valid values are"
+"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
+"defined. Valid values are"
 msgstr ""
-"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` "
-"is defined. Valid values are"
+"Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
+"defined. Valid values are"
 
 #: src/file_conversor/cli/config/set_cmd.py:93
 msgid ""
@@ -640,7 +642,7 @@ msgstr "Image file manipulation"
 
 #: src/file_conversor/cli/image/_typer.py:8
 msgid "Conversions"
-msgstr ""
+msgstr "Conversions"
 
 #: src/file_conversor/cli/image/_typer.py:9
 #: src/file_conversor/cli/pdf/_typer.py:9
@@ -650,7 +652,7 @@ msgstr "Transformations"
 
 #: src/file_conversor/cli/image/_typer.py:10
 msgid "Filters"
-msgstr ""
+msgstr "Filters"
 
 #: src/file_conversor/cli/image/_typer.py:11
 #: src/file_conversor/cli/pdf/_typer.py:10
@@ -661,23 +663,23 @@ msgstr "Other commands"
 
 #: src/file_conversor/cli/image/antialias_cmd.py:60
 msgid "Applies antialias filter to an image file."
-msgstr ""
+msgstr "Applies antialias filter to an image file."
 
 #: src/file_conversor/cli/image/antialias_cmd.py:75
 msgid "Algorithm to use. Available algorihtms:"
-msgstr ""
+msgstr "Algorithm to use. Available algorihtms:"
 
 #: src/file_conversor/cli/image/antialias_cmd.py:96
 msgid "Image antialiasing"
-msgstr ""
+msgstr "Image antialiasing"
 
 #: src/file_conversor/cli/image/blur_cmd.py:41
 msgid "Applies gaussian blur to an image file."
-msgstr ""
+msgstr "Applies gaussian blur to an image file."
 
 #: src/file_conversor/cli/image/blur_cmd.py:71
 msgid "Image blur"
-msgstr ""
+msgstr "Image blur"
 
 #: src/file_conversor/cli/image/compress_cmd.py:61
 msgid "Compress an image file (requires external libraries)."
@@ -701,31 +703,33 @@ msgstr "Image convertion"
 
 #: src/file_conversor/cli/image/enhance_cmd.py:59
 msgid "Enhance image file color, brightness, contrast, or sharpness."
-msgstr ""
+msgstr "Enhance image file color, brightness, contrast, or sharpness."
 
 #: src/file_conversor/cli/image/enhance_cmd.py:106
 msgid "Image enhance"
-msgstr ""
+msgstr "Image enhance"
 
 #: src/file_conversor/cli/image/filter_cmd.py:60
 msgid "Applies filter to an image file."
-msgstr ""
+msgstr "Applies filter to an image file."
 
 #: src/file_conversor/cli/image/filter_cmd.py:75
 msgid "Filter to apply. Available filters:"
-msgstr ""
+msgstr "Filter to apply. Available filters:"
 
 #: src/file_conversor/cli/image/filter_cmd.py:95
 msgid "Image filter"
-msgstr ""
+msgstr "Image filter"
 
 #: src/file_conversor/cli/image/info_cmd.py:62
 msgid "Get EXIF information about a image file."
 msgstr "Get EXIF information about a image file."
 
 #: src/file_conversor/cli/image/info_cmd.py:64
-msgid "This command retrieves metadata and other information about the image file"
-msgstr "This command retrieves metadata and other information about the image file"
+msgid ""
+"This command retrieves metadata and other information about the image file"
+msgstr ""
+"This command retrieves metadata and other information about the image file"
 
 #: src/file_conversor/cli/image/info_cmd.py:81
 msgid "Parsing metadata for"
@@ -797,11 +801,11 @@ msgstr "Outputs an image file with _rotated at the end."
 
 #: src/file_conversor/cli/image/rotate_cmd.py:83
 msgid ""
-"Rotation in degrees. Valid values are between -360 (anti-clockwise "
-"rotation) and 360 (clockwise rotation)."
+"Rotation in degrees. Valid values are between -360 (anti-clockwise rotation)"
+" and 360 (clockwise rotation)."
 msgstr ""
-"Rotation in degrees. Valid values are between -360 (anti-clockwise "
-"rotation) and 360 (clockwise rotation)."
+"Rotation in degrees. Valid values are between -360 (anti-clockwise rotation)"
+" and 360 (clockwise rotation)."
 
 #: src/file_conversor/cli/image/rotate_cmd.py:109
 msgid "Image rotation"
@@ -813,11 +817,9 @@ msgstr "Convert a list of image files to one PDF file, one image per page."
 
 #: src/file_conversor/cli/image/to_pdf_cmd.py:64
 msgid ""
-"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure "
-"size."
+"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure size."
 msgstr ""
-"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure "
-"size."
+"Valid only if ``--page-size`` is defined. Otherwise, PDF size = figure size."
 
 #: src/file_conversor/cli/image/to_pdf_cmd.py:66
 #: src/file_conversor/cli/image/to_pdf_cmd.py:68
@@ -854,19 +856,21 @@ msgstr "PDF generation"
 
 #: src/file_conversor/cli/image/unsharp_cmd.py:41
 msgid "Applies unsharp mask to an image file."
-msgstr ""
+msgstr "Applies unsharp mask to an image file."
 
 #: src/file_conversor/cli/image/unsharp_cmd.py:58
 msgid "Unsharp strength, in percent"
-msgstr ""
+msgstr "Unsharp strength, in percent"
 
 #: src/file_conversor/cli/image/unsharp_cmd.py:64
-msgid "Threshold controls the minimum brightness change that will be sharpened"
+msgid ""
+"Threshold controls the minimum brightness change that will be sharpened"
 msgstr ""
+"Threshold controls the minimum brightness change that will be sharpened"
 
 #: src/file_conversor/cli/image/unsharp_cmd.py:86
 msgid "Image unsharp"
-msgstr ""
+msgstr "Image unsharp"
 
 #: src/file_conversor/cli/pdf/__init__.py:25
 msgid "PDF file manipulation"
@@ -901,8 +905,10 @@ msgid "File convertion"
 msgstr "File convertion"
 
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:61
-msgid "Remove password protection from a PDF file  (create decrypted PDF file)."
-msgstr "Remove password protection from a PDF file  (create decrypted PDF file)."
+msgid ""
+"Remove password protection from a PDF file  (create decrypted PDF file)."
+msgstr ""
+"Remove password protection from a PDF file  (create decrypted PDF file)."
 
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:63
 msgid "Outputs a file with _decrypted at the end."
@@ -913,8 +919,10 @@ msgid "Password used for decryption."
 msgstr "Password used for decryption."
 
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:76
-msgid "Password for decryption (password will not be displayed, for your safety)"
-msgstr "Password for decryption (password will not be displayed, for your safety)"
+msgid ""
+"Password for decryption (password will not be displayed, for your safety)"
+msgstr ""
+"Password for decryption (password will not be displayed, for your safety)"
 
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 msgid "Decryption"
@@ -930,11 +938,11 @@ msgstr "Outputs a file with _encrypted at the end."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:75
 msgid ""
-"Owner password for encryption. Owner has ALL PERMISSIONS in the output "
-"PDF file."
+"Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF "
+"file."
 msgstr ""
-"Owner password for encryption. Owner has ALL PERMISSIONS in the output "
-"PDF file."
+"Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF "
+"file."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:76
 msgid ""
@@ -946,11 +954,11 @@ msgstr ""
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:81
 msgid ""
-"User password for encryption. User has ONLY THE PERMISSIONS specified in "
-"the arguments. Defaults to None (user and owner password are the same)."
+"User password for encryption. User has ONLY THE PERMISSIONS specified in the"
+" arguments. Defaults to None (user and owner password are the same)."
 msgstr ""
-"User password for encryption. User has ONLY THE PERMISSIONS specified in "
-"the arguments. Defaults to None (user and owner password are the same)."
+"User password for encryption. User has ONLY THE PERMISSIONS specified in the"
+" arguments. Defaults to None (user and owner password are the same)."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:84
 msgid ""
@@ -986,19 +994,21 @@ msgstr ""
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:100
 msgid ""
-"User can insert, delete, or rotate pages (subset of --modify). Default to"
-" False (not set)."
+"User can insert, delete, or rotate pages (subset of --modify). Default to "
+"False (not set)."
 msgstr ""
-"User can insert, delete, or rotate pages (subset of --modify). Default to"
-" False (not set)."
+"User can insert, delete, or rotate pages (subset of --modify). Default to "
+"False (not set)."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:104
 msgid "User can copy text/images. Default to False (not set)."
 msgstr "User can copy text/images. Default to False (not set)."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:108
-msgid "User can use screen readers for accessibility. Default to True (allow)."
-msgstr "User can use screen readers for accessibility. Default to True (allow)."
+msgid ""
+"User can use screen readers for accessibility. Default to True (allow)."
+msgstr ""
+"User can use screen readers for accessibility. Default to True (allow)."
 
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:112
 msgid "User can print (low quality). Defaults to True (allow)."
@@ -1079,12 +1089,8 @@ msgid "Outputs a file with _merged at the end."
 msgstr "Outputs a file with _merged at the end."
 
 #: src/file_conversor/cli/pdf/merge_cmd.py:52
-msgid ""
-"Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into "
-"\"output_file.pdf\""
-msgstr ""
-"Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into "
-"\"output_file.pdf\""
+msgid "Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into \"output_file.pdf\""
+msgstr "Merge files \"input_file1.pdf\" and \"input_file2.pdf\" into \"output_file.pdf\""
 
 #: src/file_conversor/cli/pdf/merge_cmd.py:58
 msgid ""
@@ -1144,11 +1150,11 @@ msgstr "Split PDF pages into several 1-page PDFs."
 
 #: src/file_conversor/cli/pdf/split_cmd.py:64
 msgid ""
-"For every PDF page, a new single page PDF will be created using the "
-"format `input_file_X.pdf`, where X is the page number."
+"For every PDF page, a new single page PDF will be created using the format "
+"`input_file_X.pdf`, where X is the page number."
 msgstr ""
-"For every PDF page, a new single page PDF will be created using the "
-"format `input_file_X.pdf`, where X is the page number."
+"For every PDF page, a new single page PDF will be created using the format "
+"`input_file_X.pdf`, where X is the page number."
 
 #: src/file_conversor/cli/pdf/split_cmd.py:71
 msgid "Split pages of input_file.pdf into output_file_X.pdf files"
@@ -1168,15 +1174,15 @@ msgstr "Pipeline file processing (task automation)"
 
 #: src/file_conversor/cli/pipeline/__init__.py:19
 msgid ""
-"The pipeline processsing by processing an input folder, passing those "
-"files to the next pipeline stage, and processing them inside that stage. "
-"This process continues (output of the current stage is the input of the "
-"next stage), until those files reach the end of the pipeline."
+"The pipeline processsing by processing an input folder, passing those files "
+"to the next pipeline stage, and processing them inside that stage. This "
+"process continues (output of the current stage is the input of the next "
+"stage), until those files reach the end of the pipeline."
 msgstr ""
-"The pipeline processsing by processing an input folder, passing those "
-"files to the next pipeline stage, and processing them inside that stage. "
-"This process continues (output of the current stage is the input of the "
-"next stage), until those files reach the end of the pipeline."
+"The pipeline processsing by processing an input folder, passing those files "
+"to the next pipeline stage, and processing them inside that stage. This "
+"process continues (output of the current stage is the input of the next "
+"stage), until those files reach the end of the pipeline."
 
 #: src/file_conversor/cli/pipeline/__init__.py:23
 msgid "Example"
@@ -1203,8 +1209,10 @@ msgid "Creates a file processing pipeline (for tasks automation)."
 msgstr "Creates a file processing pipeline (for tasks automation)."
 
 #: src/file_conversor/cli/pipeline/create_cmd.py:40
-msgid "Will ask questions interactively to create the file processing pipeline."
-msgstr "Will ask questions interactively to create the file processing pipeline."
+msgid ""
+"Will ask questions interactively to create the file processing pipeline."
+msgstr ""
+"Will ask questions interactively to create the file processing pipeline."
 
 #: src/file_conversor/cli/pipeline/create_cmd.py:42
 msgid "Placeholders available for commands"
@@ -1320,120 +1328,129 @@ msgstr "Converts text file formats (json, xml, yaml, etc)."
 
 #: src/file_conversor/cli/video/__init__.py:27
 msgid "Video file manipulation (requires FFMpeg external library)"
-msgstr ""
+msgstr "Video file manipulation (requires FFMpeg external library)"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:118
 msgid "Could not determine input file duration"
-msgstr ""
+msgstr "Could not determine input file duration"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
 msgid "Target size too small"
-msgstr ""
+msgstr "Target size too small"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
 msgid "Increase target size to at least"
-msgstr ""
+msgstr "Increase target size to at least"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:131
 msgid "(might not be enougth to achieve good video quality)"
-msgstr ""
+msgstr "(might not be enougth to achieve good video quality)"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:133
 msgid "Audio bitrate"
-msgstr ""
+msgstr "Audio bitrate"
 
 #: src/file_conversor/cli/video/_ffmpeg_cmd.py:134
 msgid "Video bitrate"
-msgstr ""
+msgstr "Video bitrate"
 
 #: src/file_conversor/cli/video/check_cmd.py:60
 msgid "Checks a audio/video file for corruption / inconsistencies."
-msgstr ""
+msgstr "Checks a audio/video file for corruption / inconsistencies."
 
 #: src/file_conversor/cli/video/compress_cmd.py:62
 msgid "Compress a video file to a target file size."
-msgstr ""
+msgstr "Compress a video file to a target file size."
 
 #: src/file_conversor/cli/video/compress_cmd.py:64
 msgid "Outputs an video file with _compressed at the end."
-msgstr ""
+msgstr "Outputs an video file with _compressed at the end."
 
 #: src/file_conversor/cli/video/compress_cmd.py:76
-msgid "Target file size (<size>[K|M|G]) [0 = do not limit output file size]"
-msgstr ""
+msgid "Target file size (size[K|M|G]) [0 = do not limit output file size]"
+msgstr "Target file size (size[K|M|G]) [0 = do not limit output file size]"
 
 #: src/file_conversor/cli/video/convert_cmd.py:82
 msgid "Convert a video file to another video format."
-msgstr ""
+msgstr "Convert a video file to another video format."
 
 #: src/file_conversor/cli/video/enhance_cmd.py:63
 msgid "Enhance video bitrate, resolution, fps, color, brightness, etc."
-msgstr ""
+msgstr "Enhance video bitrate, resolution, fps, color, brightness, etc."
 
 #: src/file_conversor/cli/video/enhance_cmd.py:102
-msgid "Target Resolution (width:height) [0:0 = do not change video resolution]"
+msgid ""
+"Target Resolution (width:height) [0:0 = do not change video resolution]"
 msgstr ""
+"Target Resolution (width:height) [0:0 = do not change video resolution]"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:108
 msgid "Target FPS [0 = do not change FPS]"
-msgstr ""
+msgstr "Target FPS [0 = do not change FPS]"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:114
 msgid "Color adjustment (> 1.0 increases color, < 1.0 decreases color)"
-msgstr ""
+msgstr "Color adjustment (> 1.0 increases color, < 1.0 decreases color)"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:118
 msgid ""
 "Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases "
 "brightness)"
 msgstr ""
+"Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases "
+"brightness)"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:122
-msgid "Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)"
+msgid ""
+"Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)"
 msgstr ""
+"Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:126
 msgid "Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)"
-msgstr ""
+msgstr "Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:131
 msgid "Apply deshake filter?"
-msgstr ""
+msgstr "Apply deshake filter?"
 
 #: src/file_conversor/cli/video/enhance_cmd.py:135
 msgid "Apply unsharp filter?"
-msgstr ""
+msgstr "Apply unsharp filter?"
 
 #: src/file_conversor/cli/video/execute_cmd.py:41
 msgid "Execute FFmpeg command (advanced, use with caution)."
-msgstr ""
+msgstr "Execute FFmpeg command (advanced, use with caution)."
 
 #: src/file_conversor/cli/video/execute_cmd.py:64
 msgid "Apply a custom FFmpeg audio filter"
-msgstr ""
+msgstr "Apply a custom FFmpeg audio filter"
 
 #: src/file_conversor/cli/video/execute_cmd.py:64
 #: src/file_conversor/cli/video/execute_cmd.py:68
 msgid ""
-"(advanced option, use with caution). Uses the same format as FFmpeg "
-"filters (e.g., filter=option1=value1:option2=value2:...). Filters are "
-"applied in the order they appear in the command."
+"(advanced option, use with caution). Uses the same format as FFmpeg filters "
+"(e.g., filter=option1=value1:option2=value2:...). Filters are applied in the"
+" order they appear in the command."
 msgstr ""
+"(advanced option, use with caution). Uses the same format as FFmpeg filters "
+"(e.g., filter=option1=value1:option2=value2:...). Filters are applied in the"
+" order they appear in the command."
 
 #: src/file_conversor/cli/video/execute_cmd.py:64
 #: src/file_conversor/cli/video/execute_cmd.py:68
 msgid "Defaults to None (do not apply custom filters)"
-msgstr ""
+msgstr "Defaults to None (do not apply custom filters)"
 
 #: src/file_conversor/cli/video/execute_cmd.py:68
 msgid "Apply a custom FFmpeg video filter"
-msgstr ""
+msgstr "Apply a custom FFmpeg video filter"
 
 #: src/file_conversor/cli/video/execute_cmd.py:72
 msgid ""
-"Apply a custom FFmpeg output arguments (advanced option, use with "
-"caution)."
+"Apply a custom FFmpeg output arguments (advanced option, use with caution)."
 msgstr ""
+"Apply a custom FFmpeg output arguments (advanced option, use with caution)."
 
 #: src/file_conversor/cli/video/execute_cmd.py:72
 #: src/file_conversor/utils/typer_utils.py:56
@@ -1442,7 +1459,7 @@ msgstr "Defaults to None"
 
 #: src/file_conversor/cli/video/execute_cmd.py:103
 msgid "FFMpeg execution"
-msgstr ""
+msgstr "FFMpeg execution"
 
 #: src/file_conversor/cli/video/info_cmd.py:66
 msgid "Get information about a audio/video file."
@@ -1458,47 +1475,49 @@ msgstr ""
 
 #: src/file_conversor/cli/video/list_formats_cmd.py:40
 msgid "List available video formats and codecs."
-msgstr ""
+msgstr "List available video formats and codecs."
 
 #: src/file_conversor/cli/video/list_formats_cmd.py:42
-msgid "If a video format is provided, only codecs for that format will be shown."
+msgid ""
+"If a video format is provided, only codecs for that format will be shown."
 msgstr ""
+"If a video format is provided, only codecs for that format will be shown."
 
 #: src/file_conversor/cli/video/list_formats_cmd.py:61
 msgid "Audio codecs"
-msgstr ""
+msgstr "Audio codecs"
 
 #: src/file_conversor/cli/video/list_formats_cmd.py:62
 msgid "Video codecs"
-msgstr ""
+msgstr "Video codecs"
 
 #: src/file_conversor/cli/video/mirror_cmd.py:69
 msgid "Mirror a video file (vertically or horizontally)."
-msgstr ""
+msgstr "Mirror a video file (vertically or horizontally)."
 
 #: src/file_conversor/cli/video/mirror_cmd.py:71
 msgid "Outputs a video file with _mirrored at the end."
-msgstr ""
+msgstr "Outputs a video file with _mirrored at the end."
 
 #: src/file_conversor/cli/video/resize_cmd.py:63
 msgid "Resize a video file (downscaling / upscaling)."
-msgstr ""
+msgstr "Resize a video file (downscaling / upscaling)."
 
 #: src/file_conversor/cli/video/resize_cmd.py:65
 msgid "Outputs a video file with _resized at the end."
-msgstr ""
+msgstr "Outputs a video file with _resized at the end."
 
 #: src/file_conversor/cli/video/resize_cmd.py:77
 msgid "Enter target resolution (WIDTH:HEIGHT)"
-msgstr ""
+msgstr "Enter target resolution (WIDTH:HEIGHT)"
 
 #: src/file_conversor/cli/video/rotate_cmd.py:69
 msgid "Rotate a video file (clockwise or anti-clockwise)."
-msgstr ""
+msgstr "Rotate a video file (clockwise or anti-clockwise)."
 
 #: src/file_conversor/cli/video/rotate_cmd.py:71
 msgid "Outputs an video file with _rotated at the end."
-msgstr ""
+msgstr "Outputs an video file with _rotated at the end."
 
 #: src/file_conversor/cli/win/__init__.py:18
 msgid "Windows OS commands (for Windows ONLY)"
@@ -1514,12 +1533,12 @@ msgstr "Installs app context menu (right click in Windows Explorer)."
 
 #: src/file_conversor/cli/win/install_menu_cmd.py:51
 msgid ""
-"Restart explorer.exe (to make ctx menu effective immediately). Defaults "
-"to False (do not restart, user must log off/in to make ctx menu changes "
+"Restart explorer.exe (to make ctx menu effective immediately). Defaults to "
+"False (do not restart, user must log off/in to make ctx menu changes "
 "effective)"
 msgstr ""
-"Restart explorer.exe (to make ctx menu effective immediately). Defaults "
-"to False (do not restart, user must log off/in to make ctx menu changes "
+"Restart explorer.exe (to make ctx menu effective immediately). Defaults to "
+"False (do not restart, user must log off/in to make ctx menu changes "
 "effective)"
 
 #: src/file_conversor/cli/win/install_menu_cmd.py:59
@@ -1693,161 +1712,201 @@ msgid ""
 "Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip "
 "vertically)."
 msgstr ""
+"Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip "
+"vertically)."
 
 #: src/file_conversor/utils/typer_utils.py:89
-msgid "Image quality in dots per inch (DPI). Valid values are between 40-3600."
-msgstr "Image quality in dots per inch (DPI). Valid values are between 40-3600."
+msgid ""
+"Image quality in dots per inch (DPI). Valid values are between 40-3600."
+msgstr ""
+"Image quality in dots per inch (DPI). Valid values are between 40-3600."
 
 #: src/file_conversor/utils/typer_utils.py:100
 msgid ""
 "Adjust brightness. brightness = 1.00 means no change. brightness < 1.00 "
 "makes image black. brightness > 1.00 makes image lighter."
 msgstr ""
+"Adjust brightness. brightness = 1.00 means no change. brightness < 1.00 "
+"makes image black. brightness > 1.00 makes image lighter."
 
 #: src/file_conversor/utils/typer_utils.py:109
 msgid ""
-"Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces"
-" contrast (grayish image). contrast > 1.00 increases contrast."
+"Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces "
+"contrast (grayish image). contrast > 1.00 increases contrast."
 msgstr ""
+"Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces "
+"contrast (grayish image). contrast > 1.00 increases contrast."
 
 #: src/file_conversor/utils/typer_utils.py:118
 msgid ""
 "Adjust color. color = 1.00 means no change. color < 1.00 reduces color "
 "saturation. color > 1.00 increases color saturation."
 msgstr ""
+"Adjust color. color = 1.00 means no change. color < 1.00 reduces color "
+"saturation. color > 1.00 increases color saturation."
 
 #: src/file_conversor/utils/typer_utils.py:127
 msgid ""
-"Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 "
-"makes image more blurry. sharpness > 1.00 increases image crispness (and "
-"noise as well)."
+"Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 makes "
+"image more blurry. sharpness > 1.00 increases image crispness (and noise as "
+"well)."
 msgstr ""
+"Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 makes "
+"image more blurry. sharpness > 1.00 increases image crispness (and noise as "
+"well)."
 
 #: src/file_conversor/utils/typer_utils.py:135
 msgid "Box radius (in pixels)."
-msgstr ""
+msgstr "Box radius (in pixels)."
 
 #: src/file_conversor/utils/typer_utils.py:149
-msgid "Password used to open protected file. Defaults to None (do not decrypt)."
-msgstr "Password used to open protected file. Defaults to None (do not decrypt)."
+msgid ""
+"Password used to open protected file. Defaults to None (do not decrypt)."
+msgstr ""
+"Password used to open protected file. Defaults to None (do not decrypt)."
 
 #: src/file_conversor/utils/typer_utils.py:161
 msgid "Target file size."
-msgstr ""
+msgstr "Target file size."
 
 #: src/file_conversor/utils/typer_utils.py:161
 msgid ""
-"Format <size>[K|M|G]. If 0, do not limit output file size (use encoding "
+"Format \"size[K|M|G]\". If 0, do not limit output file size (use encoding "
 "speed and quality options to calculate output file size)."
 msgstr ""
+"Format \"size[K|M|G]\". If 0, do not limit output file size (use encoding "
+"speed and quality options to calculate output file size)."
 
 #: src/file_conversor/utils/typer_utils.py:181
 msgid ""
-"Overrides video quality setting (if set). If 0, use video quality setting"
-" to encode video using variable bitrate (CRF) encoding (if supported by "
-"codec, otherwise use default bitrate for codec/container)"
+"Overrides video quality setting (if set). If 0, use video quality setting to"
+" encode video using variable bitrate (CRF) encoding (if supported by codec, "
+"otherwise use default bitrate for codec/container)"
 msgstr ""
+"Overrides video quality setting (if set). If 0, use video quality setting to"
+" encode video using variable bitrate (CRF) encoding (if supported by codec, "
+"otherwise use default bitrate for codec/container)"
 
 #: src/file_conversor/utils/typer_utils.py:191
 msgid ""
-"Audio codec. Not all codecs are supported in a given format container "
-"(run `file_conversor video list-formats` for more information). Available"
-" options are:"
+"Audio codec. Not all codecs are supported in a given format container (run "
+"`file_conversor video list-formats` for more information). Available options"
+" are:"
 msgstr ""
+"Audio codec. Not all codecs are supported in a given format container (run "
+"`file_conversor video list-formats` for more information). Available options"
+" are:"
 
 #: src/file_conversor/utils/typer_utils.py:191
 #: src/file_conversor/utils/typer_utils.py:201
 msgid "Defaults to None (use the default for the file container)"
-msgstr ""
+msgstr "Defaults to None (use the default for the file container)"
 
 #: src/file_conversor/utils/typer_utils.py:201
 msgid ""
-"Video codec. Not all codecs are supported in a given format container "
-"(run `file_conversor video list-formats` for more information). Available"
-" options are:"
+"Video codec. Not all codecs are supported in a given format container (run "
+"`file_conversor video list-formats` for more information). Available options"
+" are:"
 msgstr ""
+"Video codec. Not all codecs are supported in a given format container (run "
+"`file_conversor video list-formats` for more information). Available options"
+" are:"
 
 #: src/file_conversor/utils/typer_utils.py:211
 msgid "Video encoding speed/quality trade-off. Available options are:"
-msgstr ""
+msgstr "Video encoding speed/quality trade-off. Available options are:"
 
 #: src/file_conversor/utils/typer_utils.py:211
 msgid ""
-"Faster encoding speed usually results in lower video quality and larger "
-"file size"
+"Faster encoding speed usually results in lower video quality and larger file"
+" size"
 msgstr ""
+"Faster encoding speed usually results in lower video quality and larger file"
+" size"
 
 #: src/file_conversor/utils/typer_utils.py:211
 #: src/file_conversor/utils/typer_utils.py:221
 msgid "Defaults to 'medium'"
-msgstr ""
+msgstr "Defaults to 'medium'"
 
 #: src/file_conversor/utils/typer_utils.py:221
 msgid "Video quality preset. Available options are:"
-msgstr ""
+msgstr "Video quality preset. Available options are:"
 
 #: src/file_conversor/utils/typer_utils.py:221
 msgid ""
-"Higher quality usually results in larger file size. Video bitrate (if "
-"set) overrides this setting."
+"Higher quality usually results in larger file size. Video bitrate (if set) "
+"overrides this setting."
 msgstr ""
+"Higher quality usually results in larger file size. Video bitrate (if set) "
+"overrides this setting."
 
 #: src/file_conversor/utils/typer_utils.py:231
 msgid ""
-"Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to "
-"None (use same resolution as video source)"
+"Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None "
+"(use same resolution as video source)"
 msgstr ""
+"Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None "
+"(use same resolution as video source)"
 
 #: src/file_conversor/utils/typer_utils.py:241
 msgid ""
-"Target video FPS (frames per second). Uses ``minterpolate`` filter to "
-"adjust fps. Defaults to None (use same fps as video source)"
+"Target video FPS (frames per second). Uses ``minterpolate`` filter to adjust"
+" fps. Defaults to None (use same fps as video source)"
 msgstr ""
+"Target video FPS (frames per second). Uses ``minterpolate`` filter to adjust"
+" fps. Defaults to None (use same fps as video source)"
 
 #: src/file_conversor/utils/typer_utils.py:251
 msgid "Rotate video (clockwise). Available options are:"
-msgstr ""
+msgstr "Rotate video (clockwise). Available options are:"
 
 #: src/file_conversor/utils/typer_utils.py:262
 msgid "Adjust gamma"
-msgstr ""
+msgstr "Adjust gamma"
 
 #: src/file_conversor/utils/typer_utils.py:262
 msgid ""
-"gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma"
-" > 1.00 increases image lightenss"
+"gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma > "
+"1.00 increases image lightenss"
 msgstr ""
+"gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma > "
+"1.00 increases image lightenss"
 
 #: src/file_conversor/utils/typer_utils.py:270
-msgid "Increase video sharpness (using unsharp mask). May increase image noise."
+msgid ""
+"Increase video sharpness (using unsharp mask). May increase image noise."
 msgstr ""
+"Increase video sharpness (using unsharp mask). May increase image noise."
 
 #: src/file_conversor/utils/typer_utils.py:270
 #: src/file_conversor/utils/typer_utils.py:279
 msgid "Defaults to False (do not apply filter)"
-msgstr ""
+msgstr "Defaults to False (do not apply filter)"
 
 #: src/file_conversor/utils/typer_utils.py:279
-msgid "Deshake video (attempt to fix vertical/horizontal span from handrecoding)"
+msgid ""
+"Deshake video (attempt to fix vertical/horizontal span from handrecoding)"
 msgstr ""
+"Deshake video (attempt to fix vertical/horizontal span from handrecoding)"
 
 #: src/file_conversor/utils/validators.py:72
 msgid "Invalid file size"
-msgstr ""
+msgstr "Invalid file size"
 
 #: src/file_conversor/utils/validators.py:72
 msgid "Valid file size is <size>[K|M|G]"
-msgstr ""
+msgstr "Valid file size is <size>[K|M|G]"
 
 #: src/file_conversor/utils/validators.py:95
 #: src/file_conversor/utils/validators.py:98
 msgid "Invalid format for video resolution"
-msgstr ""
+msgstr "Invalid format for video resolution"
 
 #: src/file_conversor/utils/validators.py:95
 #: src/file_conversor/utils/validators.py:98
 msgid "Valid format is WIDTH:HEIGHT"
-msgstr ""
+msgstr "Valid format is WIDTH:HEIGHT"
 
 #: src/file_conversor/utils/validators.py:116
 #: src/file_conversor/utils/validators.py:125
@@ -1892,7 +1951,7 @@ msgstr "Supported formats are"
 
 #: src/file_conversor/utils/validators.py:190
 msgid "is invalid.  Valid options are"
-msgstr ""
+msgstr "is invalid.  Valid options are"
 
 #~ msgid "Multimedia files"
 #~ msgstr "Multimedia files"
@@ -1910,25 +1969,15 @@ msgstr ""
 #~ msgstr "Batch file processing (task automation)"
 
 #~ msgid ""
-#~ "The batch processing pipeline works by"
-#~ " monitoring an input folder, passing "
-#~ "those files to the next pipeline "
-#~ "stage, and processing them inside that"
-#~ " stage. This process continues (output "
-#~ "of the current stage is the input"
-#~ " of the next stage), until those "
-#~ "files reach the end of the "
-#~ "pipeline."
+#~ "The batch processing pipeline works by monitoring an input folder, passing "
+#~ "those files to the next pipeline stage, and processing them inside that "
+#~ "stage. This process continues (output of the current stage is the input of "
+#~ "the next stage), until those files reach the end of the pipeline."
 #~ msgstr ""
-#~ "The batch processing pipeline works by"
-#~ " monitoring an input folder, passing "
-#~ "those files to the next pipeline "
-#~ "stage, and processing them inside that"
-#~ " stage. This process continues (output "
-#~ "of the current stage is the input"
-#~ " of the next stage), until those "
-#~ "files reach the end of the "
-#~ "pipeline."
+#~ "The batch processing pipeline works by monitoring an input folder, passing "
+#~ "those files to the next pipeline stage, and processing them inside that "
+#~ "stage. This process continues (output of the current stage is the input of "
+#~ "the next stage), until those files reach the end of the pipeline."
 
 #~ msgid "Show the application help"
 #~ msgstr "Show the application help"
@@ -1967,11 +2016,9 @@ msgstr ""
 #~ msgstr "Creates a batch file processing pipeline (for tasks automation)."
 
 #~ msgid ""
-#~ "Will ask questions interactively to "
-#~ "create a batch file processing pipeline."
+#~ "Will ask questions interactively to create a batch file processing pipeline."
 #~ msgstr ""
-#~ "Will ask questions interactively to "
-#~ "create a batch file processing pipeline."
+#~ "Will ask questions interactively to create a batch file processing pipeline."
 
 #~ msgid "Batch creation"
 #~ msgstr "Batch creation"
@@ -1983,36 +2030,26 @@ msgstr ""
 #~ msgstr "Batch execution"
 
 #~ msgid ""
-#~ "Image fit (for ``image to_pdf`` "
-#~ "command). Valid only if ``--page-size``"
-#~ " is defined. Valid values are 'into',"
-#~ " or 'fill'. Defaults to 'into'. "
+#~ "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
+#~ "defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "
 #~ msgstr ""
-#~ "Image fit (for ``image to_pdf`` "
-#~ "command). Valid only if ``--page-size``"
-#~ " is defined. Valid values are 'into',"
-#~ " or 'fill'. Defaults to 'into'. "
+#~ "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
+#~ "defined. Valid values are 'into', or 'fill'. Defaults to 'into'. "
 
 #~ msgid ""
-#~ "Page size (for ``image to_pdf`` "
-#~ "command). Format (width, height). Other "
-#~ "valid values are: 'a4_portrait', "
-#~ "'a4_landscape'. Defaults to None (PDF "
-#~ "size = image size)."
+#~ "Page size (for ``image to_pdf`` command). Format (width, height). Other "
+#~ "valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size "
+#~ "= image size)."
 #~ msgstr ""
-#~ "Page size (for ``image to_pdf`` "
-#~ "command). Format (width, height). Other "
-#~ "valid values are: 'a4_portrait', "
-#~ "'a4_landscape'. Defaults to None (PDF "
-#~ "size = image size)."
+#~ "Page size (for ``image to_pdf`` command). Format (width, height). Other "
+#~ "valid values are: 'a4_portrait', 'a4_landscape'. Defaults to None (PDF size "
+#~ "= image size)."
 
 #~ msgid ""
-#~ "Set PDF metadata (for ``image to_pdf``"
-#~ " command). Defaults to True (set "
+#~ "Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set "
 #~ "creator, producer, modification date, etc)."
 #~ msgstr ""
-#~ "Set PDF metadata (for ``image to_pdf``"
-#~ " command). Defaults to True (set "
+#~ "Set PDF metadata (for ``image to_pdf`` command). Defaults to True (set "
 #~ "creator, producer, modification date, etc)."
 
 #~ msgid "use the same input file as output name"
@@ -2025,35 +2062,25 @@ msgstr ""
 #~ msgstr "Image quality (valid only for JPG). Valid values are between 1-100."
 
 #~ msgid ""
-#~ "Image fit. Valid only if ``--page-"
-#~ "size`` is defined. Valid values are "
-#~ "'into', or 'fill'. Defaults to 'into'."
-#~ " "
+#~ "Image fit. Valid only if ``--page-size`` is defined. Valid values are "
+#~ "'into', or 'fill'. Defaults to 'into'. "
 #~ msgstr ""
-#~ "Image fit. Valid only if ``--page-"
-#~ "size`` is defined. Valid values are "
-#~ "'into', or 'fill'. Defaults to 'into'."
-#~ " "
+#~ "Image fit. Valid only if ``--page-size`` is defined. Valid values are "
+#~ "'into', or 'fill'. Defaults to 'into'. "
 
 #~ msgid ""
-#~ "Page size. Format '(width, height)'. "
-#~ "Other valid values are: 'a4', "
-#~ "'a4_landscape'. Defaults to None (PDF "
-#~ "size = image size)."
+#~ "Page size. Format '(width, height)'. Other valid values are: 'a4', "
+#~ "'a4_landscape'. Defaults to None (PDF size = image size)."
 #~ msgstr ""
-#~ "Page size. Format '(width, height)'. "
-#~ "Other valid values are: 'a4', "
-#~ "'a4_landscape'. Defaults to None (PDF "
-#~ "size = image size)."
+#~ "Page size. Format '(width, height)'. Other valid values are: 'a4', "
+#~ "'a4_landscape'. Defaults to None (PDF size = image size)."
 
 #~ msgid ""
-#~ "Set PDF metadata. Defaults to True "
-#~ "(set creator, producer, modification date, "
-#~ "etc)."
+#~ "Set PDF metadata. Defaults to True (set creator, producer, modification "
+#~ "date, etc)."
 #~ msgstr ""
-#~ "Set PDF metadata. Defaults to True "
-#~ "(set creator, producer, modification date, "
-#~ "etc)."
+#~ "Set PDF metadata. Defaults to True (set creator, producer, modification "
+#~ "date, etc)."
 
 #~ msgid "with _rotated at the end)"
 #~ msgstr "with _rotated at the end)"
@@ -2074,21 +2101,17 @@ msgstr ""
 #~ msgstr "with _compressed.pdf at the end)"
 
 #~ msgid ""
-#~ "Merge protected PDF \"input_file1.pdf\" with"
-#~ " password \"unlock_password\" with unprotected"
-#~ " file \"input_file2.pdf\""
+#~ "Merge protected PDF \"input_file1.pdf\" with password \"unlock_password\" "
+#~ "with unprotected file \"input_file2.pdf\""
 #~ msgstr ""
-#~ "Merge protected PDF \"input_file1.pdf\" with"
-#~ " password \"unlock_password\" with unprotected"
-#~ " file \"input_file2.pdf\""
+#~ "Merge protected PDF \"input_file1.pdf\" with password \"unlock_password\" "
+#~ "with unprotected file \"input_file2.pdf\""
 
 #~ msgid ""
-#~ "If file is protected, provide its "
-#~ "password using the format "
+#~ "If file is protected, provide its password using the format "
 #~ "`\"filepath:password\"`"
 #~ msgstr ""
-#~ "If file is protected, provide its "
-#~ "password using the format "
+#~ "If file is protected, provide its password using the format "
 #~ "`\"filepath:password\"`"
 
 #~ msgid "use the same input file of 1st file as output name"
@@ -2104,15 +2127,11 @@ msgstr ""
 #~ msgstr "Valid format is 'filepath:password' or 'filepath'"
 
 #~ msgid ""
-#~ "For every PDF page, a new single"
-#~ " page PDF will be created using "
-#~ "the format `output_file_X.pdf`, where X "
-#~ "is the page number."
+#~ "For every PDF page, a new single page PDF will be created using the format "
+#~ "`output_file_X.pdf`, where X is the page number."
 #~ msgstr ""
-#~ "For every PDF page, a new single"
-#~ " page PDF will be created using "
-#~ "the format `output_file_X.pdf`, where X "
-#~ "is the page number."
+#~ "For every PDF page, a new single page PDF will be created using the format "
+#~ "`output_file_X.pdf`, where X is the page number."
 
 #~ msgid "Output file path"
 #~ msgstr "Output file path"
@@ -2120,12 +2139,10 @@ msgstr ""
 #~ msgid "with _extracted.pdf at the end)"
 #~ msgstr "with _extracted.pdf at the end)"
 
-#~ msgid ""
-#~ "Pages to extract (comma-separated list)."
-#~ " Format \"page_num\" or \"start-end\"."
+#~ msgid "Pages to extract (comma-separated list). Format \"page_num\" or \"start-end\"."
 #~ msgstr ""
-#~ "Pages to extract (comma-separated list)."
-#~ " Format \"page_num\" or \"start-end\"."
+#~ "Pages to extract (comma-separated list). Format \"page_num\" or \"start-"
+#~ "end\"."
 
 #~ msgid "Pages to extract [comma-separated list] (e.g., 1-3, 7)"
 #~ msgstr "Pages to extract [comma-separated list] (e.g., 1-3, 7)"
@@ -2149,13 +2166,11 @@ msgstr ""
 #~ msgstr "Convert a audio/video file to a different format."
 
 #~ msgid ""
-#~ "This command can be used to "
-#~ "convert audio or video files to "
-#~ "the specified format."
+#~ "This command can be used to convert audio or video files to the specified "
+#~ "format."
 #~ msgstr ""
-#~ "This command can be used to "
-#~ "convert audio or video files to "
-#~ "the specified format."
+#~ "This command can be used to convert audio or video files to the specified "
+#~ "format."
 
 #~ msgid "Audio bitrate in kbps"
 #~ msgstr "Audio bitrate in kbps"
@@ -2167,15 +2182,11 @@ msgstr ""
 #~ msgstr "FFMpeg convertion"
 
 #~ msgid ""
-#~ "Set preferred language for app (if "
-#~ "available). Format lang_COUNTRY. Defaults to"
-#~ " system preffered language or 'en_US' "
-#~ "(English - United States)."
+#~ "Set preferred language for app (if available). Format lang_COUNTRY. Defaults"
+#~ " to system preffered language or 'en_US' (English - United States)."
 #~ msgstr ""
-#~ "Set preferred language for app (if "
-#~ "available). Format lang_COUNTRY. Defaults to"
-#~ " system preffered language or 'en_US' "
-#~ "(English - United States)."
+#~ "Set preferred language for app (if available). Format lang_COUNTRY. Defaults"
+#~ " to system preffered language or 'en_US' (English - United States)."
 
 #~ msgid "Conversion"
 #~ msgstr "Conversion"
@@ -2184,9 +2195,14 @@ msgstr ""
 #~ msgstr "Transformation"
 
 #~ msgid ""
-#~ "Axis. Valid values are 'x' (mirror "
-#~ "horizontally) or 'y' (flip vertically)."
+#~ "Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."
 #~ msgstr ""
-#~ "Axis. Valid values are 'x' (mirror "
-#~ "horizontally) or 'y' (flip vertically)."
+#~ "Axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."
 
+#~ msgid "Target file size (<size>[K|M|G]) [0 = do not limit output file size]"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Format <size>[K|M|G]. If 0, do not limit output file size (use encoding "
+#~ "speed and quality options to calculate output file size)."
+#~ msgstr ""
