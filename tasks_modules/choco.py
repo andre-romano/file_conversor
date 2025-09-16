@@ -188,7 +188,7 @@ def build(c: InvokeContext):
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing choco package ... [/]')
     dist_path = Path(rf".\dist")
-    result = c.run(rf'choco install -y --acceptlicense "{PROJECT_NAME}" --version="{PROJECT_VERSION}" --source="{dist_path}"')
+    result = c.run(rf'choco install -y --acceptlicense "{PROJECT_NAME}" --version="{PROJECT_VERSION}" --source="{dist_path};https://community.chocolatey.org/api/v2/"')
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Installing choco package ... [/][bold green]OK[/]')
 
