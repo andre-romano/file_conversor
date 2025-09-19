@@ -14,6 +14,78 @@ from tasks_modules import base
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
+CHOCO_DESCRIPTION = rf"""
+A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
+
+**Summary**:
+  - [Usage](#usage)
+    - [CLI - Command line interface](#cli---command-line-interface)
+    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
+  - [Why use File Conversor?](#why-use-file-conversor)
+  - [Features](#features)
+  - [External dependencies](#external-dependencies)
+  - [Installing](#installing)
+    - [For Windows](#for-windows)
+    - [For Linux / MacOS](#for-linux--macos)
+  - [Contributing \& Support](#contributing--support)
+  - [License and Copyright](#license-and-copyright)
+
+## Usage
+
+### CLI - Command line interface
+
+![cli_terminal_demo](https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/assets/cli_demo.gif)
+
+Run ``file_conversor -h`` to explore all available commands and options.
+
+### Windows Context Menu (Windows OS only)
+
+1. Right click a file in Windows Explorer
+2. Choose an action from "File Conversor" menu
+
+![windows_context_menu](https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/assets/ctx_menu.jpg)
+
+## Why use File Conversor?
+
+- Automate repetitive file conversion or compression tasks
+- Manipulate various media formats with a single tool
+- Integrate seamlessly with scripting workflows
+- Configure advanced file processing pipelines
+
+## Features
+
+- **Format Conversion**
+  - **Documents**: `docx ⇄ odt`, `docx → pdf`, etc
+  - **Spreadsheets**: `xlsx ⇄ ods`, `xlsx → pdf`, etc
+  - **Video**: `mkv ⇄ mp4`, `avi ⇄ mp4`, etc.
+  - **Images**: `jpg ⇄ png`, `gif ⇄ webp`, `bmp ⇄ tiff`, etc.
+  - **Audio**: `mp3 ⇄ m4a`, etc.
+  - **Text**: `json ⇄ yaml`, `xml ⇄ json`, etc
+  - And more ...
+
+- **Compression**  
+  - Optimizes size for formats like MP4, MP3, PDF, JPG, and others.
+
+- **Metadata Inspection**  
+  - Retrieves EXIF data from images, stream details from audio/video.
+
+- **File Manipulation**  
+  - **PDFs**: split, rotate, encrypt, etc  
+  - **Images**: rotate, enhance, and apply other transformations  
+
+- **Batch Processing**  
+  - Use pipelines and config files for automation and advanced tasks.
+
+- **Multiple Interfaces**  
+  - **Windows Explorer integration**: right-click files for quick actions
+  - CLI for scripting and automation  
+
+*For full feature set, check* [`FEATURE_SET.md`](https://github.com/andre-romano/file_conversor/blob/master/FEATURE_SET.md)
+"""
+
+if len(CHOCO_DESCRIPTION) >= 4000:
+    raise RuntimeError("CHOCO_DESCRIPTION must be < 4000 characters")
+
 
 def escape_xml(text: str | None) -> str:
     """
@@ -126,13 +198,14 @@ elseif ($key.Count -gt 1) {{
     <title>{escape_xml(PROJECT_TITLE)}</title>
     <authors>{escape_xml(", ".join(PROJECT_AUTHORS))}</authors>
     <description>
-        {escape_xml(README_PATH.read_text(encoding="utf-8"))[0:3999]}
+        {escape_xml(CHOCO_DESCRIPTION)}
     </description>
     <summary>{escape_xml(PROJECT_DESCRIPTION)}</summary>
     <tags>{escape_xml(" ".join(PROJECT_KEYWORDS))}</tags>
     <iconUrl>{ICON_URL}</iconUrl>
     <projectUrl>{PROJECT_HOMEPAGE}</projectUrl>
-    <packageSourceUrl>{SOURCE_URL}</packageSourceUrl>
+    <projectSourceUrl>{PROJECT_HOMEPAGE}</projectSourceUrl>
+    <packageSourceUrl>{CHOCO_PKG_REPO_URL}</packageSourceUrl>
     <licenseUrl>{LICENSE_URL}</licenseUrl>
     <releaseNotes>{RELEASE_NOTES_URL}</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

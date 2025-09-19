@@ -30,6 +30,7 @@ PROJECT_DESCRIPTION = str(PYPROJECT["project"]["description"])
 PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
 
 PROJECT_HOMEPAGE = f"https://github.com/andre-romano/{PROJECT_NAME}"
+CHOCO_PKG_REPO_URL = f"https://github.com/andre-romano/{PROJECT_NAME}"
 
 ICONS_PATH = Path(PYPROJECT["tool"]["myproject"]["icons_path"])
 I18N_PATH = Path(PYPROJECT["tool"]["myproject"]["locales_path"])

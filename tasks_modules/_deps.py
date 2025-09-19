@@ -6,8 +6,6 @@ from tasks_modules._config import *
 
 CHOCO_DEPS = {
     "chocolatey-core.extension": "1.3.3",
-    "ffmpeg": "",
-    "ghostscript": "",
 }
 
 SCOOP_DEPS = {
