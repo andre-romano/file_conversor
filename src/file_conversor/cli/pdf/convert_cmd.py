@@ -9,7 +9,7 @@ from typing import Annotated, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend.pdf import PyMuPDFBackend
+from file_conversor.backend.pdf import PyMuPDFBackend, PDF2DOCXBackend
 
 from file_conversor.cli.pdf._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.pdf._typer import COMMAND_NAME, CONVERT_NAME
@@ -33,7 +33,10 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = PyMuPDFBackend.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = set([
+    *PyMuPDFBackend.EXTERNAL_DEPENDENCIES,
+    *PDF2DOCXBackend.EXTERNAL_DEPENDENCIES,
+])
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
@@ -51,6 +54,16 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 description="To JPG",
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg"',
                 icon=str(icons_folder_path / 'jpg.ico'),
+            ),
+        ])
+    # pdf2docx
+    for ext in PDF2DOCXBackend.SUPPORTED_IN_FORMATS:
+        ctx_menu.add_extension(f".{ext}", [
+            WinContextCommand(
+                name="to_docx",
+                description="To DOCX",
+                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "docx"',
+                icon=str(icons_folder_path / 'docx.ico'),
             ),
         ])
 
@@ -73,23 +86,33 @@ ctx_menu.register_callback(register_ctx_menu)
 
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f jpg --dpi 200`
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f png -o`
+        - `file_conversor -oo {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f png`
     """)
 def convert(
-    input_files: Annotated[List[str], InputFilesArgument(PyMuPDFBackend)],
-    format: Annotated[str, FormatOption(PyMuPDFBackend)],
+    input_files: Annotated[List[str], InputFilesArgument(["pdf"])],
+    format: Annotated[str, FormatOption({
+        **PyMuPDFBackend.SUPPORTED_OUT_FORMATS,
+        **PDF2DOCXBackend.SUPPORTED_OUT_FORMATS,
+    })],
     dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     pymupdf_backend = PyMuPDFBackend(verbose=STATE['verbose'])
+    pdf2docx_backend = PDF2DOCXBackend(verbose=STATE['verbose'])
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         print(f"Processing '{output_file}' ...")
-        pymupdf_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            dpi=dpi,
-        )
+        if format in PDF2DOCXBackend.SUPPORTED_OUT_FORMATS:
+            pdf2docx_backend.to_docx(
+                input_file=input_file,
+                output_file=output_file,
+            )
+        elif format in PyMuPDFBackend.SUPPORTED_OUT_FORMATS:
+            pymupdf_backend.convert(
+                input_file=input_file,
+                output_file=output_file,
+                dpi=dpi,
+            )
         progress_mgr.complete_step()
     cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_suffix=f".{format}")

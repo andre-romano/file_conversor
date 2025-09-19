@@ -80,7 +80,6 @@ def extract_img(
             # files
             input_file=input_file,
             output_dir=output_dir,
-            overwrite_files=STATE["overwrite-output"],
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()

@@ -80,7 +80,6 @@ class PyMuPDFBackend(AbstractBackend):
             self,
             input_file: str | Path,
             output_dir: str | Path,
-            overwrite_files: bool,
             progress_callback: Callable[[float], Any] | None = None,
     ):
         """

@@ -20,6 +20,7 @@ dependencies = [
     "toml>=0.10.2",
     "concurrent-log-handler>=0.9.28",
     "portalocker>=3.2.0",
+    "pdf2docx>=0.5.8",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"

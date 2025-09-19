@@ -20,7 +20,8 @@ def main() -> None:
         LOG.shutdown()
         sys.exit(0)
     except Exception as e:
-        error_type = str(type(e)).split("'")[1]
+        error_type = str(type(e))
+        error_type = error_type.split("'")[1]
         logger.error(f"{error_type} ({e})", exc_info=True if STATE["debug"] else None)
         if isinstance(e, subprocess.CalledProcessError):
             logger.error(f"CMD: {e.cmd} ({e.returncode})")

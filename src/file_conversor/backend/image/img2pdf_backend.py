@@ -111,5 +111,9 @@ class Img2PDFBackend(AbstractBackend):
                 fit=image_fit,
             )
 
+        buffer = img2pdf.convert(*input_files, **opts)
+        if not buffer:
+            raise RuntimeError(f"Error converting files to PDF: {input_files}")
+
         with open(output_path, "wb") as f:
-            f.write(img2pdf.convert(*input_files, **opts))
+            f.write(buffer)

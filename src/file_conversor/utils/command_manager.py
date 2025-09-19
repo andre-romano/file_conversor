@@ -48,6 +48,6 @@ class CommandManager:
             for input_file in self._input_files:
                 output_file = self._output_dir / self.get_output_file(input_file, stem=out_stem, suffix=out_suffix)
                 if not self._overwrite and output_file.exists():
-                    raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}")
+                    raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
 
                 callback(input_file, output_file, progress_mgr)
