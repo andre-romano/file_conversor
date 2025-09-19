@@ -116,16 +116,8 @@ def check(c: InvokeContext):
 @task(pre=[build,])
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
-    result = c.run(f'git status', hide=True)
-    assert (result is not None) and (result.return_code == 0)
-    if Path(SCOOP_PATH).name not in result.stdout:
-        print(f"[bold] Skipping publish: no changes in bucket file. [/]")
-        return
-    result = c.run(f'git add "{SCOOP_PATH}"', hide=True)
-    assert (result is not None) and (result.return_code == 0)
 
-    result = c.run(f'git commit -m "ci: scoop bucket {GIT_RELEASE}"', hide=True)
-    assert (result is not None) and (result.return_code == 0)
+    git_commit(c, SCOOP_PATH, message=f"ci: scoop bucket {GIT_RELEASE}")
 
     result = c.run(f'git push')
     assert (result is not None) and (result.return_code == 0)

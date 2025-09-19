@@ -211,3 +211,19 @@ def extract(src: Path, dst: Path):
 
     with zipfile.ZipFile(src, "r") as zipf:
         zipf.extractall(extract_to)
+
+
+def git_commit(c: InvokeContext, path: Path | str, message: str):
+    path = Path(path).resolve()
+    result = c.run(f'git status', hide=True)
+    assert (result is not None) and (result.return_code == 0)
+
+    if path.name not in result.stdout:
+        print(f"[bold] Skipping commit: file {path.name} not changed. [/]")
+        return
+
+    result = c.run(f'git add "{path}"', hide=True)
+    assert (result is not None) and (result.return_code == 0)
+
+    result = c.run(f'git commit -m "{message}"', hide=True)
+    assert (result is not None) and (result.return_code == 0)
