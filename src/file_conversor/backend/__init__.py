@@ -9,6 +9,7 @@ making them available when importing the backend package.
 
 # SUBMODULES
 from file_conversor.backend.audio_video import *
+from file_conversor.backend.ebook import *
 from file_conversor.backend.image import *
 from file_conversor.backend.office import DOC_BACKEND, XLS_BACKEND, PPT_BACKEND
 from file_conversor.backend.pdf import *

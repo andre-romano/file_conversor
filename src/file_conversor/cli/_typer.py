@@ -12,6 +12,7 @@ from file_conversor.cli.audio import audio_cmd
 from file_conversor.cli.video import video_cmd
 from file_conversor.cli.config import config_cmd
 from file_conversor.cli.doc import doc_cmd
+from file_conversor.cli.ebook import ebook_cmd
 from file_conversor.cli.hash import hash_cmd
 from file_conversor.cli.image import image_cmd
 from file_conversor.cli.pdf import pdf_cmd
@@ -69,6 +70,11 @@ COMMANDS_LIST.extend([
     {
 
         "typer_instance": pdf_cmd,
+        "rich_help_panel": FILE_PANEL
+    },
+    {
+
+        "typer_instance": ebook_cmd,
         "rich_help_panel": FILE_PANEL
     },
     {
