@@ -176,11 +176,11 @@ class GhostscriptBackend(AbstractBackend):
         verbose: bool = False,
     ):
         """
-        Initialize the FFMpeg backend.
+        Initialize the backend.
 
         :param install_deps: Install external dependencies. If True auto install using a package manager. If False, do not install external dependencies. If None, asks user for action. 
 
-        :raises RuntimeError: if ffmpeg dependency is not found
+        :raises RuntimeError: if dependency is not found
         """
         super().__init__(
             pkg_managers={

@@ -2,6 +2,7 @@
 import subprocess
 import shutil
 import sys
+import time
 
 from importlib.resources import files
 
@@ -19,6 +20,81 @@ logger = LOG.getLogger(__name__)
 class Environment:
 
     __instance = None
+
+    @classmethod
+    def remove(cls, src: str | Path, globs: str = "*", remove_src: bool = True, no_exists_ok: bool = True):
+        """
+        Remove dir or file, using globs / wildcards
+
+        :param src: Source folder/file to remove
+        :param globs: Globs/wildcards to match files/folders to remove. Defaults to "*" (all files/folders).
+        :param remove_src: If True, remove the source folder itself. Valid only if src is a directory. Defaults to True.
+        :param no_exists_ok: Do not raise error if file/folder does not exist. Defaults to True.
+
+        :raises FileNotFoundError: if file/folder does not exist and no_exists_ok is False
+        """
+        src_path = Path(src).resolve()
+        if not src_path.exists():
+            if no_exists_ok:
+                return
+            raise FileNotFoundError(f"Source '{src_path}' does not exist")
+
+        if src_path.is_file():
+            src_path.unlink()  # Remove single file
+            return
+
+        if src_path.is_dir():
+            if remove_src:
+                shutil.rmtree(src_path)
+                return
+            for path in src_path.glob(globs):
+                logger.debug(f"Removing '{path}' ... ")
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()  # Remove single file
+
+    @classmethod
+    def copy(cls, src: Path | str, dst: Path | str, overwrite: bool = False):
+        """Copy a file or folder."""
+        src = Path(src).resolve()
+        dst = Path(dst).resolve()
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not src.exists():
+            raise FileNotFoundError(f"Source '{src}' does not exist")
+        if dst.exists():
+            if not overwrite:
+                raise FileExistsError(f"Destination '{dst}' already exists")
+            if dst.is_dir():
+                shutil.rmtree(dst)
+            else:
+                dst.unlink()
+        if src.is_dir():
+            shutil.copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
+
+    @classmethod
+    def move(cls, src: Path | str, dst: Path | str, overwrite: bool = False):
+        """Move a file or folder."""
+        src = Path(src).resolve()
+        dst = Path(dst).resolve()
+        if not src.exists():
+            raise FileNotFoundError(f"Source '{src}' does not exist")
+        if dst.exists():
+            if not overwrite:
+                raise FileExistsError(f"Destination '{dst}' already exists")
+            cls.remove(dst, remove_src=True, no_exists_ok=True)
+        shutil.move(str(src), str(dst))
+
+    @classmethod
+    def touch(cls, path: Path | str, mode: int = 0o644, exists_ok: bool = True):
+        """Create an empty file."""
+        path = Path(path).resolve()
+        if path.exists() and not exists_ok:
+            raise FileExistsError(f"File '{path}' already exists")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch(mode=mode, exist_ok=exists_ok)
 
     @classmethod
     def get_executable(cls) -> str:
@@ -41,6 +117,12 @@ class Environment:
         """Get the absolute path of the included folders in pip."""
         res_path = Path(str(files("file_conversor"))).resolve()
         return res_path
+
+    @classmethod
+    def get_data_folder(cls) -> Path:
+        data_path = cls.get_resources_folder() / ".data"
+        logger.debug(f"Data path: {data_path}")
+        return data_path
 
     @classmethod
     def get_icons_folder(cls) -> Path:
@@ -68,8 +150,8 @@ class Environment:
                    encoding: str | None = None,
                    env: dict | None = None,
                    cwd: str | Path | None = None,
-                   stdout=subprocess.PIPE,
-                   stderr=subprocess.STDOUT,
+                   stdout: int | None = subprocess.PIPE,
+                   stderr: int | None = subprocess.STDOUT,
                    **kwargs,
                    ) -> subprocess.Popen:
         """
@@ -110,8 +192,8 @@ class Environment:
             encoding: str | None = None,
             env: dict | None = None,
             cwd: str | Path | None = None,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stdout: int | None = subprocess.PIPE,
+            stderr: int | None = subprocess.STDOUT,
             **kwargs,
             ) -> subprocess.CompletedProcess:
         """

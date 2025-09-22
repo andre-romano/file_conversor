@@ -23,6 +23,7 @@ EXTRACT_NAME = "extract"
 EXTRACT_IMG_NAME = "extract-img"
 
 MERGE_NAME = "merge"
+OCR_NAME = "ocr"
 REPAIR_NAME = "repair"
 
 ROTATE_NAME = "rotate"

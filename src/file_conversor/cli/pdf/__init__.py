@@ -14,6 +14,7 @@ from file_conversor.cli.pdf.encrypt_cmd import typer_cmd as encrypt_cmd
 from file_conversor.cli.pdf.extract_cmd import typer_cmd as extract_cmd
 from file_conversor.cli.pdf.extract_img_cmd import typer_cmd as extract_img_cmd
 from file_conversor.cli.pdf.merge_cmd import typer_cmd as merge_cmd
+from file_conversor.cli.pdf.ocr_cmd import typer_cmd as ocr_cmd
 from file_conversor.cli.pdf.repair_cmd import typer_cmd as repair_cmd
 from file_conversor.cli.pdf.rotate_cmd import typer_cmd as rotate_cmd
 from file_conversor.cli.pdf.split_cmd import typer_cmd as split_cmd
@@ -34,6 +35,7 @@ pdf_cmd.add_typer(extract_cmd)
 pdf_cmd.add_typer(merge_cmd)
 pdf_cmd.add_typer(rotate_cmd)
 pdf_cmd.add_typer(split_cmd)
+pdf_cmd.add_typer(ocr_cmd)
 
 # OTHERS_PANEL
 pdf_cmd.add_typer(convert_cmd)
