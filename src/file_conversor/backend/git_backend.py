@@ -9,6 +9,8 @@ from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.http_backend import HttpBackend
+
 from file_conversor.config import Environment, Log, get_translation
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
@@ -34,7 +36,70 @@ class GitBackend(AbstractBackend):
         "git",
     }
 
-    def check_repository(self, path: str | Path) -> Path:
+    @staticmethod
+    def get_download_url(
+        user_name: str,
+        repo_name: str,
+        file_path: str | Path,
+        branch: str = "",
+    ):
+        """Get the download URL for a file in a GitHub repository.
+
+        :param user_name: The GitHub username or organization name.
+        :param repo_name: The name of the repository.
+        :param file_path: The path to the file in the repository.        
+        :param branch: The branch name. If not provided, the default branch will be used.
+        """
+        file_path = Path(file_path)
+        request_url = f"https://raw.githubusercontent.com/{user_name}/{repo_name}/{branch}/{file_path.as_posix()}"
+        return request_url
+
+    @staticmethod
+    def get_info_api(
+        user_name: str,
+        repo_name: str,
+        path: str | Path = "",
+        branch: str = "",
+    ) -> list[dict[str, Any]]:
+        """
+        Get information about a file or directory in a GitHub repository using the GitHub API.
+
+        return [{
+            "name": "filename",
+            "path": "path/to/filename",
+            "sha": "53098f771f720bf80a8e05ac53f6c281da6cf2b5",
+            "size": number | 0 (if a directory),
+            "url": "https://api.github.com/repos/<user>/<repo>/contents/.gitmodules?ref=<branch>",
+            "html_url": "https://github.com/<user>/<repo>/blob/<branch>/.gitmodules",
+            "download_url": "https://raw.githubusercontent.com/<user>/<repo>/<branch>/.gitmodules",
+            "type": "file"|"dir",
+        }]
+
+        :param user_name: The GitHub username or organization name.
+        :param repo_name: The name of the repository.
+        :param path: The path to the file or directory in the repository. Defaults to the root directory.
+        :param branch: The branch name. If not provided, the default branch will be used.
+
+        :return: A dictionary containing information about the file or directory.
+
+        :raises RuntimeError: if the GitHub API request fails
+        """
+        http_backend = HttpBackend(verbose=False)
+        res = http_backend.get_json(
+            url=f"https://api.github.com/repos/{user_name}/{repo_name}/contents/{path}",
+            params={"ref": branch} if branch else None,
+        )
+        if isinstance(res, dict) and res.get("status", "200") != "200":
+            raise RuntimeError(f"{_('Failed to retrieve info from GitHub API')}: {res.get('status', '200')} - {res.get('message', '')}")
+        if isinstance(res, dict):
+            return [res]
+        elif isinstance(res, list):
+            return res
+        else:
+            raise RuntimeError(f"{_('Failed to retrieve info from GitHub API')}: {type(res)}")
+
+    @staticmethod
+    def check_repository(path: str | Path) -> Path:
         """
         Check if a given path is a Git repository.
 

@@ -18,6 +18,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.rich_utils import get_progress_bar
 from file_conversor.utils.typer_utils import DPIOption, FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -87,6 +88,31 @@ def ocr(
         install_deps=CONFIG['install-deps'],
         verbose=STATE['verbose'],
     )
+    local_langs: set[str] = ocrmypdf_backend.get_available_languages()
+    remote_langs: set[str] = set()
+
+    if 'all' in languages:
+        remote_langs = ocrmypdf_backend.get_available_remote_languages()
+        print(f"{_('Available remote languages')}: {', '.join(remote_langs)}")
+        print(f"{_('Installed languages')}: {', '.join(local_langs)}")
+        return
+
+    install_langs = set(languages) - local_langs
+    if install_langs:
+        remote_langs = ocrmypdf_backend.get_available_remote_languages()
+        if install_langs - remote_langs:
+            print(f"{_('Available remote languages')}: {', '.join(remote_langs)}")
+            print(f"{_('Languages requested')}: {', '.join(install_langs)}")
+            raise ValueError(f"{_('Some languages are not available for installation')}.")
+
+        with get_progress_bar() as progress:
+            for lang in install_langs:
+                task = progress.add_task(f"{_('Installing language')} '{lang}' ...", total=100)
+                ocrmypdf_backend.install_language(
+                    lang=lang,
+                    progress_callback=lambda p: progress.update(task, completed=p),
+                )
+                progress.update(task, completed=100)
 
     for input_file in input_files:
         input_file = Path(input_file).resolve()
@@ -96,17 +122,10 @@ def ocr(
 
         print(f"Processing '{output_file}' ...")
 
-        if 'all' in languages:
-            langs = ocrmypdf_backend.get_available_languages()
-            if not langs:
-                raise RuntimeError(_("No available languages found."))
-            print(f"{_('Available languages')}: {', '.join(langs)}")
-
-        else:
-            ocrmypdf_backend.to_pdf(
-                input_file=input_file,
-                output_file=output_file,
-                languages=languages,
-            )
+        ocrmypdf_backend.to_pdf(
+            input_file=input_file,
+            output_file=output_file,
+            languages=languages,
+        )
 
     logger.info(f"{_('File OCR')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

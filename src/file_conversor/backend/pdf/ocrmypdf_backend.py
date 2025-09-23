@@ -2,8 +2,6 @@
 
 import multiprocessing
 import re
-import shutil
-import tempfile
 import ocrmypdf
 
 from pathlib import Path
@@ -16,6 +14,8 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.git_backend import GitBackend
+from file_conversor.backend.http_backend import HttpBackend
+
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
 STATE = State.get_instance()
@@ -26,6 +26,14 @@ _ = get_translation()
 
 
 class OcrMyPDFBackend(AbstractBackend):
+    TESSDATA_REMOTE_LANGS: set[str] | None = None
+    TESSDATA_DIR: Path | None = None
+
+    TESSDATA_REPOSITORY = {
+        "user_name": "tesseract-ocr",
+        "repo_name": "tessdata",
+        "branch": "main",
+    }
 
     SUPPORTED_IN_FORMATS = {
         "pdf": {},
@@ -65,36 +73,36 @@ class OcrMyPDFBackend(AbstractBackend):
 
         self._tesseract_bin = self.find_in_path("tesseract")
 
-        langs = self.get_available_languages()
-        if not langs:
-            logger.warning(f"{_('No Tesseract languages found. Installing language packs ...')}")
-            self._install_tesseract_languages()
-            if not self.get_available_languages():
-                raise RuntimeError(_("No Tesseract languages found after installation."))
-        logger.debug(f"{_('Available Tesseract languages')}: {', '.join(langs)}")
+        self.TESSDATA_DIR = self.get_tessdata_dir()
+        logger.debug(f"{_('Tesseract tessdata directory')}: {self.TESSDATA_DIR}")
 
-    def _install_tesseract_languages(self):
-        tessdata_path = self.get_tessdata_dir()
-        if not tessdata_path:
-            raise RuntimeError(_("Could not determine Tesseract tessdata directory."))
-        logger.info(f"{_('Tesseract tessdata directory')}: {tessdata_path}")
+    def install_language(
+            self,
+            lang: str,
+            progress_callback: Callable[[float], None] | None = None,
+    ):
+        if not self.TESSDATA_DIR:
+            raise FileNotFoundError(_("Tessdata directory not found."))
 
-        git_backend = GitBackend(
-            install_deps=self._install_deps,
-            verbose=self._verbose,
+        lang_file = self.TESSDATA_DIR / f"{lang}.traineddata"
+        if lang_file.exists():
+            logger.warning(f"{_('Language')} '{lang}' {_('already installed')}.")
+            return
+
+        lang_url = GitBackend.get_download_url(
+            **self.TESSDATA_REPOSITORY,
+            file_path=f"{lang}.traineddata",
         )
-        with tempfile.TemporaryDirectory() as temp_dir:
-            git_backend.clone(
-                repo_url="https://github.com/tesseract-ocr/tessdata.git",
-                dest_folder=temp_dir,
-            )
-            for src_file in Path(temp_dir).glob("*.traineddata"):
-                dest_file = tessdata_path / src_file.name
-                if dest_file.exists():
-                    logger.warning(f"{_('Tesseract language file already exists')}: {dest_file}")
-                    continue
-                logger.debug(f"{_('Installing Tesseract language file')}: {dest_file}")
-                Environment.move(src_file, dest_file)
+        http_backend = HttpBackend(verbose=self._verbose)
+        http_backend.download(
+            url=lang_url,
+            dest_folder=lang_file,
+            progress_callback=progress_callback,
+        )
+
+        available_languages = self.get_available_languages()
+        if lang not in available_languages:
+            raise RuntimeError(f"{_('Failed to install language')} '{lang}'.")
 
     def get_tessdata_dir(self) -> Path:
         """
@@ -104,6 +112,9 @@ class OcrMyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if tessdata directory not found
         """
+        if self.TESSDATA_DIR:
+            return self.TESSDATA_DIR
+
         process = Environment.run(
             str(self._tesseract_bin),
             "--list-langs",
@@ -119,7 +130,25 @@ class OcrMyPDFBackend(AbstractBackend):
             return tessdata_path
         raise FileNotFoundError(_("Tessdata directory not found."))
 
-    def get_available_languages(self) -> list[str]:
+    def get_available_remote_languages(self) -> set[str]:
+        """
+        Get available remote languages for OCR.
+        """
+        if self.TESSDATA_REMOTE_LANGS is not None:
+            return self.TESSDATA_REMOTE_LANGS
+
+        self.TESSDATA_REMOTE_LANGS = set()
+        for file_info in GitBackend.get_info_api(
+            **self.TESSDATA_REPOSITORY,
+        ):
+            if not file_info.get("name", "").endswith(".traineddata"):
+                continue
+            lang = file_info["name"][:-len(".traineddata")]
+            if lang and lang not in ("configs", "tessdata_best", "tessdata_fast"):
+                self.TESSDATA_REMOTE_LANGS.add(lang)
+        return self.TESSDATA_REMOTE_LANGS
+
+    def get_available_languages(self) -> set[str]:
         """
         Get available languages for OCR.
 
@@ -130,13 +159,12 @@ class OcrMyPDFBackend(AbstractBackend):
             "--list-langs",
         )
         # First line is usually 'List of available languages (x):'
-        langs: list[str] = []
+        langs: set[str] = set()
         for line in process.stdout.splitlines()[1:]:
             line = str(line).strip().lower()
             if not line or line == "none" or line.startswith("list of available"):
                 continue
-            langs.append(line)
-        langs.sort()
+            langs.add(line)
         return langs
 
     def to_pdf(

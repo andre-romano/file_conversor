@@ -22,6 +22,7 @@ dependencies = [
     "portalocker>=3.2.0",
     "pdf2docx>=0.5.8",
     "ocrmypdf>=16.11.0",
+    "requests>=2.32.5",
 ]
 requires-python = "==3.13.*"
 readme = "README.md"
@@ -157,4 +158,5 @@ dev = [
     "pyinstaller>=6.15.0",
     "polib>=1.2.0",
     "deep-translator>=1.11.4",
+    "requests>=2.32.5",
 ]

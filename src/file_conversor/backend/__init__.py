@@ -18,5 +18,6 @@ from file_conversor.backend.pdf import *
 from file_conversor.backend.batch_backend import BatchBackend
 from file_conversor.backend.git_backend import GitBackend
 from file_conversor.backend.hash_backend import HashBackend
+from file_conversor.backend.http_backend import HttpBackend
 from file_conversor.backend.text_backend import TextBackend
 from file_conversor.backend.win_reg_backend import WinRegBackend
