@@ -46,6 +46,7 @@ def build(c: InvokeContext):
         "pdm", "run", "pyinstaller", f'"{MAIN_PATH}"',
         "--name", f'"{PROJECT_NAME}"',
         "--icon", f'"{ICON_APP}"',
+        "--additional-hooks-dir=hooks",
         "--clean",
         "--onedir",
     ]
