@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-16 15:59-0300\n"
+"POT-Creation-Date: 2025-09-23 13:38-0300\n"
 "PO-Revision-Date: 2025-08-20 16:30-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en_US <LL@li.org>\n"
@@ -27,8 +27,9 @@ msgid "found"
 msgstr "found"
 
 #: src/file_conversor/backend/abstract_backend.py:56
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
 #: src/file_conversor/cli/audio/check_cmd.py:85
+#: src/file_conversor/cli/pdf/ocr_cmd.py:121
 #: src/file_conversor/cli/video/check_cmd.py:86
 #: src/file_conversor/utils/command_manager.py:51
 #: src/file_conversor/utils/validators.py:107
@@ -60,6 +61,7 @@ msgstr "Package Manager Installation"
 #: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
 #: src/file_conversor/cli/audio/check_cmd.py:91
 #: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/hash/check_cmd.py:82
 #: src/file_conversor/cli/hash/create_cmd.py:68
 #: src/file_conversor/cli/image/antialias_cmd.py:96
@@ -75,12 +77,13 @@ msgstr "Package Manager Installation"
 #: src/file_conversor/cli/image/to_pdf_cmd.py:124
 #: src/file_conversor/cli/image/unsharp_cmd.py:86
 #: src/file_conversor/cli/pdf/compress_cmd.py:115
-#: src/file_conversor/cli/pdf/convert_cmd.py:97
+#: src/file_conversor/cli/pdf/convert_cmd.py:120
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:160
 #: src/file_conversor/cli/pdf/extract_cmd.py:95
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:88
 #: src/file_conversor/cli/pdf/merge_cmd.py:83
+#: src/file_conversor/cli/pdf/ocr_cmd.py:131
 #: src/file_conversor/cli/pdf/repair_cmd.py:92
 #: src/file_conversor/cli/pdf/rotate_cmd.py:108
 #: src/file_conversor/cli/pdf/split_cmd.py:99
@@ -162,6 +165,29 @@ msgstr "FAILED"
 msgid "Finished batch stage"
 msgstr "Finished batch stage"
 
+#: src/file_conversor/backend/git_backend.py:93
+#: src/file_conversor/backend/git_backend.py:99
+msgid "Failed to retrieve info from GitHub API"
+msgstr "Failed to retrieve info from GitHub API"
+
+#: src/file_conversor/backend/git_backend.py:204
+#: src/file_conversor/backend/git_backend.py:226
+msgid "This might take a while (couple minutes, or hours) ..."
+msgstr "This might take a while (couple minutes, or hours) ..."
+
+#: src/file_conversor/backend/http_backend.py:62
+msgid "Failed to get JSON from url"
+msgstr "Failed to get JSON from url"
+
+#: src/file_conversor/backend/http_backend.py:66
+msgid "Failed to parse JSON from url"
+msgstr "Failed to parse JSON from url"
+
+#: src/file_conversor/backend/http_backend.py:83
+#: src/file_conversor/backend/http_backend.py:92
+msgid "Failed to download file"
+msgstr "Failed to download file"
+
 #: src/file_conversor/backend/audio_video/ffmpeg_backend.py:99
 msgid "Input file not set"
 msgstr "Input file not set"
@@ -232,53 +258,75 @@ msgstr "Invalid quality level. Valid values are"
 msgid "Image correction failed"
 msgstr "Image correction failed"
 
-#: src/file_conversor/backend/pdf/pymupdf_backend.py:114
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:77
+msgid "Tesseract tessdata directory"
+msgstr "Tesseract tessdata directory"
+
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:85
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:131
+msgid "Tessdata directory not found."
+msgstr "Tessdata directory not found."
+
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:89
+msgid "Language"
+msgstr "Language"
+
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:89
+msgid "already installed"
+msgstr "already installed"
+
+#: src/file_conversor/backend/pdf/ocrmypdf_backend.py:105
+msgid "Failed to install language"
+msgstr "Failed to install language"
+
+#: src/file_conversor/backend/pdf/pymupdf_backend.py:113
+#: src/file_conversor/cli/pdf/ocr_cmd.py:121
 #: src/file_conversor/utils/command_manager.py:51
 #: src/file_conversor/utils/validators.py:109
 msgid "exists"
 msgstr "exists"
 
-#: src/file_conversor/cli/__init__.py:65
+#: src/file_conversor/cli/__init__.py:66
 msgid "For more information, visit"
 msgstr "For more information, visit"
 
-#: src/file_conversor/cli/__init__.py:70
+#: src/file_conversor/cli/__init__.py:71
 msgid "Disable file logs"
 msgstr "Disable file logs"
 
-#: src/file_conversor/cli/__init__.py:75
+#: src/file_conversor/cli/__init__.py:76
 msgid "Disable progress bars"
 msgstr "Disable progress bars"
 
-#: src/file_conversor/cli/__init__.py:80
+#: src/file_conversor/cli/__init__.py:81
 msgid "Enable quiet mode (only display errors and progress bars)"
 msgstr "Enable quiet mode (only display errors and progress bars)"
 
-#: src/file_conversor/cli/__init__.py:85
+#: src/file_conversor/cli/__init__.py:86
 msgid "Enable verbose mode"
 msgstr "Enable verbose mode"
 
-#: src/file_conversor/cli/__init__.py:90
+#: src/file_conversor/cli/__init__.py:91
 msgid "Enable debug mode"
 msgstr "Enable debug mode"
 
-#: src/file_conversor/cli/__init__.py:95
+#: src/file_conversor/cli/__init__.py:96
 msgid "Display version"
 msgstr "Display version"
 
-#: src/file_conversor/cli/__init__.py:101
+#: src/file_conversor/cli/__init__.py:102
 msgid "Overwrite output files"
 msgstr "Overwrite output files"
 
-#: src/file_conversor/cli/_typer.py:27
+#: src/file_conversor/cli/_typer.py:28
 msgid "Office files"
 msgstr "Office files"
 
-#: src/file_conversor/cli/_typer.py:28
+#: src/file_conversor/cli/_typer.py:29
 msgid "Other files"
 msgstr "Other files"
 
-#: src/file_conversor/cli/_typer.py:29
+#: src/file_conversor/cli/_typer.py:30
 msgid "Utils and Config"
 msgstr "Utils and Config"
 
@@ -301,6 +349,7 @@ msgstr "Checks a audio file for corruption / inconsistencies."
 #: src/file_conversor/cli/config/set_cmd.py:40
 #: src/file_conversor/cli/config/show_cmd.py:36
 #: src/file_conversor/cli/doc/convert_cmd.py:65
+#: src/file_conversor/cli/ebook/convert_cmd.py:63
 #: src/file_conversor/cli/hash/check_cmd.py:61
 #: src/file_conversor/cli/hash/create_cmd.py:42
 #: src/file_conversor/cli/image/antialias_cmd.py:63
@@ -317,12 +366,13 @@ msgstr "Checks a audio file for corruption / inconsistencies."
 #: src/file_conversor/cli/image/to_pdf_cmd.py:71
 #: src/file_conversor/cli/image/unsharp_cmd.py:44
 #: src/file_conversor/cli/pdf/compress_cmd.py:71
-#: src/file_conversor/cli/pdf/convert_cmd.py:72
+#: src/file_conversor/cli/pdf/convert_cmd.py:85
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/extract_cmd.py:66
 #: src/file_conversor/cli/pdf/extract_img_cmd.py:68
 #: src/file_conversor/cli/pdf/merge_cmd.py:48
+#: src/file_conversor/cli/pdf/ocr_cmd.py:67
 #: src/file_conversor/cli/pdf/repair_cmd.py:66
 #: src/file_conversor/cli/pdf/rotate_cmd.py:73
 #: src/file_conversor/cli/pdf/split_cmd.py:67
@@ -606,11 +656,20 @@ msgstr ""
 "LibreOffice)."
 
 #: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/ppt/convert_cmd.py:87
 #: src/file_conversor/cli/text/convert_cmd.py:107
 #: src/file_conversor/cli/xls/convert_cmd.py:87
 msgid "File conversion"
 msgstr "File conversion"
+
+#: src/file_conversor/cli/ebook/__init__.py:18
+msgid "Ebook file manipulation (requires Calibre external library)"
+msgstr "Ebook file manipulation (requires Calibre external library)"
+
+#: src/file_conversor/cli/ebook/convert_cmd.py:60
+msgid "Convert an ebook file to another ebook format (or PDF)."
+msgstr "Convert an ebook file to another ebook format (or PDF)."
 
 #: src/file_conversor/cli/hash/__init__.py:17
 msgid "Hashing manipulation (check, gen, etc)"
@@ -872,7 +931,7 @@ msgstr ""
 msgid "Image unsharp"
 msgstr "Image unsharp"
 
-#: src/file_conversor/cli/pdf/__init__.py:25
+#: src/file_conversor/cli/pdf/__init__.py:26
 msgid "PDF file manipulation"
 msgstr "PDF file manipulation"
 
@@ -892,15 +951,15 @@ msgstr "Outputs a file with _compressed at the end."
 msgid "File compression"
 msgstr "File compression"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:67
+#: src/file_conversor/cli/pdf/convert_cmd.py:80
 msgid "Convert a PDF file to a different format."
 msgstr "Convert a PDF file to a different format."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:69
+#: src/file_conversor/cli/pdf/convert_cmd.py:82
 msgid "Outputs a file with the PDF page number at the end."
 msgstr "Outputs a file with the PDF page number at the end."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:97
+#: src/file_conversor/cli/pdf/convert_cmd.py:120
 msgid "File convertion"
 msgstr "File convertion"
 
@@ -1076,7 +1135,7 @@ msgstr ""
 "For every PDF page, a new image file will be created using the format "
 "`input_file_X`, where X is the page number."
 
-#: src/file_conversor/cli/pdf/extract_img_cmd.py:89
+#: src/file_conversor/cli/pdf/extract_img_cmd.py:88
 msgid "Extract images"
 msgstr "Extract images"
 
@@ -1103,6 +1162,57 @@ msgstr ""
 #: src/file_conversor/cli/pdf/merge_cmd.py:83
 msgid "Merge pages"
 msgstr "Merge pages"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:62
+msgid "Create a searchable PDF file using OCR."
+msgstr "Create a searchable PDF file using OCR."
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:64
+msgid "Outputs a text searchable PDF file."
+msgstr "Outputs a text searchable PDF file."
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:82
+msgid ""
+"Languages to use for OCR (three character language codes). Format: LANG "
+"(e.g., 'eng', 'por'). Type 'all' to query all available languages."
+msgstr ""
+"Languages to use for OCR (three character language codes). Format: LANG "
+"(e.g., 'eng', 'por'). Type 'all' to query all available languages."
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:96
+#: src/file_conversor/cli/pdf/ocr_cmd.py:104
+msgid "Available remote languages"
+msgstr "Available remote languages"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:97
+msgid "Installed languages"
+msgstr "Installed languages"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:105
+msgid "Languages requested"
+msgstr "Languages requested"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:106
+msgid "Some languages are not available for installation"
+msgstr "Some languages are not available for installation"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:110
+msgid "Installing language"
+msgstr "Installing language"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:121
+#: src/file_conversor/utils/command_manager.py:51
+msgid "Use"
+msgstr "Use"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:121
+#: src/file_conversor/utils/command_manager.py:51
+msgid "to overwrite"
+msgstr "to overwrite"
+
+#: src/file_conversor/cli/pdf/ocr_cmd.py:131
+msgid "File OCR"
+msgstr "File OCR"
 
 #: src/file_conversor/cli/pdf/repair_cmd.py:61
 msgid "Repair (lightly) corrupted PDF files."
