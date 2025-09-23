@@ -5,7 +5,7 @@ from invoke.tasks import task
 
 # user provided
 from tasks_modules._config import *
-from tasks_modules import _config, base
+from tasks_modules import _config, base, locales
 
 
 @task
@@ -63,7 +63,7 @@ def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[base.tests])
+@task(pre=[locales.translate, base.tests])
 def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [/]")
     result = c.run(f"git push")
