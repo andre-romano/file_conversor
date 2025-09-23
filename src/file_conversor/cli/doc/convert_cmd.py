@@ -67,6 +67,8 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.odt -o output_file.doc`
 
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.docx -o output_file.pdf`
+
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -o output_file.docx`
     """)
 def convert(
     input_files: Annotated[List[str], InputFilesArgument(DOC_BACKEND)],

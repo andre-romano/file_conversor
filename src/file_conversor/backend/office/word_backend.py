@@ -22,6 +22,7 @@ class WordBackend(AbstractMSOfficeBackend):
         "doc": {},
         "docx": {},
         "odt": {},
+        "pdf": {},
     }
     SUPPORTED_OUT_FORMATS = {
         # format = wdFormat VBA code
