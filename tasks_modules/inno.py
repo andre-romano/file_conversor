@@ -62,7 +62,7 @@ ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile={ICON_APP.resolve()}
-UninstallDisplayIcon={{app}}\{ICON_APP.parent.name}\{ICON_APP.name}
+UninstallDisplayIcon={{app}}\{ICON_APP.parent.parent.name}\{ICON_APP.parent.name}\{ICON_APP.name}
 SourceDir={Path(".").resolve()}
 OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
@@ -83,6 +83,8 @@ StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Pa
 
 [UninstallRun]
 StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser
+
 ''', encoding="utf-8")
     assert setup_iss_path.exists()
     print("[bold green]OK[/]")

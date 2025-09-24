@@ -7,7 +7,7 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import base
+from tasks_modules import base, locales
 
 if base.WINDOWS:
     INSTALL_APP_CURR = INSTALL_APP_WIN
@@ -68,7 +68,7 @@ def requirements_download(c: InvokeContext):
     print(f"[bold] Downloading deps to {BUILD_DIR} ... [/][bold green]OK[/]")
 
 
-@task(pre=[requirements_download])
+@task(pre=[requirements_download, locales.build])
 def copy_src_folder(c: InvokeContext):
     print(f"[bold] Copying src/ to {BUILD_DIR} ... [/]")
 
