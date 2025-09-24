@@ -47,10 +47,6 @@ jobs:
         run: |
           pdm run invoke inno.check
 
-      - name: Clean remaining tmp files in dist/
-        run: |
-          pdm run invoke pyinstaller.clean-app-folder
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -84,6 +80,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pdm invoke
           pdm install
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Publish Git release
         env:
