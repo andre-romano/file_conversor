@@ -1,4 +1,4 @@
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import collect_data_files  # pyright: ignore[reportMissingModuleSource]
 
 # Collect all data files packaged inside ocrmypdf
 datas = collect_data_files('ocrmypdf')

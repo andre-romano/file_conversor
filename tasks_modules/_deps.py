@@ -8,13 +8,7 @@ CHOCO_DEPS = {
     "chocolatey-core.extension": "1.3.3",
 }
 
-SCOOP_DEPS = {
-    "ffmpeg": "",
-    "ghostscript": "",
-    "oxipng": "",
-    "gifsicle": "",
-    "mozjpeg": "",
-}
+SCOOP_DEPS = {}
 
 # DOCKER
 DOCKER_APT_DEPS = [

@@ -29,6 +29,8 @@ PROJECT_DESCRIPTION = str(PYPROJECT["project"]["description"])
 
 PROJECT_TITLE = str(PYPROJECT["tool"]["myproject"]["title"])
 
+PROJECT_ENTRYPOINTS: list[str] = list(PYPROJECT["project"]["scripts"].values())
+
 PROJECT_HOMEPAGE = f"https://github.com/andre-romano/{PROJECT_NAME}"
 CHOCO_PKG_REPO_URL = f"https://github.com/andre-romano/{PROJECT_NAME}"
 

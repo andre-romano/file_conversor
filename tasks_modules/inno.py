@@ -9,12 +9,14 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import pyinstaller, choco, base
+from tasks_modules import choco, base, zip
 
 INNO_PATH = str("inno")
 INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
 
 INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor").resolve()
+
+APP_EXE = Path(f"{PROJECT_NAME}.bat")
 
 
 @task
@@ -35,14 +37,14 @@ def clean_exe(c: InvokeContext):
     _config.remove_path(f"{INSTALL_APP_WIN_EXE}")
 
 
-@task(pre=[clean_inno, pyinstaller.check])
+@task(pre=[clean_inno, zip.check])
 def create_manifest(c: InvokeContext):
     """Update inno files, based on pyproject.toml"""
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
 
-    if not pyinstaller.APP_FOLDER.exists():
-        raise RuntimeError(f"Path {pyinstaller.APP_FOLDER} does not exist")
+    if not zip.BUILD_DIR.exists():
+        raise RuntimeError(f"Path {zip.BUILD_DIR} does not exist")
 
     # setup.iss
     setup_iss_path = Path(f"{INNO_ISS}")
@@ -60,14 +62,14 @@ ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile={ICON_APP.resolve()}
-UninstallDisplayIcon={{app}}\{PROJECT_NAME}.exe
+UninstallDisplayIcon={{app}}\{ICON_APP.parent.name}\{ICON_APP.name}
 SourceDir={Path(".").resolve()}
 OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
 AlwaysRestart=yes
 
 [Files]
-Source: "{pyinstaller.APP_FOLDER.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles 
+Source: "{zip.BUILD_DIR.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -77,10 +79,10 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{PROJECT_NAME}.exe"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 ''', encoding="utf-8")
     assert setup_iss_path.exists()
     print("[bold green]OK[/]")
@@ -100,7 +102,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_exe, create_manifest, install,], post=[pyinstaller.clean_app_folder])
+@task(pre=[clean_exe, create_manifest, install,], post=[zip.clean_build])
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")
@@ -147,4 +149,4 @@ def uninstall_app(c: InvokeContext):
 
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
-    base.check(c, exe=INSTALL_PATH / f"{PROJECT_NAME}.exe")
+    base.check(c, exe=INSTALL_PATH / f"{APP_EXE}")
