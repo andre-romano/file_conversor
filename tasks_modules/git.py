@@ -16,6 +16,7 @@ def check_pending_commit(c: InvokeContext):
     if result.stdout.strip() != "":
         print(result.stdout)
         raise RuntimeError("You have pending commits. Please commit or stash them before proceeding.")
+    print(f"[bold] Checking pending commits ... [bold green]OK[/][/]")
 
 
 @task
@@ -26,7 +27,7 @@ def check_files_updated(c: InvokeContext):
     print(f"  pyproject.toml (version = {PROJECT_VERSION})")
     print(f"  README.md")
     print()
-    confirm = input("Did you updated those files? (y/n): ")
+    confirm = input("Did you updated those files? (y/N): ")
     if confirm.lower() != "y":
         raise RuntimeError("Files not updated. Aborting operation.")
 
