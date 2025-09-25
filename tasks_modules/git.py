@@ -46,7 +46,7 @@ def changelog(c: InvokeContext):
     if not changelog_path.exists():
         raise RuntimeError(f"{changelog_path} does not exist")
 
-    git_commit(c, changelog_path, message=f"chore: update changelog for {GIT_RELEASE}")
+    git_commit_push(c, changelog_path, message=f"chore: update changelog for {GIT_RELEASE}")
     print(f"[bold] Generating {changelog_path} ... OK [/]")
 
 

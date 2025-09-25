@@ -16,8 +16,13 @@ elif base.LINUX:
 else:
     INSTALL_APP_CURR = INSTALL_APP_MAC
 
-BUILD_DIR = Path(f"build/{PROJECT_NAME}")
+BUILD_DIR = Path(f"build") / PROJECT_NAME
+
 REQUIREMENTS_TXT = BUILD_DIR / "requirements.txt"
+
+SHIM_FILE = BUILD_DIR / f"{PROJECT_NAME}.bat"
+if not base.WINDOWS:
+    SHIM_FILE = BUILD_DIR / f"{PROJECT_NAME}.sh"
 
 
 @task
@@ -186,14 +191,12 @@ $pythonPath = $pythonCmd.Path
         print(f"{ps1_launcher_file.name} contents:\n{ps1_launcher_file.read_text(encoding='utf-8')}")
 
         # Create a .bat file to launch the PowerShell script
-        shim_file = BUILD_DIR / f"{PROJECT_NAME}.bat"
-        shim_file.write_text(rf"""@echo off
+        SHIM_FILE.write_text(rf"""@echo off
 powershell -ExecutionPolicy Bypass -File "%~dp0\{ps1_launcher_file.name}" %*
 """, encoding="utf-8")
     else:
         # Linux/MacOS
-        shim_file = BUILD_DIR / f"{PROJECT_NAME}.sh"
-        shim_file.write_text(rf"""#!/bin/bash
+        SHIM_FILE.write_text(rf"""#!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)"
 
@@ -208,10 +211,10 @@ fi
 
 $PYTHON_CMD "$SCRIPT_DIR/__main__.py" "$@"
 """, encoding="utf-8")
-    assert shim_file.exists()
-    print(f"{shim_file.name} contents:\n{shim_file.read_text(encoding='utf-8')}")
-    shim_file.chmod(0o755)  # Make it executable
-    assert os.access(shim_file, os.X_OK), f"Cannot make '{shim_file}' executable"
+    assert SHIM_FILE.exists()
+    print(f"{SHIM_FILE.name} contents:\n{SHIM_FILE.read_text(encoding='utf-8')}")
+    SHIM_FILE.chmod(0o755)  # Make it executable
+    assert os.access(SHIM_FILE, os.X_OK), f"Cannot make '{SHIM_FILE}' executable"
 
     print(f"[bold] Creating shim file ... [/][bold green]OK[/]")
 

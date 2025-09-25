@@ -11,18 +11,18 @@ from tasks_modules._config import *
 
 from tasks_modules import choco, base, zip
 
-INNO_PATH = str("inno")
-INNO_ISS = Path(f"{INNO_PATH}/setup.iss")
+INNO_PATH = Path("inno")
+INNO_ISS = INNO_PATH / "setup.iss"
 
 INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor").resolve()
 
-APP_EXE = Path(f"{PROJECT_NAME}.bat")
+INNO_APP_EXE = Path(zip.SHIM_FILE.name)
 
 
 @task
 def mkdirs(c: InvokeContext):
     _config.mkdir([
-        INNO_PATH,
+        f"{INNO_PATH}",
         "dist",
     ])
 
@@ -79,10 +79,10 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser
 
 ''', encoding="utf-8")
@@ -151,4 +151,4 @@ def uninstall_app(c: InvokeContext):
 
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
-    base.check(c, exe=INSTALL_PATH / f"{APP_EXE}")
+    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_EXE}")

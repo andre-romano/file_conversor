@@ -5,14 +5,14 @@ from pathlib import Path
 from invoke.tasks import task
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, zip
 from tasks_modules._config import *
 from tasks_modules._deps import *
 
-from tasks_modules import base
-
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
+
+CHOCO_APP_EXE = Path(zip.SHIM_FILE.name)  # e.g. PROJECT_NAME.bat
 
 CHOCO_DESCRIPTION = rf"""
 A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
@@ -149,7 +149,7 @@ Install-ChocolateyPackage -PackageName $packageName `
     -ChecksumType "sha256"
 
 Write-Output "Installing shim ..."
-$exePath = Join-Path $dir "{PROJECT_NAME}.exe"
+$exePath = Join-Path $dir "{CHOCO_APP_EXE}"
 Install-BinFile -Name "{PROJECT_NAME}" -Path $exePath
 ''', encoding="utf-8")
     assert install_ps1_path.exists()

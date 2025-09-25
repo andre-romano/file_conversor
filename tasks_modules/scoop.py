@@ -5,20 +5,20 @@ from pathlib import Path
 from invoke.tasks import task
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, zip
 from tasks_modules._config import *
 from tasks_modules._deps import *
 
-from tasks_modules import base
+SCOOP_PATH = Path("bucket")
+SCOOP_JSON = SCOOP_PATH / f"{PROJECT_NAME}.json"
 
-SCOOP_PATH = str("bucket")
-SCOOP_JSON = Path(f"{SCOOP_PATH}/{PROJECT_NAME}.json")
+SCOOP_APP_EXE = Path(zip.SHIM_FILE.name)
 
 
 @task
 def mkdirs(c: InvokeContext):
     _config.mkdir([
-        SCOOP_PATH,
+        f"{SCOOP_PATH}",
     ])
 
 
@@ -43,17 +43,17 @@ def manifest(c: InvokeContext):
         "license": "Apache-2.0",
         "url": INSTALL_APP_WIN_EXE_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}",
-        "bin": f"{PROJECT_NAME}.exe",
+        "bin": f"{SCOOP_APP_EXE}",
         "pre_install": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName',
             rf'Start-Process -FilePath "$exePath" -ArgumentList "/DIR=$dir", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
-            rf'if (!(Test-Path "$dir\{PROJECT_NAME}.exe")) {{throw "Install failed: executable {PROJECT_NAME}.exe not found"}}',
+            rf'if (!(Test-Path "$dir\{SCOOP_APP_EXE}")) {{throw "Install failed: executable {SCOOP_APP_EXE} not found"}}',
             rf'Remove-Item -Path "$exePath"',
         ],
         "pre_uninstall": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter {UNINSTALL_APP_WIN.name}  | Select-Object -ExpandProperty FullName',
             rf'Start-Process -FilePath "$exePath" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
-            rf'if (Test-Path "$dir\{PROJECT_NAME}.exe") {{throw "Uninstall failed: executable still exists"}}',
+            rf'if (Test-Path "$dir\{SCOOP_APP_EXE}") {{throw "Uninstall failed: executable still exists"}}',
         ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
@@ -117,8 +117,6 @@ def check(c: InvokeContext):
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
 
-    git_commit(c, SCOOP_PATH, message=f"ci: scoop bucket {GIT_RELEASE}")
+    git_commit_push(c, SCOOP_PATH, message=f"ci: scoop bucket {GIT_RELEASE}")
 
-    result = c.run(f'git push')
-    assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Publishing to Scoop (using GitHub) ... OK [/]")

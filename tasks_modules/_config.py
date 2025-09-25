@@ -215,7 +215,7 @@ def extract(src: Path, dst: Path):
         zipf.extractall(extract_to)
 
 
-def git_commit(c: InvokeContext, path: Path | str, message: str):
+def git_commit_push(c: InvokeContext, path: Path | str, message: str):
     path = Path(path).resolve()
     result = c.run(f'git status', hide=True)
     assert (result is not None) and (result.return_code == 0)
@@ -228,4 +228,7 @@ def git_commit(c: InvokeContext, path: Path | str, message: str):
     assert (result is not None) and (result.return_code == 0)
 
     result = c.run(f'git commit -m "{message}"', hide=True)
+    assert (result is not None) and (result.return_code == 0)
+
+    result = c.run(f'git push', hide=True)
     assert (result is not None) and (result.return_code == 0)
