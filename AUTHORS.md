@@ -1,6 +1,4 @@
-# Authors
+# Maintainers
 
-This project was created and is maintained by:
-
-- André Luiz Romano Madureira 
+- André Luiz Romano Madureira (original creator)
 

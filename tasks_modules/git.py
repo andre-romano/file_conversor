@@ -9,6 +9,29 @@ from tasks_modules import _config, base, locales
 
 
 @task
+def check_pending_commit(c: InvokeContext):
+    print(f"[bold] Checking pending commits ... [/]")
+    result = c.run("git status --porcelain")
+    assert (result is not None) and (result.return_code == 0)
+    if result.stdout.strip() != "":
+        print(result.stdout)
+        raise RuntimeError("You have pending commits. Please commit or stash them before proceeding.")
+
+
+@task
+def check_files_updated(c: InvokeContext):
+    print("Please make sure you have updated the following files:")
+    print(f"  FEATURE_SET.md")
+    print(f"  MANIFEST.in")
+    print(f"  pyproject.toml (version = {PROJECT_VERSION})")
+    print(f"  README.md")
+    print()
+    confirm = input("Did you updated those files? (y/n): ")
+    if confirm.lower() != "y":
+        raise RuntimeError("Files not updated. Aborting operation.")
+
+
+@task
 def checksum(c: InvokeContext):
     print(f"[bold] Generating SHA256 hash ... [/]")
     INSTALL_APP_HASH.parent.mkdir(parents=True, exist_ok=True)
@@ -63,7 +86,7 @@ def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[locales.translate, base.tests])
+@task(pre=[check_pending_commit, check_files_updated, locales.translate, base.tests])
 def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [/]")
     result = c.run(f"git push")
