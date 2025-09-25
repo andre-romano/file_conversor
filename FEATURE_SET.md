@@ -1,14 +1,15 @@
 
-# File Conversor v0.5.0
+# File Conversor v0.6.0
 
 **Summary**:
-- [File Conversor v0.5.0](#file-conversor-v050)
+- [File Conversor v0.6.0](#file-conversor-v060)
   - [Feature-set available](#feature-set-available)
     - [Office files (doc, xls, ppt, etc)](#office-files-doc-xls-ppt-etc)
     - [Audio  files](#audio--files)
     - [Video  files](#video--files)
     - [Image files](#image-files)
     - [PDF files](#pdf-files)
+    - [Ebook files (epub, mobi, azw3, etc)](#ebook-files-epub-mobi-azw3-etc)
     - [Text files (json, yaml, ini, etc)](#text-files-json-yaml-ini-etc)
     - [Hash files (sha256, md5, etc)](#hash-files-sha256-md5-etc)
     - [Windows utilities](#windows-utilities)
@@ -19,11 +20,11 @@
 
 ### Office files (doc, xls, ppt, etc)
 
-| Command     | Description                        | Input formats  | Output formats                 |
-| ----------- | ---------------------------------- | -------------- | ------------------------------ |
-| doc convert | Converts document file formats     | doc, docx, odt | doc, docx, odt, pdf, html      |
-| ppt convert | Converts presentation file formats | ppt, pptx, odp | ppt, pptx, odp, pdf            |
-| xls convert | Converts spreadsheet file formats  | xls, xlsx, ods | xls, xlsx, ods, csv, pdf, html |
+| Command     | Description                        | Input formats       | Output formats                 |
+| ----------- | ---------------------------------- | ------------------- | ------------------------------ |
+| doc convert | Converts document file formats     | doc, docx, odt, pdf | doc, docx, odt, pdf, html      |
+| ppt convert | Converts presentation file formats | ppt, pptx, odp      | ppt, pptx, odp, pdf            |
+| xls convert | Converts spreadsheet file formats  | xls, xlsx, ods      | xls, xlsx, ods, csv, pdf, html |
 
 ### Audio  files
 
@@ -73,18 +74,26 @@
 ### PDF files
 
 
-| Command         | Description                                                      | Input formats | Output formats     |
-| --------------- | ---------------------------------------------------------------- | ------------- | ------------------ |
-| pdf encrypt     | Protect PDF file with a password (create encrypted PDF file)     | pdf           | pdf                |
-| pdf decrypt     | Remove password protection from a PDF file  (decrypted PDF file) | pdf           | pdf                |
-| pdf compress    | Compress a PDF file                                              | pdf           | pdf                |
-| pdf extract     | Extract pages from a PDF file                                    | pdf           | pdf                |
-| pdf merge       | Merge (join) input PDFs into a single PDF file                   | pdf           | pdf                |
-| pdf rotate      | Rotate PDF pages (clockwise or anti-clockwise)                   | pdf           | pdf                |
-| pdf split       | Split PDF pages into separate PDF files (one per page)           | pdf           | pdf                |
-| pdf convert     | Convert each PDF page into an image                              | pdf           | png, jpg           |
-| pdf extract-img | Extract images from a PDF file                                   | pdf           | png, jpg, jpx, gif |
-| pdf repair      | Repair (lightly) corrupted PDF files                             | pdf           | pdf                |
+| Command         | Description                                                       | Input formats | Output formats     |
+| --------------- | ----------------------------------------------------------------- | ------------- | ------------------ |
+| pdf encrypt     | Protect PDF file with a password (create encrypted PDF file)      | pdf           | pdf                |
+| pdf decrypt     | Remove password protection from a PDF file  (decrypted PDF file)  | pdf           | pdf                |
+| pdf compress    | Compress a PDF file                                               | pdf           | pdf                |
+| pdf extract     | Extract pages from a PDF file                                     | pdf           | pdf                |
+| pdf merge       | Merge (join) input PDFs into a single PDF file                    | pdf           | pdf                |
+| pdf rotate      | Rotate PDF pages (clockwise or anti-clockwise)                    | pdf           | pdf                |
+| pdf split       | Split PDF pages into separate PDF files (one per page)            | pdf           | pdf                |
+| pdf ocr         | Create a searchable PDF using OCR (optical character recognition) | pdf           | pdf                |
+| pdf convert     | Convert each PDF page into an image                               | pdf           | png, jpg           |
+| pdf extract-img | Extract images from a PDF file                                    | pdf           | png, jpg, jpx, gif |
+| pdf repair      | Repair (lightly) corrupted PDF files                              | pdf           | pdf                |
+
+### Ebook files (epub, mobi, azw3, etc)
+
+
+| Command       | Description                | Input formats                              | Output formats                   |
+| ------------- | -------------------------- | ------------------------------------------ | -------------------------------- |
+| ebook convert | Convert ebbok file formats | azw, azw3, azw4, cbr, cbz, epub, fb2, mobi | azw3, docx, epub, fb2, mobi, pdf |
 
 
 ### Text files (json, yaml, ini, etc)
