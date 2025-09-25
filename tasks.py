@@ -24,3 +24,5 @@ ns.add_collection(Collection.from_module(pyinstaller), name="pyinstaller")
 ns.add_collection(Collection.from_module(pypi), name="pypi")
 ns.add_collection(Collection.from_module(scoop), name="scoop")
 ns.add_collection(Collection.from_module(zip), name="zip")
+
+print(f"Python version: {base.PYTHON_VERSION}")

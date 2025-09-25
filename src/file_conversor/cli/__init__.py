@@ -13,7 +13,7 @@ from typing import Annotated, Any
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
 
-from file_conversor.cli._typer import COMMANDS_LIST
+from file_conversor.cli._typer import COMMANDS_LIST, PYTHON_VERSION
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -53,7 +53,8 @@ def version_callback(value: bool):
             project_toml = Path() / "pyproject.toml"
         PYPROJECT = tomllib.loads(project_toml.read_text())
         VERSION = str(PYPROJECT["project"]["version"])
-        typer.echo(f"File Conversor {VERSION}")
+        print(f"File Conversor {VERSION}")
+        print(f"Python {PYTHON_VERSION} ({sys.executable})")
         raise typer.Exit()
 
 
@@ -111,8 +112,10 @@ def main_callback(
         "debug": debug,
         "overwrite-output": overwrite_output,
     })
+    logger.debug(f"Python {PYTHON_VERSION} ({sys.executable})")
     logger.debug(f"Command: {sys.argv}")
-    Environment.get_executable()
+    # Environment.get_executable()
+    logger.debug(f"Working directory: {Path().resolve()}")
     logger.debug(f"Config file: {CONFIG.get_path()}")
     logger.debug(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
     logger.debug(f"Language (config / sys): ({CONFIG['language']} / {get_system_locale()})")

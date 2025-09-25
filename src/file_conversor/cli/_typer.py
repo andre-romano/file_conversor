@@ -1,6 +1,8 @@
 # src\file_conversor\cli\_info.py
 
+import sys
 import typer
+
 from typing import Any
 
 # user-provided modules
@@ -23,6 +25,8 @@ from file_conversor.cli.win import win_cmd
 from file_conversor.cli.xls import xls_cmd
 
 _ = get_translation()
+
+PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 # PANELS
 OFFICE_PANEL = _("Office files")

@@ -74,7 +74,7 @@ class PyMuPDFBackend(AbstractBackend):
             # => .png, .jpg, .svg OUTPUT
             for page in doc:
                 pix = page.get_pixmap(dpi=dpi)  # type: ignore
-                pix.save(f"{output_file.with_suffix("")}_{page.number + 1}{output_file.suffix}")  # pyright: ignore[reportOptionalOperand]
+                pix.save(f"{output_file.with_suffix("")}_{page.number + 1}{output_file.suffix}")  # type: ignore
 
     def extract_images(
             self,
