@@ -116,10 +116,13 @@ def untag(c: InvokeContext):
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to GitHub ... [/]")
     gh_cmd = [
-        "gh", "release",
+        "gh",
+        "release",
         "create", rf'"{GIT_RELEASE}"',
         "--title", rf'"{GIT_RELEASE}"',
-        "--notes-file", rf'"{RELEASE_NOTES_PATH}"',
+        # "--notes-file", rf'"{RELEASE_NOTES_PATH}"',
+        "--generate-notes",
+        "--latest",
         'dist/*',
     ]
     result = c.run(" ".join(gh_cmd))
