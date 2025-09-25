@@ -239,6 +239,8 @@ def extract_app(c: InvokeContext):
 def check(c: InvokeContext):
     print("[bold] Checking .ZIP ... [/]")
     SHIM_FILE = BUILD_DIR / (f"{PROJECT_NAME}.bat" if base.WINDOWS else f"{PROJECT_NAME}.sh")
+    if not base.WINDOWS:
+        c.run(f"chmod +rx {SHIM_FILE.resolve()}")
     result = c.run(f"{SHIM_FILE.resolve()} --version")
     assert (result is not None) and (result.return_code == 0)
     print("[bold] Checking .ZIP ... [/][bold green]OK[/]")
