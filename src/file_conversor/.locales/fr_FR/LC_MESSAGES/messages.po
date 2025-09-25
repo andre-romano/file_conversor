@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-23 13:38-0300\n"
+"POT-Creation-Date: 2025-09-25 15:48-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr "Installation de gestionnaire de packages"
 #: src/file_conversor/backend/batch_backend.py:127
 #: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
 #: src/file_conversor/cli/audio/check_cmd.py:91
-#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/doc/convert_cmd.py:91
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/hash/check_cmd.py:82
 #: src/file_conversor/cli/hash/create_cmd.py:68
@@ -77,7 +77,7 @@ msgstr "Installation de gestionnaire de packages"
 #: src/file_conversor/cli/image/to_pdf_cmd.py:124
 #: src/file_conversor/cli/image/unsharp_cmd.py:86
 #: src/file_conversor/cli/pdf/compress_cmd.py:115
-#: src/file_conversor/cli/pdf/convert_cmd.py:120
+#: src/file_conversor/cli/pdf/convert_cmd.py:118
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:160
 #: src/file_conversor/cli/pdf/extract_cmd.py:95
@@ -373,7 +373,7 @@ msgstr "Vérifie un fichier audio pour corruption / incohérences."
 #: src/file_conversor/cli/image/to_pdf_cmd.py:71
 #: src/file_conversor/cli/image/unsharp_cmd.py:44
 #: src/file_conversor/cli/pdf/compress_cmd.py:71
-#: src/file_conversor/cli/pdf/convert_cmd.py:85
+#: src/file_conversor/cli/pdf/convert_cmd.py:76
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/extract_cmd.py:66
@@ -669,7 +669,7 @@ msgstr ""
 "Convertir les fichiers de documents en autres formats (nécessite Microsoft "
 "Word / LibreOffice)."
 
-#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/doc/convert_cmd.py:91
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/ppt/convert_cmd.py:87
 #: src/file_conversor/cli/text/convert_cmd.py:107
@@ -983,15 +983,19 @@ msgstr "Sorte un fichier avec _Compressé à la fin."
 msgid "File compression"
 msgstr "Compression de fichiers"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:80
-msgid "Convert a PDF file to a different format."
-msgstr "Convertissez un fichier PDF en un format différent."
+#: src/file_conversor/cli/pdf/convert_cmd.py:71
+msgid ""
+"Convert a PDF file to a different format (might require Microsoft Word / "
+"LibreOffice)."
+msgstr ""
+"Convertir un fichier PDF en un format différent (peut nécessiter Microsoft "
+"Word / LibreOffice)."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:82
+#: src/file_conversor/cli/pdf/convert_cmd.py:73
 msgid "Outputs a file with the PDF page number at the end."
 msgstr "Sort un fichier avec le numéro de page PDF à la fin."
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:120
+#: src/file_conversor/cli/pdf/convert_cmd.py:118
 msgid "File convertion"
 msgstr "Convertion de fichiers"
 
@@ -2431,3 +2435,6 @@ msgstr "n'est pas valide.  Les options valides sont"
 #~ "Format <Size> [k | m | g]. Si 0, ne limitez pas la taille du fichier de "
 #~ "sortie (utilisez des options de vitesse de codage et de qualité pour "
 #~ "calculer la taille du fichier de sortie)."
+
+#~ msgid "Convert a PDF file to a different format."
+#~ msgstr "Convertissez un fichier PDF en un format différent."

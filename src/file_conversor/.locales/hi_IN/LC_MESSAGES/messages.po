@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-23 13:38-0300\n"
+"POT-Creation-Date: 2025-09-25 15:48-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: hi_IN <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr "पैकेज प्रबंधक स्थापना"
 #: src/file_conversor/backend/batch_backend.py:127
 #: src/file_conversor/cli/audio/_ffmpeg_cmd.py:73
 #: src/file_conversor/cli/audio/check_cmd.py:91
-#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/doc/convert_cmd.py:91
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/hash/check_cmd.py:82
 #: src/file_conversor/cli/hash/create_cmd.py:68
@@ -77,7 +77,7 @@ msgstr "पैकेज प्रबंधक स्थापना"
 #: src/file_conversor/cli/image/to_pdf_cmd.py:124
 #: src/file_conversor/cli/image/unsharp_cmd.py:86
 #: src/file_conversor/cli/pdf/compress_cmd.py:115
-#: src/file_conversor/cli/pdf/convert_cmd.py:120
+#: src/file_conversor/cli/pdf/convert_cmd.py:118
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:93
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:160
 #: src/file_conversor/cli/pdf/extract_cmd.py:95
@@ -366,7 +366,7 @@ msgstr "भ्रष्टाचार / विसंगतियों के �
 #: src/file_conversor/cli/image/to_pdf_cmd.py:71
 #: src/file_conversor/cli/image/unsharp_cmd.py:44
 #: src/file_conversor/cli/pdf/compress_cmd.py:71
-#: src/file_conversor/cli/pdf/convert_cmd.py:85
+#: src/file_conversor/cli/pdf/convert_cmd.py:76
 #: src/file_conversor/cli/pdf/decrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/encrypt_cmd.py:66
 #: src/file_conversor/cli/pdf/extract_cmd.py:66
@@ -656,7 +656,7 @@ msgstr ""
 "दस्तावेज़ फ़ाइलों को अन्य प्रारूपों में परिवर्तित करें (Microsoft Word / "
 "libreoffice की आवश्यकता होती है)।"
 
-#: src/file_conversor/cli/doc/convert_cmd.py:89
+#: src/file_conversor/cli/doc/convert_cmd.py:91
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
 #: src/file_conversor/cli/ppt/convert_cmd.py:87
 #: src/file_conversor/cli/text/convert_cmd.py:107
@@ -958,15 +958,19 @@ msgstr "अंत में _compressed के साथ एक फ़ाइल 
 msgid "File compression"
 msgstr "संचिका संपीड़न"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:80
-msgid "Convert a PDF file to a different format."
-msgstr "एक पीडीएफ फ़ाइल को एक अलग प्रारूप में बदलें।"
+#: src/file_conversor/cli/pdf/convert_cmd.py:71
+msgid ""
+"Convert a PDF file to a different format (might require Microsoft Word / "
+"LibreOffice)."
+msgstr ""
+"एक पीडीएफ फाइल को एक अलग प्रारूप में बदलें (Microsoft Word / libreoffice की "
+"आवश्यकता हो सकती है)।"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:82
+#: src/file_conversor/cli/pdf/convert_cmd.py:73
 msgid "Outputs a file with the PDF page number at the end."
 msgstr "अंत में पीडीएफ पेज नंबर के साथ एक फ़ाइल को आउटपुट करता है।"
 
-#: src/file_conversor/cli/pdf/convert_cmd.py:120
+#: src/file_conversor/cli/pdf/convert_cmd.py:118
 msgid "File convertion"
 msgstr "संचिका अभिसरण"
 
@@ -2356,3 +2360,6 @@ msgstr "इनवैलिड है।  मान्य विकल्प ह�
 #~ "प्रारूप <आकार> [k | m | g] यदि 0, आउटपुट फ़ाइल आकार को सीमित न करें (आउटपुट "
 #~ "फ़ाइल आकार की गणना करने के लिए एन्कोडिंग गति और गुणवत्ता विकल्पों का उपयोग "
 #~ "करें)।"
+
+#~ msgid "Convert a PDF file to a different format."
+#~ msgstr "एक पीडीएफ फ़ाइल को एक अलग प्रारूप में बदलें।"
