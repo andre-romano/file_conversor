@@ -20,7 +20,7 @@ class TestPdfOCR:
             COMMAND_NAME, OCR_NAME,
             str(in_path),
             "-l", "eng",
-            *Test.get_out_file_params(out_path),
+            *Test.get_out_dir_params(out_path),
         )
         assert result.exit_code == 0
         assert out_path.exists()
