@@ -50,17 +50,9 @@ jobs:
           pdm run invoke base.tests
         shell: bash
 
-      - name: Build zip archives
+      - name: Build and check zip archives
         run: |
-          pdm run invoke zip.extract-app
-        shell: bash
-
-      - name: Check zip archives
-        run: |
-          chmod +rx ./build/file_conversor/*
-          if [ "$(uname)" = "Linux" ]; then ./build/file_conversor/file_conversor.sh --version; fi
-          if [ "$(uname)" = "Darwin" ]; then ./build/file_conversor/file_conversor.sh --version; fi
-          if [ "$(uname)" = "Windows" ]; then ./build/file_conversor/file_conversor.exe --version; fi
+          pdm run invoke zip.check
         shell: bash
 
       - name: Build and check InnoSetup installer
@@ -75,6 +67,37 @@ jobs:
           name: dist-${{ matrix.os }}
           path: dist/*
           if-no-files-found: error
+
+  test-zip:
+    name: Test zip archives on ${{ matrix.os }} (w/o Python)
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    needs: [test-build]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dist-${{ matrix.os }}
+          path: dist
+          merge-multiple: true
+
+      - name: Dist files list
+        run: |
+          ls ./dist
+        shell: bash
+
+      - name: Unzipping and testing app
+        run: |
+          unzip ./dist/*.zip -d /tmp/
+          /tmp/file_conversor --version
+        shell: bash
 
   test-exe:
     name: Test InnoSetup installer on Windows (w/o Python)
