@@ -16,7 +16,7 @@ INNO_ISS = INNO_PATH / "setup.iss"
 
 INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / PROJECT_NAME).resolve()
 
-INNO_APP_EXE = Path(zip.SHIM_FILE.name)
+INNO_APP_EXE = Path(zip.APP_EXE.name)
 
 
 @task
