@@ -2,7 +2,7 @@
 src/file_conversor/.config.json
 
 #vagrant
-**/*.nupkg
+*.nupkg
 vagrant/.vagrant
 dotNetFx40.exe
 SQLServer
