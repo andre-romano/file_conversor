@@ -53,8 +53,8 @@ def build(c: InvokeContext):
     print(f"[bold] Building PyPi package ... [/]")
     result = c.run(f"pdm build")
     assert (result is not None) and (result.return_code == 0)
-    if not list(Path("dist").glob("*.whl")):
-        raise RuntimeError("Build WHL - Empty dist/*.whl")
+    whl_path = _config.get_whl_file()
+    assert whl_path is not None
     print(f"[bold] Building PyPi package ... [/][bold green]OK[/]")
     print(f"[bold] Checking .WHL build ... [/]")
     result = c.run(f"pdm run twine check dist/*.whl dist/*.tar.gz")
@@ -65,11 +65,7 @@ def build(c: InvokeContext):
 @task(pre=[build,],)
 def install_app(c: InvokeContext):
     print(f"[bold] Installing PyPi package ... [/]")
-    whl_path: Path | None = None
-    for whl in list(Path("dist").glob("*.whl")):
-        if PROJECT_VERSION in str(whl):
-            whl_path = whl
-    assert whl_path is not None
+    whl_path = _config.get_whl_file()
     print(f"Installing '{whl_path}' ...")
     result = c.run(rf'pip install "{whl_path}"')
     assert (result is not None) and (result.return_code == 0)

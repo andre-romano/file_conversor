@@ -48,6 +48,7 @@ README_PATH = Path("README.md")
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
 SCRIPTS_PATH = Path(f'scripts')
+INSTALL_PYTHON = SCRIPTS_PATH / 'install_python.ps1'
 INSTALL_CHOCO = SCRIPTS_PATH / 'install_choco.ps1'
 INSTALL_SCOOP = SCRIPTS_PATH / 'install_scoop.ps1'
 
@@ -235,3 +236,10 @@ def git_commit_push(c: InvokeContext, path: Path | str, message: str):
 
     result = c.run(f'git push', hide=True)
     assert (result is not None) and (result.return_code == 0)
+
+
+def get_whl_file(path: str | Path = "dist"):
+    for whl in list(Path("dist").glob("*.whl")):
+        if PROJECT_VERSION in str(whl):
+            return whl
+    raise RuntimeError(f"WHL file not found in '{path}'")

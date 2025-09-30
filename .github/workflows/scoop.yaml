@@ -21,6 +21,53 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Cache PDM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            __pypackages__/
+            .venv/
+          key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pdm-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pdm invoke
+          pdm install
+        shell: bash
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        shell: bash
+
+      - name: Build and install scoop bucket
+        run: |
+          pdm run invoke scoop.check
+        shell: bash
+
+      - name: Publish scoop bucket
+        run: |
+          pdm run invoke scoop.publish
+        shell: bash
+
+  test-scoop:
+    name: Test Scoop package (no python installed)
+    runs-on: windows-latest
+    needs: [build]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - uses: MinoruSekine/setup-scoop@v4.0.2
         with:
           install_scoop: "true"
@@ -28,26 +75,12 @@ jobs:
           scoop_update: "true"
           update_path: "true"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
-      - name: Install Python dependencies
+      - name: Build and install scoop bucket
         run: |
-          python -m pip install --upgrade pip
-          pip install pdm invoke
-          pdm install
+          scoop install ./bucket/file_conversor.json
+        shell: bash
 
-      - name: Build and check scoop bucket
+      - name: Check installed scoop app
         run: |
-          pdm run invoke scoop.check
-
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Publish scoop bucket
-        run: |
-          pdm run invoke scoop.publish
+          file_conversor --version
+        shell: bash

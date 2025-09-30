@@ -9,6 +9,8 @@ from tasks_modules import _config, base, zip
 from tasks_modules._config import *
 from tasks_modules._deps import *
 
+VAGRANT_PATH = Path(f"vagrant")
+
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
@@ -244,6 +246,16 @@ def install(c: InvokeContext):
         raise RuntimeError("'choco' not found in PATH")
 
 
+@task(pre=[install])
+def install_vagrant(c: InvokeContext):
+    if shutil.which("vagrant"):
+        return
+    print("[bold] Installing Vagrant ... [/]")
+    c.run(rf'choco install -y vagrant')
+    if not shutil.which("vagrant"):
+        raise RuntimeError("'vagrant' not found in PATH")
+
+
 @task(pre=[clean_nupkg, create_manifest, install,])
 def build(c: InvokeContext):
     if not CHOCO_NUSPEC.exists():
@@ -279,13 +291,28 @@ def check(c: InvokeContext):
     base.check(c)
 
 
+@task(pre=[build, install_vagrant])
+def check_vm(c: InvokeContext):
+    print(rf'[bold] Checking choco package in Vagrant VM ... [/]')
+    with c.cd(VAGRANT_PATH):
+        result = c.run(rf'vagrant snapshot restore good --no-provision')
+        assert (result is not None) and (result.return_code == 0)
+
+        result = c.run(rf'vagrant up --provision')
+        assert (result is not None) and (result.return_code == 0)
+
+        result = c.run(rf'vagrant halt')
+        assert (result is not None) and (result.return_code == 0)
+    print(rf'[bold] Checking choco package in Vagrant VM ... [/][bold green]OK[/]')
+
+
 @task(pre=[build,])
 def publish(c: InvokeContext, api_key: str = ""):
     print(rf'[bold] Publishing choco package ... [/]')
-    nupkg_path = list(Path("dist").glob("*.nupkg"))[0]
-    if api_key:
-        result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/ --apikey {api_key}')
-    else:
-        result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/')
-    assert (result is not None) and (result.return_code == 0)
+    for nupkg_path in Path("dist").glob("*.nupkg"):
+        if api_key:
+            result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/ --apikey {api_key}')
+        else:
+            result = c.run(rf'choco push {nupkg_path} --source https://push.chocolatey.org/')
+        assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Publishing choco package ... [/][bold green]OK[/]')

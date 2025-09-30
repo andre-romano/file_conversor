@@ -1,6 +1,16 @@
 # config file
 src/file_conversor/.config.json
 
+#vagrant
+**/*.nupkg
+vagrant/.vagrant
+dotNetFx40.exe
+SQLServer
+.DS_Store
+.librarian
+.tmp
+
+
 # BAK / LOG files
 *.bak
 *.log

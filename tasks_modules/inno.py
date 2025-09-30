@@ -14,7 +14,7 @@ from tasks_modules import choco, base, zip
 INNO_PATH = Path("inno")
 INNO_ISS = INNO_PATH / "setup.iss"
 
-INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / "file_conversor").resolve()
+INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / PROJECT_NAME).resolve()
 
 INNO_APP_EXE = Path(zip.SHIM_FILE.name)
 
@@ -70,6 +70,7 @@ AlwaysRestart=yes
 
 [Files]
 Source: "{zip.BUILD_DIR.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
+Source: "{SCRIPTS_PATH.resolve()}\*"; DestDir: "{{tmp}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -79,6 +80,7 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Run]
+StatusMsg: "Installing Python ..."; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{{tmp}}/{INSTALL_PYTHON.name}"""; WorkingDir: "{{tmp}}"; Flags: runhidden runascurrentuser waituntilterminated
 StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]

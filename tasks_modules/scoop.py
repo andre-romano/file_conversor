@@ -87,12 +87,12 @@ def install(c: InvokeContext):
         raise RuntimeError("'scoop' not found in PATH")
 
 
-@task(pre=[manifest, install,])
+@task(pre=[manifest,])
 def build(c: InvokeContext):
     pass
 
 
-@task(pre=[build,],)
+@task(pre=[build, install],)
 def install_app(c: InvokeContext):
     print(f"[bold] Installing scoop package ... [/]")
     result = c.run(rf'scoop install "{SCOOP_JSON}"')
@@ -100,7 +100,7 @@ def install_app(c: InvokeContext):
     print(f"[bold] Installing scoop package ... [/][bold green]OK[/]")
 
 
-@task
+@task(pre=[install])
 def uninstall_app(c: InvokeContext):
     print(f"[bold] Uninstalling scoop package ... [/]")
     result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')

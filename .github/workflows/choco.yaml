@@ -23,16 +23,69 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Cache PDM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            __pypackages__/
+            .venv/
+          key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pdm-
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pdm invoke
           pdm install
+        shell: bash
 
-      - name: Build and check .nupkg
+      - name: Build .nupkg
         run: |
-          pdm run invoke choco.check
+          pdm run invoke choco.build
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-nupkg
+          path: dist/*.nupkg
+          if-no-files-found: error
+
+  test-choco:
+    name: Test Choco package (no python installed)
+    runs-on: windows-latest
+    needs: [build]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-nupkg
+          path: dist
+          merge-multiple: true
+
+      - name: Dist files list
+        run: |
+          ls ./dist
+        shell: bash
+
+      - name: Install choco app
+        run: |
+          PACKAGE_NAME=$(ls ./dist/*.nupkg | sed -E 's/.*\/(.*)-[0-9]+\.[0-9]+\.[0-9]+\.nupkg/\1/')
+          VERSION=$(ls ./dist/*.nupkg | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/')
+          choco install -y --acceptlicense "$PACKAGE_NAME" --version="$VERSION" --source="./dist;https://community.chocolatey.org/api/v2/"
+        shell: bash
+
+      - name: Check installed choco app
+        run: |
+          file_conversor --version
+        shell: bash
 
       - name: Publish Choco package
         run: |
-          pdm run invoke choco.publish --api-key ${{ secrets.CHOCO_API_KEY }}
+          choco push ./dist/*.nupkg --source https://push.chocolatey.org/ --apikey ${{ secrets.CHOCO_API_KEY }}
+        shell: bash
