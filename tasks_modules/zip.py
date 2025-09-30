@@ -29,7 +29,7 @@ if not base.WINDOWS:
 def mkdirs(c: InvokeContext):
     _config.mkdir([
         "dist",
-        "build",
+        f"{BUILD_DIR}",
     ])
 
 
@@ -48,6 +48,7 @@ def clean_zip(c: InvokeContext):
 @task(pre=[clean_build])
 def pyz(c: InvokeContext):
     print(f"[bold] Creating {PYZ_FILE.name} to {BUILD_DIR} ... [/]")
+    PYZ_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     cmd_list = [
         "pdm", "run",
