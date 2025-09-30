@@ -80,6 +80,16 @@ LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
+def move(src: Path, dst: Path):
+    if not src.exists():
+        raise FileNotFoundError(f"Src file '{src}' not found")
+    print(f"Moving '{src}' => '{dst}' ...", end="")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(src=src, dst=dst)
+    assert dst.exists()
+    print(f"[bold green]OK[/]")
+
+
 def copy(src: Path, dst: Path):
     if not src.exists():
         raise FileNotFoundError(f"Src file '{src}' not found")

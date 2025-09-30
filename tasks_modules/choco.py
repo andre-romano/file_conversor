@@ -14,7 +14,7 @@ VAGRANT_PATH = Path(f"vagrant")
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
 
-CHOCO_APP_EXE = Path(zip.SHIM_FILE.name)  # e.g. PROJECT_NAME.bat
+CHOCO_APP_EXE = Path(zip.APP_EXE.name)  # e.g. PROJECT_NAME.bat
 
 CHOCO_DESCRIPTION = rf"""
 A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.

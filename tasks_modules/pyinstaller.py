@@ -1,7 +1,5 @@
 # tasks_modules\pyinstaller.py
 
-import re
-
 from pathlib import Path
 from invoke.tasks import task
 
@@ -12,13 +10,15 @@ from tasks_modules._config import *
 from tasks_modules import locales
 
 APP_FOLDER = Path(f"dist/{PROJECT_NAME}")
+APP_EXE = APP_FOLDER / (f"{PROJECT_NAME}" if not base.WINDOWS else f"{PROJECT_NAME}.exe")
 
 
 @task
 def mkdirs(c: InvokeContext):
     _config.mkdir([
+        "build",
         "dist",
-        APP_FOLDER,
+        f"{APP_FOLDER}",
     ])
 
 
@@ -28,22 +28,34 @@ def clean_app_folder(c: InvokeContext):
 
 
 @task(pre=[mkdirs, locales.build])
-def copy_includes(c: InvokeContext):
-    print("[bold]Copying MANIFEST.in includes ...[/]")
-    for include in _config.parse_manifest_includes():
-        include_path = Path(include)
-        dest_path = APP_FOLDER / "_internal" / PROJECT_NAME / include_path.name
-        _config.copy(src=include_path, dst=dest_path)
-    print("[bold]Copying MANIFEST.in includes ... [/][bold green]OK[/]")
+def copy_dependencies(c: InvokeContext):
+    print("[bold]Copying dependencies into pyinstaller ...[/]")
+    SITE_PACKAGES = APP_FOLDER / "_internal"
+
+    # cmd_list = [
+    #     "pip",
+    #     "install",
+    #     "-t", f"{SITE_PACKAGES}",
+    #     "--compile",
+    #     "--no-warn-script-location",
+    #     "--exists-action=w",
+    #     "--upgrade",
+    #     ".",
+    # ]
+    # print(rf"$ {cmd_list}")
+    # result = c.run(" ".join(cmd_list))
+    # assert (result is not None) and (result.return_code == 0)
+
+    print("[bold]Copying dependencies into pyinstaller ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_app_folder,], post=[copy_includes,])
+@task(pre=[clean_app_folder,], post=[copy_dependencies,])
 def build(c: InvokeContext):
-    MAIN_PATH = Path(rf"src/{PROJECT_NAME}/__main__.py")
+    SHIM_PATH = Path(rf"src/{PROJECT_NAME}/__shim__.py")
 
     print(f"[bold] Building Pyinstaller (EXE) ... [/]")
     cmd_list = [
-        "pdm", "run", "pyinstaller", f'"{MAIN_PATH}"',
+        "pdm", "run", "pyinstaller", f'"{SHIM_PATH}"',
         "--name", f'"{PROJECT_NAME}"',
         "--icon", f'"{ICON_APP}"',
         "--additional-hooks-dir=hooks",
