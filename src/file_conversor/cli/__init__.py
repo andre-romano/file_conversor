@@ -100,7 +100,7 @@ def main_callback(
         )] = False,
         overwrite_output: Annotated[bool, typer.Option(
             "--overwrite-output", "-oo",
-            help=f"{_("Overwrite output files")}. Defaults to False (do not overwrite).",
+            help=f"{_('Overwrite output files')}. Defaults to False (do not overwrite).",
             is_flag=True,
         )] = False,
 ):
