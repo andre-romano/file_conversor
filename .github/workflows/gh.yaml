@@ -57,6 +57,7 @@ jobs:
 
       - name: Check zip archives
         run: |
+          chmod +rx ./build/file_conversor/*
           if [ "$(uname)" = "Linux" ]; then ./build/file_conversor/file_conversor.sh --version; fi
           if [ "$(uname)" = "Darwin" ]; then ./build/file_conversor/file_conversor.sh --version; fi
           if [ "$(uname)" = "Windows" ]; then ./build/file_conversor/file_conversor.exe --version; fi
