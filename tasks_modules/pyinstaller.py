@@ -32,19 +32,19 @@ def copy_dependencies(c: InvokeContext):
     print("[bold]Copying dependencies into pyinstaller ...[/]")
     SITE_PACKAGES = APP_FOLDER / "_internal"
 
-    # cmd_list = [
-    #     "pip",
-    #     "install",
-    #     "-t", f"{SITE_PACKAGES}",
-    #     "--compile",
-    #     "--no-warn-script-location",
-    #     "--exists-action=w",
-    #     "--upgrade",
-    #     ".",
-    # ]
-    # print(rf"$ {cmd_list}")
-    # result = c.run(" ".join(cmd_list))
-    # assert (result is not None) and (result.return_code == 0)
+    cmd_list = [
+        "pip",
+        "install",
+        "-t", f"{SITE_PACKAGES}",
+        "--compile",
+        "--no-warn-script-location",
+        "--exists-action=w",
+        "--upgrade",
+        ".",
+    ]
+    print(rf"$ {cmd_list}")
+    result = c.run(" ".join(cmd_list))
+    assert (result is not None) and (result.return_code == 0)
 
     print("[bold]Copying dependencies into pyinstaller ... [/][bold green]OK[/]")
 
