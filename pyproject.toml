@@ -157,4 +157,5 @@ dev = [
     "polib>=1.2.0",
     "deep-translator>=1.11.4",
     "requests>=2.32.5",
+    "shiv>=1.0.8",
 ]
