@@ -7,10 +7,10 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import base, pyinstaller
+from tasks_modules import base, embedpy
 
-BUILD_DIR = Path("build") / PROJECT_NAME
-APP_EXE = BUILD_DIR / pyinstaller.APP_EXE.name
+BUILD_DIR = embedpy.BUILD_DIR
+APP_EXE = embedpy.PORTABLE_SHIM_BAT
 
 if base.WINDOWS:
     INSTALL_APP_CURR = INSTALL_APP_WIN
@@ -40,13 +40,7 @@ def clean_zip(c: InvokeContext):
     _config.remove_path(f"{INSTALL_APP_MAC}")
 
 
-@task(pre=[pyinstaller.check],)
-def move_pyinstaller_to_build(c: InvokeContext):
-    clean_build(c)
-    _config.move(src=pyinstaller.APP_FOLDER, dst=BUILD_DIR)
-
-
-@task(pre=[clean_zip, move_pyinstaller_to_build],)
+@task(pre=[clean_zip, embedpy.check],)
 def build(c: InvokeContext):
     print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/]")
     _config.compress(src=BUILD_DIR, dst=INSTALL_APP_CURR)

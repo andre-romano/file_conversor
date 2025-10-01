@@ -50,14 +50,10 @@ jobs:
           pdm run invoke base.tests
         shell: bash
 
-      - name: Build and check zip archives
-        run: |
-          pdm run invoke zip.check
-        shell: bash
-
-      - name: Build and check InnoSetup installer
+      - name: Build and check (zip / InnoSetup installer)
         if: runner.os == 'Windows'
         run: |
+          pdm run invoke zip.check
           pdm run invoke inno.check
         shell: bash
 
@@ -67,37 +63,6 @@ jobs:
           name: dist-${{ matrix.os }}
           path: dist/*
           if-no-files-found: error
-
-  test-zip:
-    name: Test zip archives on ${{ matrix.os }} (w/o Python)
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    needs: [test-build]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download distribution artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: dist-${{ matrix.os }}
-          path: dist
-          merge-multiple: true
-
-      - name: Dist files list
-        run: |
-          ls ./dist
-        shell: bash
-
-      - name: Unzipping and testing app
-        run: |
-          unzip ./dist/*.zip -d /tmp/
-          /tmp/file_conversor --version
-        shell: bash
 
   test-exe:
     name: Test InnoSetup installer on Windows (w/o Python)
@@ -127,7 +92,7 @@ jobs:
 
       - name: Check installed app
         run: |
-          "C:\Program Files (x86)\file_conversor\file_conversor.exe" --version
+          "C:\Program Files (x86)\file_conversor\file_conversor.bat" --version
         shell: bash
 
   publish:

@@ -78,6 +78,7 @@ ICON_URL = f"http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{str(I
 LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+EMBEDPY_URL = f"https://www.python.org/ftp/python/{PYTHON_VERSION}/python-{PYTHON_VERSION}-embed-amd64.zip"
 
 
 def move(src: Path, dst: Path):
