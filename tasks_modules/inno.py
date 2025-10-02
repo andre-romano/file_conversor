@@ -14,7 +14,7 @@ from tasks_modules import choco, base, zip
 INNO_PATH = Path("inno")
 INNO_ISS = INNO_PATH / "setup.iss"
 
-INSTALL_PATH = (Path("build") / PROJECT_NAME).resolve()
+INSTALL_PATH = Path("build") / PROJECT_NAME
 
 INNO_APP_EXE = Path(zip.APP_EXE.name)
 
