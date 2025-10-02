@@ -77,6 +77,8 @@ jobs:
         run: |
           PACKAGE_NAME=$(ls ./dist/*.nupkg | sed -E 's/.*\/(.*)-[0-9]+\.[0-9]+\.[0-9]+\.nupkg/\1/')
           VERSION=$(ls ./dist/*.nupkg | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/')
+          echo "Package name: $PACKAGE_NAME"
+          echo "Version: $VERSION"
           choco install -y --acceptlicense "$PACKAGE_NAME" --version="$VERSION" --source="./dist;https://community.chocolatey.org/api/v2/"
         shell: bash
 

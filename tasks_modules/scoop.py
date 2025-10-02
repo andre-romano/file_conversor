@@ -12,7 +12,7 @@ from tasks_modules._deps import *
 SCOOP_PATH = Path("bucket")
 SCOOP_JSON = SCOOP_PATH / f"{PROJECT_NAME}.json"
 
-SCOOP_APP_EXE = zip.APP_EXE
+SCOOP_APP_EXE = zip.APP_EXE.relative_to(zip.BUILD_DIR)
 
 
 @task
