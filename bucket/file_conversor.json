@@ -25,5 +25,8 @@
         "hash": {
             "url": "https://github.com/andre-romano/file_conversor/releases/download/v$version/file_conversor-v$version-Win_x64-Installer.sha256"
         }
-    }
+    },
+    "depends": [
+        "python"
+    ]
 }
