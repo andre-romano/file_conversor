@@ -14,7 +14,7 @@ from tasks_modules import choco, base, zip
 INNO_PATH = Path("inno")
 INNO_ISS = INNO_PATH / "setup.iss"
 
-INSTALL_PATH = (Path(os.environ.get('ProgramFiles(x86)') or "") / PROJECT_NAME).resolve()
+INSTALL_PATH = (Path("build") / PROJECT_NAME).resolve()
 
 INNO_APP_EXE = Path(zip.APP_EXE.name)
 
@@ -117,9 +117,12 @@ def build(c: InvokeContext):
 @task(pre=[build,],)
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/]')
+    _config.remove_path(f"{INSTALL_PATH.relative_to(Path())}/*")
+    INSTALL_PATH.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         rf'"{INSTALL_APP_WIN_EXE}"',
         rf'/DIR="{INSTALL_PATH}"',
+        "/CURRENTUSER",
         "/SUPPRESSMSGBOXES",
         "/VERYSILENT",
         "/NORESTART",
