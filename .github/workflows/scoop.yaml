@@ -50,12 +50,6 @@ jobs:
           pdm install
         shell: bash
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        shell: bash
-
       - name: Build and install scoop bucket
         run: |
           pdm run invoke scoop.check
@@ -91,6 +85,12 @@ jobs:
           scoop_update: "true"
           update_path: "true"
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        shell: bash
+
       - name: Build and install scoop bucket
         run: |
           scoop install ./bucket/file_conversor.json
@@ -99,4 +99,11 @@ jobs:
       - name: Check installed scoop app
         run: |
           file_conversor --version
+        shell: bash
+
+      - name: Publish Scoop bucket
+        run: |
+          git add bucket/*.json
+          git commit -m "Update scoop bucket"
+          git push
         shell: bash
