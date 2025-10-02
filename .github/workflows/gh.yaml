@@ -88,12 +88,14 @@ jobs:
 
       - name: Installing app
         run: |
-          ./dist/*.exe /DIR="C:\Program Files (x86)\file_conversor" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-
+          CUR_PWD=$(pwd)
+          echo "Current PWD: $CUR_PWD"
+          ./dist/*.exe /DIR="$CUR_PWD" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-
         shell: bash
 
       - name: Check installed app
         run: |
-          "C:\Program Files (x86)\file_conversor\file_conversor.bat" --version
+          "./file_conversor.bat" --version
         shell: bash
 
   publish:
