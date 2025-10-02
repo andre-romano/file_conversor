@@ -59,6 +59,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
         with:
           name: dist-${{ matrix.os }}
           path: dist/*
