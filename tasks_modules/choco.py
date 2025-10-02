@@ -145,7 +145,7 @@ $checksum    = "{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}"  # SHA256
 Write-Output "Installing app ..."
 Install-ChocolateyPackage -PackageName $packageName `
     -FileType "exe" `
-    -SilentArgs "/DIR=`"$dir`" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
+    -SilentArgs "/DIR=`"$dir`" /ALLUSERS /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
     -Url $url `
     -Checksum $checksum `
     -ChecksumType "sha256"

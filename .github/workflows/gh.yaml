@@ -53,7 +53,6 @@ jobs:
       - name: Build and check (zip / InnoSetup installer)
         if: runner.os == 'Windows'
         run: |
-          pdm run invoke zip.check
           pdm run invoke inno.check
         shell: bash
 
@@ -65,8 +64,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  test-exe:
-    name: Test InnoSetup installer on Windows (w/o Python)
+  test-exe-admin:
+    name: Test InnoSetup installer on Windows (admin - w/o Python)
     runs-on: windows-latest
     needs: [test-build]
 
@@ -83,25 +82,25 @@ jobs:
 
       - name: Dist files list
         run: |
+          echo "Current PWD: $(pwd)"
+          echo "Dist contents:"
           ls ./dist
         shell: bash
 
       - name: Installing app
         run: |
-          CUR_PWD=$(pwd)
-          echo "Current PWD: $CUR_PWD"
-          ./dist/*.exe /DIR="$CUR_PWD" /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-
+          "$(ls ./dist/*.exe)" /DIR="$(pwd)/temp" /ALLUSERS /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-
         shell: bash
 
       - name: Check installed app
         run: |
-          "./file_conversor.bat" --version
+          "./temp/file_conversor.bat" --version
         shell: bash
 
   publish:
     name: Git Release app
     runs-on: ubuntu-latest
-    needs: [test-exe]
+    needs: [test-exe-admin]
 
     steps:
       - name: Checkout repository

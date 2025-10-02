@@ -46,7 +46,7 @@ def manifest(c: InvokeContext):
         "bin": f"{SCOOP_APP_EXE}",
         "pre_install": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName',
-            rf'Start-Process -FilePath "$exePath" -ArgumentList "/DIR=$dir", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
+            rf'Start-Process -FilePath "$exePath" -ArgumentList "/DIR=$dir", "/CURRENTUSER", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
             rf'if (!(Test-Path "$dir\{SCOOP_APP_EXE}")) {{throw "Install failed: executable {SCOOP_APP_EXE} not found"}}',
             rf'Remove-Item -Path "$exePath"',
         ],
