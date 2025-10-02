@@ -1,14 +1,14 @@
 {
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)",
     "homepage": "https://github.com/andre-romano/file_conversor",
     "license": "Apache-2.0",
-    "url": "https://github.com/andre-romano/file_conversor/releases/download/v0.6.0/file_conversor-v0.6.0-Win_x64-Installer.exe",
-    "hash": "a26ebdd312995e0712b8ba6aecc255653c83f67afa7113b6798b24c00bb3f5f3",
+    "url": "https://github.com/andre-romano/file_conversor/releases/download/v0.6.1/file_conversor-v0.6.1-Win_x64-Installer.exe",
+    "hash": "cf8414bee619afef511b95bc861c8846a952eac908279480b70e0a6265104d19",
     "bin": "file_conversor.bat",
     "pre_install": [
         "$exePath = Get-ChildItem -Path \"$dir\" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName",
-        "Start-Process -FilePath \"$exePath\" -ArgumentList \"/DIR=$dir\", \"/SUPPRESSMSGBOXES\", \"/VERYSILENT\", \"/NORESTART\", \"/SP-\" -Wait",
+        "Start-Process -FilePath \"$exePath\" -ArgumentList \"/DIR=$dir\", \"/CURRENTUSER\", \"/SUPPRESSMSGBOXES\", \"/VERYSILENT\", \"/NORESTART\", \"/SP-\" -Wait",
         "if (!(Test-Path \"$dir\\file_conversor.bat\")) {throw \"Install failed: executable file_conversor.bat not found\"}",
         "Remove-Item -Path \"$exePath\""
     ],
@@ -25,8 +25,5 @@
         "hash": {
             "url": "https://github.com/andre-romano/file_conversor/releases/download/v$version/file_conversor-v$version-Win_x64-Installer.sha256"
         }
-    },
-    "depends": [
-        "python"
-    ]
+    }
 }
