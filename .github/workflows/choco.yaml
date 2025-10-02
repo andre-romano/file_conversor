@@ -75,11 +75,13 @@ jobs:
 
       - name: Install choco app
         run: |
-          PACKAGE_NAME=$(ls ./dist/*.nupkg | sed -E 's/.*\/(.*)-[0-9]+\.[0-9]+\.[0-9]+\.nupkg/\1/')
-          VERSION=$(ls ./dist/*.nupkg | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/')
-          echo "Package name: $PACKAGE_NAME"
-          echo "Version: $VERSION"
-          choco install -y --acceptlicense "$PACKAGE_NAME" --version="$VERSION" --source="./dist;https://community.chocolatey.org/api/v2/"
+          for FILE in ./dist/*.nupkg; do
+            PACKAGE_NAME=$(basename "$FILE" | sed -E 's@\.[0-9]+\.[0-9]+\.[0-9]+\.nupkg$@@')
+            VERSION=$(basename "$FILE" | sed -E 's@.*\.([0-9]+\.[0-9]+\.[0-9]+)\.nupkg@\1@')
+            echo "Package name: $PACKAGE_NAME"
+            echo "Version: $VERSION"
+            choco install -y --acceptlicense "$PACKAGE_NAME" --version="$VERSION" --source="./dist;https://community.chocolatey.org/api/v2/"
+          done
         shell: bash
 
       - name: Check installed choco app
