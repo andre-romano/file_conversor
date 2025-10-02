@@ -61,7 +61,7 @@ def manifest(c: InvokeContext):
         "autoupdate": {
             "url": f"{INSTALL_APP_AUTOUPDATE}",
             "hash": {
-                "url": f"{INSTALL_APP_AUTOUPDATE.replace(".exe", INSTALL_APP_HASH.suffix)}"
+                "url": f"{INSTALL_APP_AUTOUPDATE.replace(f"{INSTALL_APP_WIN_EXE.name}", INSTALL_APP_HASH.name)}"
             }
         }
     }

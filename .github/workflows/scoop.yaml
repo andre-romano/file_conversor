@@ -98,7 +98,7 @@ jobs:
 
       - name: Install scoop bucket
         run: |
-          scoop install ./bucket/file_conversor.json
+          scoop install .\bucket\file_conversor.json
         shell: pwsh
 
       - name: Check installed scoop app
