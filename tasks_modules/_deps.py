@@ -6,11 +6,9 @@ from tasks_modules._config import *
 
 CHOCO_DEPS = {
     "chocolatey-core.extension": "1.3.3",
-    "python": f"{PYTHON_VERSION}",
 }
 
 SCOOP_DEPS = {
-    "python": f"{PYTHON_VERSION}",
 }
 
 # DOCKER
