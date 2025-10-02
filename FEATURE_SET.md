@@ -1,8 +1,8 @@
 
-# File Conversor v0.6.0
+# File Conversor v0.6.1
 
 **Summary**:
-- [File Conversor v0.6.0](#file-conversor-v060)
+- [File Conversor v0.6.1](#file-conversor-v061)
   - [Feature-set available](#feature-set-available)
     - [Office files (doc, xls, ppt, etc)](#office-files-doc-xls-ppt-etc)
     - [Audio  files](#audio--files)
