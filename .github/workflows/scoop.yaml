@@ -91,10 +91,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         shell: bash
 
-      - name: Build and install scoop bucket
+      - name: Scoop bucket contents
+        run: |
+          cat ./bucket/file_conversor.json
+        shell: bash
+
+      - name: Install scoop bucket
         run: |
           scoop install ./bucket/file_conversor.json
-        shell: bash
+        shell: pwsh
 
       - name: Check installed scoop app
         run: |
