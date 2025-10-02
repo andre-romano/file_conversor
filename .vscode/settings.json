@@ -22,7 +22,6 @@
         "**/.coverage*/**": true,
         "**/.pytest_cache/**": true,
         "**/.pdm-python/**": true,
-        "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,

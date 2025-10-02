@@ -9,7 +9,7 @@ from invoke.tasks import task
 from tasks_modules import _config
 from tasks_modules._config import *
 
-from tasks_modules import base, pypi
+from tasks_modules import base
 
 BUILD_DIR = Path("build") / PROJECT_NAME
 PORTABLE_PYTHON_DIR = BUILD_DIR / "python"
@@ -19,6 +19,19 @@ PORTABLE_PIP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / "pip.exe"
 PORTABLE_APP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / f"{PROJECT_NAME}.exe"
 
 PORTABLE_SHIM_BAT = BUILD_DIR / f"{PROJECT_NAME}.bat"
+
+
+def get_pip_install_cmd(*modules: str):
+    cmd = " ".join([
+        f'"{PORTABLE_PYTHON_EXE.resolve()}"', "-m",
+        "pip",
+        "install",
+        "--ignore-installed",
+        "--prefix", f"{PORTABLE_PYTHON_DIR.resolve()}",
+        "--compile",
+        *modules,
+    ])
+    return cmd
 
 
 @task
@@ -110,18 +123,21 @@ def install_pip(c: InvokeContext):
     print(f"[bold] Installing pip ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_pip, pypi.build],)
+@task(pre=[install_pip],)
+def install_setuptools(c: InvokeContext):
+    print(f"[bold] Installing setuptools ... [/]")
+    cmd = get_pip_install_cmd("setuptools", "wheel")
+    print(f"$ {cmd}")
+    result = c.run(cmd, out_stream=sys.stdout, err_stream=sys.stderr)
+    if (result is None) or (result.return_code != 0):
+        raise RuntimeError(f"Cannot install setuptools: {result}")
+    print(f"[bold] Installing setuptools ... [/][bold green]OK[/]")
+
+
+@task(pre=[install_setuptools],)
 def install_app(c: InvokeContext):
     print(f"[bold] Installing app {PROJECT_NAME} ... [/]")
-    cmd = " ".join([
-        f'"{PORTABLE_PYTHON_EXE.resolve()}"', "-m",
-        "pip",
-        "install",
-        "--ignore-installed",
-        "--prefix", f"{PORTABLE_PYTHON_DIR.resolve()}",
-        "--compile",
-        f"{_config.get_whl_file().resolve()}",
-    ])
+    cmd = get_pip_install_cmd(".")
     print(f"$ {cmd}")
     result = c.run(cmd, out_stream=sys.stdout, err_stream=sys.stderr)
     if (result is None) or (result.return_code != 0):

@@ -246,16 +246,6 @@ def install(c: InvokeContext):
         raise RuntimeError("'choco' not found in PATH")
 
 
-@task(pre=[install])
-def install_vagrant(c: InvokeContext):
-    if shutil.which("vagrant"):
-        return
-    print("[bold] Installing Vagrant ... [/]")
-    c.run(rf'choco install -y vagrant')
-    if not shutil.which("vagrant"):
-        raise RuntimeError("'vagrant' not found in PATH")
-
-
 @task(pre=[clean_nupkg, create_manifest, install,])
 def build(c: InvokeContext):
     if not CHOCO_NUSPEC.exists():
@@ -289,21 +279,6 @@ def uninstall_app(c: InvokeContext):
 @task(pre=[install_app,], post=[uninstall_app,])
 def check(c: InvokeContext):
     base.check(c)
-
-
-@task(pre=[build, install_vagrant])
-def check_vm(c: InvokeContext):
-    print(rf'[bold] Checking choco package in Vagrant VM ... [/]')
-    with c.cd(VAGRANT_PATH):
-        result = c.run(rf'vagrant snapshot restore good --no-provision')
-        assert (result is not None) and (result.return_code == 0)
-
-        result = c.run(rf'vagrant up --provision')
-        assert (result is not None) and (result.return_code == 0)
-
-        result = c.run(rf'vagrant halt')
-        assert (result is not None) and (result.return_code == 0)
-    print(rf'[bold] Checking choco package in Vagrant VM ... [/][bold green]OK[/]')
 
 
 @task(pre=[build,])
