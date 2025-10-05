@@ -35,6 +35,10 @@ def manifest(c: InvokeContext):
 
     INSTALL_APP_AUTOUPDATE = INSTALL_APP_WIN_EXE_URL.replace(PROJECT_VERSION, "$version")
 
+    INSTALL_APP_AUTOUPDATE_HASH = INSTALL_APP_WIN_EXE_URL.replace(
+        INSTALL_APP_WIN_EXE.name, INSTALL_APP_HASH.name
+    ).replace(PROJECT_VERSION, "$version")
+
     # bucket/file_conersor.json
     json_obj = {
         "version": PROJECT_VERSION,
@@ -61,7 +65,7 @@ def manifest(c: InvokeContext):
         "autoupdate": {
             "url": f"{INSTALL_APP_AUTOUPDATE}",
             "hash": {
-                "url": f"{INSTALL_APP_AUTOUPDATE.replace(f"{INSTALL_APP_WIN_EXE.name}", INSTALL_APP_HASH.name)}"
+                "url": f"{INSTALL_APP_AUTOUPDATE_HASH}"
             }
         }
     }
