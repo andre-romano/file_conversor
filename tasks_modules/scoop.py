@@ -31,7 +31,7 @@ def clean_scoop(c: InvokeContext):
 def manifest(c: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
-    print("[bold] Updating Scoop manifest files ... [/]", end="")
+    print("[bold] Updating Scoop manifest files ... [/]")
 
     INSTALL_APP_AUTOUPDATE = INSTALL_APP_WIN_EXE_URL.replace(PROJECT_VERSION, "$version")
 
@@ -74,7 +74,7 @@ def manifest(c: InvokeContext):
     SCOOP_JSON.write_text(json.dumps(json_obj, indent=4) + "\n", encoding="utf-8")
     assert SCOOP_JSON.exists()
 
-    print("[bold green] OK [/]",)
+    print("[bold] Updating Scoop manifest files ... [/] [bold green]OK[/]")
 
     print(f"{SCOOP_JSON}:")
     print(SCOOP_JSON.read_text())

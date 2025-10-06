@@ -27,6 +27,7 @@ def get_pip_install_cmd(*modules: str):
         "pip",
         "install",
         "--ignore-installed",
+        "--no-user",
         "--prefix", f"{PORTABLE_PYTHON_DIR.resolve()}",
         *modules,
     ])
@@ -52,17 +53,15 @@ def get_portable_python(c: InvokeContext):
 
     print(f"[bold] Getting portable Python ... [/]")
     PORTABLE_PYTHON_DIR.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_zip = Path(temp_dir) / "embedpy.zip"
 
-        print(f"Downloading '{EMBEDPY_URL}' ... ", end="")
-        temp_zip.write_bytes(_config.get_url(EMBEDPY_URL))
-        print(f"[bold green]OK[/]")
+    _, CACHED_PYTHON_ZIP = _config.get_url(EMBEDPY_URL)
+    if not CACHED_PYTHON_ZIP or not CACHED_PYTHON_ZIP.exists():
+        raise RuntimeError(f"'{CACHED_PYTHON_ZIP}' not found")
 
-        print(f"Extracting '{temp_zip}' ... ", end="")
-        _config.extract(src=temp_zip, dst=PORTABLE_PYTHON_DIR)
-        assert PORTABLE_PYTHON_DIR.exists()
-        print(f"[bold green]OK[/]")
+    print(f"Extracting '{CACHED_PYTHON_ZIP}' ... ", end="")
+    _config.extract(src=CACHED_PYTHON_ZIP, dst=PORTABLE_PYTHON_DIR)
+    assert PORTABLE_PYTHON_DIR.exists()
+    print(f"[bold green]OK[/]")
 
     if not PORTABLE_PYTHON_EXE:
         raise RuntimeError(f"'{PORTABLE_PYTHON_EXE}' not found")
@@ -74,7 +73,7 @@ def get_portable_python(c: InvokeContext):
 
 
 @task(pre=[get_portable_python],)
-def config_pip(c: InvokeContext):
+def config_import(c: InvokeContext):
     print(f"[bold] Configuring pip ... [/]")
     for path in PORTABLE_PYTHON_DIR.glob("*._pth"):
         content = path.read_text()
@@ -96,17 +95,19 @@ def config_pip(c: InvokeContext):
         print(f"Updated '{path}'")
 
 
-@task(pre=[config_pip],)
+@task(pre=[config_import],)
 def install_pip(c: InvokeContext):
     print(f"[bold] Installing pip ... [/]")
-    get_pip_script = PORTABLE_PYTHON_DIR / "get-pip.py"
-    get_pip_script.write_bytes(
-        _config.get_url("https://bootstrap.pypa.io/get-pip.py")
-    )
+
+    PIP_SCRIPT_URL = "https://bootstrap.pypa.io/get-pip.py"
+
+    _, CACHED_PIP_PY = _config.get_url(PIP_SCRIPT_URL)
+    if not CACHED_PIP_PY or not CACHED_PIP_PY.exists():
+        raise RuntimeError(f"'{CACHED_PIP_PY}' not found")
 
     cmd = " ".join([
         f'"{PORTABLE_PYTHON_EXE.resolve()}"',
-        f'"{get_pip_script.resolve()}"',
+        f'"{CACHED_PIP_PY.resolve()}"',
     ])
     print(f"$ {cmd}")
     result = c.run(cmd, out_stream=sys.stdout, err_stream=sys.stderr)
@@ -120,7 +121,6 @@ def install_pip(c: InvokeContext):
     if not PORTABLE_PIP_EXE.exists():
         raise RuntimeError(f"pip.exe not found after installation")
 
-    _config.remove_path(get_pip_script.name, base_path=PORTABLE_PYTHON_DIR)
     print(f"[bold] Installing pip ... [/][bold green]OK[/]")
 
 
@@ -172,7 +172,10 @@ def compile_all(c: InvokeContext):
     cmd = " ".join([
         f'"{PORTABLE_PYTHON_EXE.resolve()}"', "-m",
         'compileall',
-        '-b', '-f', '-q',
+        '-j', '4',   # parallel compile
+        '-b',
+        '-f',
+        '-q',
         '--invalidation-mode=unchecked-hash',
         f'"{PORTABLE_PYTHON_DIR.resolve()}"',
     ])

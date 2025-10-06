@@ -21,6 +21,7 @@ def mkdirs(c: InvokeContext):
     dirs = [
         "build",
         "dist",
+        f"{CACHE_DIR}",
         "docs",
         "htmlcov",
     ]
@@ -47,6 +48,11 @@ def clean_dist(c: InvokeContext):
 
 
 @task(pre=[mkdirs])
+def clean_cache(c: InvokeContext):
+    remove_path(f"{CACHE_DIR}/*")
+
+
+@task(pre=[mkdirs])
 def clean_htmlcov(c: InvokeContext):
     remove_path(f"htmlcov/*")
 
@@ -70,6 +76,7 @@ def clean_requirements(c: InvokeContext):
 @task(pre=[clean_logs,
            clean_build,
            clean_dist,
+           clean_cache,
            clean_htmlcov,
            clean_docs,
            clean_changelog,

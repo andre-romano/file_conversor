@@ -126,7 +126,7 @@ def clean_nupkg(c: InvokeContext):
 def create_manifest(c: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
-    print("[bold] Updating Chocolatey manifest files ... [/]", end="")
+    print("[bold] Updating Chocolatey manifest files ... [/]")
     CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
     CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
 
@@ -222,8 +222,6 @@ elseif ($key.Count -gt 1) {{
 """, encoding="utf-8")
     assert CHOCO_NUSPEC.exists()
 
-    print("[bold green]OK[/]")
-
     print(f"{install_ps1_path}:")
     print(install_ps1_path.read_text())
 
@@ -232,6 +230,8 @@ elseif ($key.Count -gt 1) {{
 
     print(f"{CHOCO_NUSPEC}:")
     print(CHOCO_NUSPEC.read_text())
+
+    print("[bold] Updating Chocolatey manifest files ... [/] [bold green]OK[/]")
 
 
 @task

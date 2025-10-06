@@ -12,6 +12,7 @@ import requests
 from invoke.context import Context as InvokeContext
 from typing import Any, Iterable
 from pathlib import Path
+from email.utils import formatdate
 
 from rich import print
 
@@ -46,6 +47,8 @@ RELEASE_NOTES_PATH = Path("RELEASE_NOTES.md")
 README_PATH = Path("README.md")
 
 GIT_RELEASE = f"v{PROJECT_VERSION}"
+
+CACHE_DIR = Path(".cache")
 
 SCRIPTS_PATH = Path(f'scripts')
 INSTALL_PYTHON = SCRIPTS_PATH / 'install_python.ps1'
@@ -107,7 +110,7 @@ def copy(src: Path, dst: Path):
     print(f"[bold green]OK[/]")
 
 
-def remove_path(path_pattern: str, base_path: Path = Path(), dry_run: bool = False, verbose: bool = True):
+def remove_path(path_pattern: str, base_path: Path = Path(), dry_run: bool = False, verbose: bool = False):
     """Remove dir or file, using globs / wildcards"""
     if not verbose:
         print(f"Cleaning '{base_path}/{path_pattern}' ... ", end="")
@@ -153,11 +156,38 @@ def get_dir_size(path: Path | str) -> tuple[str, float]:
     return (f"{total:.2f} PB", total)
 
 
-def get_url(url: str) -> bytes:
-    response = requests.get(url)
+def get_url(url: str, cache: bool = True, **kwargs) -> tuple[bytes, Path | None]:
+    cache_file: Path | None = None
+    if cache:
+        cache_file = CACHE_DIR / hashlib.sha256(url.encode("utf-8")).hexdigest()
+        print(f"Using cache file: {cache_file} ({url})")
+
+    headers = kwargs.get("headers", {})
+    if cache_file and cache_file.exists():
+        mtime = cache_file.stat().st_mtime  # posix timestamp
+        headers["If-Modified-Since"] = formatdate(timeval=mtime, usegmt=True)
+
+    if "headers" in kwargs:
+        del kwargs["headers"]
+    if "stream" in kwargs:
+        del kwargs["stream"]
+
+    print(f"Accessing url '{url}' ... ", end="")
+    response = requests.get(url, headers=headers, stream=True, **kwargs)
+    print(f"[bold blue]{response.status_code}[/]")
+
     if not response.ok:
         raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
-    return response.content
+    if cache_file and response.status_code == 304:
+        print("Cached version is up-to-date.")
+        return (cache_file.read_bytes(), cache_file)
+    else:
+        print("A newer version is available.")
+        if cache_file:
+            cache_file.parent.mkdir(parents=True, exist_ok=True)
+            cache_file.write_bytes(response.content)
+            print(f"Updated {cache_file}")
+        return (response.content, cache_file if cache_file else None)
 
 
 def get_hash(data: bytes | str | Path) -> str:
@@ -174,8 +204,8 @@ def get_hash(data: bytes | str | Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def get_remote_hash(url: str) -> str:
-    return get_hash(get_url(url))
+def get_remote_hash(url: str, cache: bool = True, **kwargs) -> str:
+    return get_hash(get_url(url, cache=cache, **kwargs)[0])
 
 
 def verify_with_sha256_file(sha_file: Path):
