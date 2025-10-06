@@ -43,9 +43,16 @@ def clean_zip(c: InvokeContext):
 @task(pre=[clean_zip, embedpy.check],)
 def build(c: InvokeContext):
     print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/]")
+
+    human_size, size_bytes_orig = get_dir_size(BUILD_DIR)
+    print(f"Size BEFORE compression: {human_size} ({BUILD_DIR})")
+
     _config.compress(src=BUILD_DIR, dst=INSTALL_APP_CURR)
     if not INSTALL_APP_CURR.exists():
         raise RuntimeError(f"'{INSTALL_APP_CURR}' not found")
+
+    human_size, size_bytes_final = get_dir_size(INSTALL_APP_CURR)
+    print(f"Size AFTER compression: {human_size} (-{100 - (size_bytes_final / size_bytes_orig * 100):.2f}%)")
     print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/][bold green]OK[/]")
 
 

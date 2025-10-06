@@ -62,6 +62,11 @@ def clean_changelog(c: InvokeContext):
     remove_path(f"RELEASE_NOTES.md")
 
 
+@task(pre=[mkdirs])
+def clean_requirements(c: InvokeContext):
+    remove_path(f"requirements.txt")
+
+
 @task(pre=[clean_logs,
            clean_build,
            clean_dist,
@@ -71,6 +76,14 @@ def clean_changelog(c: InvokeContext):
            ])
 def clean(c: InvokeContext):
     pass
+
+
+@task(pre=[clean_requirements,])
+def requirements(c: InvokeContext, prod: bool = True):
+    print("[bold]Generating requirements.txt ... [/]")
+    result = c.run(f"pdm export -f requirements --without-hashes {'--prod' if prod else ''} > requirements.txt")
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold]Generating requirements.txt ... [/][bold green]OK[/]")
 
 
 @task(pre=[clean_htmlcov, locales.build,])

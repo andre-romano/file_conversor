@@ -57,7 +57,8 @@ def create_manifest(c: InvokeContext):
 AppName={PROJECT_TITLE}
 AppVersion={PROJECT_VERSION}
 DefaultDirName={{autopf}}/{PROJECT_NAME}
-Compression=LZMA2
+Compression=lzma2/max
+SolidCompression=yes
 ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog

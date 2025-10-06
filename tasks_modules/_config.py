@@ -107,18 +107,25 @@ def copy(src: Path, dst: Path):
     print(f"[bold green]OK[/]")
 
 
-def remove_path(path_pattern: str):
+def remove_path(path_pattern: str, base_path: Path = Path(), dry_run: bool = False, verbose: bool = True):
     """Remove dir or file, using globs / wildcards"""
-    for path in Path('.').glob(path_pattern):
+    if not verbose:
+        print(f"Cleaning '{base_path}/{path_pattern}' ... ", end="")
+    for path in base_path.rglob(path_pattern):
         if not path.exists():
             pass
-        print(f"Cleaning '{path}' ... ", end="")
-        if path.is_dir():
-            shutil.rmtree(path)
-        else:
-            path.unlink()  # Remove single file
-        if path.exists():
-            raise RuntimeError(f"Cannot remove dir / file '{path}'")
+        if verbose:
+            print(f"Cleaning '{path}' ... ", end="")
+        if not dry_run:
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()  # Remove single file
+            if path.exists():
+                raise RuntimeError(f"Cannot remove dir / file '{path}'")
+        if verbose:
+            print("[bold green]OK[/]")
+    if not verbose:
         print("[bold green]OK[/]")
 
 
@@ -127,6 +134,23 @@ def mkdir(dirs: Iterable):
         Path(dir).mkdir(parents=True, exist_ok=True)
         if not Path(dir).exists():
             raise RuntimeError(f"Cannot create dir '{dir}'")
+
+
+def get_dir_size(path: Path | str) -> tuple[str, float]:
+    """
+    Get the total size of a directory and its contents.
+
+    :return: (human-readable string, size in bytes).
+    """
+    path = Path(path)
+    total: float = 0.0 if path.is_dir() else float(path.stat().st_size)
+    total += sum(f.stat().st_size for f in path.rglob('*') if f.is_file())
+    # Return size in a human-readable format
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if total < 1024:
+            return (f"{total:.2f} {unit}", total)
+        total /= 1024
+    return (f"{total:.2f} PB", total)
 
 
 def get_url(url: str) -> bytes:
@@ -205,12 +229,12 @@ def remove_from_PATH(paths: str | Path | list[str | Path]):
     os.environ["PATH"] = os.pathsep.join(env_paths)
 
 
-def compress(src: Path, dst: Path):
+def compress(src: Path, dst: Path, compress: int = zipfile.ZIP_DEFLATED, compress_level: int | None = None):
     dst = dst.with_suffix(".zip")
     if not src.is_dir():
         raise ValueError(f"'{src}' is not a valid directory")
 
-    with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(dst, "w", compression=compress, compresslevel=compress_level) as zipf:
         for root, _, files in os.walk(src):
             for file in files:
                 file_path = Path(root) / file
@@ -250,7 +274,8 @@ def git_commit_push(c: InvokeContext, path: Path | str, message: str):
 
 
 def get_whl_file(path: str | Path = "dist"):
-    for whl in list(Path("dist").glob("*.whl")):
+    path = Path(path)
+    for whl in path.glob(f"{PROJECT_NAME}-*.whl"):
         if PROJECT_VERSION in str(whl):
             return whl
     raise RuntimeError(f"WHL file not found in '{path}'")
