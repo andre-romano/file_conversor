@@ -2,7 +2,7 @@
 
 [project]
 name = "file_conversor"
-version = "0.6.1"
+version = "0.7.0"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
@@ -22,8 +22,10 @@ dependencies = [
     "portalocker>=3.2.0",
     "ocrmypdf>=16.11.0",
     "requests>=2.32.5",
+    "pywebview>=6.0",
+    "flask>=3.1.2",
 ]
-requires-python = "==3.13.*"
+requires-python = ">=3.13.6"
 readme = "README.md"
 license-files = ["LICEN[CS]E*", "AUTHORS.md","README.md"]
 classifiers = [

@@ -189,3 +189,20 @@ def check_valid_options(data: Any | None, valid_options: Iterable):
     if data not in valid_options:
         raise typer.BadParameter(f"'{data}' {_('is invalid.  Valid options are')} {', '.join([str(v) for v in valid_options])}.")
     return data
+
+
+def check_ip_format(data: str | None) -> str | None:
+    exception = typer.BadParameter(f"'{data}' {_('is not a valid IP address')}.")
+    if not data:
+        return data
+    parts = data.split(".")
+    if len(parts) != 4:
+        raise exception
+    for part in parts:
+        try:
+            number = int(part)
+            if number < 0 or number > 255:
+                raise exception
+        except ValueError:
+            raise exception
+    return data

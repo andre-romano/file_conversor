@@ -119,10 +119,10 @@ class Environment:
         return res_path
 
     @classmethod
-    def get_data_folder(cls) -> Path:
-        data_path = cls.get_resources_folder() / ".data"
-        logger.debug(f"Data path: {data_path}")
-        return data_path
+    def get_web_folder(cls) -> Path:
+        web_path = cls.get_resources_folder() / ".web"
+        logger.debug(f"Web path: {web_path}")
+        return web_path
 
     @classmethod
     def get_icons_folder(cls) -> Path:

@@ -259,7 +259,7 @@ def remove_from_PATH(paths: str | Path | list[str | Path]):
     os.environ["PATH"] = os.pathsep.join(env_paths)
 
 
-def compress(src: Path, dst: Path, compress: int = zipfile.ZIP_DEFLATED, compress_level: int | None = None):
+def compress(src: Path, dst: Path, compress: int = zipfile.ZIP_DEFLATED, compress_level: int = 9):
     dst = dst.with_suffix(".zip")
     if not src.is_dir():
         raise ValueError(f"'{src}' is not a valid directory")

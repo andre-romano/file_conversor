@@ -1,6 +1,6 @@
 include LICENSE AUTHORS.md README.md pyproject.toml
 
-recursive-include src/file_conversor/.data *
+recursive-include src/file_conversor/.web *
 recursive-include src/file_conversor/.icons *
 recursive-include src/file_conversor/.locales *
 
