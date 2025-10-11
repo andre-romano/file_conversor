@@ -1,8 +1,12 @@
 {# src\file_conversor\.web\templates\_status_bar\_status_bar.jinja2 #}
 
-<div class="status-bar is-fixed-bottom">
-    <div class="is-size-6 p-1 pl-3">
-        <span class="has-text-weight-bold">STATUS:</span> <span class="status-message">{{ status_message |
-            default("Ready") }}</span>
+<div
+    class="status-bar is-fixed-bottom is-flex is-justify-content-space-between is-align-items-center is-size-6 p-1 pl-3 pr-3">
+    <div class="status-bar-start is-flex is-align-items-center">
+        <span class="has-text-weight-bold">STATUS:</span>
+        <span class="status-message">{{ status_message |default("Ready") }}</span>
+    </div>
+    <div class="status-bar-end is-flex is-align-items-center">
+        <span class="status-time">{{ status_time |default("") }}</span>
     </div>
 </div>
