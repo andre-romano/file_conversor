@@ -1,0 +1,8 @@
+{# src\file_conversor\.web\templates\_status_bar\_status_bar.jinja2 #}
+
+<div class="status-bar is-fixed-bottom">
+    <div class="is-size-6 p-1 pl-3">
+        <span class="has-text-weight-bold">STATUS:</span> <span class="status-message">{{ status_message |
+            default("Ready") }}</span>
+    </div>
+</div>

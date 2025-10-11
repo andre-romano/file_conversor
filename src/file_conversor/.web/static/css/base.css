@@ -6,6 +6,7 @@
     --bulma-footer-background-color: var(--bulma-scheme-main);
     --bulma-main-app-margin: 20px;
     --bulma-shadow: 0px 0px 15px 2px rgba(70, 70, 70, 0.4);
+    --bulma-status-bar-height: 2rem;
 }
 
 html,
@@ -14,6 +15,11 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+}
+
+html.has-status-bar-fixed-bottom,
+body.has-status-bar-fixed-bottom {
+    padding-bottom: var(--bulma-status-bar-height);
 }
 
 #main-app {
@@ -27,7 +33,9 @@ body nav.navbar.is-fixed-top {
 }
 
 body nav.navbar.is-fixed-top.has-border {
+    border-top: 1px solid var(--bulma-navbar-border-color);
     border-bottom: 1px solid var(--bulma-navbar-border-color);
+    box-shadow: var(--bulma-shadow);
 }
 
 body nav.navbar .navbar-menu .navbar-item,
@@ -67,7 +75,24 @@ body div.card {
 }
 
 /* FOOTER */
-body footer.footer {
+body #footer {
     padding: 3rem;
     padding-bottom: 4rem;
+    background-color: var(--bulma-footer-background-color);
+}
+
+/* STATUS BAR */
+body .status-bar.is-fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--bulma-status-bar-height);
+    color: var(--bulma-navbar-item-color);
+    background-color: var(--bulma-footer-background-color);
+    border-top: solid 1px var(--bulma-navbar-border-color);
+    border-bottom: solid 1px var(--bulma-navbar-border-color);
+    text-align: left;
+    box-shadow: var(--bulma-shadow);
+    z-index: 30;
 }
