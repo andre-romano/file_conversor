@@ -1,0 +1,103 @@
+{# src\file_conversor\.web\templates\_header\_header.jinja2 #}
+
+{% import '_header/_macros.jinja2' as macros %}
+
+<style>
+    :root {
+        --bulma-navbar-height: 2.85rem;
+        --navbar-border-color: #b4b4b4;
+    }
+
+    body nav.navbar.is-fixed-top {
+        height: var(--bulma-navbar-height);
+    }
+
+    body nav.navbar.is-fixed-top.has-border {
+        border-bottom: 1px solid var(--navbar-border-color);
+    }
+
+    body nav.navbar .navbar-menu .navbar-item,
+    body nav.navbar .navbar-menu .navbar-item a {
+        color: var(--bulma-navbar-item-color);
+    }
+
+    body nav.navbar .navbar-menu .navbar-dropdown {
+        border: solid 1px var(--navbar-border-color);
+        border-top: none;
+    }
+
+    @media screen and (max-width: 1023px) {
+        body nav.navbar.is-fixed-top>.navbar-menu {
+            display: block !important;
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            visibility: hidden;
+            overflow: hidden;
+            transition: all 0.35s ease;
+        }
+
+        body nav.navbar.is-fixed-top>.navbar-menu.is-active {
+            max-height: calc(100vh - var(--bulma-navbar-height));
+            padding-top: 8px;
+            padding-bottom: 8px;
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+</style>
+
+<nav class="navbar is-fixed-top is-light has-border has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        {# Logo #}
+        <a class="navbar-item" href="{{ url_for('index') }}">
+            <img height="140" src="{{ url_for('icons', filename='icon.png') }}" alt="">
+        </a>
+
+        {# Navbar burger for mobile view #}
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenuContent">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    {# Navbar menu #}
+    <div id="navbarMenuContent" class="navbar-menu">
+        <div class="navbar-start">
+            {# Navbar links #}
+            {{ macros.navbar_item('Home', url='/') }}
+
+            {{ macros.navbar_dropdown('More', [
+            {'label': 'About', 'url': '/about', 'img': url_for('icons', filename='pdf.ico')},
+            {'label': 'Contact', 'url': '/contact', 'icon': 'fas fa-envelope'},
+            {'label': 'Help', 'url': '/help', 'icon': 'fas fa-question-circle'},
+            ]) }}
+        </div>
+
+        <div class="navbar-end">
+            {# Right-aligned items (if any) can go here #}
+            {{ macros.navbar_item('Config', url='/config') }}
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all "navbar-burger" elements
+        const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+
+        burgers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.dataset.target;
+                const menu = document.getElementById(target);
+
+                // Toggle "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
+                menu.classList.toggle('is-active');
+            });
+        });
+    });
+</script>

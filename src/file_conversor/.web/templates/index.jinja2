@@ -1,0 +1,22 @@
+{# src\file_conversor\.web\templates\index.jinja2 #}
+{% import '_macros.jinja2' as macros %}
+{% extends '_base.jinja2' %}
+
+{% block title %}File Conversor - Home{% endblock %}
+
+{% block content %}
+<div class="grid is-col-min-6 is-gap-2">
+  {% for tool in tools %}
+  <div class="cell">
+    {{
+    macros.card(
+    image=tool.image | default({}),
+    media=tool.media | default({}),
+    content=tool.content | default(""),
+    url=tool.url | default("#"),
+    )
+    }}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

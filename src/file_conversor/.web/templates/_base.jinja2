@@ -1,0 +1,40 @@
+{# src\file_conversor\.web\templates\_base.jinja2 #}
+
+<!DOCTYPE html>
+<html lang="en" class="has-navbar-fixed-top">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}app_title{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('icons', filename='icon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('icons', filename='icon.png') }}">
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #main-app {
+            --margin: 20px;
+            margin-top: var(--margin);
+            margin-bottom: var(--margin);
+        }
+    </style>
+</head>
+
+<body>
+    {% include '_header/_header.jinja2' %}
+
+    <div id="main-app" class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>

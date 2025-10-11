@@ -1,0 +1,30 @@
+{# src\file_conversor\.web\templates\header\_macros.jinja2 #}
+
+{% macro navbar_item(label, classes='', url='', icon='', img='') %}
+<a class="navbar-item {{ classes }}" href="{{ url }}">
+    {% if icon %}
+    <span class="icon">
+        <i class="{{ icon }}"></i>
+    </span>
+    {% endif %}
+    {% if img %}
+    <figure class="image is-24x24">
+        <img src="{{ img }}" alt="{{ label }}">
+    </figure>
+    {% endif %}
+    {{ label }}
+</a>
+{% endmacro %}
+
+{% macro navbar_dropdown(label, items) %}
+<div class="navbar-item has-dropdown is-hoverable is-light">
+    <a class="navbar-link">
+        {{ label }}
+    </a>
+    <div class="navbar-dropdown">
+        {% for item in items %}
+        {{ navbar_item(item.label, item.get('classes',''), item.url, item.get('icon',''), item.get('img','')) }}
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}

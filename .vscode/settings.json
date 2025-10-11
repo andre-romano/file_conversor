@@ -29,5 +29,15 @@
         "**/Thumbs.db": true,
         "**/*.spec": true,
         "**/pdm.lock/**": true,
-    }
+    },
+    "emmet.includeLanguages": {
+        "jinja": "html",
+        "jinja2": "html",
+        "jinja-html": "html"
+    },
+    "files.associations": {
+        "*.j2": "jinja-html",
+        "*.jinja": "jinja-html",
+        "*.jinja2": "jinja-html"
+    },
 }

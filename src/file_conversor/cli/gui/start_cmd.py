@@ -9,8 +9,8 @@ from rich import print
 
 
 # user-provided modules
+from file_conversor.backend.gui import FlaskApp
 from file_conversor.cli.gui._typer import COMMAND_NAME, START_NAME
-from file_conversor.gui import FlaskApp
 
 from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
@@ -40,11 +40,11 @@ EXTERNAL_DEPENDENCIES = set([])
     """
 )
 def start_gui(
-    non_interactive: Annotated[bool, typer.Option("--non-interactive", "-ni",
-                                                  help=_("Run the GUI in non-interactive mode."),
-                                                  is_flag=True,
-                                                  )] = False,
+    open_browser: Annotated[bool, typer.Option("--open-browser/--no-open-browser", "-ob/-nob",
+                                               help=_("Open the web browser."),
+                                               is_flag=True,
+                                               )] = True,
 ):
     logger.info(f"[bold]{_('Starting the graphical user interface')} ...[/]")
-    app = FlaskApp.get_instance(non_interactive=non_interactive)
-    app.run()
+    webapp = FlaskApp.get_instance()
+    webapp.run(open_browser=open_browser)
