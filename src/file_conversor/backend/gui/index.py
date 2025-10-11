@@ -3,8 +3,12 @@
 from flask import render_template, send_from_directory, url_for
 
 # user-provided modules
+from file_conversor.backend.gui.flask_route import FlaskRoute
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
+
+from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -16,11 +20,13 @@ logger = LOG.getLogger()
 
 
 def index():
-    tools = [
-        # OFFICE
+    tools = []
+
+    # OFFICE tools
+    tools.extend([
         {
             'media': {
-                'image': {'src': url_for('icons', filename='doc.ico')},
+                'image': {'src': url_for('icons', filename='docx.ico')},
                 'title': _("Document Tools"),
                 'subtitle': f"{_('Document file manipulation')} {_('(requires MS Office / LibreOffice)')})",
             },
@@ -42,14 +48,103 @@ def index():
             },
             'url': url_for('ppt_index'),
         },
-        # PDF
+    ])
+
+    # OTHER FILES
+    tools.extend([
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='mp3.ico')},
+                'title': _("Audio Tools"),
+                'subtitle': _("Audio file manipulation (requires FFMpeg external library)"),
+            },
+            'url': url_for('audio_index'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='mp4.ico')},
+                'title': _("Video Tools"),
+                'subtitle': _("Video file manipulation (requires FFMpeg external library)"),
+            },
+            'url': url_for('video_index'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='jpg.ico')},
+                'title': _("Image Tools"),
+                'subtitle': _("Image file manipulation"),
+            },
+            'url': url_for('image_index'),
+        },
         {
             'media': {
                 'image': {'src': url_for('icons', filename='pdf.ico')},
                 'title': _("PDF Tools"),
-                'subtitle': _("Convert, Split, Merge, Compress and more."),
+                'subtitle': _("PDF file manipulation."),
             },
             'url': url_for('pdf_index'),
         },
-    ]
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='epub.ico')},
+                'title': _("Ebook Tools"),
+                'subtitle': _("Ebook file manipulation (requires Calibre external library)"),
+            },
+            'url': url_for('ebook_index'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='json.ico')},
+                'title': _("Text Tools"),
+                'subtitle': _("Text file manipulation"),
+            },
+            'url': url_for('text_index'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='sha256.ico')},
+                'title': _("Hash Tools"),
+                'subtitle': _("Hash file manipulation"),
+            },
+            'url': url_for('hash_index'),
+        },
+    ])
+
+    # UTILS CONFIG
+    if CURR_PLATFORM == PLATFORM_WINDOWS:
+        tools.append({
+            'media': {
+                'image': {'src': url_for('icons', filename='win.ico')},
+                'title': _("Windows Tools"),
+                'subtitle': _("Windows OS commands (for Windows ONLY)"),
+            },
+            'url': url_for('win_index'),
+        })
+
+    tools.extend([
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='config.ico')},
+                'title': _("Configuration"),
+                'subtitle': _("Configure application default options"),
+            },
+            'url': url_for('config_index'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='pipeline.ico')},
+                'title': _("Pipeline Tools"),
+                'subtitle': _("Pipeline file processing (task automation)"),
+            },
+            'url': url_for('pipeline_index'),
+        },
+    ])
     return render_template('index.jinja2', tools=tools)
+
+
+routes = [FlaskRoute(
+    rule="/",
+    handler=index
+)]
+
+__all__ = ['routes']

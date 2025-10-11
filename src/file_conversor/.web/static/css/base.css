@@ -1,0 +1,73 @@
+/* src\file_conversor\.web\static\css\base.css */
+
+:root {
+    --bulma-navbar-height: 2.85rem;
+    --bulma-navbar-border-color: #c7c7c7;
+    --bulma-footer-background-color: var(--bulma-scheme-main);
+    --bulma-main-app-margin: 20px;
+    --bulma-shadow: 0px 0px 15px 2px rgba(70, 70, 70, 0.4);
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#main-app {
+    margin-top: var(--bulma-main-app-margin);
+    margin-bottom: var(--bulma-main-app-margin);
+}
+
+/* NAVBAR */
+body nav.navbar.is-fixed-top {
+    height: var(--bulma-navbar-height);
+}
+
+body nav.navbar.is-fixed-top.has-border {
+    border-bottom: 1px solid var(--bulma-navbar-border-color);
+}
+
+body nav.navbar .navbar-menu .navbar-item,
+body nav.navbar .navbar-menu .navbar-item a {
+    color: var(--bulma-navbar-item-color);
+}
+
+body nav.navbar .navbar-menu .navbar-dropdown {
+    border: solid 1px var(--bulma-navbar-border-color);
+    border-top: none;
+}
+
+@media screen and (max-width: 1023px) {
+    body nav.navbar.is-fixed-top>.navbar-menu {
+        display: block !important;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+        visibility: hidden;
+        overflow: hidden;
+        transition: all 0.35s ease;
+    }
+
+    body nav.navbar.is-fixed-top>.navbar-menu.is-active {
+        max-height: calc(100vh - var(--bulma-navbar-height));
+        padding-top: 8px;
+        padding-bottom: 8px;
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* CARDS */
+body div.card {
+    border: solid 1px var(--bulma-navbar-border-color);
+}
+
+/* FOOTER */
+body footer.footer {
+    padding: 3rem;
+    padding-bottom: 4rem;
+}

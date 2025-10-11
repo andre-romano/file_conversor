@@ -8,40 +8,42 @@
 {% endmacro %}
 
 {% macro card(image={}, media={}, content="", url="#") %}
-<a class="card" href="{{ url }}">
-    {% if image %}
-    <div class="card-image {{ image.container_classes | default('') }}">
-        {{ figure(image=image) }}
-    </div>
-    {% endif %}
-    <div class="card-content">
-        {% if media %}
-        <div class="media">
-            {% if media.image %}
-            <div class="media-left">
-                <figure class="image {{ media.image.classes | default('is-48x48') }}">
-                    <img src="{{ media.image.src }}" alt="Placeholder image" />
-                </figure>
-            </div>
-            {% endif %}
-            {% if media.title or media.subtitle %}
-            <div class="media-content">
-                {% if media.title %}
-                <p class="title is-4">{{ media.title }}</p>
-                {% endif %}
-                {% if media.subtitle %}
-                <p class="subtitle is-6">{{ media.subtitle }}</p>
-                {% endif %}
-            </div>
-            {% endif %}
+<div class="card">
+    <a href="{{ url }}">
+        {% if image %}
+        <div class="card-image {{ image.container_classes | default('') }}">
+            {{ figure(image=image) }}
         </div>
         {% endif %}
+        <div class="card-content">
+            {% if media %}
+            <div class="media">
+                {% if media.image %}
+                <div class="media-left">
+                    <figure class="image {{ media.image.classes | default('is-48x48') }}">
+                        <img src="{{ media.image.src }}" alt="Placeholder image" />
+                    </figure>
+                </div>
+                {% endif %}
+                {% if media.title or media.subtitle %}
+                <div class="media-content">
+                    {% if media.title %}
+                    <p class="title is-4">{{ media.title }}</p>
+                    {% endif %}
+                    {% if media.subtitle %}
+                    <p class="subtitle is-6">{{ media.subtitle }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
 
-        {% if content %}
-        <div class="content">
-            {{ content }}
+            {% if content %}
+            <div class="content">
+                {{ content }}
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
-</a>
+    </a>
+</div>
 {% endmacro %}

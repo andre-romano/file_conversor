@@ -1,6 +1,5 @@
 # src\file_conversor\cli\__init__.py
 
-import tomllib
 import sys
 import typer
 
@@ -48,11 +47,7 @@ for cmd_obj in COMMANDS_LIST:
 
 def version_callback(value: bool):
     if value:
-        project_toml = Environment.get_resources_folder() / "pyproject.toml"
-        if not project_toml.exists():
-            project_toml = Path() / "pyproject.toml"
-        PYPROJECT = tomllib.loads(project_toml.read_text())
-        VERSION = str(PYPROJECT["project"]["version"])
+        VERSION = Environment.get_version()
         print(f"File Conversor {VERSION}")
         print(f"Python {PYTHON_VERSION} ({sys.executable})")
         raise typer.Exit()

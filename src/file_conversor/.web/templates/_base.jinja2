@@ -10,31 +10,20 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('icons', filename='icon.png') }}">
     <link rel="icon" type="image/png" href="{{ url_for('icons', filename='icon.png') }}">
 
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
-    <style>
-        html,
-        body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
 
-        #main-app {
-            --margin: 20px;
-            margin-top: var(--margin);
-            margin-bottom: var(--margin);
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
 </head>
 
 <body>
-    {% include '_header/_header.jinja2' %}
+    {% include '_navbar/_navbar.jinja2' %}
 
     <div id="main-app" class="container">
         {% block content %}{% endblock %}
     </div>
+
+    {% include '_footer/_footer.jinja2' %}
 </body>
 
 </html>

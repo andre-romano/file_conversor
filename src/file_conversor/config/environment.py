@@ -5,6 +5,7 @@ import sys
 import time
 
 from importlib.resources import files
+from importlib.metadata import version
 
 from pathlib import Path
 
@@ -136,6 +137,11 @@ class Environment:
         locales_path = cls.get_resources_folder() / ".locales"
         logger.debug(f"Locales path: {locales_path}")
         return locales_path
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Get the current version of the app."""
+        return version("file_conversor")
 
     @classmethod
     def get_instance(cls):
