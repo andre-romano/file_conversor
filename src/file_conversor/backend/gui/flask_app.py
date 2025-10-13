@@ -1,5 +1,7 @@
 # src\file_conversor\gui\flask_app.py
 
+import os
+import signal
 import webbrowser
 import typer
 import time
@@ -96,6 +98,12 @@ class FlaskApp:
 
         logger.info(f"[bold]{_('Shutting down the application ...')}[/]")
         raise typer.Exit(0)
+
+    def stop(self) -> None:
+        """Stop the Flask server."""
+        logger.info(f"[bold]{_('Flask server is shutting down...')}[/]")
+        os.kill(os.getpid(), signal.SIGINT)
+        logger.info(f"[bold]{_('Flask server has shut down.')}[/]")
 
 
 __all__ = ["FlaskApp"]

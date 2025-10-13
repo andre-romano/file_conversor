@@ -10,8 +10,15 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('icons', filename='icon.png') }}">
     <link rel="icon" type="image/png" href="{{ url_for('icons', filename='icon.png') }}">
 
+    {# BULMA CSS #}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
 
+    {# ALPINE JS #}
+    <script src="{{ url_for('static', filename='js/alpine.mask.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/alpine.sort.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/alpine.min.js') }}" defer></script>
+
+    {# CUSTOM #}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
 </head>

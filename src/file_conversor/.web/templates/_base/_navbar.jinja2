@@ -3,7 +3,7 @@
 {% import '_macros.jinja2' as macros %}
 
 <nav class="navbar is-fixed-top is-light has-border has-shadow is-flex is-justify-content-space-between is-align-items-center"
-    role="navigation" aria-label="main navigation">
+    role="navigation" x-data="{ open: false }" aria-label="main navigation">
     <div class="navbar-brand">
         {# Logo #}
         <a class="navbar-item" href="{{ url_for('index') }}">
@@ -12,7 +12,8 @@
         </a>
 
         {# Navbar burger for mobile view #}
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenuContent">
+        <a role="button" class="navbar-burger" @click="open = ! open" aria-label="menu" aria-expanded="false"
+            data-target="navbarMenuContent">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -33,7 +34,7 @@
     </div>
 
     {# Navbar menu #}
-    <div id="navbarMenuContent" class="navbar-menu">
+    <div id="navbarMenuContent" :class="open ? 'navbar-menu is-active' : 'navbar-menu'">
         {# <div class="navbar-start"> #}
             {# Navbar links #}
             {# </div> #}
