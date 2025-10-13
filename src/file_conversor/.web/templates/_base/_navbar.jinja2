@@ -1,0 +1,51 @@
+{# src\file_conversor\.web\templates\_base\_navbar.jinja2 #}
+
+{% import '_macros.jinja2' as macros %}
+
+<nav class="navbar is-fixed-top is-light has-border has-shadow is-flex is-justify-content-space-between is-align-items-center"
+    role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        {# Logo #}
+        <a class="navbar-item" href="{{ url_for('index') }}">
+            <img height="140" src="{{ url_for('icons', filename='icon.png') }}" alt="">
+            <span class="is-size-6 has-text-weight-bold">File Conversor</span>
+        </a>
+
+        {# Navbar burger for mobile view #}
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenuContent">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    {# Title #}
+    <div class="navbar-title is-flex  is-align-items-center">
+        {# Center-aligned items (if any) can go here #}
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                {% for item in breadcrumb_items %}
+                <li class="{{ 'is-active' if item.active else '' }}"><a href="{{ item.url }}">{{ item.label }}</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+
+    {# Navbar menu #}
+    <div id="navbarMenuContent" class="navbar-menu">
+        {# <div class="navbar-start"> #}
+            {# Navbar links #}
+            {# </div> #}
+
+        <div class="navbar-end">
+            {# Right-aligned items (if any) can go here #}
+            {{ macros.navbar_item({
+            'label': exit_label | default("Shutdown App"),
+            'url': url_for('api_shutdown'),
+            'img': url_for('icons', filename='pwr_btn.ico'),
+            'reverse': True,
+            }) }}
+        </div>
+    </div>
+</nav>

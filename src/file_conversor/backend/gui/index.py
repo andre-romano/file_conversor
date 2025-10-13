@@ -108,28 +108,6 @@ def index():
             },
             'url': url_for('hash_index'),
         },
-    ])
-
-    # UTILS CONFIG
-    if CURR_PLATFORM == PLATFORM_WINDOWS:
-        tools.append({
-            'media': {
-                'image': {'src': url_for('icons', filename='win.ico')},
-                'title': _("Windows Tools"),
-                'subtitle': _("Windows OS commands (for Windows ONLY)"),
-            },
-            'url': url_for('win_index'),
-        })
-
-    tools.extend([
-        {
-            'media': {
-                'image': {'src': url_for('icons', filename='config.ico')},
-                'title': _("Configuration"),
-                'subtitle': _("Configure application default options"),
-            },
-            'url': url_for('config_index'),
-        },
         {
             'media': {
                 'image': {'src': url_for('icons', filename='pipeline.ico')},
@@ -138,13 +116,34 @@ def index():
             },
             'url': url_for('pipeline_index'),
         },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='config.ico')},
+                'title': _("Configuration"),
+                'subtitle': _("Configure application default options"),
+            },
+            'url': url_for('config_index'),
+        },
     ])
-    return render_template('index.jinja2', tools=tools)
+
+    return render_template(
+        'index.jinja2',
+        tools=tools,
+        breadcrumb_items=[{
+            'label': _("Home"),
+            'url': url_for('index'),
+            'active': True,
+        }],
+    )
 
 
-routes = [FlaskRoute(
-    rule="/",
-    handler=index
-)]
+def routes():
+    return [
+        FlaskRoute(
+            rule="/",
+            handler=index
+        ),
+    ]
+
 
 __all__ = ['routes']

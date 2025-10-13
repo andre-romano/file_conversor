@@ -36,7 +36,7 @@ EXTERNAL_DEPENDENCIES = HashBackend.EXTERNAL_DEPENDENCIES
 @typer_cmd.command(
     name=CREATE_NAME,
     help=f"""
-        {_('Creates hash file (.sha256, .sha1, etc).')}        
+        {_('Creates a hash file (.sha256, .sha1, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 

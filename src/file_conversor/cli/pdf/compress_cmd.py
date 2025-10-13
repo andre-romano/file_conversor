@@ -63,7 +63,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=COMPRESS_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Compress a PDF file (requires Ghostscript external library).')}
+        {_('Reduce the file size of a PDF document (requires Ghostscript external library).')}
         
         {_('Outputs a file with _compressed at the end.')}
     """,

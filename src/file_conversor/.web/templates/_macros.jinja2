@@ -47,3 +47,39 @@
     </a>
 </div>
 {% endmacro %}
+
+{# NAVBAR #}
+
+{% macro navbar_item(item) %}
+<a class="navbar-item {{ item.get('classes', '') }}" href="{{ item.url }}">
+    {% if item.reverse %}
+    {{ item.label }}
+    {% endif %}
+    {% if item.icon %}
+    <span class="icon">
+        <i class="{{ item.icon }}"></i>
+    </span>
+    {% endif %}
+    {% if item.img %}
+    <figure class="image is-24x24">
+        <img src="{{ item.img }}" alt="{{ item.label }}">
+    </figure>
+    {% endif %}
+    {% if not item.reverse %}
+    {{ item.label }}
+    {% endif %}
+</a>
+{% endmacro %}
+
+{% macro navbar_dropdown(label, items) %}
+<div class="navbar-item has-dropdown is-hoverable is-light">
+    <a class="navbar-link">
+        {{ label }}
+    </a>
+    <div class="navbar-dropdown">
+        {% for item in items %}
+        {{ navbar_item(item) }}
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}

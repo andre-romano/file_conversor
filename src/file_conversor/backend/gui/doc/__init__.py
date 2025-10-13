@@ -2,13 +2,22 @@
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
-from file_conversor.backend.gui.doc.index import doc_index
+from file_conversor.backend.gui.doc._index import doc_index
 
-routes = [
-    FlaskRoute(
-        rule="/doc",
-        handler=doc_index
-    )
-]
+from file_conversor.backend.gui.doc.convert import doc_convert
+
+
+def routes():
+    return [
+        FlaskRoute(
+            rule="/doc",
+            handler=doc_index
+        ),
+        FlaskRoute(
+            rule="/doc/convert",
+            handler=doc_convert
+        ),
+    ]
+
 
 __all__ = ['routes']

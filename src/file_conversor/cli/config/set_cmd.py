@@ -34,7 +34,7 @@ EXTERNAL_DEPENDENCIES = set()
 @typer_cmd.command(
     name=SET_NAME,
     help=f"""
-        {_('Configure the default options for the file converter.')}
+        {_('Configure the default options for the app.')}
     """,
     epilog=f"""
         **{_('Examples')}:** 

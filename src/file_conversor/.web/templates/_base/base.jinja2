@@ -1,0 +1,30 @@
+{# src\file_conversor\.web\templates\_base\base.jinja2 #}
+
+<!DOCTYPE html>
+<html lang="en" class="has-navbar-fixed-top has-status-bar-fixed-bottom">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}app_title{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('icons', filename='icon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('icons', filename='icon.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
+</head>
+
+<body>
+    {% include '_base/_navbar.jinja2' %}
+
+    <div id="main-app" class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% include '_base/_footer.jinja2' %}
+    {% include '_base/_status_bar.jinja2' %}
+</body>
+
+</html>

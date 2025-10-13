@@ -12,9 +12,13 @@ def icons(filename):
     return send_from_directory(icons_path, filename)
 
 
-routes = [FlaskRoute(
-    rule="/icons/<path:filename>",
-    handler=icons,
-)]
+def routes():
+    return [
+        FlaskRoute(
+            rule="/icons/<path:filename>",
+            handler=icons,
+        )
+    ]
+
 
 __all__ = ['routes']

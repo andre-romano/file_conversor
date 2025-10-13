@@ -56,7 +56,7 @@ ctx_menu.register_callback(register_ctx_menu)
 @typer_cmd.command(
     name=CHECK_NAME,
     help=f"""
-        {_('Checks a text file (json, xml, yaml, etc).')}        
+        {_('Checks a text file schema compliance (json, xml, yaml, etc).')}        
     """,
     epilog=f"""
 **{_('Examples')}:** 

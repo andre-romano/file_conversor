@@ -56,7 +56,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=ENHANCE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Enhance image file color, brightness, contrast, or sharpness.')}
+        {_('Enhance image color, brightness, contrast, or sharpness.')}
     """,
     epilog=f"""
         **{_('Examples')}:**

@@ -2,14 +2,23 @@
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
-from file_conversor.backend.gui.ppt.index import ppt_index
+from file_conversor.backend.gui.ppt._index import ppt_index
+
+from file_conversor.backend.gui.ppt.convert import ppt_convert
 
 
-routes = [
-    FlaskRoute(
-        rule="/ppt",
-        handler=ppt_index
-    )
-]
+def routes():
+    return [
+        FlaskRoute(
+            rule="/ppt",
+            handler=ppt_index,
+        ),
+        # TOOLS
+        FlaskRoute(
+            rule="/ppt/convert",
+            handler=ppt_convert,
+        ),
+    ]
+
 
 __all__ = ['routes']

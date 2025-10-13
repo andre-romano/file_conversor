@@ -2,13 +2,16 @@
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
-from file_conversor.backend.gui.config.index import config_index
+from file_conversor.backend.gui.config._index import config_index
 
-routes = [
-    FlaskRoute(
-        rule="/config",
-        handler=config_index
-    )
-]
+
+def routes():
+    return [
+        FlaskRoute(
+            rule="/config",
+            handler=config_index
+        ),
+    ]
+
 
 __all__ = ['routes']

@@ -59,7 +59,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=OCR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Create a searchable PDF file using OCR.')}
+        {_('Create a searchable PDF file from scanned documents using OCR.')}
 
         {_('Outputs a text searchable PDF file.')}
     """,

@@ -58,7 +58,7 @@ ctx_menu.register_callback(register_ctx_menu)
     name=REPAIR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Repair (lightly) corrupted PDF files.')}        
+        {_('Attempt to repair a corrupted PDF file.')}        
         
         {_('Outputs a file with _repaired at the end.')}
     """,

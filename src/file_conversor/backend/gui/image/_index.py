@@ -1,0 +1,139 @@
+# src/file_conversor/backend/gui/image/index.py
+
+from flask import render_template, url_for
+
+# user-provided modules
+from file_conversor.config import Configuration, Environment, Log, State
+from file_conversor.config.locale import get_translation
+
+# Get app config
+CONFIG = Configuration.get_instance()
+STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger()
+
+
+def image_index():
+    tools = [
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='convert.ico')},
+                'title': _("Convert files"),
+                'subtitle': _("Convert a image file to a different format."),
+            },
+            'url': url_for('image_convert'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='svg.ico')},
+                'title': _("Render vector"),
+                'subtitle': _("Render an image vector file into a different format."),
+            },
+            'url': url_for('image_render'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='pdf.ico')},
+                'title': _("To PDF"),
+                'subtitle': _("Convert a images to one PDF file, one image per page."),
+            },
+            'url': url_for('image_to_pdf'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='compress.ico')},
+                'title': _("Compress file"),
+                'subtitle': _("Compress an image file (requires external libraries)."),
+            },
+            'url': url_for('image_compress'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='left_right.ico')},
+                'title': _("Mirror / Flip"),
+                'subtitle': _("Mirror an image file (vertically or horizontally)."),
+            },
+            'url': url_for('image_mirror'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='rotate_right.ico')},
+                'title': _("Rotate"),
+                'subtitle': _("Rotate a image file (clockwise or anti-clockwise)."),
+            },
+            'url': url_for('image_rotate'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='resize.ico')},
+                'title': _("Resize"),
+                'subtitle': _("Resize an image file resolution (upscale or downscale)."),
+            },
+            'url': url_for('image_resize'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='diagonal_line.ico')},
+                'title': _("Antialias"),
+                'subtitle': _("Applies antialias filter to an image file."),
+            },
+            'url': url_for('image_antialias'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='blur.ico')},
+                'title': _("Blur"),
+                'subtitle': _("Applies gaussian blur to an image file."),
+            },
+            'url': url_for('image_blur'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='color.ico')},
+                'title': _("Enhance"),
+                'subtitle': _("Enhance image color, brightness, contrast, or sharpness."),
+            },
+            'url': url_for('image_enhance'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='filter.ico')},
+                'title': _("Filter"),
+                'subtitle': _("Applies multiples filters to an image file."),
+            },
+            'url': url_for('image_filter'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='sharpener.ico')},
+                'title': _("Sharpen"),
+                'subtitle': _("Applies unsharp mask to an image file."),
+            },
+            'url': url_for('image_unsharp'),
+        },
+        {
+            'media': {
+                'image': {'src': url_for('icons', filename='info.ico')},
+                'title': _("Get info"),
+                'subtitle': _("Get EXIF information about a image file."),
+            },
+            'url': url_for('image_info'),
+        },
+    ]
+    return render_template(
+        'image/index.jinja2',
+        tools=tools,
+        breadcrumb_items=[
+            {
+                'label': _("Home"),
+                'url': url_for('index'),
+            },
+            {
+                'label': _("Image"),
+                'url': url_for('image_index'),
+                'active': True,
+            },
+        ],
+    )

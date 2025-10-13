@@ -32,6 +32,10 @@ body nav.navbar.is-fixed-top {
     height: var(--bulma-navbar-height);
 }
 
+body nav.navbar.is-fixed-top .navbar-menu {
+    flex-grow: 0;
+}
+
 body nav.navbar.is-fixed-top.has-border {
     border-top: 1px solid var(--bulma-navbar-border-color);
     border-bottom: 1px solid var(--bulma-navbar-border-color);

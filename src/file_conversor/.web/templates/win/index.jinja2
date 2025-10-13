@@ -1,0 +1,22 @@
+{# src\file_conversor\.web\templates\win\index.jinja2 #}
+{% import '_macros.jinja2' as macros %}
+{% extends '_base/base.jinja2' %}
+
+{% block title %}File Conversor - Windows Tools{% endblock %}
+
+{% block content %}
+<div class="grid is-col-min-12 is-gap-2">
+  {% for tool in tools %}
+  <div class="cell">
+    {{
+    macros.card(
+    image=tool.image | default({}),
+    media=tool.media | default({}),
+    content=tool.content | default(""),
+    url=tool.url | default("#"),
+    )
+    }}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
