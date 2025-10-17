@@ -1,12 +1,45 @@
 {# src\file_conversor\.web\templates\_base\_status_bar.jinja2 #}
 
-<div
-    class="status-bar is-fixed-bottom is-flex is-justify-content-space-between is-align-items-center is-size-6 p-1 pl-3 pr-3">
+<div x-data="{}" class="
+    status-bar 
+    is-fixed-bottom 
+    is-flex is-justify-content-space-between is-align-items-center 
+    is-size-6 p-1 pl-3 pr-3">
     <div class="status-bar-start is-flex is-align-items-center">
-        <span class="has-text-weight-bold">STATUS: </span>
-        <span class="status-message">{{ status_message | default("Ready") }}</span>
+        <span class="has-text-weight-bold mr-2" :class="{
+        'is-flex': (typeof $store.status_bar.message === 'string'), 
+        'is-hidden': (typeof $store.status_bar.message !== 'string'),
+        }">STATUS:</span>
+        <span class="status-message" x-text="$store.status_bar.message"></span>
     </div>
-    <div class="status-bar-end is-flex is-align-items-center">
-        <span class="status-time">{{ status_time | default("") }}</span>
+    <div class="status-bar-center is-align-items-center is-flex-grow-1 mx-6 px-6" :class="{
+        'is-flex': (typeof $store.status_bar.progress === 'number'), 
+        'is-hidden': (typeof $store.status_bar.progress !== 'number'),
+        }">
+        <progress class="status-progress-bar progress is-small is-success my-0 mr-3"
+            :value="(typeof $store.status_bar.progress === 'number') ? $store.status_bar.progress : null"
+            max="100"></progress>
+        <span class="status-progress-text" x-text="`${Math.round($store.status_bar.progress)}%`"></span>
+    </div>
+    <div class="status-bar-end is-align-items-center" :class="{
+        'is-flex': (typeof $store.status_bar.time === 'number'),
+        'is-hidden': (typeof $store.status_bar.time !== 'number'),
+        }">
+        <span class="status-time" x-text="
+        new Date($store.status_bar.time * 1000)
+            .toISOString()
+            .substring(11, 19)
+        "></span>
     </div>
 </div>
+
+<script>
+    // JavaScript to create status bar global state
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('status_bar', {
+            message: null,
+            progress: null,
+            time: null,
+        });
+    });
+</script>

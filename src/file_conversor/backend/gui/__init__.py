@@ -5,6 +5,8 @@ from file_conversor.backend.gui.flask_app import FlaskApp
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 # routes
+from file_conversor.backend.gui._translations import ctx_processors as translations_ctx_processors
+
 from file_conversor.backend.gui._api import routes as api_routes
 
 from file_conversor.backend.gui.audio import routes as audio_routes
@@ -36,6 +38,9 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 fapp = FlaskApp.get_instance()
+
+# add context processors
+fapp.add_context_processor(translations_ctx_processors)
 
 # api
 fapp.add_route(api_routes())

@@ -77,6 +77,11 @@ class FlaskApp:
             self.routes.add(route)
         return self
 
+    def add_context_processor(self, func: Callable[..., dict[str, Any]]) -> Self:
+        """Add a new context processor to the Flask application."""
+        self.app.context_processor(func)
+        return self
+
     def run(self, open_browser: bool) -> None:
         """Run the Flask server and the webview window."""
         flask_thread = threading.Thread(target=self._run_flask, daemon=True)
