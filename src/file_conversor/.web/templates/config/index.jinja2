@@ -10,7 +10,7 @@
     Alpine.store('configForm', {
       category: 'general',
       isValid: true,
-      sendConfig: async (form) => {
+      async sendConfig(form) {
         let modal = Alpine.store('modal');
         modal.title = '{{ config_index.config_saved.title }}';
         try {
@@ -93,7 +93,7 @@
   <div class="field is-grouped is-grouped-right mt-5">
     <p class="control">
       <button type="button" class="button is-primary" :disabled="!$store.configForm.isValid"
-        @click="sendConfig($event.target.form)">
+        @click="$store.configForm.sendConfig($event.target.form)">
         {{ config_index.save_changes }}
       </button>
     </p>
