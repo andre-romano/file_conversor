@@ -23,6 +23,9 @@ class AbstractFFmpegBackend(AbstractBackend):
     AbstractFFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
+    ENCODING_SPEEDS = ["fast", "medium", "slow"]
+    QUALITY_PRESETS = ["high", "medium", "low"]
+
     SUPPORTED_IN_AUDIO_FORMATS = {
         'aac': {},
         'ac3': {},

@@ -5,8 +5,6 @@ from file_conversor.backend.gui.flask_app import FlaskApp
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 # routes
-from file_conversor.backend.gui._translations import ctx_processors as translations_ctx_processors
-
 from file_conversor.backend.gui._api import routes as api_routes
 
 from file_conversor.backend.gui.audio import routes as audio_routes
@@ -39,8 +37,22 @@ logger = LOG.getLogger()
 
 fapp = FlaskApp.get_instance()
 
+
 # add context processors
-fapp.add_context_processor(translations_ctx_processors)
+fapp.add_context_processor(lambda: {
+    'app': {
+        'title': 'File Conversor',
+        'version': Environment.get_version(),
+    },
+    '_base_navbar': {
+        'shutdown': {
+            'btn_label': _('Shutdown'),
+            'title': _('Server Shutdown'),
+            'success': _('Server has been shut down successfully. Restart the app to use it again.'),
+            'error': _('Unable to shut down the server'),
+        },
+    }
+})
 
 # api
 fapp.add_route(api_routes())

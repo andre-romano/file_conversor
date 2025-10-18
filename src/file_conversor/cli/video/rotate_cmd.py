@@ -86,8 +86,8 @@ def rotate(
 
     video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
-    video_quality: Annotated[str | None, VideoQualityOption()] = CONFIG["video-quality"],
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
+    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG["video-quality"],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

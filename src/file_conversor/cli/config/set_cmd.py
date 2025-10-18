@@ -8,10 +8,11 @@ from typing import Annotated
 from rich import print
 
 # user-provided modules
-from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
 import file_conversor.cli.config.show_cmd as show_cmd
 
-from file_conversor.backend import Img2PDFBackend, PillowBackend, FFmpegBackend
+from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
+
+from file_conversor.backend import Img2PDFBackend, PillowBackend, FFmpegBackend, GhostscriptBackend
 from file_conversor.config import Configuration, State, Log, locale, get_translation, AVAILABLE_LANGUAGES
 
 from file_conversor.utils.typer_utils import VideoEncodingSpeedOption, VideoQualityOption
@@ -65,16 +66,6 @@ def set(
                                       min=1, max=65535,
                                       )] = CONFIG["port"],
 
-    window_width: Annotated[int, typer.Option("--window-width", "-ww",
-                                              help=_("Set the width of the GUI window."),
-                                              min=200,
-                                              )] = CONFIG["window_width"],
-
-    window_height: Annotated[int, typer.Option("--window-height", "-wh",
-                                               help=_("Set the height of the GUI window."),
-                                               min=100,
-                                               )] = CONFIG["window_height"],
-
     audio_bitrate: Annotated[int, typer.Option("--audio-bitrate", "-ab",
                                                help=f"{_("Audio bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
                                                callback=lambda x: check_positive_integer(x, allow_zero=True),
@@ -86,13 +77,13 @@ def set(
                                                )] = CONFIG["video-bitrate"],
 
     video_format: Annotated[str, typer.Option("--video-format", "-vf",
-                                              help=f"{_("Video format.")} {_('Available formats:')} {", ".join(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)}",
-                                              callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS),
+                                              help=f"{_("Video format.")} {_('Available formats:')} {", ".join(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)}",
+                                              callback=lambda x: check_valid_options(x, FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS),
                                               )] = CONFIG["video-format"],
 
-    video_encoding_speed: Annotated[str, VideoEncodingSpeedOption()] = CONFIG["video-encoding-speed"],
+    video_encoding_speed: Annotated[str, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
 
-    video_quality: Annotated[str, VideoQualityOption()] = CONFIG["video-quality"],
+    video_quality: Annotated[str, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG["video-quality"],
 
     image_quality: Annotated[int, typer.Option("--image-quality", "-iq",
                                                help=_("Image quality (for ``image convert`` command). Valid values are between 1-100."),
@@ -120,16 +111,14 @@ def set(
                                                   )] = CONFIG["image-resampling"],
 
     pdf_compression: Annotated[str, typer.Option("--pdf-compression", "-pc",
-                                                 help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(["low", "medium", "high", "none"])}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
-                                                 callback=lambda x: check_valid_options(x, ["low", "medium", "high", "none"]),
+                                                 help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                                 callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                                  )] = CONFIG["pdf-compression"],
 ):
     # update the configuration dictionary
     CONFIG.update({
         "host": host,
         "port": port,
-        "window_width": window_width,
-        "window_height": window_height,
         "language": language,
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),
         "audio-bitrate": audio_bitrate,

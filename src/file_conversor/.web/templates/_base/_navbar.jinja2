@@ -42,7 +42,7 @@
         <div class="navbar-end">
             {# Right-aligned items (if any) can go here #}
             <a class="navbar-item" href="#" onclick="window.navbar_api_shutdown()">
-                {{ i18n.shutdown.btn_label }}
+                {{ _base_navbar.shutdown.btn_label }}
                 <figure class="image is-24x24">
                     <img src="{{ url_for('icons', filename='pwr_btn.ico') }}" alt="">
                 </figure>
@@ -56,10 +56,10 @@
         window.navbar_api_shutdown = () => {
             fetch('/api/shutdown', { method: 'GET' })
                 .then(response => {
-                    msg = `Error: {{ i18n.shutdown.error }} ${response.status} ${response.statusText}`;
+                    msg = `Error: {{ _base_navbar.shutdown.error }} ${response.status} ${response.statusText}`;
                     console.log(msg);
                     Alpine.store("modal").open = true;
-                    Alpine.store("modal").title = `{{ i18n.shutdown.title }}`;
+                    Alpine.store("modal").title = `{{ _base_navbar.shutdown.title }}`;
                     Alpine.store("modal").content_html = msg;
                     Alpine.store("modal").footer_html = '';
                     Alpine.store("modal").closeable = true;
@@ -67,8 +67,8 @@
                 .catch(error => {
                     console.log('Server shut down');
                     Alpine.store("modal").open = true;
-                    Alpine.store("modal").title = `{{ i18n.shutdown.title }}`;
-                    Alpine.store("modal").content_html = `{{ i18n.shutdown.success }}`;
+                    Alpine.store("modal").title = `{{ _base_navbar.shutdown.title }}`;
+                    Alpine.store("modal").content_html = `{{ _base_navbar.shutdown.success }}`;
                     Alpine.store("modal").footer_html = '';
                     Alpine.store("modal").closeable = false;
                 });

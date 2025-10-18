@@ -204,23 +204,23 @@ def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = Fals
     )
 
 
-def VideoEncodingSpeedOption(prompt: bool | str = False) -> OptionInfo:
+def VideoEncodingSpeedOption(options: list[str], prompt: bool | str = False) -> OptionInfo:
     """--video-encoding-speed, -ves"""
     return typer.Option(
         "--video-encoding-speed", "-ves",
-        help=f'{_("Video encoding speed/quality trade-off. Available options are:")} {", ".join(["fast", "medium", "slow"])}. {_("Faster encoding speed usually results in lower video quality and larger file size")}. {_("Defaults to 'medium'")}.',
+        help=f'{_("Video encoding speed/quality trade-off. Available options are:")} {", ".join(options)}. {_("Faster encoding speed usually results in lower video quality and larger file size")}. {_("Defaults to 'medium'")}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, ["fast", "medium", "slow"]),
+        callback=lambda x: check_valid_options(x, options),
     )
 
 
-def VideoQualityOption(prompt: bool | str = False) -> OptionInfo:
+def VideoQualityOption(options: list[str], prompt: bool | str = False) -> OptionInfo:
     """--video-quality, -vq"""
     return typer.Option(
         "--video-quality", "-vq",
-        help=f'{_("Video quality preset. Available options are:")} {", ".join(["high", "medium", "low"])}. {_("Higher quality usually results in larger file size. Video bitrate (if set) overrides this setting.")}. {_("Defaults to 'medium'")}.',
+        help=f'{_("Video quality preset. Available options are:")} {", ".join(options)}. {_("Higher quality usually results in larger file size. Video bitrate (if set) overrides this setting.")}. {_("Defaults to 'medium'")}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, ["high", "medium", "low"]),
+        callback=lambda x: check_valid_options(x, options),
     )
 
 

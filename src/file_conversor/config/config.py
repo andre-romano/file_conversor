@@ -30,8 +30,6 @@ class Configuration:
         self.__data = {
             "host": "127.0.0.1",       # Default host IP address (flask app)
             "port": 5000,              # Default port (flask app)
-            "window_width": 1024,      # Default GUI window width
-            "window_height": 640,      # Default GUI window height
             "language": language,      # Default: system language or "en_US"
             "install-deps": True,      # Default: ask user to confirm dependency installation
             "audio-bitrate": 0,        # Default audio bitrate in kbps
