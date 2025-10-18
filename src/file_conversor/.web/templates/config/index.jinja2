@@ -1,109 +1,46 @@
 {# src\file_conversor\.web\templates\config\index.jinja2 #}
-{% import '_macros.jinja2' as macros %}
+{% import '_macros_form.jinja2' as fmacro %}
 {% extends '_base/base.jinja2' %}
 
 {% block title %}File Conversor - Config{% endblock %}
 
 {% block content %}
-<form x-data="{
-    category: {
-        value: '{{ config_index.category.current }}',
-    },     
-    language: {
-        value: '{{ config_index.language.current }}',
-        isValid: true,
-    },
-    host: {
-        value: '{{ config_index.host.current }}',
-        isValid: true,
-    },
-    port: {
-        value: '{{ config_index.port.current }}',
-        isValid: true,
-    },
-    install_deps: {
-        value: {{ 'true' if config_index.install_deps.current else 'false' }},
-    },
-    audio: {
-        bitrate: {
-            value: '{{ config_index.audio.bitrate.current }}',
-            isValid: true,
-        },
-    },
-    video: {
-        bitrate: {
-            value: '{{ config_index.video.bitrate.current }}',
-            isValid: true,
-        },
-        format: {
-            value: '{{ config_index.video.format.current }}',
-            isValid: true,
-        },
-        encoding_speed: {
-            value: '{{ config_index.video.encoding_speed.current }}',
-            isValid: true,
-        },
-        quality: {
-            value: '{{ config_index.video.quality.current }}',
-            isValid: true,
-        },
-    },
-    image: {
-        quality: {
-            value: '{{ config_index.image.quality.current }}',
-            isValid: true,
-        },
-        dpi: {
-            value: '{{ config_index.image.dpi.current }}',
-            isValid: true,
-        },
-        fit: {
-            value: '{{ config_index.image.fit.current }}',
-            isValid: true,
-        },  
-        page_size: {
-            value: '{{ config_index.image.page_size.current }}',
-            isValid: true,
-        },
-        resampling: {
-            value: '{{ config_index.image.resampling.current }}',
-            isValid: true,
-        },
-    },
-    pdf: {
-        compression: {
-            value: '{{ config_index.pdf.compression.current }}',
-            isValid: true,
-        },
-    },
-    async sendConfig(form) {
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.store('configForm', {
+      category: 'general',
+      isValid: true,
+      sendConfig: async (form) => {
         let modal = Alpine.store('modal');
         modal.title = '{{ config_index.config_saved.title }}';
         try {
-            const response = await fetch(`{{ url_for('api_config') }}`, {
-                method: 'POST',
-                body: new FormData(form)
-            });
-            const data = await response.json();
-            if (response.ok) {
-                modal.content_html = `<p>{{ config_index.config_saved.success }}</p>`;
-            } else {
-                modal.content_html = `<p>{{ config_index.config_saved.error }} ${response.statusText} - ${JSON.stringify(data)}</p>`;
-            }
+          const response = await fetch(`{{ url_for('api_config') }}`, {
+            method: 'POST',
+            body: new FormData(form)
+          });
+          const data = await response.json();
+          if (response.ok) {
+            modal.content_html = `<p>{{ config_index.config_saved.success }}</p>`;
+          } else {
+            modal.content_html = `<p>{{ config_index.config_saved.error }} ${response.statusText} - ${JSON.stringify(data)}</p>`;
+          }
         } catch (error) {
-            modal.content_html = `<p>{{ config_index.config_saved.error }} - ${error.message}</p>`;
+          modal.content_html = `<p>{{ config_index.config_saved.error }} - ${error.message}</p>`;
         }
         modal.open = true;
-    }
-}" action="" method="post">
+      },
+    });
+  });
+</script>
 
+<form x-data="{}" action="" method="post">
   <div class="tabs is-boxed is-toggle is-toggle-rounded is-fullwidth mx-4">
     <ul>
       {% for category_val, category_label in config_index.category.available %}
       <li :class="{
-        'is-active': category.value === '{{ category_val }}',
+        'is-active': $store.configForm.category === '{{ category_val }}',
       }">
-        <a @click.prevent="category.value = '{{ category_val }}'">
+        <a @click.prevent="$store.configForm.category = '{{ category_val }}'">
           <span>{{ category_label }}</span>
         </a>
       </li>
@@ -113,350 +50,54 @@
 
   {# GENERAL SETTINGS #}
   <div :class="{
-    'is-hidden': category.value !== 'general',
+    'is-hidden': $store.configForm.category !== 'general',
   }">
-
-    {# LANGUAGE #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.language.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="is-flex is-flex-direction-column is-flex-grow-5">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="language.value" name="language" class="is-flex-grow-1">
-              {% for lang in config_index.language.available %}
-              <option value="{{ lang }}"> {{ lang }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-    'is-danger': !language.isValid,
-    'is-success': language.isValid,
-    }">{{ config_index.language.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# INSTALL DEPENDENCIES #}
-    <div class="field is-flex is-justify-content-flex-end">
-      <label class="checkbox">
-        <input x-model="install_deps.value" type="checkbox" name="install-deps" />
-        {{ config_index.install_deps.label }}
-      </label>
-    </div>
-
+    {% include "config/_general.jinja2" %}
     {# GENERAL SETTINGS - END #}
   </div>
 
   {# NETWORK SETTINGS #}
   <div :class="{
-    'is-hidden': category.value !== 'network',
+    'is-hidden': $store.configForm.category !== 'network',
   }">
-    {# Host IP Address #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.host.label }} / {{ config_index.port.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="control is-flex-grow-1">
-          <input x-model="host.value"
-            @input.debounce.300ms="host.isValid = host.value.split('.').length === 4 && host.value.split('.').every(part => part.trim().length > 0 && !isNaN(part))"
-            :class="{
-        'is-danger': !host.isValid,
-        'is-success': host.isValid,
-      }" class="input" name="host" type="text" placeholder="{{ config_index.host.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !host.isValid,
-    'is-success': host.isValid,
-    }">{{ config_index.host.help }}</p>
-        </div>
-        <div class="control is-flex mt-2">&nbsp;:&nbsp;</div>
-        <div class="control is-flex-grow-1">
-          <input x-model="port.value"
-            @input.debounce.300ms="port.isValid = Number.isInteger(parseInt(port.value)) && parseInt(port.value) > 0 && parseInt(port.value) < 65536"
-            :class="{
-        'is-danger': !port.isValid,
-        'is-success': port.isValid,
-      }" class="input" name="port" type="text" placeholder="{{ config_index.port.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !port.isValid,
-    'is-success': port.isValid,
-    }">{{ config_index.port.help }}</p>
-        </div>
-      </div>
-    </div>
-
+    {% include "config/_network.jinja2" %}
     {# NETWORK SETTINGS - END #}
   </div>
 
   {# AUDIO & VIDEO SETTINGS #}
   <div :class="{
-    'is-hidden': category.value !== 'audio_video',
+    'is-hidden': $store.configForm.category !== 'audio_video',
   }">
-    {# AUDIO BITRATE #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.audio.bitrate.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="control is-flex-grow-1">
-          <input x-model="audio.bitrate.value"
-            @input.debounce.300ms="audio.bitrate.isValid = Number.isInteger(parseInt(audio.bitrate.value)) && parseInt(audio.bitrate.value) >= 0"
-            :class="{
-        'is-danger': !audio.bitrate.isValid,
-        'is-success': audio.bitrate.isValid,
-      }" class="input" name="audio-bitrate" type="text" placeholder="{{ config_index.audio.bitrate.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !audio.bitrate.isValid,
-    'is-success': audio.bitrate.isValid,
-    }">{{ config_index.audio.bitrate.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# VIDEO BITRATE #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.video.bitrate.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="control is-flex-grow-1">
-          <input x-model="video.bitrate.value"
-            @input.debounce.300ms="video.bitrate.isValid = Number.isInteger(parseInt(video.bitrate.value)) && parseInt(video.bitrate.value) >= 0"
-            :class="{
-        'is-danger': !video.bitrate.isValid,
-        'is-success': video.bitrate.isValid,
-      }" class="input" name="video-bitrate" type="text" placeholder="{{ config_index.video.bitrate.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !video.bitrate.isValid,
-    'is-success': video.bitrate.isValid,
-    }">{{ config_index.video.bitrate.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# VIDEO FORMAT #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.video.format.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="is-flex is-flex-direction-column is-flex-grow-5">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="video.format.value" name="video-format" class="is-flex-grow-1">
-              {% for format in config_index.video.format.available %}
-              <option value="{{ format }}"> {{ format }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-    'is-danger': !video.format.isValid,
-    'is-success': video.format.isValid,
-    }">{{ config_index.video.format.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# VIDEO ENCODING SPEED #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.video.encoding_speed.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="is-flex is-flex-direction-column is-flex-grow-5">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="video.encoding_speed.value" name="video-encoding-speed" class="is-flex-grow-1">
-              {% for speed in config_index.video.encoding_speed.available %}
-              <option value="{{ speed }}"> {{ speed }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-            'is-danger': !video.encoding_speed.isValid,
-            'is-success': video.encoding_speed.isValid,
-          }">{{ config_index.video.encoding_speed.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# VIDEO QUALITY #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.video.quality.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="is-flex is-flex-direction-column is-flex-grow-5">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="video.quality.value" name="video-quality" class="is-flex-grow-1">
-              {% for quality in config_index.video.quality.available %}
-              <option value="{{ quality }}"> {{ quality }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-            'is-danger': !video.quality.isValid,
-            'is-success': video.quality.isValid,
-          }">{{ config_index.video.quality.help }}</p>
-        </div>
-      </div>
-    </div>
-
+    {% include "config/_audio_video.jinja2" %}
     {# AUDIO & VIDEO SETTINGS - END #}
   </div>
 
   {# IMAGE SETTINGS #}
   <div :class="{
-    'is-hidden': category.value !== 'image',
+    'is-hidden': $store.configForm.category !== 'image',
   }">
-    {# image quality #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.image.quality.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="control is-flex-grow-1">
-          <input x-model="image.quality.value"
-            @input.debounce.300ms="image.quality.isValid = Number.isInteger(parseInt(image.quality.value)) && parseInt(image.quality.value) > 0 && parseInt(image.quality.value) <= 100"
-            :class="{
-        'is-danger': !image.quality.isValid,
-        'is-success': image.quality.isValid,
-      }" class="input" name="image-quality" type="number" placeholder="{{ config_index.image.quality.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !image.quality.isValid,
-    'is-success': image.quality.isValid,
-    }">{{ config_index.image.quality.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# image dpi #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.image.dpi.label }}</label>
-      </div>
-      <div class="field-body is-flex">
-        <div class="control is-flex-grow-1">
-          <input x-model="image.dpi.value"
-            @input.debounce.300ms="image.dpi.isValid = Number.isInteger(parseInt(image.dpi.value)) && parseInt(image.dpi.value) >= 40 && parseInt(image.dpi.value) <= 3600"
-            :class="{
-        'is-danger': !image.dpi.isValid,
-        'is-success': image.dpi.isValid,
-      }" class="input" name="image-dpi" type="number" placeholder="{{ config_index.image.dpi.placeholder }}">
-          <p class="help" :class="{
-    'is-danger': !image.dpi.isValid,
-    'is-success': image.dpi.isValid,
-    }">{{ config_index.image.dpi.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# image fit #}
-    <div class="field is-horizontal">
-      <div class="field-label is-flex-grow-1">
-        <label class="label">{{ config_index.image.fit.label }}</label>
-      </div>
-      <div class="field-body is-flex is-flex-direction-column is-flex-grow-5">
-        <div class="select is-flex is-flex-grow-1">
-          <select x-model="image.fit.value" name="image-fit" class="is-flex-grow-1">
-            {% for fit in config_index.image.fit.available %}
-            <option value="{{ fit }}"> {{ fit }} </option>
-            {% endfor %}
-          </select>
-        </div>
-        <p class="help" :class="{
-          'is-danger': !image.fit.isValid,
-          'is-success': image.fit.isValid,
-        }">{{ config_index.image.fit.help }}</p>
-      </div>
-    </div>
-
-    {# image page size #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.image.page_size.label }}</label>
-      </div>
-      <div class="field-body is-flex is-flex-grow-5">
-        <div class="control is-flex is-flex-direction-column is-flex-grow-1">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="image.page_size.value" name="image-page-size" class="is-flex-grow-1">
-              {% for size in config_index.image.page_size.available %}
-              <option value="{{ size }}"> {{ size }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-            'is-danger': !image.page_size.isValid,
-            'is-success': image.page_size.isValid,
-          }">{{ config_index.image.page_size.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# image resampling #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.image.resampling.label }}</label>
-      </div>
-      <div class="field-body is-flex is-flex-grow-5">
-        <div class="control is-flex is-flex-direction-column is-flex-grow-1">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="image.resampling.value" name="image-resampling" class="is-flex-grow-1">
-              {% for method in config_index.image.resampling.available %}
-              <option value="{{ method }}"> {{ method }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-            'is-danger': !image.resampling.isValid,
-            'is-success': image.resampling.isValid,
-          }">{{ config_index.image.resampling.help }}</p>
-        </div>
-      </div>
-    </div>
-
-
+    {% include "config/_image.jinja2" %}
     {# IMAGE SETTINGS - END #}
   </div>
 
 
   {# PDF SETTINGS #}
   <div :class="{
-    'is-hidden': category.value !== 'pdf',
+    'is-hidden': $store.configForm.category !== 'pdf',
   }">
-    {# pdf compression #}
-    <div class="field is-horizontal">
-      <div class="field-label">
-        <label class="label">{{ config_index.pdf.compression.label }}</label>
-      </div>
-      <div class="field-body is-flex is-flex-grow-5">
-        <div class="control is-flex is-flex-direction-column is-flex-grow-1">
-          <div class="select is-flex is-flex-grow-1">
-            <select x-model="pdf.compression.value" name="pdf-compression" class="is-flex-grow-1">
-              {% for method in config_index.pdf.compression.available %}
-              <option value="{{ method }}"> {{ method }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <p class="help" :class="{
-            'is-danger': !pdf.compression.isValid,
-            'is-success': pdf.compression.isValid,
-          }">{{ config_index.pdf.compression.help }}</p>
-        </div>
-      </div>
-    </div>
-
-    {# IMAGE SETTINGS - END #}
+    {% include "config/_pdf.jinja2" %}
+    {# PDF SETTINGS - END #}
   </div>
 
   {# SUBMIT BUTTON #}
   <div class="field is-grouped is-grouped-right mt-5">
     <p class="control">
-      <button type="button" class="button is-primary" :disabled="!host.isValid || !port.isValid"
+      <button type="button" class="button is-primary" :disabled="!$store.configForm.isValid"
         @click="sendConfig($event.target.form)">
         {{ config_index.save_changes }}
       </button>
     </p>
   </div>
 </form>
+
 {% endblock %}

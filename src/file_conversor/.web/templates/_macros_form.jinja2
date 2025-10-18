@@ -1,0 +1,68 @@
+{# src\file_conversor\.web\templates\_macros_form.jinja2 #}
+
+{% macro form_checkbox(label, checkbox) %}
+<div x-data="{
+    value: {{ 'true' if checkbox.current else 'false' }},
+}" class="field is-flex is-justify-content-flex-end">
+    <label class="checkbox">
+        <input x-model="value" type="checkbox" name="{{ checkbox.name }}" />
+        {{ label | escape }}
+    </label>
+</div>
+{% endmacro %}
+
+{% macro form_input(label, input, validation) %}
+<div x-data="{ 
+    value: `{{ input.current | escape }}`,
+    help: `{{ input.help | escape }}`,
+    isValid: true,
+}" class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">{{ label }}</label>
+    </div>
+    <div class="field-body is-flex">
+        <div class="control is-flex-grow-1">
+            <input x-model="value"
+                @input.debounce.300ms="isValid = {{ validation.expr }} ; {{ validation.form }}.isValid = isValid ;"
+                :class="{
+        'is-danger': !isValid,
+        'is-success': isValid,
+      }" class="input" name="{{ input.name }}" type="{{ input.type }}" placeholder="{{ input.placeholder | escape }}" />
+            <p class="help" :class="{
+    'is-danger': !isValid,
+    'is-success': isValid,
+    }" x-text="help"></p>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro form_select(label, select) %}
+<div x-data="{ 
+    value: `{{ select.current }}`,
+    help: `{{ select.help | escape }}`,
+    isValid: true,
+}" class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">{{ label | escape }}</label>
+    </div>
+    <div class="field-body is-flex is-flex-grow-5">
+        <div class="control is-flex is-flex-direction-column is-flex-grow-1">
+            <div class="select is-flex is-flex-grow-1">
+                <select name="{{ select.name }}" class="is-flex-grow-1" :class="{
+                    'is-danger': !isValid,
+                    'is-success': isValid,
+                    }" x-model="value">
+                    {% for opt_val in select.options %}
+                    <option value="{{ opt_val }}"> {{ opt_val }} </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="help" :class="{
+            'is-danger': !isValid,
+            'is-success': isValid,
+          }" x-text="help"></p>
+        </div>
+    </div>
+</div>
+{% endmacro %}

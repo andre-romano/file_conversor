@@ -1,0 +1,68 @@
+{# src\file_conversor\.web\templates\config\_audio_video.jinja2 #}
+
+{% import '_macros_form.jinja2' as fmacro %}
+
+{# AUDIO BITRATE #}
+{{ fmacro.form_input(
+label=config_index.audio.bitrate.label,
+input={
+'name': 'audio-bitrate',
+'type': 'number',
+'placeholder': config_index.audio.bitrate.placeholder,
+'help': config_index.audio.bitrate.help,
+'current': config_index.audio.bitrate.current,
+},
+validation={
+'form': '$store.configForm',
+'expr': 'Number.isInteger(parseInt(value)) && parseInt(value) >= 0',
+},
+)}}
+
+{# VIDEO BITRATE #}
+{{ fmacro.form_input(
+label=config_index.video.bitrate.label,
+input={
+'name': 'video-bitrate',
+'type': 'number',
+'placeholder': config_index.video.bitrate.placeholder,
+'help': config_index.video.bitrate.help,
+'current': config_index.video.bitrate.current,
+},
+validation={
+'form': '$store.configForm',
+'expr': 'Number.isInteger(parseInt(value)) && parseInt(value) >= 0',
+},
+)}}
+
+{# VIDEO FORMAT #}
+{{ fmacro.form_select(
+label=config_index.video.format.label,
+select={
+'name': 'video-format',
+'options': config_index.video.format.available,
+'current': config_index.video.format.current,
+'help': config_index.video.format.help,
+},
+) }}
+
+{# VIDEO ENCODING SPEED #}
+{{ fmacro.form_select(
+label=config_index.video.encoding_speed.label,
+select={
+'name': 'video-encoding-speed',
+'options': config_index.video.encoding_speed.available,
+'current': config_index.video.encoding_speed.current,
+'help': config_index.video.encoding_speed.help,
+},
+) }}
+
+{# VIDEO QUALITY #}
+{{ fmacro.form_select(
+label=config_index.video.quality.label,
+select={
+'name': 'video-quality',
+'options': config_index.video.quality.available,
+'current': config_index.video.quality.current,
+'help': config_index.video.quality.help,
+},
+) }}

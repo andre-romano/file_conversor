@@ -1,0 +1,23 @@
+{# src\file_conversor\.web\templates\config\_general.jinja2 #}
+
+{% import '_macros_form.jinja2' as fmacro %}
+
+{# LANGUAGE #}
+{{ fmacro.form_select(
+label=config_index.language.label,
+select={
+'name': 'language',
+'options': config_index.language.available,
+'current': config_index.language.current,
+'help': config_index.language.help,
+},
+) }}
+
+{# INSTALL DEPENDENCIES #}
+{{ fmacro.form_checkbox(
+label=config_index.install_deps.label,
+checkbox={
+'name': 'install-deps',
+'current': config_index.install_deps.current,
+}
+) }}

@@ -1,0 +1,35 @@
+{# src\file_conversor\.web\templates\config\_network.jinja2 #}
+{% import '_macros_form.jinja2' as fmacro %}
+
+{# Host IP Address #}
+{{ fmacro.form_input(
+label=config_index.host.label,
+input={
+'name': 'host',
+'type': 'text',
+'placeholder': config_index.host.placeholder,
+'help': config_index.host.help,
+'current': config_index.host.current,
+},
+validation={
+'form': '$store.configForm',
+'expr': "value.split('.').length === 4 && host.value.split('.').every(part => part.trim().length > 0 && !isNaN(part))",
+},
+)}}
+
+
+{# port #}
+{{ fmacro.form_input(
+label=config_index.port.label,
+input={
+'name': 'port',
+'type': 'number',
+'placeholder': config_index.port.placeholder,
+'help': config_index.port.help,
+'current': config_index.port.current,
+},
+validation={
+'form': '$store.configForm',
+'expr': 'Number.isInteger(parseInt(value)) && parseInt(value) > 0 && parseInt(value) < 65536',
+},
+)}}

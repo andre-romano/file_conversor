@@ -50,7 +50,7 @@ def config_index():
             },
             'host': {
                 'current': CONFIG['host'],
-                'label': _('GUI Host IP Address'),
+                'label': _('IP Address'),
                 'placeholder': _('IP address'),
                 'help': _('Type 127.0.0.1 for localhost, 0.0.0.0 for all interfaces.'),
             },
