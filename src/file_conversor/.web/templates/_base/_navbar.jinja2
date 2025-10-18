@@ -53,6 +53,8 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        if (window.navbar_api_shutdown) return;
+
         window.navbar_api_shutdown = () => {
             fetch('/api/shutdown', { method: 'GET' })
                 .then(response => {

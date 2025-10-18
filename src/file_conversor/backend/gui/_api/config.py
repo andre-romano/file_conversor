@@ -1,6 +1,6 @@
 # src/file_conversor/backend/gui/_api/config.py
 
-from flask import json, render_template, request, url_for
+from flask import json, render_template, url_for
 
 from typing import Any
 
@@ -22,26 +22,7 @@ logger = LOG.getLogger()
 def api_config():
     """API endpoint to update the application configuration."""
     logger.info(f"[bold]{_('Configuration update requested via API.')}[/]")
-    data: dict[str, Any] = request.form.to_dict()
-    logger.debug(f"Received data: {data}")
-    # Update the configuration with the provided data
-    for key, value in data.items():
-        # Attempt to convert to appropriate type
-        if value.lower() in ('true', 'on'):
-            value = True
-        elif value.lower() in ('false', 'off'):
-            value = False
-        elif value.lower() == 'none':
-            value = None
-        else:
-            try:
-                if '.' in value:
-                    value = float(value)
-                else:
-                    value = int(value)
-            except ValueError:
-                pass  # Keep as string if conversion fails
-        data[key] = value
+    data = FlaskApp.get_form_data()
     CONFIG.update(data)
     CONFIG.save()
     logger.debug(f"Configuration updated: {CONFIG}")

@@ -1,0 +1,54 @@
+{# src\file_conversor\.web\templates\doc\convert.jinja2 #}
+{% import '_macros_form.jinja2' as fmacro %}
+{% extends '_base/base.jinja2' %}
+
+{% block title %}File Conversor - Doc Tools{% endblock %}
+
+{% block content %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.store('form', {
+      isValid: false,
+      async send(form) {
+        let modal = Alpine.store('modal');
+        try {
+          const response = await fetch(`{{ url_for('api_doc_convert') }}`, {
+            method: 'POST',
+            body: new FormData(form)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            modal.title = '{{ doc_convert.modal.title }}';
+            modal.content_html = `{{ doc_convert.modal.error }}: ${response.statusText} - ${JSON.stringify(data)}`;
+            modal.open = true;
+            return;
+          }
+          let status_bar = Alpine.store('status_bar');
+          status_bar.status_id = data.status_id;
+          status_bar.time = 0;
+          status_bar.update();
+        } catch (error) {
+          modal.title = '{{ doc_convert.modal.title }}';
+          modal.content_html = `{{ doc_convert.modal.error }}: ${error.message}`;
+          modal.open = true;
+        }
+      },
+    });
+  });
+</script>
+
+<form x-data="{}" action="" method="post">
+  {# TODO #}
+
+  {# SUBMIT BUTTON #}
+  <div class="field is-grouped is-grouped-right mt-5">
+    <p class="control">
+      <button type="button" class="button is-primary" :disabled="!$store.form.isValid"
+        @click="$store.form.send($event.target.form)">
+        {{ doc_convert.execute_btn }}
+      </button>
+    </p>
+  </div>
+</form>
+
+{% endblock %}

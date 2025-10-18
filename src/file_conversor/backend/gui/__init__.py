@@ -44,6 +44,20 @@ fapp.add_context_processor(lambda: {
         'title': 'File Conversor',
         'version': Environment.get_version(),
     },
+    '_base_status_bar': {
+        'modal': {
+            'title': _('Status Error'),
+            'error': _('An error occurred while fetching the status'),
+            'lost_conn': {
+                'title': _('Connection Lost'),
+                'msg': _('Lost connection to the server. Please check your network connection and try again.'),
+            },
+        },
+        'processing': _('Processing...'),
+        'failed': _('Failed'),
+        'lost_conn': _('Connection Lost'),
+        'completed': _('Completed'),
+    },
     '_base_navbar': {
         'shutdown': {
             'btn_label': _('Shutdown'),

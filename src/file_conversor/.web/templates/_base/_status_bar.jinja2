@@ -17,9 +17,11 @@
         'is-hidden': (typeof $store.status_bar.progress !== 'number'),
         }">
         <progress class="status-progress-bar progress is-small is-success my-0 mr-3"
-            :value="(typeof $store.status_bar.progress === 'number') ? $store.status_bar.progress : null"
+            :value="(typeof $store.status_bar.progress === 'number' && $store.status_bar.progress >= 0) ? $store.status_bar.progress : null"
             max="100"></progress>
-        <span class="status-progress-text" x-text="`${Math.round($store.status_bar.progress)}%`"></span>
+        <span class="status-progress-text" :class="{
+        'is-hidden': (typeof $store.status_bar.progress !== 'number' || $store.status_bar.progress < 0),
+        }" x-text="`${Math.round($store.status_bar.progress)}%`"></span>
     </div>
     <div class="status-bar-end is-align-items-center" :class="{
         'is-flex': (typeof $store.status_bar.time === 'number'),
@@ -34,12 +36,65 @@
 </div>
 
 <script>
-    // JavaScript to create status bar global state
     document.addEventListener('alpine:init', () => {
+        if (Alpine.store('status_bar')) return;
+
+        let modal = Alpine.store('modal');
         Alpine.store('status_bar', {
             message: null,
             progress: null,
             time: null,
+            status_id: 0,
+
+            async update() {
+                try {
+                    if (typeof this.progress !== 'number') {
+                        this.progress = -1;
+                    }
+                    if (typeof this.time !== 'number') {
+                        this.time = 0;
+                    } else {
+                        this.time++;
+                    }
+
+                    const response = await fetch(`{{ url_for('api_status') }}?status_id=${this.status_id}`, {
+                        method: 'GET',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    this.message = data.message;
+                    this.progress = data.progress;
+
+                    if (data.status === 'failed') {
+                        throw new Error(data.exception || 'Unknown failure');
+                    }
+
+                    if (data.status !== 'completed') {
+                        setTimeout(() => this.update(), 1000);
+                    }
+
+                } catch (err) {
+                    console.error('Status update failed:', err);
+
+                    if (err.message.includes('Failed to fetch')) {
+                        this.message = '{{ _base_status_bar.lost_conn }}';
+                        modal.title = '{{ _base_status_bar.modal.lost_conn.title }}';
+                        modal.content_html = '{{ _base_status_bar.modal.lost_conn.msg }}';
+                        modal.closeable = false;
+                    } else {
+                        this.message = '{{ _base_status_bar.failed }}';
+                        modal.title = '{{ _base_status_bar.modal.title }}';
+                        modal.content_html = `{{ _base_status_bar.modal.error }}: ${err.message}`;
+                    }
+                    modal.open = true;
+                }
+            },
         });
+
+        Alpine.store('status_bar').update();
     });
 </script>

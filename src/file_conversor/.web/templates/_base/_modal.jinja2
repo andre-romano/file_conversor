@@ -19,6 +19,8 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        if (Alpine.store('modal')) return;
+
         Alpine.store('modal', {
             open: false,
             title: '',

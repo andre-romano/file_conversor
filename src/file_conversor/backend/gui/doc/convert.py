@@ -33,4 +33,11 @@ def doc_convert():
                 'active': True,
             },
         ],
+        doc_convert={
+            'modal': {
+                'title': _('Conversion error'),
+                'error': _('An error occurred during the document conversion process:'),
+            },
+            'execute_btn': _('Execute'),
+        }
     )
