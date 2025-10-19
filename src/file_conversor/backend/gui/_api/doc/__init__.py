@@ -10,6 +10,7 @@ def routes():
         FlaskRoute(
             rule="/api/doc/convert",
             handler=api_doc_convert,
+            methods=["POST"],
         ),
     ]
 

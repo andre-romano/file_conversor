@@ -38,8 +38,9 @@ class Win32Com:
         self._app = None
 
     def __enter__(self):
-        if not client:
+        if not client or not pythoncom:
             raise OSError("Win32Com is only available in Windows OS")
+        pythoncom.CoInitialize()  # Initialize COM for this thread
         self._app = client.Dispatch(self._prog_id)
         try:
             if self._visible is not None:
@@ -55,6 +56,8 @@ class Win32Com:
         except Exception:
             logger.warning(f"Fail to quit Win32Com prog_id '{self._prog_id}'. Try again later.")
         self._app = None
+        if pythoncom:
+            pythoncom.CoUninitialize()  # Uninitialize COM for this thread
         # Returning False means exceptions (if any) will propagate
         return False
 

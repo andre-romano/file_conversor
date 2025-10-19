@@ -27,7 +27,8 @@
                 :class="{
         'is-danger': !isValid,
         'is-success': isValid,
-      }" class="input" name="{{ input.name }}" type="{{ input.type }}" placeholder="{{ input.placeholder | escape }}" />
+      }" class="input" name="{{ input.name }}" type="{{ input.type }}"
+                placeholder="{{ input.placeholder | escape }}" />
             <p class="help" :class="{
     'is-danger': !isValid,
     'is-success': isValid,
@@ -52,7 +53,7 @@
                 <select name="{{ select.name }}" class="is-flex-grow-1" :class="{
                     'is-danger': !isValid,
                     'is-success': isValid,
-                    }" x-model="value">
+                    }">
                     {% for opt_val in select.options %}
                     <option value="{{ opt_val }}"> {{ opt_val }} </option>
                     {% endfor %}
@@ -62,6 +63,62 @@
             'is-danger': !isValid,
             'is-success': isValid,
           }" x-text="help"></p>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro form_file_list(label, input, validation) %}
+<div x-data="{     
+    selected: [],
+    help: `{{ input.help | escape }}`,
+    files: [],
+    isValid: false,
+    init() {
+        this.$watch('files', value => {                        
+            this.isValid = {{ validation.expr }};
+            {{ validation.form }}.isValid = this.isValid;
+        });        
+    },
+}" class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">{{ label | escape }}</label>
+    </div>
+    <div class="field-body is-flex is-flex-grow-5">
+        <div class="control is-flex is-flex-direction-column is-flex-grow-1">
+            <div class="select is-multiple is-flex is-flex-grow-1">
+                <select multiple size="8" class="is-flex-grow-1" :class="{
+                    'is-danger': !isValid,
+                    'is-success': isValid,
+                    }" x-model="selected">
+                    <template x-for="opt in files" :key="opt">
+                        <option :value="opt" x-text="opt"></option>
+                    </template>
+                </select>
+            </div>
+            <p class="help" :class="{
+            'is-danger': !isValid,
+            'is-success': isValid,
+          }" x-text="help"></p>
+        </div>
+        <div class="control is-flex is-flex-direction-column is-justify-content-flex-start is-align-items-start ml-2">
+            <div class="file is-info is-48x48 mb-2">
+                <label class="file-label is-full-height is-full-width">
+                    <input class="file-input" type="file" name="{{ input.name }}" multiple="true" @change="
+                        files = Array.from($event.target.files).map(file => file.name);
+                    " />
+                    <span
+                        class="file-cta is-full-height is-full-width is-flex is-justify-content-center is-align-items-center p-0">
+                        <i class="fa-solid fa-plus"></i>
+                    </span>
+                </label>
+            </div>
+            <button class="button is-danger is-48x48 has-border" alt="Remove file" @click.prevent="                
+                files = files.filter(file => !selected.includes(file));
+                selected = [];
+            ">
+                <i class="fa-solid fa-trash"></i>
+            </button>
         </div>
     </div>
 </div>

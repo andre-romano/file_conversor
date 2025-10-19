@@ -64,11 +64,11 @@ ctx_menu.register_callback(register_ctx_menu)
     epilog=f"""
         **{_('Examples')}:** 
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.odt -o output_file.doc`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.odt -f doc`
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.docx -o output_file.pdf`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.docx -f pdf`
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -o output_file.docx`
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f docx`
     """)
 def convert(
     input_files: Annotated[List[str], InputFilesArgument(DOC_BACKEND)],

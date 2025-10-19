@@ -2,17 +2,19 @@
 
 import os
 import signal
+import tempfile
 import webbrowser
 import typer
 import time
 import threading
 
 from flask import Flask, request
+from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
 # user-provided modules
 from file_conversor.backend.gui.flask_route import FlaskRoute
-from file_conversor.backend.gui.flask_status import FlaskStatus
+from file_conversor.backend.gui.flask_status import FlaskStatus, FlaskStatusCompleted, FlaskStatusError, FlaskStatusProcessing, FlaskStatusReady, FlaskStatusUnknown
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
@@ -60,6 +62,24 @@ class FlaskApp:
             data[key] = value
         return data
 
+    @classmethod
+    def get_files_list(cls, key: str) -> tuple[list[Path], Path]:
+        """
+        Save the uploaded files from the request into temporary dir, for processing.
+
+        :return: tuple[list[Path], Path]: A tuple containing the list of saved file paths and the temporary directory path.
+        """
+        res: list[Path] = []
+        files = request.files.getlist(key)
+        temp_dir = Path(tempfile.mkdtemp())
+        for file in files:
+            if not file.filename:
+                continue
+            file_path = temp_dir / file.filename
+            file.save(file_path)
+            res.append(file_path)
+        return res, temp_dir
+
     def __init__(self) -> None:
         super().__init__()
         web_path = Environment.get_web_folder()
@@ -95,13 +115,22 @@ class FlaskApp:
                 time.sleep(0.100)  # Wait before retrying
         logger.info(f"[bold]{_('Flask server stopped.')}[/]")
 
-    def add_status(self, status_id: str, status: FlaskStatus) -> None:
+    def add_status(self) -> FlaskStatus:
         """Add or update the status of a specific operation by its ID."""
-        self.status[status_id] = status
+        status_id = len(self.status) + 1
+        status = FlaskStatusProcessing(id=status_id)
+        self.status[status._id] = status
+        return status
 
-    def get_status(self, status_id: str) -> FlaskStatus | None:
+    def get_status(self, status_id: str | None) -> FlaskStatus:
         """Get the status of a specific operation by its ID."""
-        return self.status.get(status_id)
+        if status_id is None or status_id.lower() in ('', 'none', 'null', '0'):
+            return FlaskStatusReady()
+        status = self.status.get(status_id)
+        # remove completed or error statuses
+        if status is not None and isinstance(status, (FlaskStatusCompleted, FlaskStatusError)):
+            del self.status[status_id]
+        return status or FlaskStatusUnknown(status_id)
 
     def add_route(self, routes: FlaskRoute | Iterable[FlaskRoute]) -> Self:
         """Add a new route to the Flask application."""

@@ -27,6 +27,37 @@ body.has-status-bar-fixed-bottom {
     margin-bottom: var(--bulma-main-app-margin);
 }
 
+.is-64x64 {
+    width: 64px !important;
+    height: 64px !important;
+}
+
+.is-48x48 {
+    width: 48px !important;
+    height: 48px !important;
+}
+
+.is-32x32 {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.is-full-width {
+    width: 100% !important;
+}
+
+.is-full-height {
+    height: 100% !important;
+}
+
+.has-shadow {
+    box-shadow: var(--bulma-shadow) !important;
+}
+
+.has-border {
+    border: solid 1px var(--bulma-navbar-border-color) !important;
+}
+
 /* NAVBAR */
 body nav.navbar.is-fixed-top {
     height: var(--bulma-navbar-height);

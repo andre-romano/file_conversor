@@ -33,6 +33,16 @@
         "**/*.spec": true,
         "**/pdm.lock/**": true,
     },
+    "eslint.options": {
+        "overrideConfigFile": "eslint.config.mjs"
+    },
+    "eslint.validate": [
+        "javascript",
+        "html",
+        "jinja",
+        "jinja2",
+        "jinja-html",
+    ],
     "emmet.includeLanguages": {
         "jinja": "html",
         "jinja2": "html",
