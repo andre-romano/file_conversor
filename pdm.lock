@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:9c14470713d8c4b10a118a3355b6903d707347e951e7222a771a3812915f811a"
+content_hash = "sha256:f2ecfe73366d062577de8c7589d273e457a95e402dd51546bebdf56411bf8fa6"
 
 [[metadata.targets]]
 requires_python = "~=3.13.6"
@@ -372,6 +372,18 @@ marker = "python_full_version ~= \"3.13.6\""
 files = [
     {file = "docutils-0.22-py3-none-any.whl", hash = "sha256:4ed966a0e96a0477d852f7af31bdcb3adc049fbb35ccba358c2ea8a03287615e"},
     {file = "docutils-0.22.tar.gz", hash = "sha256:ba9d57750e92331ebe7c08a1bbf7a7f8143b86c476acd51528b042216a6aad0f"},
+]
+
+[[package]]
+name = "dominate"
+version = "2.9.1"
+requires_python = ">=3.4"
+summary = "Dominate is a Python library for creating and manipulating HTML documents using an elegant DOM API."
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+files = [
+    {file = "dominate-2.9.1-py2.py3-none-any.whl", hash = "sha256:cb7b6b79d33b15ae0a6e87856b984879927c7c2ebb29522df4c75b28ffd9b989"},
+    {file = "dominate-2.9.1.tar.gz", hash = "sha256:558284687d9b8aae1904e3d6051ad132dd4a8c0cf551b37ea4e7e42a31d19dc4"},
 ]
 
 [[package]]

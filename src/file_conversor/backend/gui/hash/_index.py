@@ -1,8 +1,10 @@
 # src/file_conversor/backend/gui/hash/index.py
 
-from flask import render_template, url_for
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -18,34 +20,32 @@ logger = LOG.getLogger()
 def hash_index():
     tools = [
         {
-            'media': {
-                'image': {'src': url_for('icons', filename='check.ico')},
-                'title': _("Check"),
-                'subtitle': _("Checks a hash file (.sha256, .sha1, etc)."),
-            },
+            'image': url_for('icons', filename='check.ico'),
+            'title': _("Check"),
+            'subtitle': _("Checks a hash file (.sha256, .sha1, etc)."),
             'url': url_for('hash_check'),
         },
         {
-            'media': {
-                'image': {'src': url_for('icons', filename='new_file.ico')},
-                'title': _("Create"),
-                'subtitle': _("Creates a hash file (.sha256, .sha1, etc)."),
-            },
+            'image': url_for('icons', filename='new_file.ico'),
+            'title': _("Create"),
+            'subtitle': _("Creates a hash file (.sha256, .sha1, etc)."),
             'url': url_for('hash_create'),
         },
     ]
-    return render_template(
-        'hash/index.jinja2',
-        tools=tools,
-        breadcrumb_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Hash"),
-                'url': url_for('hash_index'),
-                'active': True,
-            },
-        ],
+    return render_template_string(str(
+        PageCardGrid(
+            *tools,
+            nav_items=[
+                {
+                    'label': _("Home"),
+                    'url': url_for('index'),
+                },
+                {
+                    'label': _("Hash"),
+                    'url': url_for('hash_index'),
+                    'active': True,
+                },
+            ],
+            _title=_("File Conversor - Hash Tools"),
+        ))
     )

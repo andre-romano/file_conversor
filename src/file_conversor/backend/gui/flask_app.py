@@ -39,6 +39,10 @@ class FlaskApp:
         return cls._instance
 
     @classmethod
+    def get_args(cls):
+        return request.args.to_dict()
+
+    @classmethod
     def get_form_data(cls) -> dict[str, Any]:
         data: dict[str, Any] = request.form.to_dict()
         logger.debug(f"Received data: {data}")

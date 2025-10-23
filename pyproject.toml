@@ -23,6 +23,7 @@ dependencies = [
     "ocrmypdf>=16.11.0",
     "requests>=2.32.5",
     "flask>=3.1.2",
+    "dominate>=2.9.1",
 ]
 requires-python = ">=3.13.6"
 readme = "README.md"

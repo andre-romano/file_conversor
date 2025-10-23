@@ -3,29 +3,27 @@
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 from file_conversor.backend.gui._api.config import api_config
-from file_conversor.backend.gui._api.shutdown import api_shutdown
 from file_conversor.backend.gui._api.status import api_status
 
-# operation APIs
+# sub APIs
+from file_conversor.backend.gui._api.component import routes as component_api_routes
 from file_conversor.backend.gui._api.doc import routes as doc_api_routes
 
 
 def routes():
     return [
+        # general APIs
         FlaskRoute(
             rule="/api/config",
             handler=api_config,
             methods=["GET", "POST"]
         ),
         FlaskRoute(
-            rule="/api/shutdown",
-            handler=api_shutdown,
-        ),
-        FlaskRoute(
             rule="/api/status",
             handler=api_status,
         ),
-        # operation APIs
+        # sub APIs
+        *component_api_routes(),
         *doc_api_routes(),
     ]
 
