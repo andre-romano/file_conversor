@@ -58,6 +58,35 @@ body.has-status-bar-fixed-bottom {
     border: solid 1px var(--bulma-navbar-border-color) !important;
 }
 
+/* CURSORS */
+.is-cursor-auto {
+    cursor: auto !important;
+}
+
+.is-cursor-copy {
+    cursor: copy !important;
+}
+
+.is-cursor-pointer {
+    cursor: pointer !important;
+}
+
+.is-cursor-grab {
+    cursor: grab !important;
+}
+
+.is-cursor-grabbing {
+    cursor: grabbing !important;
+}
+
+.is-cursor-progress {
+    cursor: progress !important;
+}
+
+.is-cursor-wait {
+    cursor: wait !important;
+}
+
 /* NAVBAR */
 body nav.navbar.is-fixed-top {
     height: var(--bulma-navbar-height);

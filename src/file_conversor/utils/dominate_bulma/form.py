@@ -91,6 +91,7 @@ def Select(
         placeholder: str = "",
         _class: str = "",
         _class_container: str = "",
+        kwargs_container: dict[str, Any] | None = None,
         **kwargs,
 ):
     """
@@ -101,7 +102,7 @@ def Select(
     :param _class: Additional CSS classes for the select element.
     :param _class_container: Additional CSS classes for the select container.
     """
-    with div(_class=f"select {_class_container}") as select_el:
+    with div(_class=f"select {_class_container}", **(kwargs_container if kwargs_container else {})) as select_el:
         with select(_class=f"is-full-width {_class}", **kwargs,):
             if placeholder and not options:
                 option(placeholder, _disabled=True, _selected=True, _hidden=True)
@@ -338,14 +339,14 @@ def FormFieldSelect(
             *options,
             _class="is-flex is-flex-grow-1",
             _name=_name,
-            **{
+            kwargs_container={
                 ':class': """{
                     'is-danger': !isValid,
                     'is-success': isValid,
                 }""",
-                'x-model': 'value',
-                **kwargs,
             },
+            **{'x-model': 'value'},
+            **kwargs,
         ),
         current_value=current_value,
         _class_control="is-flex is-flex-direction-column is-flex-grow-1",

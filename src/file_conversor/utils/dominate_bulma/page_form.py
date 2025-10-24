@@ -54,6 +54,7 @@ def PageForm(
                 **{
                     ':class': """{
                         'is-loading': checkLoading(),
+                        'is-cursor-progress': checkLoading(),
                     }""",
                     ':disabled': '!isValid || checkLoading()',
                     '@click': f'$store.form.submit($el, `{api_endpoint}`)',
