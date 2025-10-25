@@ -1,7 +1,7 @@
 # src\file_conversor\backend\gui\__init__.py
 
 # user-provided modules
-from file_conversor.backend.gui.flask_app import FlaskApp
+from file_conversor.backend.gui.web_app import WebApp
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 # routes
@@ -35,7 +35,7 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger()
 
-fapp = FlaskApp.get_instance()
+fapp = WebApp.get_instance()
 
 
 # add context processors
@@ -93,4 +93,4 @@ fapp.add_route(icons_routes())
 fapp.add_route(index_routes())
 
 # export
-__all__ = ["FlaskApp"]
+__all__ = ["WebApp"]

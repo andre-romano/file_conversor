@@ -62,14 +62,17 @@ def PageForm(
             ),
             _class='is-flex is-flex-direction-column is-align-items-flex-end is-full-width',
             **{'x-data': r"""{ 
-                    isValid: false,                     
+                    isValid: false, 
+                    elements: [],                    
                     checkLoading() {
                         return this.$store.status_bar.started && !this.$store.status_bar.finished;
                     },
                     updateValidity() {
-                        let res = true;         
-                        const el = this.$el.querySelectorAll('[x-data]');
-                        el.forEach((item) => {
+                        let res = true;     
+                        if (!this.elements || this.elements.length === 0) {   
+                            this.elements = this.$el.querySelectorAll('[x-data]');
+                        }
+                        this.elements.forEach((item) => {
                             if (item === this.$el) return;
                             const data = Alpine.$data(item);
                             const valid = data.isValid;
@@ -80,6 +83,9 @@ def PageForm(
                         });
                         this.isValid = res;
                     },
+                    init() {
+                        this.updateValidity();
+                    },  
                }"""},
             **kwargs,
         ),

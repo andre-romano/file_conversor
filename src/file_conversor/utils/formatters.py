@@ -133,3 +133,17 @@ def format_bitrate(bps: int) -> str:
     elif bps >= 1000:
         return f"{bps / 1000:.0f} kbps"
     return f"{bps} bps"
+
+
+def format_file_types_webview(*file_types: str, description: str = "") -> str:
+    """
+    Format file types for PyWebView file dialogs.
+
+    :param file_types: File type patterns (e.g., '*.png', '*.jpg').
+    :param description: Description for the file types (e.g., 'Image Files').
+
+    :return: Formatted file types string for PyWebView.
+    """
+    if not file_types:
+        return f'{_("All Files")} (*.*)'
+    return f'{description} ({"; ".join(file_types)})'

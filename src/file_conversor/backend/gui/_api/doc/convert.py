@@ -10,7 +10,7 @@ from flask import json, render_template, request, url_for
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.gui.flask_app import FlaskApp
+from file_conversor.backend.gui.web_app import WebApp
 from file_conversor.backend.gui.flask_status import FlaskStatusCompleted, FlaskStatusError
 
 from file_conversor.backend.office import DOC_BACKEND
@@ -26,7 +26,7 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger()
 
-fapp = FlaskApp.get_instance()
+fapp = WebApp.get_instance()
 
 
 def doc_convert_thread(params: dict[str, Any]) -> None:

@@ -8,10 +8,10 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
+from file_conversor.system import is_windows
 
 # conditional import
-if CURR_PLATFORM == PLATFORM_WINDOWS:
+if is_windows():
     import pythoncom  # pyright: ignore[reportMissingModuleSource]
     from win32com import client  # pyright: ignore[reportMissingModuleSource]
 else:

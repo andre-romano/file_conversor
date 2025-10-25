@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.system import PLATFORM_WINDOWS
+from file_conversor.system import _PLATFORM_WINDOWS
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
@@ -45,7 +45,7 @@ class ScoopPackageManager(AbstractPackageManager):
         return shutil.which("scoop")
 
     def _get_supported_oses(self) -> set[str]:
-        return {PLATFORM_WINDOWS}
+        return {_PLATFORM_WINDOWS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return [

@@ -1,7 +1,6 @@
-# src\file_conversor\gui\flask_app.py
+# src\file_conversor\gui\web_app.py
 
-import os
-import signal
+import webview
 import tempfile
 import webbrowser
 import typer
@@ -13,6 +12,8 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Self
 
 # user-provided modules
+from file_conversor.backend.gui._webview_api import WebViewAPI
+
 from file_conversor.backend.gui.flask_route import FlaskRoute
 from file_conversor.backend.gui.flask_status import FlaskStatus, FlaskStatusCompleted, FlaskStatusError, FlaskStatusProcessing, FlaskStatusReady, FlaskStatusUnknown
 
@@ -28,8 +29,34 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-# Create a Flask application
-class FlaskApp:
+# Create a web application
+class WebApp:
+    LOCALIZATION = {
+        'global.quitConfirmation': _('Do you really want to quit?'),
+        'global.ok': _('OK'),
+        'global.quit': _('Quit'),
+        'global.cancel': _('Cancel'),
+        'global.saveFile': _('Save file'),
+        'cocoa.menu.about': _('About'),
+        'cocoa.menu.services': _('Services'),
+        'cocoa.menu.view': _('View'),
+        'cocoa.menu.edit': _('Edit'),
+        'cocoa.menu.hide': _('Hide'),
+        'cocoa.menu.hideOthers': _('Hide Others'),
+        'cocoa.menu.showAll': _('Show All'),
+        'cocoa.menu.quit': _('Quit'),
+        'cocoa.menu.fullscreen': _('Enter Fullscreen'),
+        'cocoa.menu.cut': _('Cut'),
+        'cocoa.menu.copy': _('Copy'),
+        'cocoa.menu.paste': _('Paste'),
+        'cocoa.menu.selectAll': _('Select All'),
+        'windows.fileFilter.allFiles': _('All files'),
+        'windows.fileFilter.otherFiles': _('Other file types'),
+        'linux.openFile': _('Open file'),
+        'linux.openFiles': _('Open files'),
+        'linux.openFolder': _('Open folder'),
+    }
+
     _instance: Self | None = None
 
     @classmethod
@@ -88,36 +115,76 @@ class FlaskApp:
         super().__init__()
         web_path = Environment.get_web_folder()
 
+        window = webview.create_window(
+            title="File Conversor",
+            url=f"http://127.0.0.1:{CONFIG['port']}",
+            localization=self.LOCALIZATION,
+            maximized=True,
+            js_api=WebViewAPI(),
+        )
+        if window is None:
+            raise RuntimeError("Failed to create webview window.")
+        self.window: webview.Window = window
         self.app = Flask(
             __name__,
             static_folder=web_path / 'static',
             template_folder=web_path / 'templates',
         )
+        self._flask_ready = threading.Event()
         self.routes: set[FlaskRoute] = set()
         self.status: dict[str, FlaskStatus] = {}
 
+    def _open_browser(self, url: str) -> None:
+        # new=0 → same window (if possible)
+        # new=1 → new window
+        # new=2 → new tab (recommended)
+        webbrowser.open(url, new=2)
+
     def _run_flask(self):
-        logger.info(f"[bold]{_('Registering routes ...')}[/]")
+        logger.info(f"{_('Registering routes ...')}")
         for route in self.routes:
             route.register(self.app)
-            logger.debug(f"Route registered: {route.rule} -> {route.options}")
-        logger.info(f"[bold]{_('Starting Flask server ...')}[/]")
+            # logger.debug(f"Route registered: {route.rule} -> {route.options}")
+        logger.info(f"{_('[bold] Starting Flask server ... [/]')}")
         while True:
             try:
+                self._flask_ready.set()
                 self.app.run(
-                    host=CONFIG["host"],
+                    host="127.0.0.1",
                     port=CONFIG["port"],
                     debug=STATE["debug"],
                     threaded=True,  # Allow handling multiple requests
                     use_reloader=False,   # Disable the reloader to avoid issues with threading
                 )
             except (typer.Abort, typer.Exit, KeyboardInterrupt, SystemExit) as e:
-                logger.info(f"[bold]{_('Attempting to shut down Flask server ...')}[/]")
+                logger.info(f"{_('Attempting to shut down Flask server ...')}")
                 break
             except Exception as e:
                 logger.error(f"Error in Flask server: {repr(e)}")
                 time.sleep(0.100)  # Wait before retrying
         logger.info(f"[bold]{_('Flask server stopped.')}[/]")
+
+    def _run_webview(self) -> None:
+        logger.info(f"[bold]{_('Starting webview window ...')}[/]")
+        webview.start(
+            gui="qt",
+            debug=STATE['debug'],
+            icon=str(Environment.get_icons_folder() / "icon.ico"),
+        )
+        logger.info(f"[bold]{_('Webview window closed.')}[/]")
+
+    def expose(self, *func: Callable[..., Any]) -> Self:
+        """Expose a new function to the webview JS API."""
+        self.window.expose(*func)
+        return self
+
+    def evaluate_js(
+            self,
+            script: str,
+            callback: Callable[..., Any] | None = None,
+    ) -> Any:
+        """Evaluate a JavaScript script in the webview window."""
+        return self.window.evaluate_js(script, callback)
 
     def add_status(self) -> FlaskStatus:
         """Add or update the status of a specific operation by its ID."""
@@ -149,33 +216,24 @@ class FlaskApp:
         self.app.context_processor(func)
         return self
 
-    def run(self, open_browser: bool) -> None:
+    def run(self) -> None:
         """Run the Flask server and the webview window."""
         flask_thread = threading.Thread(target=self._run_flask, daemon=True)
         flask_thread.start()
 
-        # new=0 → same window (if possible)
-        # new=1 → new window
-        # new=2 → new tab (recommended)
+        logger.debug(f"{_('Waiting for Flask to be ready ...')}")
+        self._flask_ready.wait()
+
         url = f"http://127.0.0.1:{CONFIG['port']}"
-        if open_browser:
-            webbrowser.open(url, new=2)
         try:
             logger.info(f"[bold]{_('Access the app at')} {url}[/]")
             logger.info(f"[bold]{_('Press Ctrl+C to exit.')}[/]")
-            while True:
-                time.sleep(0.100)
+            self._run_webview()
         except (typer.Abort, typer.Exit, KeyboardInterrupt, SystemExit) as e:
-            logger.info(f"[bold]{_('Shutting down main thread...')}[/]")
+            logger.info(f"{_('Shutting down main thread...')}")
 
-        logger.info(f"[bold]{_('Shutting down the application ...')}[/]")
+        logger.info(f"{_('[bold] Shutting down the application ... [/]')}")
         raise typer.Exit(0)
 
-    def stop(self) -> None:
-        """Stop the Flask server."""
-        logger.info(f"[bold]{_('Flask server is shutting down...')}[/]")
-        os.kill(os.getpid(), signal.SIGINT)
-        logger.info(f"[bold]{_('Flask server has shut down.')}[/]")
 
-
-__all__ = ["FlaskApp"]
+__all__ = ["WebApp"]

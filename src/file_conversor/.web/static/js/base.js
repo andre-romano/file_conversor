@@ -190,12 +190,42 @@ function alpineFileDialogConfig() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.dom_ready) return;
+    window.dom_ready = true;
+
     console.log('DOMContentLoaded event fired');
 });
 
 document.addEventListener('alpine:init', () => {
+    if (window.alpine_ready) return;
+    window.alpine_ready = true;
+
     console.log('Alpine initialized');
     alpineConfigStatusBar();
     alpineConfigForm();
     alpineFileDialogConfig();
+});
+
+window.addEventListener('pywebviewready', async () => {
+    if (window.pywebview_ready) return;
+    window.pywebview_ready = true;
+
+    console.log('pywebview JS API is ready');
+
+    // Adjust zoom level for high-DPI displays in PyWebView
+    const multiplier = 1.2; // You can adjust this multiplier as needed
+    const zoom = 1 / window.devicePixelRatio * multiplier;
+    document.body.style.zoom = zoom;
+    console.log('Applied zoom for PyWebView:', zoom);
+
+    // fix window title to reflect <title> tag
+    const title = document.title;
+    await window.pywebview.api.set_title({ title: title });
+    console.log('Set window title:', title);
+
+    // fix window maximize issue in PyWebView (zoom reset on maximize)
+    setTimeout(async () => {
+        await window.pywebview.api.maximize();
+        console.log('Requested window maximize');
+    }, 250);
 });

@@ -3,7 +3,7 @@
 from flask import json, render_template, request, url_for
 
 # user-provided modules
-from file_conversor.backend.gui.flask_app import FlaskApp
+from file_conversor.backend.gui.web_app import WebApp
 from file_conversor.backend.gui.flask_status import FlaskStatus, FlaskStatusError, FlaskStatusUnknown
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -23,7 +23,7 @@ def api_status():
     # logger.info(f"[bold]{_('Status requested via API.')}[/]")
     status_id = request.args.get('status_id')
     # logger.debug(f"Status ID requested: {status_id} (type: {type(status_id)})")
-    status = FlaskApp.get_instance().get_status(status_id)
+    status = WebApp.get_instance().get_status(status_id)
     # if status.get_id() != '0':
     #     logger.debug(f"{status}")
     ret_code = 200

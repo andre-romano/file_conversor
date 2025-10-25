@@ -28,7 +28,6 @@ class Configuration:
         if locale.getlocale() and locale.getlocale()[0]:
             language = locale.getlocale()[0]
         self.__data = {
-            "host": "127.0.0.1",       # Default host IP address (flask app)
             "port": 5000,              # Default port (flask app)
             "language": language,      # Default: system language or "en_US"
             "install-deps": True,      # Default: ask user to confirm dependency installation

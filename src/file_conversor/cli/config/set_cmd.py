@@ -56,11 +56,6 @@ def set(
                                                      callback=check_is_bool_or_none,
                                                      )] = CONFIG["install-deps"],
 
-    host: Annotated[str, typer.Option("--host", "-h",
-                                      help=f'{_("Set preferred listen host for app (if available). If '0.0.0.0' serves web app on all interfaces. Defaults to '127.0.0.1' (serve app to localhost only).")}.',
-                                      callback=check_ip_format,
-                                      )] = CONFIG["host"],
-
     port: Annotated[int, typer.Option("--port", "-p",
                                       help=f'{_("Set preferred listen port for app (if available). Ports below 1024 require root privileges. Defaults to 5000.")}.',
                                       min=1, max=65535,
@@ -117,7 +112,6 @@ def set(
 ):
     # update the configuration dictionary
     CONFIG.update({
-        "host": host,
         "port": port,
         "language": language,
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),

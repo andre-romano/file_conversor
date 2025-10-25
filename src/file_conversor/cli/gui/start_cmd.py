@@ -9,7 +9,8 @@ from rich import print
 
 
 # user-provided modules
-from file_conversor.backend.gui import FlaskApp
+from file_conversor.backend.gui import WebApp
+
 from file_conversor.cli.gui._typer import COMMAND_NAME, START_NAME
 
 from file_conversor.config import Configuration, State, Log
@@ -39,12 +40,7 @@ EXTERNAL_DEPENDENCIES = set([])
 - `file_conversor {COMMAND_NAME} {START_NAME}`
     """
 )
-def start_gui(
-    open_browser: Annotated[bool, typer.Option("--open-browser/--no-open-browser", "-ob/-nob",
-                                               help=_("Open the web browser."),
-                                               is_flag=True,
-                                               )] = True,
-):
+def start_gui():
     logger.info(f"[bold]{_('Starting the graphical user interface')} ...[/]")
-    webapp = FlaskApp.get_instance()
-    webapp.run(open_browser=open_browser)
+    webapp = WebApp.get_instance()
+    webapp.run()

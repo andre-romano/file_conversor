@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:f2ecfe73366d062577de8c7589d273e457a95e402dd51546bebdf56411bf8fa6"
+content_hash = "sha256:8519c0d30faee7bdc28e8e5fa230fd8e68b9342dfbc306d1650058d0264faa33"
 
 [[metadata.targets]]
 requires_python = "~=3.13.6"
@@ -91,6 +91,17 @@ files = [
 ]
 
 [[package]]
+name = "bottle"
+version = "0.13.4"
+summary = "Fast and simple WSGI-framework for small web-applications."
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+files = [
+    {file = "bottle-0.13.4-py2.py3-none-any.whl", hash = "sha256:045684fbd2764eac9cdeb824861d1551d113e8b683d8d26e296898d3dd99a12e"},
+    {file = "bottle-0.13.4.tar.gz", hash = "sha256:787e78327e12b227938de02248333d788cfe45987edca735f8f88e03472c3f47"},
+]
+
+[[package]]
 name = "certifi"
 version = "2025.8.3"
 requires_python = ">=3.7"
@@ -108,7 +119,7 @@ version = "1.17.1"
 requires_python = ">=3.8"
 summary = "Foreign Function Interface for Python calling C code."
 groups = ["default", "dev"]
-marker = "platform_python_implementation != \"PyPy\" and python_full_version ~= \"3.13.6\""
+marker = "python_full_version ~= \"3.13.6\" and sys_platform == \"win32\" or platform_python_implementation != \"PyPy\" and python_full_version ~= \"3.13.6\""
 dependencies = [
     "pycparser",
 ]
@@ -165,6 +176,22 @@ dependencies = [
 files = [
     {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
     {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
+]
+
+[[package]]
+name = "clr-loader"
+version = "0.2.8"
+requires_python = ">=3.7"
+summary = "Generic pure Python loader for .NET runtimes"
+groups = ["default"]
+marker = "sys_platform == \"win32\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "cffi>=1.13; python_version <= \"3.8\"",
+    "cffi>=1.17; python_version >= \"3.8\"",
+]
+files = [
+    {file = "clr_loader-0.2.8-py3-none-any.whl", hash = "sha256:2cd76904e2f68fecab1ad1d158fb2905b5173a2b0cd54606d548518642bfbce9"},
+    {file = "clr_loader-0.2.8.tar.gz", hash = "sha256:b4cd3a2ee5f0489885ef07ffd87eb38b2cee24ca65dcacea97b34e7b59913814"},
 ]
 
 [[package]]
@@ -964,12 +991,22 @@ files = [
 ]
 
 [[package]]
+name = "proxy-tools"
+version = "0.1.0"
+summary = "Proxy Implementation"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+files = [
+    {file = "proxy_tools-0.1.0.tar.gz", hash = "sha256:ccb3751f529c047e2d8a58440d86b205303cf0fe8146f784d1cbcd94f0a28010"},
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 requires_python = ">=3.8"
 summary = "C parser in Python"
 groups = ["default", "dev"]
-marker = "platform_python_implementation != \"PyPy\" and python_full_version ~= \"3.13.6\""
+marker = "python_full_version ~= \"3.13.6\" and sys_platform == \"win32\" or platform_python_implementation != \"PyPy\" and python_full_version ~= \"3.13.6\""
 files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
@@ -1095,6 +1132,102 @@ files = [
 ]
 
 [[package]]
+name = "pyobjc-core"
+version = "12.0"
+requires_python = ">=3.8"
+summary = "Python<->ObjC Interoperability Module"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+files = [
+    {file = "pyobjc_core-12.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:c44b76d8306a130c9eb0cb79d86fd6675c8ba3e5b458e78095d271a10cd38b6a"},
+    {file = "pyobjc_core-12.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:5c617551e0ab860c49229fcec0135a5cde702485f22254ddc17205eb24b7fc55"},
+    {file = "pyobjc_core-12.0.tar.gz", hash = "sha256:7e05c805a776149a937b61b892a0459895d32d9002bedc95ce2be31ef1e37a29"},
+]
+
+[[package]]
+name = "pyobjc-framework-cocoa"
+version = "12.0"
+requires_python = ">=3.9"
+summary = "Wrappers for the Cocoa frameworks on macOS"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "pyobjc-core>=12.0",
+]
+files = [
+    {file = "pyobjc_framework_cocoa-12.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:13e573f5093f4158f305b1bac5e1f783881ce2f5f4a69f3c80cb000f76731259"},
+    {file = "pyobjc_framework_cocoa-12.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:3b167793cd1b509eaf693140ace9be1f827a2c8686fceb8c599907661f608bc2"},
+    {file = "pyobjc_framework_cocoa-12.0.tar.gz", hash = "sha256:02d69305b698015a20fcc8e1296e1528e413d8cf9fdcd590478d359386d76e8a"},
+]
+
+[[package]]
+name = "pyobjc-framework-quartz"
+version = "12.0"
+requires_python = ">=3.9"
+summary = "Wrappers for the Quartz frameworks on macOS"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "pyobjc-core>=12.0",
+    "pyobjc-framework-Cocoa>=12.0",
+]
+files = [
+    {file = "pyobjc_framework_quartz-12.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:ece7a05aa2bfc3aa215f1a7c8580e873f3867ba40d0006469618cc2ceb796578"},
+    {file = "pyobjc_framework_quartz-12.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:f1b2e34f6f0dd023f80a0e875af4dab0ad27fccac239da9ad3d311a2d2578e27"},
+    {file = "pyobjc_framework_quartz-12.0.tar.gz", hash = "sha256:5bcb9e78d671447e04d89e2e3c39f3135157892243facc5f8468aa333e40d67f"},
+]
+
+[[package]]
+name = "pyobjc-framework-security"
+version = "12.0"
+requires_python = ">=3.9"
+summary = "Wrappers for the framework Security on macOS"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "pyobjc-core>=12.0",
+    "pyobjc-framework-Cocoa>=12.0",
+]
+files = [
+    {file = "pyobjc_framework_security-12.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:be1435584cdd116495a16e6cd8a086d6930f0005ea49df4e4958b5a142dd6f63"},
+    {file = "pyobjc_framework_security-12.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:e3c27816b102858c976956ab8eee156b9c724cd0f1d488f3285ac4921a904788"},
+    {file = "pyobjc_framework_security-12.0.tar.gz", hash = "sha256:d64d069da79fbf1dadbc091717604843b9d5be96670f7b40bc9a08df12b4045b"},
+]
+
+[[package]]
+name = "pyobjc-framework-uniformtypeidentifiers"
+version = "12.0"
+requires_python = ">=3.9"
+summary = "Wrappers for the framework UniformTypeIdentifiers on macOS"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "pyobjc-core>=12.0",
+    "pyobjc-framework-Cocoa>=12.0",
+]
+files = [
+    {file = "pyobjc_framework_uniformtypeidentifiers-12.0-py2.py3-none-any.whl", hash = "sha256:b2c406e34306ef55ceb9c8cb16a4a9e37e7fc2ed4c8e7948f05bf3d51dea2a91"},
+    {file = "pyobjc_framework_uniformtypeidentifiers-12.0.tar.gz", hash = "sha256:f7fe17832de25098b9ad7718af536f6f4597985418d9869946cee104e2782b8a"},
+]
+
+[[package]]
+name = "pyobjc-framework-webkit"
+version = "12.0"
+requires_python = ">=3.9"
+summary = "Wrappers for the framework WebKit on macOS"
+groups = ["default"]
+marker = "sys_platform == \"darwin\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "pyobjc-core>=12.0",
+    "pyobjc-framework-Cocoa>=12.0",
+]
+files = [
+    {file = "pyobjc_framework_webkit-12.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:46fd5e0d8aa3bc57a614dc60eef768abf715cdd873682aadd09df6ee8d31fcda"},
+    {file = "pyobjc_framework_webkit-12.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:c933ccbdfecdfe3217e32883fa365c3b2cfad601eb25c0a3aee00043aca838fb"},
+    {file = "pyobjc_framework_webkit-12.0.tar.gz", hash = "sha256:a65a33d7057aed8d096672be4a53a7ea49a7c74a0b4bc9cb216d4773ebfed6d2"},
+]
+
+[[package]]
 name = "pypdf"
 version = "5.8.0"
 requires_python = ">=3.8"
@@ -1107,6 +1240,63 @@ dependencies = [
 files = [
     {file = "pypdf-5.8.0-py3-none-any.whl", hash = "sha256:bfe861285cd2f79cceecefde2d46901e4ee992a9f4b42c56548c4a6e9236a0d1"},
     {file = "pypdf-5.8.0.tar.gz", hash = "sha256:f8332f80606913e6f0ce65488a870833c9d99ccdb988c17bb6c166f7c8e140cb"},
+]
+
+[[package]]
+name = "pyside6"
+version = "6.10.0"
+requires_python = "<3.14,>=3.9"
+summary = "Python bindings for the Qt cross-platform application and UI framework"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "PySide6-Addons==6.10.0",
+    "PySide6-Essentials==6.10.0",
+    "shiboken6==6.10.0",
+]
+files = [
+    {file = "pyside6-6.10.0-cp39-abi3-macosx_13_0_universal2.whl", hash = "sha256:c2cbc5dc2a164e3c7c51b3435e24203e90e5edd518c865466afccbd2e5872bb0"},
+    {file = "pyside6-6.10.0-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:ae8c3c8339cd7c3c9faa7cc5c52670dcc8662ccf4b63a6fed61c6345b90c4c01"},
+    {file = "pyside6-6.10.0-cp39-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:9f402f883e640048fab246d36e298a5e16df9b18ba2e8c519877e472d3602820"},
+    {file = "pyside6-6.10.0-cp39-abi3-win_amd64.whl", hash = "sha256:70a8bcc73ea8d6baab70bba311eac77b9a1d31f658d0b418e15eb6ea36c97e6f"},
+    {file = "pyside6-6.10.0-cp39-abi3-win_arm64.whl", hash = "sha256:4b709bdeeb89d386059343a5a706fc185cee37b517bda44c7d6b64d5fdaf3339"},
+]
+
+[[package]]
+name = "pyside6-addons"
+version = "6.10.0"
+requires_python = "<3.14,>=3.9"
+summary = "Python bindings for the Qt cross-platform application and UI framework (Addons)"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "PySide6-Essentials==6.10.0",
+    "shiboken6==6.10.0",
+]
+files = [
+    {file = "pyside6_addons-6.10.0-cp39-abi3-macosx_13_0_universal2.whl", hash = "sha256:88e61e21ee4643cdd9efb39ec52f4dc1ac74c0b45c5b7fa453d03c094f0a8a5c"},
+    {file = "pyside6_addons-6.10.0-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:08d4ed46c4c9a353a9eb84134678f8fdd4ce17fb8cce2b3686172a7575025464"},
+    {file = "pyside6_addons-6.10.0-cp39-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:15d32229d681be0bba1b936c4a300da43d01e1917ada5b57f9e03a387c245ab0"},
+    {file = "pyside6_addons-6.10.0-cp39-abi3-win_amd64.whl", hash = "sha256:99d93a32c17c5f6d797c3b90dd58f2a8bae13abde81e85802c34ceafaee11859"},
+    {file = "pyside6_addons-6.10.0-cp39-abi3-win_arm64.whl", hash = "sha256:92536427413f3b6557cf53f1a515cd766725ee46a170aff57ad2ff1dfce0ffb1"},
+]
+
+[[package]]
+name = "pyside6-essentials"
+version = "6.10.0"
+requires_python = "<3.14,>=3.9"
+summary = "Python bindings for the Qt cross-platform application and UI framework (Essentials)"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "shiboken6==6.10.0",
+]
+files = [
+    {file = "pyside6_essentials-6.10.0-cp39-abi3-macosx_13_0_universal2.whl", hash = "sha256:003e871effe1f3e5b876bde715c15a780d876682005a6e989d89f48b8b93e93a"},
+    {file = "pyside6_essentials-6.10.0-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:1d5e013a8698e37ab8ef360e6960794eb5ef20832a8d562e649b8c5a0574b2d8"},
+    {file = "pyside6_essentials-6.10.0-cp39-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:b1dd0864f0577a448fb44426b91cafff7ee7cccd1782ba66491e1c668033f998"},
+    {file = "pyside6_essentials-6.10.0-cp39-abi3-win_amd64.whl", hash = "sha256:fc167eb211dd1580e20ba90d299e74898e7a5a1306d832421e879641fc03b6fe"},
+    {file = "pyside6_essentials-6.10.0-cp39-abi3-win_arm64.whl", hash = "sha256:6dd0936394cb14da2fd8e869899f5e0925a738b1c8d74c2f22503720ea363fb1"},
 ]
 
 [[package]]
@@ -1145,6 +1335,47 @@ dependencies = [
 files = [
     {file = "pytest_cov-6.2.1-py3-none-any.whl", hash = "sha256:f5bc4c23f42f1cdd23c70b1dab1bbaef4fc505ba950d53e0081d0730dd7e86d5"},
     {file = "pytest_cov-6.2.1.tar.gz", hash = "sha256:25cc6cc0a5358204b8108ecedc51a9b57b34cc6b8c967cc2c01a4e00d8a67da2"},
+]
+
+[[package]]
+name = "pythonnet"
+version = "3.0.5"
+requires_python = "<3.14,>=3.7"
+summary = ".NET and Mono integration for Python"
+groups = ["default"]
+marker = "sys_platform == \"win32\" and python_full_version ~= \"3.13.6\""
+dependencies = [
+    "clr-loader<0.3.0,>=0.2.7",
+]
+files = [
+    {file = "pythonnet-3.0.5-py3-none-any.whl", hash = "sha256:f6702d694d5d5b163c9f3f5cc34e0bed8d6857150237fae411fefb883a656d20"},
+    {file = "pythonnet-3.0.5.tar.gz", hash = "sha256:48e43ca463941b3608b32b4e236db92d8d40db4c58a75ace902985f76dac21cf"},
+]
+
+[[package]]
+name = "pywebview"
+version = "6.1"
+requires_python = ">=3.7"
+summary = "Build GUI for your Python program with JavaScript, HTML, and CSS"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "QtPy; sys_platform == \"openbsd6\"",
+    "bottle",
+    "importlib-resources; python_version < \"3.7\"",
+    "proxy-tools",
+    "pyobjc-core; sys_platform == \"darwin\"",
+    "pyobjc-framework-Cocoa; sys_platform == \"darwin\"",
+    "pyobjc-framework-Quartz; sys_platform == \"darwin\"",
+    "pyobjc-framework-UniformTypeIdentifiers; sys_platform == \"darwin\"",
+    "pyobjc-framework-WebKit; sys_platform == \"darwin\"",
+    "pyobjc-framework-security; sys_platform == \"darwin\"",
+    "pythonnet; sys_platform == \"win32\"",
+    "typing-extensions",
+]
+files = [
+    {file = "pywebview-6.1-py3-none-any.whl", hash = "sha256:2b552a340557e76a740b045a25937f72dae751e0985d5f5d9556f697ba622ec5"},
+    {file = "pywebview-6.1.tar.gz", hash = "sha256:f0b95047860caf3d921581f9e16b4edb1a125b23e2ce691c4da2968f8b160ff2"},
 ]
 
 [[package]]
@@ -1189,6 +1420,21 @@ files = [
     {file = "PyYAML-6.0.2-cp313-cp313-win32.whl", hash = "sha256:bc2fa7c6b47d6bc618dd7fb02ef6fdedb1090ec036abab80d4681424b84c1183"},
     {file = "PyYAML-6.0.2-cp313-cp313-win_amd64.whl", hash = "sha256:8388ee1976c416731879ac16da0aff3f63b286ffdd57cdeb95f3f2e085687563"},
     {file = "pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"},
+]
+
+[[package]]
+name = "qtpy"
+version = "2.4.3"
+requires_python = ">=3.7"
+summary = "Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6)."
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "packaging",
+]
+files = [
+    {file = "QtPy-2.4.3-py3-none-any.whl", hash = "sha256:72095afe13673e017946cc258b8d5da43314197b741ed2890e563cf384b51aa1"},
+    {file = "qtpy-2.4.3.tar.gz", hash = "sha256:db744f7832e6d3da90568ba6ccbca3ee2b3b4a890c3d6fbbc63142f6e4cdf5bb"},
 ]
 
 [[package]]
@@ -1320,6 +1566,21 @@ marker = "python_full_version ~= \"3.13.6\""
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
+]
+
+[[package]]
+name = "shiboken6"
+version = "6.10.0"
+requires_python = "<3.14,>=3.9"
+summary = "Python/C++ bindings helper module"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+files = [
+    {file = "shiboken6-6.10.0-cp39-abi3-macosx_13_0_universal2.whl", hash = "sha256:7a5f5f400ebfb3a13616030815708289c2154e701a60b9db7833b843e0bee543"},
+    {file = "shiboken6-6.10.0-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:e612734da515d683696980107cdc0396a3ae0f07b059f0f422ec8a2333810234"},
+    {file = "shiboken6-6.10.0-cp39-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:b01377e68d14132360efb0f4b7233006d26aa8ae9bb50edf00960c2a5f52d148"},
+    {file = "shiboken6-6.10.0-cp39-abi3-win_amd64.whl", hash = "sha256:0bc5631c1bf150cbef768a17f5f289aae1cb4db6c6b0c19b2421394e27783717"},
+    {file = "shiboken6-6.10.0-cp39-abi3-win_arm64.whl", hash = "sha256:dfc4beab5fec7dbbebbb418f3bf99af865d6953aa0795435563d4cbb82093b61"},
 ]
 
 [[package]]

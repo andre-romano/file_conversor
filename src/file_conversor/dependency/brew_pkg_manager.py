@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.system import PLATFORM_LINUX, PLATFORM_MACOS
+from file_conversor.system import _PLATFORM_LINUX, _PLATFORM_MACOS
 
 from file_conversor.config.locale import get_translation
 from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
@@ -43,7 +43,7 @@ class BrewPackageManager(AbstractPackageManager):
         return shutil.which("brew")
 
     def _get_supported_oses(self) -> set[str]:
-        return {PLATFORM_LINUX, PLATFORM_MACOS}
+        return {_PLATFORM_LINUX, _PLATFORM_MACOS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ['bash', '-c', 'export HOMEBREW_NO_INSTALL_CLEANUP=1 ; curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash']

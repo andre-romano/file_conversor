@@ -5,7 +5,7 @@ from flask import json, request, render_template, url_for
 # user-provided modules
 from file_conversor.utils.dominate_bulma import ModalCard
 
-from file_conversor.backend.gui.flask_app import FlaskApp
+from file_conversor.backend.gui.web_app import WebApp
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -23,7 +23,7 @@ def api_component_modal():
     """API endpoint to show a modal."""
     logger.info(f"[bold]{_('Modal requested via API.')}[/]")
 
-    args = FlaskApp.get_args()
+    args = WebApp.get_args()
 
     title = args.get('title')
     msg = args.get('msg')

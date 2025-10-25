@@ -120,6 +120,9 @@ class State:
     def __len__(self) -> int:
         return len(self.__data)
 
+    def to_dict(self) -> dict[str, Any]:
+        return self.__data.copy()
+
     def update(self, new: dict):
         for key, value in new.items():
             self[key] = value

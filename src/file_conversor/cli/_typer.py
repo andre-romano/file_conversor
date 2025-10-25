@@ -7,7 +7,7 @@ from typing import Any
 
 # user-provided modules
 from file_conversor.config import get_translation
-from file_conversor.system import CURR_PLATFORM, PLATFORM_WINDOWS
+from file_conversor.system import is_windows
 
 # CLI
 from file_conversor.cli.audio import audio_cmd
@@ -96,7 +96,7 @@ COMMANDS_LIST.extend([
 ######################
 # UTILS/CONFIG PANEL
 ######################
-if CURR_PLATFORM == PLATFORM_WINDOWS:
+if is_windows():
     COMMANDS_LIST.append({
         "typer_instance": win_cmd,
         "rich_help_panel": UTILS_CONFIG_PANEL

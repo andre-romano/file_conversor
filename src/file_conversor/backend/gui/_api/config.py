@@ -5,7 +5,7 @@ from flask import json, render_template, url_for
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.gui.flask_app import FlaskApp
+from file_conversor.backend.gui.web_app import WebApp
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -22,7 +22,7 @@ logger = LOG.getLogger()
 def api_config():
     """API endpoint to update the application configuration."""
     logger.info(f"[bold]{_('Configuration update requested via API.')}[/]")
-    data = FlaskApp.get_form_data()
+    data = WebApp.get_form_data()
     CONFIG.update(data)
     CONFIG.save()
     logger.debug(f"Configuration updated: {CONFIG}")
