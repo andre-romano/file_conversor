@@ -168,27 +168,6 @@ function alpineConfigForm() {
     return Alpine.store('form');
 }
 
-function alpineFileDialogConfig() {
-    let fileDialogStore = (Alpine.store('file_dialog'));
-
-    if (fileDialogStore) return fileDialogStore;
-
-    Alpine.store('file_dialog', {
-        openFolderDialog() {
-            // TODO Logic to open the folder dialog
-            console.log('Open folder dialog request');
-        },
-        openFileDialog(extensions = [], multiple = false) {
-            // TODO Logic to open the file dialog
-            console.log('Open file dialog request');
-            console.log('Extensions:', extensions);
-            console.log('Multiple:', multiple);
-        },
-    });
-
-    return Alpine.store('file_dialog');
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     if (window.dom_ready) return;
     window.dom_ready = true;
@@ -203,7 +182,6 @@ document.addEventListener('alpine:init', () => {
     console.log('Alpine initialized');
     alpineConfigStatusBar();
     alpineConfigForm();
-    alpineFileDialogConfig();
 });
 
 window.addEventListener('pywebviewready', async () => {
@@ -212,20 +190,9 @@ window.addEventListener('pywebviewready', async () => {
 
     console.log('pywebview JS API is ready');
 
-    // Adjust zoom level for high-DPI displays in PyWebView
-    const multiplier = 1.2; // You can adjust this multiplier as needed
-    const zoom = 1 / window.devicePixelRatio * multiplier;
-    document.body.style.zoom = zoom;
-    console.log('Applied zoom for PyWebView:', zoom);
-
     // fix window title to reflect <title> tag
     const title = document.title;
     await window.pywebview.api.set_title({ title: title });
     console.log('Set window title:', title);
 
-    // fix window maximize issue in PyWebView (zoom reset on maximize)
-    setTimeout(async () => {
-        await window.pywebview.api.maximize();
-        console.log('Requested window maximize');
-    }, 250);
 });

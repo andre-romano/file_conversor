@@ -167,7 +167,6 @@ class WebApp:
     def _run_webview(self) -> None:
         logger.info(f"[bold]{_('Starting webview window ...')}[/]")
         webview.start(
-            gui="qt",
             debug=STATE['debug'],
             icon=str(Environment.get_icons_folder() / "icon.ico"),
         )

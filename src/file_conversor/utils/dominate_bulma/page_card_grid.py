@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from reflex import card
-
 # user-provided modules
 from file_conversor.utils.dominate_bulma.breadcrumb import Breadcrumb
 from file_conversor.utils.dominate_bulma.card import Card

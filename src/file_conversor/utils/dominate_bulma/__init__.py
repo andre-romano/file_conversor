@@ -7,7 +7,15 @@ from file_conversor.utils.dominate_bulma.figure import *
 from file_conversor.utils.dominate_bulma.flex import *
 from file_conversor.utils.dominate_bulma.font_awesome_icon import *
 from file_conversor.utils.dominate_bulma.footer import *
+from file_conversor.utils.dominate_bulma.form_button import *
+from file_conversor.utils.dominate_bulma.form_checkbox import *
+from file_conversor.utils.dominate_bulma.form_field import *
 from file_conversor.utils.dominate_bulma.form_file_list import *
+from file_conversor.utils.dominate_bulma.form_input import *
+from file_conversor.utils.dominate_bulma.form_output_dir import *
+from file_conversor.utils.dominate_bulma.form_radio import *
+from file_conversor.utils.dominate_bulma.form_select import *
+from file_conversor.utils.dominate_bulma.form_textarea import *
 from file_conversor.utils.dominate_bulma.form import *
 from file_conversor.utils.dominate_bulma.grid import *
 from file_conversor.utils.dominate_bulma.level import *

@@ -162,7 +162,7 @@ class WebViewAPI:
             directory=options.get("path") or str(Path().resolve()),
             allow_multiple=bool(options.get("multiple", False)),
         )
-        logger.debug("Selected save file:", result)
+        logger.debug(f"Selected save file: {result}")
         return list(result or [])
 
     def open_file_dialog(self, options: dict[str, Any]) -> list[str]:
@@ -184,7 +184,7 @@ class WebViewAPI:
                 format_file_types_webview(),  # filter for all files
             ],
         )
-        logger.debug("Selected files:", result)
+        logger.debug(f"Selected files: {result}")
         return list(result or [])
 
     def save_file_dialog(self, options: dict[str, Any]) -> list[str]:
@@ -204,7 +204,7 @@ class WebViewAPI:
             save_filename=options.get("filename", ""),
             file_types=options.get("file_types", [format_file_types_webview()]),
         )
-        logger.debug("Selected save file:", result)
+        logger.debug(f"Selected save file: {result}")
         if not result:
             return []
 

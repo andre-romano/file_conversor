@@ -3,7 +3,8 @@
 from typing import Any
 
 # user-provided modules
-from file_conversor.utils.dominate_bulma.form import Button, Form
+from file_conversor.utils.dominate_bulma.form_button import Button
+from file_conversor.utils.dominate_bulma.form import Form
 from file_conversor.utils.dominate_bulma.breadcrumb import Breadcrumb
 from file_conversor.utils.dominate_bulma.page_base import PageBase
 

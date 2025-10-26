@@ -1,6 +1,6 @@
 # src\file_conversor\utils\bulma\form_file_list.py
 
-from typing import Any
+from typing import Any, Sequence
 
 from file_conversor.utils.dominate_utils import *
 
@@ -43,7 +43,7 @@ def _SelectBox():
             **{
                 ":class": """{
                     'is-danger': !isValid,
-                    'is-success': isValid,
+                    'is-hidden': isValid,
                 }""",
                 "x-text": "help",
             },
@@ -59,6 +59,7 @@ def _SelectButtons(
 
     Needs alpine data with:
     - files: list of available files
+    - filesStr: JSON string of the files
     - selected: list of selected files
     - isValid: boolean indicating if the selection is valid
 
@@ -69,21 +70,23 @@ def _SelectButtons(
     ) as control_right:
 
         # Upload button
-        with div(_class="file is-info is-48x48 mb-2"):
-            with label(_class="file-label is-full-height is-full-width"):
-                input_(
-                    _type="file",
-                    _name=input_name,
-                    _multiple=True,
-                    _class="file-input",
-                    **{
-                        "@change": """files = Array.from($event.target.files).map(file => file.name);"""
-                    },
-                )
-                with span(
-                    _class="file-cta is-full-height is-full-width is-flex is-justify-content-center is-align-items-center p-0",
-                ):
-                    i(_class="fa-solid fa-plus")
+        with div(_class="is-48x48 mb-2"):
+            input_(
+                _type="text",
+                _name=input_name,
+                _hidden=True,
+                **{
+                    "x-model": "filesStr",
+                },
+            )
+            with button(
+                _class="button is-info is-48x48 has-border",
+                alt="Remove file",
+                **{
+                    "@click.prevent": "openFileDialog"
+                },
+            ):
+                i(_class="fa-solid fa-plus")
 
         # Delete button
         with button(
@@ -105,19 +108,45 @@ def FormFileList(
         label_text: str,
         input_name: str,
         validation_expr: str,
+        multiple: bool = True,
+        file_types: Sequence[str] | None = None,
         help_text: str = "",
         reverse: bool = False,
 ):
+    """
+    Create a file list form field with select and buttons.
+
+    :param label_text: The label text for the field.
+    :param input_name: The name attribute for the hidden input field.
+    :param validation_expr: The expression to validate the selection.
+    :param multiple: Whether to allow multiple file selection.
+    :param file_types: The file types to filter in the file dialog. Format (description, [extensions]).
+    :param help_text: The help text for the field.
+    :param reverse: Whether to reverse the order of buttons and select box.
+
+    :return: The form field element.
+    """
     with div(
         cls="field is-horizontal is-full-width",
         **{
             "x-data": """{     
                 selected: [],
                 help: `%s`,
+                filesStr: '',
                 files: [],
                 isValid: false,
+                async openFileDialog() {
+                    const fileList = await pywebview.api.open_file_dialog({
+                        multiple: %s,
+                        file_types: %s,
+                    });
+                    // extend file list
+                    this.files.push(...fileList);
+                },
                 init() {
-                    this.$watch('files', value => {                        
+                    this.$watch('files', value => {     
+                        this.filesStr = JSON.stringify(value);
+
                         this.isValid = %s;
                         const parentForm = this.$el.closest('form[x-data]');
                         if(parentForm){
@@ -128,7 +157,7 @@ def FormFileList(
                         }
                     });        
                 },
-            }""" % (help_text, validation_expr)
+            }""" % (help_text, 'true' if multiple else 'false', file_types or 'null', validation_expr)
         },
     ) as field:
         # Field label
