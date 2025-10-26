@@ -3,8 +3,9 @@
 from typing import Any
 
 from file_conversor.utils.dominate_bulma.font_awesome_icon import FontAwesomeIcon
-
 from file_conversor.utils.dominate_utils import *
+
+from file_conversor.utils.formatters import format_py_to_js
 
 
 def FormField(
@@ -31,22 +32,12 @@ def FormField(
     :param _class_control: Additional CSS classes for the control div.
     :param x_data: Additional Alpine.js x-data properties.
     """
-    value = ""
-    if current_value is None:
-        value = "null"
-    if current_value and current_value.lower() == "true":
-        value = "true"
-    elif current_value and current_value.lower() == "false":
-        value = "false"
-    else:
-        value = current_value
-
     with div(
         _class=f"field is-full-width {_class}",
         **{
             'x-data': """{
-                help: '%s',
-                value: '%s',
+                help: %s,
+                value: %s,
                 isValid: false,
                 validate(value){
                     console.log('Validating field with value:', value);
@@ -66,8 +57,8 @@ def FormField(
                 },
                 %s
             }""" % (
-                help,
-                value,
+                format_py_to_js(help),
+                format_py_to_js(current_value),
                 validation_expr,
                 x_data,
             ),

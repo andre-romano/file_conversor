@@ -81,7 +81,6 @@ def api_doc_convert():
     logger.info(f"[bold]{_('Document conversion requested via API.')}[/]")
     data = fapp.get_form_data()
     data['status_id'] = fapp.add_status().get_id()
-    data['input_files'] = fapp.get_files_list("input-files")  # matches formData key
     threading.Thread(target=doc_convert_thread, args=(data,), daemon=True).start()
     return json.dumps({
         'status': 'processing',

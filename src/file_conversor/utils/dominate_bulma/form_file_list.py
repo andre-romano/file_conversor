@@ -3,6 +3,7 @@
 from typing import Any, Sequence
 
 from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.formatters import format_py_to_js
 
 
 def _SelectBox():
@@ -135,13 +136,23 @@ def FormFileList(
                 filesStr: '',
                 files: [],
                 isValid: false,
+                lastPath: '',
                 async openFileDialog() {
                     const fileList = await pywebview.api.open_file_dialog({
+                        path: this.lastPath,
                         multiple: %s,
                         file_types: %s,
                     });
-                    // extend file list
-                    this.files.push(...fileList);
+                    // extend files list, if fileList is not already present
+                    fileList.forEach(file => {
+                        if (!this.files.includes(file)) {
+                            this.files.push(file);
+                        }
+                        // get last path, for windows and unix compatibility
+                        const lastSeen = file.lastIndexOf(`/`);
+                        const lastSeenWin = file.lastIndexOf(`\\\\`);
+                        this.lastPath = file.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
+                    });
                 },
                 init() {
                     this.$watch('files', value => {     
@@ -157,7 +168,12 @@ def FormFileList(
                         }
                     });        
                 },
-            }""" % (help_text, 'true' if multiple else 'false', file_types or 'null', validation_expr)
+            }""" % (
+                help_text,
+                format_py_to_js(multiple),
+                format_py_to_js(file_types),
+                validation_expr,
+            )
         },
     ) as field:
         # Field label

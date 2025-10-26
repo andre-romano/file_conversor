@@ -19,6 +19,7 @@ from file_conversor.backend.gui.flask_status import FlaskStatus, FlaskStatusComp
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
+from file_conversor.utils.formatters import parse_js_to_py
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -75,22 +76,7 @@ class WebApp:
         logger.debug(f"Received data: {data}")
         # Update the configuration with the provided data
         for key, value in data.items():
-            # Attempt to convert to appropriate type
-            if value.lower() in ('true', 'on'):
-                value = True
-            elif value.lower() in ('false', 'off'):
-                value = False
-            elif value.lower() == 'none':
-                value = None
-            else:
-                try:
-                    if '.' in value:
-                        value = float(value)
-                    else:
-                        value = int(value)
-                except ValueError:
-                    pass  # Keep as string if conversion fails
-            data[key] = value
+            data[key] = parse_js_to_py(value)
         return data
 
     @classmethod

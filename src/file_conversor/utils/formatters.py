@@ -4,11 +4,32 @@ import math
 import re
 import typer
 
+from typing import Any
 
 # user-provided modules
 from file_conversor.config.locale import get_translation
 
 _ = get_translation()
+
+
+def parse_js_to_py(value: str) -> Any:
+    # Attempt to convert to appropriate type
+    res: Any = ""
+    if value.lower() in ('true', 'on'):
+        res = True
+    elif value.lower() in ('false', 'off'):
+        res = False
+    elif value.lower() == 'none':
+        res = None
+    else:
+        try:
+            if '.' in value:
+                res = float(value)
+            else:
+                res = int(value)
+        except ValueError:
+            pass  # Keep as string if conversion fails
+    return res
 
 
 def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
@@ -146,4 +167,31 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
     """
     if not file_types:
         return f'{_("All Files")} (*.*)'
-    return f'{description} ({"; ".join(file_types)})'
+    parsed_types = [ft if ft.startswith("*.") else f"*.{ft.lstrip('.')}" for ft in file_types]
+    return f'{description} ({";".join(parsed_types)})'
+
+
+def format_py_to_js(value: Any) -> str:
+    """Convert Python value to JavaScript-compatible string."""
+    if value is None:
+        # Convert None to 'null'
+        return 'null'
+    elif isinstance(value, bool):
+        # Convert boolean to 'true'/'false'
+        return 'true' if value else 'false'
+    elif isinstance(value, (int, float)):
+        # Convert numbers directly
+        return str(value)
+    elif isinstance(value, (list, set, tuple)):
+        # Convert list to JS array
+        js_array = ', '.join(format_py_to_js(item) for item in value)
+        return '[ %s ]' % js_array
+    elif isinstance(value, dict):
+        # Convert dict to JS object
+        js_items = ', '.join(f'{format_py_to_js(key)}: {format_py_to_js(val)}' for key, val in value.items())
+        return '{ %s }' % js_items
+    else:
+        # escape string quotes
+        escaped_value = str(value).replace("'", "\\'")
+        # Convert string to quoted JS string
+        return f"'{escaped_value}'"

@@ -4,9 +4,10 @@ from typing import Any
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.utils.dominate_bulma import *
-
 from file_conversor.backend.office import DOC_BACKEND
+
+from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -21,12 +22,20 @@ logger = LOG.getLogger()
 
 
 def PageConvert():
+
     return PageForm(
         FormFileList(
             input_name="input_files",
             validation_expr="value.length > 0",
             label_text=_("Input Files"),
             help_text=_("Select (or drag) the input files."),
+            file_types=[
+                format_file_types_webview(
+                    *[f for f in DOC_BACKEND.SUPPORTED_IN_FORMATS],
+                    description=_("Document files")
+                ),
+            ],
+            multiple=True,
         ),
         FormFieldHorizontal(
             FormFieldSelect(
@@ -74,11 +83,6 @@ def PageConvert():
 
 
 def doc_convert():
-    items = []
-    # TODO
-
     return render_template_string(str(
-        PageConvert(
-            *items
-        )
+        PageConvert()
     ))
