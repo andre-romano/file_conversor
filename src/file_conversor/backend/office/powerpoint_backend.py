@@ -1,6 +1,7 @@
 # src\file_conversor\backend\office\powerpoint_backend.py
 
 from pathlib import Path
+from typing import Callable
 
 # user-provided imports
 from file_conversor.config import Log
@@ -52,21 +53,25 @@ class PowerPointBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        files: list[tuple[Path | str, Path | str]],
+        file_processed_callback: Callable[[Path], None] | None = None,
     ):
-        input_path = Path(input_file).resolve()
-        output_path = Path(output_file).resolve()
-
-        self.check_file_exists(str(input_path))
-
-        out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
-
-        # powerpoint.Visible = True  # needed for powerpoint
         with Win32Com(self.PROG_ID, visible=None) as powerpoint:
-            presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)
-            presentation.SaveAs(
-                str(output_path),
-                FileFormat=out_config['format'],
-            )
-            presentation.Close()
+            for input_file, output_file in files:
+                input_path = Path(input_file).resolve()
+                output_path = Path(output_file).resolve()
+
+                self.check_file_exists(str(input_path))
+
+                out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+
+                # powerpoint.Visible = True  # needed for powerpoint
+                presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)
+                presentation.SaveAs(
+                    str(output_path),
+                    FileFormat=out_config['format'],
+                )
+                presentation.Close()
+
+                if file_processed_callback:
+                    file_processed_callback(input_path)

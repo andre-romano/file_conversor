@@ -4,20 +4,27 @@
 import subprocess
 import sys
 
-from rich import print
-
 # user provided imports
 from file_conversor.cli import app_cmd, STATE, CONFIG, LOG, logger, _
+from file_conversor.config import add_cleanup_task
 from file_conversor.system import reload_user_path
+
+
+def cleanup():
+    """Cleanup function to be called on exit."""
+    logger.debug(f"{_('Shutting down log system')} ...")
+    LOG.shutdown()
 
 
 # Entry point of the app
 def main() -> None:
     try:
+        # Register cleanup for normal exits
+        add_cleanup_task(cleanup)
+
         # begin app
         reload_user_path()
         app_cmd(prog_name="file_conversor")
-        LOG.shutdown()
         sys.exit(0)
     except Exception as e:
         error_type = str(type(e))
@@ -27,7 +34,6 @@ def main() -> None:
             logger.error(f"CMD: {e.cmd} ({e.returncode})")
             logger.error(f"STDERR: {e.stderr}")
             logger.error(f"STDOUT: {e.stdout}")
-        LOG.shutdown()
         if STATE["debug"]:
             raise
         sys.exit(1)

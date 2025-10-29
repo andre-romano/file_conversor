@@ -1,6 +1,7 @@
 # src\file_conversor\backend\office\abstract_libreoffice_backend.py
 
 from pathlib import Path
+from typing import Callable
 
 # user-provided imports
 from file_conversor.config import Environment, Log
@@ -58,33 +59,34 @@ class AbstractLibreofficeBackend(AbstractBackend):
 
     def convert(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        files: list[tuple[Path | str, Path | str]],
+        file_processed_callback: Callable[[Path], None] | None = None,
     ):
         """
         Convert input file into an output file.
 
-        :param output_file: Output file.
-        :param input_file: Input file.        
+        :param files: List of tuples containing input and output file paths.
 
         :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
+        for input_file, output_file in files:
+            self.check_file_exists(input_file)
 
-        input_path = Path(input_file).resolve()
-        output_path = Path(output_file).resolve()
+            input_path = Path(input_file).resolve()
+            output_path = Path(output_file).resolve()
 
-        output_dir = output_path.parent
-        output_format = output_path.suffix.lstrip(".").lower()
+            output_dir = output_path.parent
+            output_format = output_path.suffix.lstrip(".").lower()
 
-        # Execute command
-        process = Environment.run(
-            str(self._libreoffice_bin),
-            "--headless",
-            "--convert-to",
-            str(output_format),
-            "--outdir",
-            str(output_dir),
-            str(input_path)
-        )
-        return process
+            # Execute command
+            Environment.run(
+                str(self._libreoffice_bin),
+                "--headless",
+                "--convert-to",
+                str(output_format),
+                "--outdir",
+                str(output_dir),
+                str(input_path)
+            )
+            if file_processed_callback:
+                file_processed_callback(input_path)

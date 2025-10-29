@@ -1,8 +1,8 @@
+# src\file_conversor\config\environment.py
 
 import subprocess
 import shutil
 import sys
-import time
 
 from importlib.resources import files
 from importlib.metadata import version
@@ -13,9 +13,7 @@ from pathlib import Path
 from file_conversor.config.log import Log
 
 # Get app config
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
+logger = Log.get_instance().getLogger(__name__)
 
 
 class Environment:
@@ -269,3 +267,8 @@ class Environment:
 
     def __init__(self) -> None:
         super().__init__()
+
+
+__all__ = [
+    "Environment",
+]

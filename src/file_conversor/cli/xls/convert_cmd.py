@@ -71,17 +71,23 @@ def convert(
     format: Annotated[str, (XLS_BACKEND)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
+    files: list[tuple[Path | str, Path | str]] = []
+    for input_file in input_files:
+        output_file = output_dir / CommandManager.get_output_file(input_file, suffix=f".{format}")
+        if not STATE["overwrite-output"] and output_file.exists():
+            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
+        files.append((input_file, output_file))
+
     xls_backend = XLS_BACKEND(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+    with ProgressManager(len(input_files)) as progress_mgr:
+        logger.info(f"[bold]{_('Converting files')}[/] ...")
+        # Perform conversion
         xls_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
+            files=files,
+            file_processed_callback=lambda _: progress_mgr.complete_step()
         )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{format}")
+
     logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

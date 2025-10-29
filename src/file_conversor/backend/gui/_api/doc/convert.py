@@ -29,27 +29,24 @@ def doc_convert_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     output_format: str = params['output_format']
     input_files: list[Path] = [Path(i) for i in params['input_files']]
 
-    total_files = len(input_files)
-    for index, input_path in enumerate(input_files):
-        logger.info(f"[bold]{_('Converting file')}[/]: {input_path.name}")
+    files: list[tuple[Path | str, Path | str]] = [
+        (input_path, output_dir / f"{input_path.stem}.{output_format}")
+        for input_path in input_files
+    ]
+    total_files = len(files)
 
-        # Perform conversion
-        output_filename = input_path.with_suffix(f".{output_format}").name
-        output_path = (output_dir / output_filename).resolve()
-
-        doc_backend = DOC_BACKEND(
-            install_deps=CONFIG['install-deps'],
-            verbose=STATE["verbose"],
-        )
-        doc_backend.convert(
-            input_file=input_path,
-            output_file=output_path,
-        )
-
-        # Update status
-        progress = int(((index + 1) / total_files) * 100)
-        status.set_progress(progress)
-        logger.debug(f"{status}")
+    logger.info(f"[bold]{_('Converting files')}[/]...")
+    doc_backend = DOC_BACKEND(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+    doc_backend.convert(
+        files=files,
+        file_processed_callback=lambda _: status.set_progress(int(
+            (status.get_progress() or 0) + (100.0 / total_files)
+        )),
+    )
+    logger.debug(f"{status}")
 
 
 def api_doc_convert():

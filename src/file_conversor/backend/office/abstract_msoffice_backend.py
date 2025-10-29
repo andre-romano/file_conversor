@@ -1,6 +1,7 @@
 # src\file_conversor\backend\office\abstract_msoffice_backend.py
 
 from pathlib import Path
+from typing import Callable
 
 # user-provided imports
 from file_conversor.config import Log
@@ -86,14 +87,13 @@ class AbstractMSOfficeBackend(AbstractBackend):
 
     def convert(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        files: list[tuple[Path | str, Path | str]],
+        file_processed_callback: Callable[[Path], None] | None = None,
     ):
         """
         Convert input file into an output file.
 
-        :param output_file: Output file.
-        :param input_file: Input file.        
+        :param files: List of tuples containing input and output file paths.    
 
         :raises FileNotFoundError: if input file not found.
         :raises OSError: if os is not Windows, or MS Office App not available.

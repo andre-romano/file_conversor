@@ -1,6 +1,7 @@
 # src\file_conversor\backend\office\word_backend.py
 
 from pathlib import Path
+from typing import Callable
 
 # user-provided imports
 from file_conversor.config import Log
@@ -54,20 +55,24 @@ class WordBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        files: list[tuple[Path | str, Path | str]],
+        file_processed_callback: Callable[[Path], None] | None = None,
     ):
-        self.check_file_exists(input_file)
-
-        input_path = Path(input_file).resolve()
-        output_path = Path(output_file).resolve()
-
-        out_config = WordBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
-
         with Win32Com(self.PROG_ID, visible=None) as word:
-            doc = word.Documents.Open(str(input_path))
-            doc.SaveAs(
-                str(output_path),
-                FileFormat=out_config['format'],
-            )
-            doc.Close()
+            for input_file, output_file in files:
+                self.check_file_exists(input_file)
+
+                input_path = Path(input_file).resolve()
+                output_path = Path(output_file).resolve()
+
+                out_config = WordBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+
+                doc = word.Documents.Open(str(input_path))
+                doc.SaveAs(
+                    str(output_path),
+                    FileFormat=out_config['format'],
+                )
+                doc.Close()
+
+                if file_processed_callback:
+                    file_processed_callback(input_path)
