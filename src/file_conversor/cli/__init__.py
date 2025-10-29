@@ -110,6 +110,7 @@ def main_callback(
     logger.debug(f"Python {PYTHON_VERSION} ({sys.executable})")
     logger.debug(f"Command: {sys.argv}")
     # Environment.get_executable()
+    logger.debug(f"Resources folder: {Environment.get_resources_folder()}")
     logger.debug(f"Working directory: {Path().resolve()}")
     logger.debug(f"Config file: {CONFIG.get_path()}")
     logger.debug(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")

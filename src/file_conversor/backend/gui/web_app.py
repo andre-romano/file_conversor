@@ -1,7 +1,6 @@
 # src\file_conversor\gui\web_app.py
 
 import webview
-import tempfile
 import webbrowser
 import typer
 import time
@@ -69,7 +68,7 @@ class WebApp:
         web_path = Environment.get_web_folder()
 
         window = webview.create_window(
-            title="File Conversor",
+            title="File Conversor - Home",
             url=f"http://127.0.0.1:{CONFIG['port']}",
             localization=self.LOCALIZATION,
             maximized=True,
@@ -118,9 +117,17 @@ class WebApp:
 
     def _run_webview(self) -> None:
         logger.info(f"[bold]{_('Starting webview window ...')}[/]")
+
+        def __init_webview():
+            self.evaluate_js(r"""
+            window.addEventListener('pywebviewready', async () => {
+                pywebview.api.set_icon();
+            });
+            """)
         webview.start(
+            __init_webview,
             debug=STATE['debug'],
-            icon=str(Environment.get_icons_folder() / "icon.ico"),
+            icon=str(Environment.get_app_icon()),
         )
         logger.info(f"[bold]{_('Webview window closed.')}[/]")
 

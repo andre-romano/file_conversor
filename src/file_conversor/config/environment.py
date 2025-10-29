@@ -120,26 +120,31 @@ class Environment:
     @classmethod
     def get_web_folder(cls) -> Path:
         web_path = cls.get_resources_folder() / ".web"
-        logger.debug(f"Web path: {web_path}")
+        # logger.debug(f"Web path: {web_path}")
         return web_path
 
     @classmethod
     def get_icons_folder(cls) -> Path:
         """Get the absolute path of the included folders in pip."""
         icons_path = cls.get_resources_folder() / ".icons"
-        logger.debug(f"Icons path: {icons_path}")
+        # logger.debug(f"Icons path: {icons_path}")
         return icons_path
 
     @classmethod
     def get_locales_folder(cls) -> Path:
         locales_path = cls.get_resources_folder() / ".locales"
-        logger.debug(f"Locales path: {locales_path}")
+        # logger.debug(f"Locales path: {locales_path}")
         return locales_path
 
     @classmethod
     def get_version(cls) -> str:
         """Get the current version of the app."""
         return version("file_conversor")
+
+    @classmethod
+    def get_app_icon(cls) -> Path:
+        """Get the path to the app icon."""
+        return cls.get_icons_folder() / "icon.ico"
 
     @classmethod
     def get_instance(cls):

@@ -196,5 +196,4 @@ window.addEventListener('pywebviewready', async () => {
     const title = document.title;
     await window.pywebview.api.set_title({ title: title });
     console.log('Set window title:', title);
-
 });

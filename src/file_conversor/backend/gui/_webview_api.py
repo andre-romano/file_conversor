@@ -11,6 +11,8 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.formatters import format_file_types_webview
 
+from file_conversor.system import set_window_icon
+
 # Get app config
 CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
@@ -127,6 +129,19 @@ class WebViewAPI:
 
         self._get_window().set_title(title)
         logger.debug(f"Window title set to '{title}'.")
+        return True
+
+    def set_icon(self) -> bool:
+        """Set the window icon (Windows only)."""
+        res = set_window_icon(
+            self._get_window().title,
+            icon_path=Environment.get_app_icon(),
+            cx=128, cy=128,
+        )
+        if not res:
+            logger.warning("Failed to set window icon.")
+            return False
+        logger.debug("Window icon set.")
         return True
 
     def open_folder_dialog(self, options: dict[str, Any]) -> list[str]:

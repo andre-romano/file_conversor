@@ -31,17 +31,17 @@ def is_unknown():
 # dynamically load modules, as needed
 if _CURR_PLATFORM == _PLATFORM_WINDOWS:
     # WINDOWS OS
-    from file_conversor.system.win import reload_user_path, is_admin
+    from file_conversor.system.win import *
 
 elif _CURR_PLATFORM == _PLATFORM_LINUX:
     # LINUX OS
-    from file_conversor.system.lin import reload_user_path, is_admin
+    from file_conversor.system.lin import *
 
 elif _CURR_PLATFORM == _PLATFORM_MACOS:
     # MACOS OS
-    from file_conversor.system.mac import reload_user_path, is_admin
+    from file_conversor.system.mac import *
 
 else:
     # UNKNOWN OS
     _CURR_PLATFORM = _PLATFORM_UNKNOWN
-    from file_conversor.system.dummy import reload_user_path, is_admin
+    from file_conversor.system.dummy import *
