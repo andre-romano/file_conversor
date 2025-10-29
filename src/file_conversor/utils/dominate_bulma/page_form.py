@@ -58,7 +58,7 @@ def PageForm(
                         'is-cursor-progress': checkLoading(),
                     }""",
                     ':disabled': '!isValid || checkLoading()',
-                    '@click': f'$store.form.submit($el, `{api_endpoint}`)',
+                    '@click': f'$store.form.submit($el.closest("form[x-data]"), `{api_endpoint}`)',
                 },
             ),
             _class='is-flex is-flex-direction-column is-align-items-flex-end is-full-width',

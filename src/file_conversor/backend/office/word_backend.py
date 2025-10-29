@@ -57,10 +57,10 @@ class WordBackend(AbstractMSOfficeBackend):
         output_file: str | Path,
         input_file: str | Path,
     ):
+        self.check_file_exists(input_file)
+
         input_path = Path(input_file).resolve()
         output_path = Path(output_file).resolve()
-
-        self.check_file_exists(str(input_path))
 
         out_config = WordBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
 

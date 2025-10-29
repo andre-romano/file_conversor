@@ -1,9 +1,11 @@
 # src\file_conversor\utils\formatters.py
 
+import json
 import math
 import re
 import typer
 
+from pathlib import Path
 from typing import Any
 
 # user-provided modules
@@ -14,22 +16,27 @@ _ = get_translation()
 
 def parse_js_to_py(value: str) -> Any:
     # Attempt to convert to appropriate type
-    res: Any = ""
-    if value.lower() in ('true', 'on'):
-        res = True
-    elif value.lower() in ('false', 'off'):
-        res = False
-    elif value.lower() == 'none':
-        res = None
-    else:
-        try:
+    try:
+        # Handle boolean values
+        if value.lower() in ('true', 'on'):
+            return True
+        elif value.lower() in ('false', 'off'):
+            return False
+        # Handle null value
+        elif value.lower() in ('null', 'none'):
+            return None
+        # Handle numeric values
+        elif re.match(r'^-?\d+(\.\d+)?$', value):
             if '.' in value:
-                res = float(value)
+                return float(value)
             else:
-                res = int(value)
-        except ValueError:
-            pass  # Keep as string if conversion fails
-    return res
+                return int(value)
+        # Handle JSON arrays and objects
+        elif (value.startswith('[') and value.endswith(']')) or (value.startswith('{') and value.endswith('}')):
+            return json.loads(value.replace("'", '"'))
+    except Exception:
+        pass
+    return value  # return as string if parsing fails
 
 
 def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
@@ -173,25 +180,4 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
 
 def format_py_to_js(value: Any) -> str:
     """Convert Python value to JavaScript-compatible string."""
-    if value is None:
-        # Convert None to 'null'
-        return 'null'
-    elif isinstance(value, bool):
-        # Convert boolean to 'true'/'false'
-        return 'true' if value else 'false'
-    elif isinstance(value, (int, float)):
-        # Convert numbers directly
-        return str(value)
-    elif isinstance(value, (list, set, tuple)):
-        # Convert list to JS array
-        js_array = ', '.join(format_py_to_js(item) for item in value)
-        return '[ %s ]' % js_array
-    elif isinstance(value, dict):
-        # Convert dict to JS object
-        js_items = ', '.join(f'{format_py_to_js(key)}: {format_py_to_js(val)}' for key, val in value.items())
-        return '{ %s }' % js_items
-    else:
-        # escape string quotes
-        escaped_value = str(value).replace("'", "\\'")
-        # Convert string to quoted JS string
-        return f"'{escaped_value}'"
+    return json.dumps(value).replace('"', "'")

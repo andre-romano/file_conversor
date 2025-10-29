@@ -1,4 +1,4 @@
-# src\file_conversor\backend\gui\flask_status.py
+# src\file_conversor\backend\gui\flask_api_status.py
 
 from flask import Flask
 from typing import Any, Callable, Self
@@ -15,7 +15,7 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-class FlaskStatus:
+class FlaskApiStatus:
     def __init__(
             self,
             id: str | int,
@@ -55,7 +55,7 @@ class FlaskStatus:
     def set_progress(self, progress: int) -> None:
         self._progress = progress
 
-    def set(self, other: 'FlaskStatus') -> None:
+    def set(self, other: 'FlaskApiStatus') -> None:
         self._status = other._status
         self._message = other._message
         self._exception = other._exception
@@ -71,7 +71,7 @@ class FlaskStatus:
         }
 
 
-class FlaskStatusCompleted(FlaskStatus):
+class FlaskApiStatusCompleted(FlaskApiStatus):
     def __init__(self, id: str | int) -> None:
         super().__init__(
             id=id,
@@ -81,7 +81,7 @@ class FlaskStatusCompleted(FlaskStatus):
         )
 
 
-class FlaskStatusProcessing(FlaskStatus):
+class FlaskApiStatusProcessing(FlaskApiStatus):
     def __init__(self, id: str | int, progress: int | None = None) -> None:
         super().__init__(
             id=id,
@@ -91,7 +91,7 @@ class FlaskStatusProcessing(FlaskStatus):
         )
 
 
-class FlaskStatusReady(FlaskStatus):
+class FlaskApiStatusReady(FlaskApiStatus):
     def __init__(self) -> None:
         super().__init__(
             id='0',
@@ -100,7 +100,7 @@ class FlaskStatusReady(FlaskStatus):
         )
 
 
-class FlaskStatusError(FlaskStatus):
+class FlaskApiStatusError(FlaskApiStatus):
     def __init__(self, id: str | int, exception: str, progress: int | None = None) -> None:
         super().__init__(
             id=id,
@@ -111,7 +111,7 @@ class FlaskStatusError(FlaskStatus):
         )
 
 
-class FlaskStatusUnknown(FlaskStatus):
+class FlaskApiStatusUnknown(FlaskApiStatus):
     def __init__(self, id: str | int) -> None:
         super().__init__(
             id=id,
@@ -122,10 +122,10 @@ class FlaskStatusUnknown(FlaskStatus):
 
 
 __all__ = [
-    'FlaskStatus',
-    'FlaskStatusCompleted',
-    'FlaskStatusProcessing',
-    'FlaskStatusReady',
-    'FlaskStatusError',
-    'FlaskStatusUnknown',
+    'FlaskApiStatus',
+    'FlaskApiStatusCompleted',
+    'FlaskApiStatusProcessing',
+    'FlaskApiStatusReady',
+    'FlaskApiStatusError',
+    'FlaskApiStatusUnknown',
 ]

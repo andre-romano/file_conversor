@@ -4,8 +4,10 @@
 
 async function loadModal(title, msg, closeable = true) {
     try {
-        const response = await fetch(`/api/component/modal?title=${title}&msg=${msg}&closeable=${closeable}`, {
+        const params = { title: title, msg: msg, closeable: closeable };
+        const response = await fetch(`/api/component/modal?${new URLSearchParams(params)}`, {
             method: 'GET',
+
         });
         if (!response.ok) {
             throw new Error(`${response.status} ${response.statusText}`);

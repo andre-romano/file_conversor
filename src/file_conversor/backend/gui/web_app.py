@@ -15,11 +15,9 @@ from typing import Any, Callable, Iterable, Self
 from file_conversor.backend.gui._webview_api import WebViewAPI
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
-from file_conversor.backend.gui.flask_status import FlaskStatus, FlaskStatusCompleted, FlaskStatusError, FlaskStatusProcessing, FlaskStatusReady, FlaskStatusUnknown
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
-from file_conversor.utils.formatters import parse_js_to_py
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -66,37 +64,6 @@ class WebApp:
             cls._instance = cls()
         return cls._instance
 
-    @classmethod
-    def get_args(cls):
-        return request.args.to_dict()
-
-    @classmethod
-    def get_form_data(cls) -> dict[str, Any]:
-        data: dict[str, Any] = request.form.to_dict()
-        logger.debug(f"Received data: {data}")
-        # Update the configuration with the provided data
-        for key, value in data.items():
-            data[key] = parse_js_to_py(value)
-        return data
-
-    @classmethod
-    def get_files_list(cls, key: str) -> tuple[list[Path], Path]:
-        """
-        Save the uploaded files from the request into temporary dir, for processing.
-
-        :return: tuple[list[Path], Path]: A tuple containing the list of saved file paths and the temporary directory path.
-        """
-        res: list[Path] = []
-        files = request.files.getlist(key)
-        temp_dir = Path(tempfile.mkdtemp())
-        for file in files:
-            if not file.filename:
-                continue
-            file_path = temp_dir / file.filename
-            file.save(file_path)
-            res.append(file_path)
-        return res, temp_dir
-
     def __init__(self) -> None:
         super().__init__()
         web_path = Environment.get_web_folder()
@@ -118,7 +85,6 @@ class WebApp:
         )
         self._flask_ready = threading.Event()
         self.routes: set[FlaskRoute] = set()
-        self.status: dict[str, FlaskStatus] = {}
 
     def _open_browser(self, url: str) -> None:
         # new=0 → same window (if possible)
@@ -170,23 +136,6 @@ class WebApp:
     ) -> Any:
         """Evaluate a JavaScript script in the webview window."""
         return self.window.evaluate_js(script, callback)
-
-    def add_status(self) -> FlaskStatus:
-        """Add or update the status of a specific operation by its ID."""
-        status_id = len(self.status) + 1
-        status = FlaskStatusProcessing(id=status_id)
-        self.status[status._id] = status
-        return status
-
-    def get_status(self, status_id: str | None) -> FlaskStatus:
-        """Get the status of a specific operation by its ID."""
-        if status_id is None or status_id.lower() in ('', 'none', 'null', '0'):
-            return FlaskStatusReady()
-        status = self.status.get(status_id)
-        # remove completed or error statuses
-        if status is not None and isinstance(status, (FlaskStatusCompleted, FlaskStatusError)):
-            del self.status[status_id]
-        return status or FlaskStatusUnknown(status_id)
 
     def add_route(self, routes: FlaskRoute | Iterable[FlaskRoute]) -> Self:
         """Add a new route to the Flask application."""

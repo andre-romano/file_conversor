@@ -31,26 +31,6 @@ class WebViewAPI:
             return window
         raise RuntimeError(_("No webview window found."))
 
-    def set_config(self, kwargs: dict[Any, Any]) -> bool:
-        """Set the application configuration."""
-        CONFIG.update(kwargs)
-        logger.debug("Configuration updated via WebViewAPI.")
-        return True
-
-    def get_config(self) -> dict[Any, Any]:
-        """Get the current configuration as a dictionary."""
-        return CONFIG.to_dict()
-
-    def set_state(self, kwargs: dict[Any, Any]) -> bool:
-        """Set the application state."""
-        STATE.update(kwargs)
-        logger.debug("State updated via WebViewAPI.")
-        return True
-
-    def get_state(self) -> dict[Any, Any]:
-        """Get the current state as a dictionary."""
-        return STATE.to_dict()
-
     def touch_file(self, options: dict[str, Any]) -> bool:
         """Create an empty file at the specified path."""
         path = options.get("path")
