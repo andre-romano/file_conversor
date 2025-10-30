@@ -1,6 +1,13 @@
 // src\file_conversor\.web\static\js\index.js
 
+/* eslint-disable no-unused-vars */
 /* global Alpine */
+
+function set_zoom(zoom_level) {
+    zoom_level = parseInt(zoom_level);
+    document.body.style.zoom = `${zoom_level}%`;
+    console.log('Set zoom level to:', zoom_level);
+}
 
 async function loadModal(title, msg, closeable = true) {
     try {

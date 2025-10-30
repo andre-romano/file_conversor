@@ -33,6 +33,10 @@ class WebViewAPI:
             return window
         raise RuntimeError(_("No webview window found."))
 
+    def get_config(self) -> dict[str, Any]:
+        """Get the current application configuration."""
+        return CONFIG.to_dict()
+
     def touch_file(self, options: dict[str, Any]) -> bool:
         """Create an empty file at the specified path."""
         path = options.get("path")

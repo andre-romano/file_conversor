@@ -35,6 +35,7 @@ def FormFieldRadio(
     help: str,
     label_text: str = "",
     x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -73,6 +74,7 @@ def FormFieldRadio(
         label_text=label_text,
         help=help,
         x_data=x_data,
+        x_init=x_init,
     )
     return field
 

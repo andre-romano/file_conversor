@@ -1,16 +1,27 @@
 # src\file_conversor\utils\dominate_bulma\page_base.py
 
 import dominate
+import dominate.tags
 
 from typing import cast
 
-import dominate.tags
-
+# user-provided modules
 from file_conversor.utils.dominate_bulma.navbar import Navbar
 from file_conversor.utils.dominate_bulma.footer import Footer
 from file_conversor.utils.dominate_bulma.status_bar import StatusBar
 
 from file_conversor.utils.dominate_utils import *
+
+from file_conversor.config import Configuration, Environment, Log, State
+from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES
+
+# Get app config
+CONFIG = Configuration.get_instance()
+STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger()
 
 
 def PageBase(
@@ -32,7 +43,7 @@ def PageBase(
         _class="has-navbar-fixed-top has-status-bar-fixed-bottom",
         **kwargs,
     ) as component:
-        with cast(dominate.tags.head, component.head):
+        with cast(dominate.tags.head, component.head) as head:
             meta(_charset="UTF-8")
             meta(_name="viewport", _content="width=device-width, initial-scale=1.0")
             # title(_title)
@@ -47,7 +58,9 @@ def PageBase(
 
             # Custom CSS
             link(_rel="stylesheet", _href="/static/css/base.css")
-        with cast(dominate.tags.body, component.body):
+        with cast(dominate.tags.body, component.body) as body:
+            body.set_attribute("style", f"zoom: {CONFIG['gui-zoom']}%;")
+
             # navbar
             Navbar(title=nav_title)
 

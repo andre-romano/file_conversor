@@ -109,6 +109,12 @@ def set(
                                                  help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
                                                  callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                                  )] = CONFIG["pdf-compression"],
+
+
+    gui_zoom: Annotated[int, typer.Option("--gui-zoom", "-gz",
+                                          help=_("GUI zoom level. Valid values are >= 1 (100 = normal size, 150 = 1.5x size, etc)."),
+                                          min=1,
+                                          )] = CONFIG["gui-zoom"],
 ):
     # update the configuration dictionary
     CONFIG.update({
@@ -126,6 +132,7 @@ def set(
         "image-page-size": image_page_size,
         "image-resampling": image_resampling,
         "pdf-compression": pdf_compression,
+        "gui-zoom": gui_zoom,
     })
     CONFIG.save()
     show_cmd.show()

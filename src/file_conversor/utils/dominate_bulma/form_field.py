@@ -19,6 +19,7 @@ def FormField(
     _class: str = "",
     _class_control: str = "",
     x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -31,6 +32,7 @@ def FormField(
     :param _class: Additional CSS classes for the form field.
     :param _class_control: Additional CSS classes for the control div.
     :param x_data: Additional Alpine.js x-data properties.
+    :param x_init: Additional Alpine.js x-init code.
     """
     with div(
         _class=f"field is-full-width {_class}",
@@ -53,13 +55,15 @@ def FormField(
                 },
                 init() {
                     this.$watch('value', this.validate.bind(this));
-                    this.validate(this.value);                    
+                    this.validate(this.value);   
+                    %s ;                 
                 },
                 %s
             }""" % (
                 format_py_to_js(help),
                 format_py_to_js(current_value),
                 validation_expr,
+                x_init,
                 x_data,
             ),
         },

@@ -37,6 +37,7 @@ def FormFieldInput(
     validation_expr: str = "",
     button: dict[str, Any] | None = None,
     x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -82,6 +83,7 @@ def FormFieldInput(
         label_text=label_text,
         help=help,
         x_data=x_data,
+        x_init=x_init,
     )
     return field
 

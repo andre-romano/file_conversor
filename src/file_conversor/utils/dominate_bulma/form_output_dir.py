@@ -10,6 +10,8 @@ from file_conversor.utils.dominate_utils import *
 def FormFieldOutputDirectory(
     help: str,
     _name: str,
+    x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -35,7 +37,9 @@ def FormFieldOutputDirectory(
                     this.value = folderList[0];
                 }
             },
-        """,
+            %s
+        """ % x_data,
+        x_init=x_init,
         **kwargs,
     )
 

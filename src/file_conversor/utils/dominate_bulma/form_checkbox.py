@@ -33,6 +33,7 @@ def FormFieldCheckbox(
     help: str,
     label_text: str = "",
     x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -69,6 +70,7 @@ def FormFieldCheckbox(
         current_value=current_value,
         help=help,
         x_data=x_data,
+        x_init=x_init,
     )
     return field
 

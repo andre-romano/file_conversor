@@ -29,6 +29,7 @@ def FormFieldTextArea(
     label_text: str = "",
     validation_expr: str = "",
     x_data: str = "",
+    x_init: str = "",
     **kwargs,
 ):
     """
@@ -63,6 +64,7 @@ def FormFieldTextArea(
         label_text=label_text,
         help=help,
         x_data=x_data,
+        x_init=x_init,
     )
     return field
 

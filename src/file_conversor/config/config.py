@@ -42,6 +42,7 @@ class Configuration:
             "image-page-size": None,    # Default image => PDF page size
             "image-resampling": "bicubic",  # Default image resampling algorithm
             "pdf-compression": "medium",  # Default PDF compression level
+            "gui-zoom": 100,            # Default GUI zoom level
         }
 
         self.load()

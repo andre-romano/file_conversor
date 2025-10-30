@@ -31,6 +31,26 @@ def TabConfigGeneral() -> tuple | list:
             ),
             label_text=_("Language"),
         ),
+        FormFieldHorizontal(
+            FormFieldInput(
+                validation_expr="Number.parseInt(value) >= 1",
+                current_value=CONFIG['gui-zoom'],
+                _name="gui-zoom",
+                _type="number",
+                help=_("Set the default zoom level for the user interface. Valid values are >= 1 (100 = normal size, 150 = 1.5x size, etc)."),
+                x_init="""
+                    let timeout;
+                    this.$watch('value', (newValue) => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            set_zoom(newValue);
+                        }, 1500);
+                    });
+                """,
+
+            ),
+            label_text=_("GUI Zoom Level (%)"),
+        ),
         FormFieldCheckbox(
             current_value=CONFIG['install-deps'],
             _name="install-deps",
