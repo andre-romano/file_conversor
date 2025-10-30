@@ -71,7 +71,7 @@ def PageForm(
                     updateValidity() {
                         let res = true;     
                         if (!this.elements || this.elements.length === 0) {   
-                            this.elements = this.$el.querySelectorAll('[x-data]');
+                            this.elements = this.$el.querySelectorAll('.field[x-data]');
                         }
                         this.elements.forEach((item) => {
                             if (item === this.$el) return;

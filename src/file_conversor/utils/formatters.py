@@ -23,7 +23,7 @@ def parse_js_to_py(value: str) -> Any:
         elif value.lower() in ('false', 'off'):
             return False
         # Handle null value
-        elif value.lower() in ('null', 'none'):
+        elif value.lower() in ('null', 'none', 'undefined'):
             return None
         # Handle numeric values
         elif re.match(r'^-?\d+(\.\d+)?$', value):
@@ -180,4 +180,8 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
 
 def format_py_to_js(value: Any) -> str:
     """Convert Python value to JavaScript-compatible string."""
-    return json.dumps(value).replace('"', "'")
+    data = json.dumps(value)
+    if data[0] in ('"', "'") and data[-1] in ('"', "'"):
+        # Strip quotes and wrap in backticks
+        return f"`{data[1:-1]}`"
+    return data

@@ -28,7 +28,10 @@ class TabsStyle:
 
 def Tabs(
     *tabs: dict[str, Any],
+    active_tab: str,
     _class: str = "",
+    _class_headers: str = "",
+    _class_content: str = "",
     **kwargs,
 ):
     """
@@ -36,18 +39,38 @@ def Tabs(
 
     :param tabs: A list of dictionaries representing each tab. Each dictionary should have:
                  - 'label': The text label of the tab.
-                 - 'active': A boolean indicating if the tab is active.
                  - 'icon': (Optional) The FontAwesome icon name for the tab.
+                 - 'content': The list of content to display when the tab is active.
+    :param active_tab: The label of the tab that should be active by default.                 
     :param _class: Additional CSS classes for the tabs container.
+    :param _class_headers: Additional CSS classes for the tab headers.
+    :param _class_content: Additional CSS classes for the tab content area.
     """
-    with div(_class=f"tabs {_class}", **kwargs) as tabs_div:
-        with ul():
+    with div(_class=f"tabs {_class}", **{
+        "x-data": """{
+            activeTab: '%s',
+        }""" % (active_tab)
+    }, **kwargs) as tabs_div:
+        with ul(_class=f"tab-headers {_class_headers}"):
             for tab in tabs:
-                with li(_class="is-active" if tab.get("active", False) else ""):
-                    with a():
+                with li(**{
+                    ":class": f"""{{
+                        'is-active': activeTab === '{tab['label']}'
+                    }}"""
+                }):
+                    with a(**{
+                        "@click.prevent": f"activeTab = '{tab['label']}'",
+                    }):
                         if "icon" in tab:
                             FontAwesomeIcon(tab["icon"], _class="is-small")
                         span(tab["label"])
+        for tab in tabs:
+            with div(_class=f"tab-content {_class_content}", **{
+                ":class": f"""{{
+                    'is-hidden': activeTab !== '{tab['label']}'
+                }}"""
+            }) as tab_content_div:
+                tab_content_div.add(*tab['content'])
     return tabs_div
 
 
