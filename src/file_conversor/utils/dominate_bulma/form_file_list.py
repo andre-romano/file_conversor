@@ -35,6 +35,7 @@ def _SelectBox():
                 _style="cursor: unset;",
                 **{
                     "x-model": "selected",
+                    ":title": "help",
                 },
             ):
                 with template(**{"x-for": "opt in files"}):
@@ -54,6 +55,8 @@ def _SelectBox():
 
 def _SelectButtons(
         input_name: str,
+        add_help: str,
+        remove_help: str,
 ):
     """
     Create the select buttons for the file list.
@@ -82,7 +85,7 @@ def _SelectButtons(
             )
             with button(
                 _class="button is-info is-48x48 has-border",
-                alt="Remove file",
+                _title=add_help,
                 **{
                     "@click.prevent": "openFileDialog"
                 },
@@ -92,7 +95,7 @@ def _SelectButtons(
         # Delete button
         with button(
             _class="button is-danger is-48x48 has-border",
-            alt="Remove file",
+            _title=remove_help,
             **{
                 "@click.prevent": """                
                     files = files.filter(file => !selected.includes(file));
@@ -112,6 +115,8 @@ def FormFileList(
         multiple: bool = True,
         file_types: Sequence[str] | None = None,
         help_text: str = "",
+        add_help: str = "Add file",
+        remove_help: str = "Remove file",
         reverse: bool = False,
 ):
     """
@@ -186,10 +191,18 @@ def FormFileList(
                 # Left-side file list
                 _SelectBox()
                 # Right-side controls
-                _SelectButtons(input_name=input_name)
+                _SelectButtons(
+                    input_name=input_name,
+                    add_help=add_help,
+                    remove_help=remove_help,
+                )
             else:
                 # Left-side controls
-                _SelectButtons(input_name=input_name)
+                _SelectButtons(
+                    input_name=input_name,
+                    add_help=add_help,
+                    remove_help=remove_help,
+                )
                 # Right-side file list
                 _SelectBox()
     return field

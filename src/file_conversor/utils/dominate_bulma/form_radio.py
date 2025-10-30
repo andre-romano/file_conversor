@@ -55,6 +55,7 @@ def FormFieldRadio(
                 _class="is-flex is-flex-grow-1",
                 _name=_name,
                 _value=value,
+                _title=help,
                 label_text=display_text,
                 **{
                     ':class': """{

@@ -29,6 +29,8 @@ def PageConvert():
             validation_expr="value.length > 0",
             label_text=_("Input Files"),
             help_text=_("Select (or drag) the input files."),
+            add_help=_("Add file"),
+            remove_help=_("Remove file"),
             file_types=[
                 format_file_types_webview(
                     *[f for f in DOC_BACKEND.SUPPORTED_IN_FORMATS],

@@ -55,6 +55,7 @@ def FormFieldCheckbox(
                 "_style": "margin-top: 3px;",
             },
             _name=_name,
+            _title=help,
             **{
                 ':class': """{
                     'is-danger': !isValid,

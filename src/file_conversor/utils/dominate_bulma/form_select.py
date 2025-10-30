@@ -57,6 +57,7 @@ def FormFieldSelect(
             *options,
             _class="is-flex is-flex-grow-1",
             _name=_name,
+            _title=help,
             kwargs_container={
                 ':class': """{
                     'is-danger': !isValid,

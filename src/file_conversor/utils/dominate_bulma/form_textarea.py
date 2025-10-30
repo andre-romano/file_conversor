@@ -47,6 +47,7 @@ def FormFieldTextArea(
         TextArea(
             _class="is-flex is-flex-grow-1",
             _name=_name,
+            _title=help,
             **{
                 ':class': """{
                     'is-danger': !isValid,

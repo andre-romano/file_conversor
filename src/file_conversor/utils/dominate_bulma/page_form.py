@@ -52,6 +52,7 @@ def PageForm(
             Button(
                 _("Execute"),
                 _class="is-primary",
+                _title=_("Execute operation"),
                 **{
                     ':class': """{
                         'is-loading': checkLoading(),

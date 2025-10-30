@@ -25,6 +25,7 @@ def FormFieldOutputDirectory(
         button={
             "icon": {"name": "folder-open"},
             "_class": "is-info",
+            "_title": help,
             "@click": "openFolderDialog",
         },
         x_data="""
