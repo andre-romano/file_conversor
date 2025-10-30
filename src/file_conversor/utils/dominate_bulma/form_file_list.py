@@ -36,6 +36,7 @@ def _SelectBox():
                 **{
                     "x-model": "selected",
                     ":title": "help",
+                    "@drop.prevent": "dropFiles",
                 },
             ):
                 with template(**{"x-for": "opt in files"}):
@@ -142,14 +143,9 @@ def FormFileList(
                 files: [],
                 isValid: false,
                 lastPath: '',
-                async openFileDialog() {
-                    const fileList = await pywebview.api.open_file_dialog({
-                        path: this.lastPath,
-                        multiple: %s,
-                        file_types: %s,
-                    });
-                    // extend files list, if fileList is not already present
-                    fileList.forEach(file => {
+                async _updateFiles(newFiles) {
+                    // extend files list, if newFiles is not already present
+                    newFiles.forEach(file => {
                         if (!this.files.includes(file)) {
                             this.files.push(file);
                         }
@@ -158,6 +154,17 @@ def FormFileList(
                         const lastSeenWin = file.lastIndexOf(`\\\\`);
                         this.lastPath = file.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
                     });
+                },
+                async dropFiles(event) {
+                    this.openFileDialog();
+                },
+                async openFileDialog() {
+                    const fileList = await pywebview.api.open_file_dialog({
+                        path: this.lastPath,
+                        multiple: %s,
+                        file_types: %s,
+                    });
+                    this._updateFiles(fileList);
                 },
                 init() {
                     this.$watch('files', value => {     

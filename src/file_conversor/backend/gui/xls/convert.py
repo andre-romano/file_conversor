@@ -27,7 +27,7 @@ def PageConvert():
             input_name="input_files",
             validation_expr="value.length > 0",
             label_text=_("Input Files"),
-            help_text=_("Select (or drag) the input files."),
+            help_text=_("Select the input files."),
             add_help=_("Add file"),
             remove_help=_("Remove file"),
             file_types=[
