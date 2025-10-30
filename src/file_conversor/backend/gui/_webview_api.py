@@ -2,6 +2,7 @@
 
 import webview
 
+from webview.dom import DOMEventHandler
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -9,7 +10,7 @@ from typing import Any, Sequence
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.formatters import format_file_types_webview
+from file_conversor.utils.formatters import format_file_types_webview, format_py_to_js
 
 from file_conversor.system import set_window_icon
 
@@ -32,6 +33,40 @@ class WebViewAPI:
             # logger.debug(f"Found webview windows: {','.join([w.title for w in webview.windows])}")
             return window
         raise RuntimeError(_("No webview window found."))
+
+    # ###### #
+    # EVENTS #
+    # ###### #
+
+    def _on_load(self) -> None:
+        logger.debug("WebViewAPI page loaded.")
+        self._get_window().dom.document.events.dragenter += DOMEventHandler(self._on_drag, True, True)  # pyright: ignore[reportOperatorIssue]
+        self._get_window().dom.document.events.dragstart += DOMEventHandler(self._on_drag, True, True)  # pyright: ignore[reportOperatorIssue]
+        self._get_window().dom.document.events.dragover += DOMEventHandler(self._on_drag, True, True, debounce=500)  # pyright: ignore[reportOperatorIssue]
+        self._get_window().dom.document.events.drop += DOMEventHandler(self._on_drop, True, True)  # pyright: ignore[reportOperatorIssue]
+
+    def _on_drag(self, event) -> None:
+        pass
+
+    def _on_drop(self, event) -> None:
+        logger.debug("Drop event detected")
+        files: list[dict[str, Any]] = event['dataTransfer']['files']
+
+        filepaths: list[str] = [
+            str(file.get('pywebviewFullPath'))
+            for file in files
+            if file.get('pywebviewFullPath')
+        ]
+        logger.debug(f"Dropped files: {filepaths}")
+        self._get_window().evaluate_js("""
+            window.dispatchEvent(new CustomEvent('filesDropped', {
+                detail: { files: %s }
+            }));
+        """ % format_py_to_js(filepaths))
+
+    # ######### #
+    # COMMANDS #
+    # ######### #
 
     def get_config(self) -> dict[str, Any]:
         """Get the current application configuration."""

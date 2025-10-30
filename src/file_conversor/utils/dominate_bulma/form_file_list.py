@@ -36,7 +36,6 @@ def _SelectBox():
                 **{
                     "x-model": "selected",
                     ":title": "help",
-                    "@drop.prevent": "dropFiles",
                 },
             ):
                 with template(**{"x-for": "opt in files"}):
@@ -127,7 +126,7 @@ def FormFileList(
     :param input_name: The name attribute for the hidden input field.
     :param validation_expr: The expression to validate the selection.
     :param multiple: Whether to allow multiple file selection.
-    :param file_types: The file types to filter in the file dialog. Format (description, [extensions]).
+    :param file_types: The file types to filter in the file dialog. Format "description (*.<extension;*.extension;...)".
     :param help_text: The help text for the field.
     :param reverse: Whether to reverse the order of buttons and select box.
 
@@ -136,56 +135,67 @@ def FormFileList(
     with div(
         cls="field is-horizontal is-full-width",
         **{
-            "x-data": """{     
+            "x-data": f"""{{     
                 selected: [],
-                help: `%s`,
+                help: `{help_text}`,
                 filesStr: '',
                 files: [],
                 isValid: false,
-                lastPath: '',
-                async _updateFiles(newFiles) {
+                lastPath: '',            
+                file_types: {format_py_to_js(file_types)},
+                _validate_file(file) {{
+                    if (this.file_types.length === 0) {{
+                        return true; // no filter, accept all files
+                    }}
+                    const fileExt = file.split('.').pop().toLowerCase();
+                    for (const type of this.file_types) {{
+                        const file_types = type.split('(')[1].split(')')[0].split(';');
+                        if (file_types.includes(`*.` + fileExt)) {{
+                            return true;
+                        }}
+                    }}
+                    return false;
+                }},
+                _updateFiles(newFiles) {{
                     // extend files list, if newFiles is not already present
-                    newFiles.forEach(file => {
-                        if (!this.files.includes(file)) {
+                    newFiles.forEach(file => {{
+                        if (!this.files.includes(file) && this._validate_file(file)) {{
                             this.files.push(file);
-                        }
+                        }}
                         // get last path, for windows and unix compatibility
                         const lastSeen = file.lastIndexOf(`/`);
                         const lastSeenWin = file.lastIndexOf(`\\\\`);
                         this.lastPath = file.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
-                    });
-                },
-                async dropFiles(event) {
-                    this.openFileDialog();
-                },
-                async openFileDialog() {
-                    const fileList = await pywebview.api.open_file_dialog({
+                    }});
+                }},
+                async openFileDialog() {{
+                    const fileList = await pywebview.api.open_file_dialog({{
                         path: this.lastPath,
-                        multiple: %s,
-                        file_types: %s,
-                    });
+                        multiple: {format_py_to_js(multiple)},
+                        file_types: this.file_types,
+                    }});
                     this._updateFiles(fileList);
-                },
-                init() {
-                    this.$watch('files', value => {     
+                }},
+                init() {{
+                    this.$watch('files', value => {{     
                         this.filesStr = JSON.stringify(value);
 
-                        this.isValid = %s;
+                        this.isValid = {validation_expr};
                         const parentForm = this.$el.closest('form[x-data]');
-                        if(parentForm){
+                        if(parentForm){{
                             const parentData = Alpine.$data(parentForm);
                             parentData.updateValidity();
-                        } else {
+                        }} else {{
                             console.log('No parent form found');
-                        }
-                    });        
-                },
-            }""" % (
-                help_text,
-                format_py_to_js(multiple),
-                format_py_to_js(file_types),
-                validation_expr,
-            )
+                        }}
+                    }});   
+                    // Listen for filesDropped event
+                    window.addEventListener('filesDropped', async (event) => {{
+                        this._updateFiles(event.detail.files);
+                        this.$nextTick(() => {{ }});
+                    }});
+                }},
+            }}"""
         },
     ) as field:
         # Field label

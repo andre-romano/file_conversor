@@ -184,10 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded event fired');
 });
 
-// Prevent default drag-and-drop pywebview intercept behavior (window level)
-document.addEventListener('dragover', e => e.preventDefault());
-document.addEventListener('drop', e => e.preventDefault());
-
 document.addEventListener('alpine:init', () => {
     if (window.alpine_ready) return;
     window.alpine_ready = true;

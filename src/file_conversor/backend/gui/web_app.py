@@ -67,12 +67,13 @@ class WebApp:
         super().__init__()
         web_path = Environment.get_web_folder()
 
+        self.webview_api = WebViewAPI()
         window = webview.create_window(
             title="File Conversor - Home",
             url=f"http://127.0.0.1:{CONFIG['port']}",
             localization=self.LOCALIZATION,
             maximized=True,
-            js_api=WebViewAPI(),
+            js_api=self.webview_api,
         )
         if window is None:
             raise RuntimeError("Failed to create webview window.")
@@ -117,19 +118,21 @@ class WebApp:
 
     def _run_webview(self) -> None:
         logger.info(f"[bold]{_('Starting webview window ...')}[/]")
-
-        def __init_webview():
-            self.evaluate_js(r"""
-            window.addEventListener('pywebviewready', async () => {
-                pywebview.api.set_icon();
-            });
-            """)
         webview.start(
-            __init_webview,
+            self.__init_webview,
             debug=STATE['debug'],
             icon=str(Environment.get_app_icon()),
         )
         logger.info(f"[bold]{_('Webview window closed.')}[/]")
+
+    def __init_webview(self) -> None:
+        self.evaluate_js(r"""
+        window.addEventListener('pywebviewready', async () => {
+            pywebview.api.set_icon();
+        });
+        """)
+        # Listen for reloads (new pages)
+        self.window.events.loaded += self.webview_api._on_load  # pyright: ignore[reportOperatorIssue]
 
     def expose(self, *func: Callable[..., Any]) -> Self:
         """Expose a new function to the webview JS API."""
