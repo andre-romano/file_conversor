@@ -36,6 +36,7 @@ class FlaskApi:
     ) -> None:
         """Thread to handle file processing."""
         try:
+            logger.debug(f"File processing thread started ...")
             status = cls._get_status(params['status_id'])
             status.set_progress(-1)  # indeterminate progress
 
@@ -44,6 +45,7 @@ class FlaskApi:
 
             # finished successfully
             status.set(FlaskApiStatusCompleted(id=status.get_id()))
+            logger.info(f"[bold]{_('File processing completed successfully.')}[/]")
         except Exception as e:
             logger.error(f"{_('File processing error')}: {repr(e)}")
             progress = status.get_progress()

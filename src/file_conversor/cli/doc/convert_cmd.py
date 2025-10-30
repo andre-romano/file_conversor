@@ -59,7 +59,7 @@ ctx_menu.register_callback(register_ctx_menu)
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
-        {_('Convert document files into other formats (requires Microsoft Word / LibreOffice).')}
+        {_('Convert document files into other formats (requires Microsoft Office / LibreOffice).')}
     """,
     epilog=f"""
         **{_('Examples')}:** 
