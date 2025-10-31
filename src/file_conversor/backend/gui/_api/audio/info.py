@@ -1,4 +1,4 @@
-# src/file_conversor/backend/gui/_api/audio/check.py
+# src/file_conversor/backend/gui/_api/audio/info.py
 
 import subprocess
 
@@ -23,15 +23,14 @@ STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()
-logger = LOG.getLogger(__name__)
+logger = LOG.getLogger()
 
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
-    """Thread to handle audio checking."""
-    logger.debug(f"Audio check thread received: {params}")
+    """Thread to handle audio information retrieval."""
+    logger.debug(f"Audio info thread received: {params}")
     input_files: list[Path] = [Path(i) for i in params['input-files']]
 
-    logger.info(f"[bold]{_('Checking audio files')}[/]...")
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
@@ -39,24 +38,17 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        # display current progress
-        ffmpeg_backend.set_files(input_file=input_file, output_file="-")
-        try:
-            ffmpeg_backend.execute(
-                progress_callback=lambda p: status.set_progress(progress_mgr.update_progress(p))
-            )
-        except subprocess.CalledProcessError:
-            logger.error(f"{_('FFMpeg check')}: [red][bold]{_('FAILED')}[/bold][/red]")
-            raise RuntimeError(f"{_('File')} '{input_file}' {_('is corrupted or has inconsistencies')}")
-        status.set_progress(progress_mgr.complete_step())
+        # TODO
+        pass
 
+    logger.info(f"[bold]{_('Converting audio files')}[/]...")
     cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback)
 
     logger.debug(f"{status}")
 
 
-def api_audio_check():
-    """API endpoint to check audio files."""
-    logger.info(f"[bold]{_('Audio check requested via API.')}[/]")
+def api_audio_info():
+    """API endpoint to get audio file information."""
+    logger.info(f"[bold]{_('Audio info requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)

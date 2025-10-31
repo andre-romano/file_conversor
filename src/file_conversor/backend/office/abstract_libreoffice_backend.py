@@ -1,7 +1,7 @@
 # src\file_conversor\backend\office\abstract_libreoffice_backend.py
 
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 # user-provided imports
 from file_conversor.config import Environment, Log
@@ -60,7 +60,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
     def convert(
         self,
         files: list[tuple[Path | str, Path | str]],
-        file_processed_callback: Callable[[Path], None] | None = None,
+        file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         """
         Convert input file into an output file.

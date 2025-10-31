@@ -1,7 +1,7 @@
 # src\file_conversor\backend\office\word_backend.py
 
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 # user-provided imports
 from file_conversor.config import Log
@@ -56,7 +56,7 @@ class WordBackend(AbstractMSOfficeBackend):
     def convert(
         self,
         files: list[tuple[Path | str, Path | str]],
-        file_processed_callback: Callable[[Path], None] | None = None,
+        file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         with Win32Com(self.PROG_ID, visible=None) as word:
             for input_file, output_file in files:

@@ -3,8 +3,9 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
+from file_conversor.backend.audio_video import FFmpegBackend
 
+from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 from file_conversor.utils.formatters import format_file_types_webview
 
@@ -22,20 +23,9 @@ logger = LOG.getLogger()
 
 def PageAudioCheck():
     return PageForm(
-        FormFileList(
-            input_name="input_files",
-            validation_expr="value.length > 0",
-            label_text=_("Input Files"),
-            help_text=_("Select (or drag) the input files."),
-            add_help=_("Add file"),
-            remove_help=_("Remove file"),
-            file_types=[
-                format_file_types_webview(
-                    *[f for f in FFmpegBackend.SUPPORTED_IN_AUDIO_FORMATS],
-                    description=_("Audio files"),
-                ),
-            ],
-            multiple=True,
+        InputFilesField(
+            *[f for f in FFmpegBackend.SUPPORTED_IN_AUDIO_FORMATS],
+            description=_("Audio files"),
         ),
         api_endpoint=f"{url_for('api_audio_check')}",
         nav_items=[

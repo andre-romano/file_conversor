@@ -6,6 +6,7 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.office import PPT_BACKEND
 
+from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 from file_conversor.utils.formatters import format_file_types_webview
 
@@ -23,46 +24,16 @@ logger = LOG.getLogger()
 
 def PageConvert():
     return PageForm(
-        FormFileList(
-            input_name="input_files",
-            validation_expr="value.length > 0",
-            label_text=_("Input Files"),
-            help_text=_("Select (or drag) the input files."),
-            add_help=_("Add file"),
-            remove_help=_("Remove file"),
-            file_types=[
-                format_file_types_webview(
-                    *[f for f in PPT_BACKEND.SUPPORTED_IN_FORMATS],
-                    description=_("Presentation files")
-                ),
-            ],
-            multiple=True,
+        InputFilesField(*[
+            f for f in PPT_BACKEND.SUPPORTED_IN_FORMATS],
+            description=_("Presentation files")
         ),
-        FormFieldHorizontal(
-            FormFieldSelect(
-                *[
-                    (f, f.upper())
-                    for f in PPT_BACKEND.SUPPORTED_OUT_FORMATS
-                ],
-                current_value="pdf",
-                _name="output_format",
-                help=_("Select the desired output format for the converted presentation."),
-            ),
-            label_text=_("Output Format"),
-        ),
-        FormFieldHorizontal(
-            FormFieldOutputDirectory(
-                _name="output_dir",
-                help=_("Select the directory where the converted presentation will be saved."),
-            ),
-            label_text=_("Output Directory"),
-        ),
-        FormFieldCheckbox(
-            current_value=STATE["overwrite-output"],
-            _name="overwrite",
-            label_text=_("Overwrite Existing Files"),
-            help=_("Allow overwriting of existing files."),
-        ),
+        FileFormatField(*[
+            (f, f.upper())
+            for f in PPT_BACKEND.SUPPORTED_OUT_FORMATS
+        ], current_value="pdf"),
+        OutputDirField(),
+        OverwriteFilesField(),
         api_endpoint=f"{url_for('api_ppt_convert')}",
         nav_items=[
             {

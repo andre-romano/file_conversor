@@ -25,9 +25,9 @@ logger = LOG.getLogger()
 def doc_convert_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle document conversion."""
     logger.debug(f"Document conversion thread received: {params}")
-    output_dir: Path = Path(params['output_dir'])
-    output_format: str = params['output_format']
-    input_files: list[Path] = [Path(i) for i in params['input_files']]
+    output_dir: Path = Path(params['output-dir'])
+    output_format: str = params['file-format']
+    input_files: list[Path] = [Path(i) for i in params['input-files']]
 
     files: list[tuple[Path | str, Path | str]] = [
         (input_path, output_dir / f"{input_path.stem}.{output_format}")

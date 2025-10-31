@@ -33,10 +33,10 @@ def Select(
 
 def FormFieldSelect(
     *options: tuple[str, str],
-    current_value: str,
     help: str,
     _name: str,
     label_text: str = "",
+    current_value: str | None = None,
     x_data: str = "",
     x_init: str = "",
     **kwargs,

@@ -11,7 +11,7 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.audio._ffmpeg_cmd import _ffmpeg_audio_run
+from file_conversor.cli.audio._ffmpeg_cmd import ffmpeg_audio_run
 from file_conversor.cli.audio._typer import COMMAND_NAME, CONVERT_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
@@ -80,7 +80,7 @@ def convert_audio(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    _ffmpeg_audio_run(
+    ffmpeg_audio_run(
         input_files,
         file_format=file_format,
         audio_bitrate=audio_bitrate,
