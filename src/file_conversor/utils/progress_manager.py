@@ -63,7 +63,7 @@ class ProgressManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._progress.__exit__(exc_type, exc_val, exc_tb)
 
-    def update_progress(self, step_progress: float):
+    def update_progress(self, step_progress: float) -> float:
         """Update progress for current file"""
         # previous completed files
         total_progress = self._completed_files * self._file_progress
@@ -72,8 +72,10 @@ class ProgressManager:
         # current step (of current file)
         total_progress += (step_progress / 100.0) * self._step_progress
         self._progress.update(self._task, completed=total_progress)
+        return total_progress
 
-    def complete_step(self):
+    def complete_step(self) -> float:
         """Mark current step as completed and move to next step"""
-        self.update_progress(100.0)  # Ensure current step is 100%
+        progress = self.update_progress(100.0)  # Ensure current step is 100%
         self.current_step += 1
+        return progress

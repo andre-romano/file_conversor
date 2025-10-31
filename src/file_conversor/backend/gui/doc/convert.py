@@ -80,7 +80,7 @@ def PageConvert():
                 'active': True,
             },
         ],
-        _title=_("Convert Doc - File Conversor"),
+        _title=f"{_('Convert Doc')} - File Conversor",
     )
 
 

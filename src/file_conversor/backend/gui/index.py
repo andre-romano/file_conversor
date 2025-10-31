@@ -28,7 +28,7 @@ def PageIndex(
     return PageCardGrid(
         *items,
         nav_items=nav_items,
-        _title=_("File Conversor - Home"),
+        _title=f"{_('Home')} - File Conversor",
     )
 
 

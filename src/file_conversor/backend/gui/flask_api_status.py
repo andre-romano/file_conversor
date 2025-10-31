@@ -52,8 +52,8 @@ class FlaskApiStatus:
     def get_progress(self) -> int | None:
         return self._progress
 
-    def set_progress(self, progress: int) -> None:
-        self._progress = progress
+    def set_progress(self, progress: int | float) -> None:
+        self._progress = int(progress)
 
     def set(self, other: 'FlaskApiStatus') -> None:
         self._status = other._status

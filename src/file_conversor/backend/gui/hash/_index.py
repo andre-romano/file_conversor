@@ -46,6 +46,6 @@ def hash_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Hash Tools"),
+            _title=f"{_('Hash Tools')} - File Conversor",
         ))
     )

@@ -40,5 +40,5 @@ def doc_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Document Tools"),
+            _title=f"{_('Document Tools')} - File Conversor",
         )))

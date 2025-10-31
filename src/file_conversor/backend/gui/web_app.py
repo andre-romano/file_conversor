@@ -69,7 +69,7 @@ class WebApp:
 
         self.webview_api = WebViewAPI()
         window = webview.create_window(
-            title="File Conversor - Home",
+            title="File Conversor",
             url=f"http://127.0.0.1:{CONFIG['port']}",
             localization=self.LOCALIZATION,
             maximized=True,

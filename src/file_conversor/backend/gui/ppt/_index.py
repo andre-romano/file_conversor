@@ -40,6 +40,6 @@ def ppt_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Presentation Tools"),
+            _title=f"{_('Presentation Tools')} - File Conversor",
         )
     ))

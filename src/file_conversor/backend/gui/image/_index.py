@@ -139,6 +139,6 @@ def image_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Image Tools"),
+            _title=f"{_('Image Tools')} - File Conversor",
         ))
     )

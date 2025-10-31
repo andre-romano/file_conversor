@@ -3,7 +3,7 @@
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 # operation APIs
-from file_conversor.backend.gui._api.component.modal import api_component_modal
+from file_conversor.backend.gui._api._component.modal import api_component_modal
 
 
 def routes():

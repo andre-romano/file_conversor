@@ -40,6 +40,6 @@ def xls_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Spreadsheet Tools"),
+            _title=f"{_('Spreadsheet Tools')} - File Conversor",
         )
     ))

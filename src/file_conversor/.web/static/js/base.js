@@ -124,7 +124,7 @@ function alpineConfigStatusBar() {
                 } else {
                     await loadModal(
                         "Operation failed",
-                        `An error occurred during the operation:<br><pre>${err.message}</pre>`,
+                        `An error occurred during the operation: ${err.message}`,
                         true,
                     );
                 }

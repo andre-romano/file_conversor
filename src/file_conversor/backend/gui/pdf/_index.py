@@ -101,6 +101,6 @@ def pdf_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - PDF Tools")
+            _title=f"{_('PDF Tools')} - File Conversor",
         )
     ))

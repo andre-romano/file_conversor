@@ -40,6 +40,6 @@ def ebook_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Ebook Tools"),
+            _title=f"{_('Ebook Tools')} - File Conversor",
         )
     ))

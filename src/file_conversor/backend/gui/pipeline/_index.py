@@ -47,6 +47,6 @@ def pipeline_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Pipeline Tools"),
+            _title=f"{_('Pipeline Tools')} - File Conversor",
         )
     ))

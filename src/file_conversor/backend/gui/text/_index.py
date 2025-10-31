@@ -52,6 +52,6 @@ def text_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Text Tools"),
+            _title=f"{_('Text Tools')} - File Conversor",
         )
     ))

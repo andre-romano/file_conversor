@@ -52,5 +52,5 @@ def audio_index():
                 'active': True,
             },
         ],
-        _title=_("File Conversor - Audio Tools"),
+        _title=f"{_('Audio Tools')} - File Conversor",
     )))

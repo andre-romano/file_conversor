@@ -6,7 +6,9 @@ from file_conversor.backend.gui._api.config import api_config
 from file_conversor.backend.gui._api.status import api_status
 
 # sub APIs
-from file_conversor.backend.gui._api.component import routes as component_api_routes
+from file_conversor.backend.gui._api._component import routes as component_api_routes
+
+from file_conversor.backend.gui._api.audio import routes as audio_api_routes
 from file_conversor.backend.gui._api.doc import routes as doc_api_routes
 from file_conversor.backend.gui._api.ppt import routes as ppt_api_routes
 from file_conversor.backend.gui._api.xls import routes as xls_api_routes
@@ -24,8 +26,10 @@ def routes():
             rule="/api/status",
             handler=api_status,
         ),
-        # sub APIs
         *component_api_routes(),
+
+        # plugin APIs
+        *audio_api_routes(),
         *doc_api_routes(),
         *ppt_api_routes(),
         *xls_api_routes(),

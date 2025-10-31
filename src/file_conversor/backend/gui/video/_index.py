@@ -88,6 +88,6 @@ def video_index():
                     'active': True,
                 },
             ],
-            _title=_("File Conversor - Video Tools"),
+            _title=f"{_('Video Tools')} - File Conversor",
         )
     ))
