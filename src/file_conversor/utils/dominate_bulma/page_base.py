@@ -6,6 +6,7 @@ import dominate.tags
 from typing import cast
 
 # user-provided modules
+from file_conversor.utils.dominate_bulma.modal import ModalCard
 from file_conversor.utils.dominate_bulma.navbar import Navbar
 from file_conversor.utils.dominate_bulma.footer import Footer
 from file_conversor.utils.dominate_bulma.status_bar import StatusBar
@@ -61,6 +62,13 @@ def PageBase(
         with cast(dominate.tags.body, component.body) as body:
             body.set_attribute("style", f"zoom: {CONFIG['gui-zoom']}%;")
 
+            # modal
+            ModalCard(
+                _class_head="p-5",
+                _class_body="p-5",
+                _class_foot="p-5",
+            )
+
             # navbar
             Navbar(title=nav_title)
 
@@ -72,6 +80,9 @@ def PageBase(
             StatusBar()
 
             # scripts
+            script(_src="/static/js/modal.js", _defer=True)
+            script(_src="/static/js/status_bar.js", _defer=True)
+            script(_src="/static/js/form.js", _defer=True)
             script(_src="/static/js/base.js", _defer=True)
 
             # alpine

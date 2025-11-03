@@ -55,6 +55,9 @@ class FlaskApiStatus:
     def set_progress(self, progress: int | float) -> None:
         self._progress = int(progress)
 
+    def set_message(self, message: str) -> None:
+        self._message = message
+
     def set(self, other: 'FlaskApiStatus') -> None:
         self._status = other._status
         self._message = other._message
@@ -72,21 +75,30 @@ class FlaskApiStatus:
 
 
 class FlaskApiStatusCompleted(FlaskApiStatus):
-    def __init__(self, id: str | int) -> None:
+    def __init__(
+            self,
+            id: str | int,
+            message: str = "",
+    ) -> None:
         super().__init__(
             id=id,
             status='completed',
-            message=_('Completed'),
+            message=message,
             progress=100,
         )
 
 
 class FlaskApiStatusProcessing(FlaskApiStatus):
-    def __init__(self, id: str | int, progress: int | None = None) -> None:
+    def __init__(
+            self,
+            id: str | int,
+            progress: int | None = None,
+            message: str = "",
+    ) -> None:
         super().__init__(
             id=id,
             status='processing',
-            message=_('Processing'),
+            message=message,
             progress=progress,
         )
 
@@ -96,27 +108,32 @@ class FlaskApiStatusReady(FlaskApiStatus):
         super().__init__(
             id='0',
             status='ready',
-            message=_('Ready'),
         )
 
 
 class FlaskApiStatusError(FlaskApiStatus):
-    def __init__(self, id: str | int, exception: str, progress: int | None = None) -> None:
+    def __init__(
+            self,
+            id: str | int,
+            exception: str,
+            progress: int | None = None,
+    ) -> None:
         super().__init__(
             id=id,
             status='failed',
-            message=_('Failed'),
             exception=exception,
             progress=progress,
         )
 
 
 class FlaskApiStatusUnknown(FlaskApiStatus):
-    def __init__(self, id: str | int) -> None:
+    def __init__(
+            self,
+            id: str | int,
+    ) -> None:
         super().__init__(
             id=id,
             status='unknown',
-            message=_('Unknown ID'),
             exception=_('The provided status ID does not exist.'),
         )
 

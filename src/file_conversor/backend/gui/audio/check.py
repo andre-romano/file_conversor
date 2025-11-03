@@ -7,7 +7,6 @@ from file_conversor.backend.audio_video import FFmpegBackend
 
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
-from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

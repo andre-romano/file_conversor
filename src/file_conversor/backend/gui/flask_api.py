@@ -44,7 +44,10 @@ class FlaskApi:
             callback(params, status)
 
             # finished successfully
-            status.set(FlaskApiStatusCompleted(id=status.get_id()))
+            status.set(FlaskApiStatusCompleted(
+                id=status.get_id(),
+                message=status.get_message(),
+            ))
             logger.info(f"[bold]{_('Processing completed successfully.')}[/]")
         except Exception as e:
             logger.error(f"{_('Processing error')}: {repr(e)}")
