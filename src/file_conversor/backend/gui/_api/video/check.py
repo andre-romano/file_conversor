@@ -1,4 +1,4 @@
-# src/file_conversor/backend/gui/_api/audio/info.py
+# src/file_conversor/backend/gui/_api/video/check.py
 
 from flask import json, render_template, request, url_for
 from pathlib import Path
@@ -10,9 +10,8 @@ from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
 from file_conversor.backend.audio_video import FFprobeBackend
 
+from file_conversor.utils import CommandManager, ProgressManager
 from file_conversor.utils.backend import FFprobeParser
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_utils import *
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -23,37 +22,33 @@ STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()
-logger = LOG.getLogger()
+logger = LOG.getLogger(__name__)
 
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
-    """Thread to handle audio information retrieval."""
-    logger.debug(f"Audio info thread received: {params}")
+    """Thread to handle video checking."""
+    logger.debug(f"Video check thread received: {params}")
     input_files: list[Path] = [Path(i) for i in params['input-files']]
 
+    logger.info(f"[bold]{_('Checking video files')}[/]...")
     backend = FFprobeBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
 
-    with div() as result:
-        for input_file in input_files:
-            logger.info(f"[bold]{_('Retrieving info for')}[/] [green]{input_file.name}[/]...")
-            parser = FFprobeParser(backend, input_file)
-            parser.run()
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        # display current progress
+        parser = FFprobeParser(backend, input_file)
+        parser.run()
+        status.set_progress(progress_mgr.complete_step())
 
-            parser.get_chapters().div()
-            parser.get_format().div()
-            parser.get_streams().div()
-            div("----------------------------------------")
-            br()
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback)
 
-    status.set_message(str(result))
-    status.set_progress(100)
     logger.debug(f"{status}")
 
 
-def api_audio_info():
-    """API endpoint to get audio file information."""
-    logger.info(f"[bold]{_('Audio info requested via API.')}[/]")
+def api_video_check():
+    """API endpoint to check video files."""
+    logger.info(f"[bold]{_('Video check requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)

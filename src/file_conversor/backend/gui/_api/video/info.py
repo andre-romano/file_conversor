@@ -1,4 +1,4 @@
-# src/file_conversor/backend/gui/_api/audio/info.py
+# src/file_conversor/backend/gui/_api/video/info.py
 
 from flask import json, render_template, request, url_for
 from pathlib import Path
@@ -13,6 +13,8 @@ from file_conversor.backend.audio_video import FFprobeBackend
 from file_conversor.utils.backend import FFprobeParser
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_utils import *
+
+from file_conversor.utils.formatters import format_bitrate, format_bytes
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -53,7 +55,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     logger.debug(f"{status}")
 
 
-def api_audio_info():
-    """API endpoint to get audio file information."""
-    logger.info(f"[bold]{_('Audio info requested via API.')}[/]")
+def api_video_info():
+    """API endpoint to get video file information."""
+    logger.info(f"[bold]{_('Video info requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)

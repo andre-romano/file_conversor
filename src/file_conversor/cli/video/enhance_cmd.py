@@ -10,7 +10,7 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.video._ffmpeg_cmd import _ffmpeg_cli_cmd
+from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd
 
 from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.video._typer import COMMAND_NAME, ENHANCE_NAME
@@ -136,7 +136,7 @@ def enhance(
             default=False, type=bool,
         )
 
-    _ffmpeg_cli_cmd(
+    ffmpeg_cli_cmd(
         input_files,
         file_format=file_format,
         out_stem="_enhanced",

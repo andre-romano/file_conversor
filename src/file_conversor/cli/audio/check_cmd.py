@@ -1,7 +1,6 @@
 
 # src\file_conversor\cli\audio\check_cmd.py
 
-import subprocess
 import typer
 
 from rich import print
@@ -10,13 +9,14 @@ from typing import Annotated, List
 from pathlib import Path
 
 # user-provided modules
-from file_conversor.backend import FFmpegBackend
+from file_conversor.backend import FFprobeBackend
 
 from file_conversor.cli.audio._typer import COMMAND_NAME, CHECK_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.backend import FFprobeParser
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
@@ -31,13 +31,13 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     # FFMPEG commands
     icons_folder_path = Environment.get_icons_folder()
-    for ext in FFmpegBackend.SUPPORTED_IN_AUDIO_FORMATS:
+    for ext in FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name="check",
@@ -64,25 +64,18 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CHECK_NAME} input_file.mp3`
     """)
 def check(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_AUDIO_FORMATS)],
+    input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS)],
 ):
-    # init ffmpeg
-    ffmpeg_backend = FFmpegBackend(
+    # init backend
+    backend = FFprobeBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         # display current progress
-        ffmpeg_backend.set_files(input_file=input_file, output_file="-")
-        try:
-            ffmpeg_backend.execute(
-                progress_callback=progress_mgr.update_progress
-            )
-        except subprocess.CalledProcessError:
-            logger.error(f"{_('FFMpeg check')}: [red][bold]{_('FAILED')}[/bold][/red]")
-            raise RuntimeError(f"{_('File')} '{input_file}' {_('is corrupted or has inconsistencies')}")
+        parser = FFprobeParser(backend, input_file)
+        parser.run()
         progress_mgr.complete_step()
 
     cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])

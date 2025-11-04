@@ -3,7 +3,7 @@
 
 from rich import print
 
-from typing import Annotated, Any, List
+from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
 # user-provided modules
@@ -25,7 +25,7 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
+def ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     input_files: List[Path],
 
     file_format: str,
@@ -55,6 +55,7 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     unsharp: bool = False,
 
     output_dir: Path = Path(),
+    progress_callback: Callable[[float, ProgressManager], Any] | None = None,
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
@@ -147,20 +148,28 @@ def _ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
             quality_setting=video_quality,
         )
 
+        progress_update_cb = progress_mgr.update_progress
+        if progress_callback is not None:
+            def progress_update_cb(step_progress: float): return progress_callback(step_progress, progress_mgr)  # pyright: ignore[reportOptionalCall]
+
+        progress_complete_cb = progress_mgr.complete_step
+        if progress_callback is not None:
+            def progress_complete_cb(): return progress_callback(progress_mgr.complete_step(), progress_mgr)  # pyright: ignore[reportOptionalCall]
+
         # display current progress
         process = ffmpeg_backend.execute(
-            progress_callback=progress_mgr.update_progress,
+            progress_callback=progress_update_cb,
             pass_num=1 if two_pass else 0,
         )
-        progress_mgr.complete_step()
+        progress_complete_cb()
 
         if two_pass:
             # display current progress
             process = ffmpeg_backend.execute(
-                progress_callback=progress_mgr.update_progress,
+                progress_callback=progress_update_cb,
                 pass_num=2,
             )
-            progress_mgr.complete_step()
+            progress_complete_cb()
 
     cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE["overwrite-output"])
     cmd_mgr.run(callback, out_suffix=f".{file_format}", out_stem=out_stem)

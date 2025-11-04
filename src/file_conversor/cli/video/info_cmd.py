@@ -22,6 +22,7 @@ from file_conversor.cli.video._typer import COMMAND_NAME, INFO_NAME
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
+from file_conversor.utils.backend import FFprobeParser
 from file_conversor.utils.formatters import format_bytes, format_bitrate
 from file_conversor.utils.typer_utils import InputFilesArgument
 
@@ -89,63 +90,17 @@ def info(
         verbose=STATE["verbose"],
     )
     for filename in input_files:
-        formatted = []
         logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")
-        metadata = ffprobe_backend.info(filename)
-        # 📁 General file information
-        if "format" in metadata:
-            format_info: dict = metadata["format"]
-
-            duration = format_info.get('duration', 'N/A')
-            if duration != "N/A":
-                duration_secs = int(float(duration))
-                duration_td = timedelta(seconds=duration_secs)
-                duration = str(duration_td)
-            size = format_info.get("size", "N/A")
-            if size != "N/A":
-                size = format_bytes(float(size))
-            bitrate = format_info.get('bit_rate', 'N/A')
-            if bitrate != "N/A":
-                bitrate = format_bitrate(int(bitrate))
-
-            formatted.append(Text(f"📁 {_('File Information')}:", style="bold cyan"))
-            formatted.append(f"  - {_('Name')}: {filename}")
-            formatted.append(f"  - {_('Format')}: {format_info.get('format_name', 'N/A')}")
-            formatted.append(f"  - {_('Duration')}: {duration}")
-            formatted.append(f"  - {_('Size')}: {size}")
-            formatted.append(f"  - {_('Bitrate')}: {bitrate}")
-
-        # 🎬 Streams de Mídia
-        if "streams" in metadata:
-            if len(metadata["streams"]) > 0:
-                formatted.append(Text(f"\n🎬 {_("Media Streams")}:", style="bold yellow"))
-            for i, stream in enumerate(metadata["streams"]):
-                stream_type = stream.get("codec_type", "unknown")
-                codec = stream.get("codec_name", "N/A")
-                resolution = f"{stream.get('width', '?')}x{stream.get('height', '?')}" if stream_type == "video" else ""
-                bitrate = stream.get("bit_rate", "N/A")
-
-                if bitrate != "N/A":
-                    bitrate = format_bitrate(int(bitrate))
-
-                formatted.append(f"\n  🔹 {_('Stream')} #{i} ({stream_type.upper()}):")
-                formatted.append(f"    - {_('Codec')}: {codec}")
-                if resolution:
-                    formatted.append(f"    - {_('Resolution')}: {resolution}")
-                formatted.append(f"    - {_('Bitrate')}: {bitrate}")
-                if stream_type == "audio":
-                    formatted.append(f"    - {_('Sampling rate')}: {stream.get('sample_rate', 'N/A')} Hz")
-                    formatted.append(f"    - {_('Channels')}: {stream.get('channels', 'N/A')}")
-
-        # 📖 Capítulos
-        if "chapters" in metadata:
-            if len(metadata["chapters"]) > 0:
-                formatted.append(Text(f"\n📖 {_('Chapters')}:", style="bold green"))
-            for chapter in metadata["chapters"]:
-                title = chapter.get('tags', {}).get('title', 'N/A')
-                start = chapter.get('start_time', 'N/A')
-                formatted.append(f"  - {title} ({_('Time')}: {start}s)")
-
-        # Agrupar e exibir tudo com Rich
-        group = Group(*formatted)
-        print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
+        try:
+            parser = FFprobeParser(ffprobe_backend, filename)
+            parser.run()
+            # Agrupar e exibir tudo com Rich
+            group = Group(*[
+                *parser.get_format().rich(),
+                *parser.get_streams().rich(),
+                *parser.get_chapters().rich(),
+            ])
+            print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
+        except Exception as e:
+            logger.error(f"{_('Error parsing file')} '{filename}': {e}")
+            continue
