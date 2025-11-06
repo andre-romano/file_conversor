@@ -22,6 +22,20 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
+def TargetSizeField():
+    """Create a form field for target file size input."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) >= 0",
+            current_value="0",
+            _name="target-size",
+            _type="number",
+            help=_("Set target file size (in MB) for the output video. Type 0 to skip size targeting (use encoding speed and quality options to find file size)."),
+        ),
+        label_text=_("Target Size (MB)"),
+    )
+
+
 def AudioBitrateField():
     """Create a form field for audio bitrate input."""
     return FormFieldHorizontal(
@@ -258,6 +272,7 @@ def UnsharpField():
 
 
 __all__ = [
+    "TargetSizeField",
     "AudioBitrateField",
     "VideoBitrateField",
     "AudioCodecField",

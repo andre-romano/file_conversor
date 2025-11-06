@@ -1,5 +1,6 @@
 # src\file_conversor\backend\gui\_webview_api.py
 
+import threading
 import webview
 
 from webview.dom import DOMEventHandler
@@ -40,17 +41,28 @@ class WebViewAPI:
 
     def _on_load(self) -> None:
         logger.debug("WebViewAPI page loaded.")
-        self._get_window().dom.document.events.dragenter += DOMEventHandler(self._on_drag, True, True)  # pyright: ignore[reportOperatorIssue]
-        self._get_window().dom.document.events.dragstart += DOMEventHandler(self._on_drag, True, True)  # pyright: ignore[reportOperatorIssue]
-        self._get_window().dom.document.events.dragover += DOMEventHandler(self._on_drag, True, True, debounce=500)  # pyright: ignore[reportOperatorIssue]
-        self._get_window().dom.document.events.drop += DOMEventHandler(self._on_drop, True, True)  # pyright: ignore[reportOperatorIssue]
+        window = self._get_window()
+        window.dom.document.events.dragover += DOMEventHandler(
+            self._on_drag,
+            prevent_default=True,
+            stop_propagation=True,
+            stop_immediate_propagation=True,
+            debounce=100,
+        )  # pyright: ignore[reportOperatorIssue]
+        window.dom.document.events.drop += DOMEventHandler(
+            self._on_drop,
+            prevent_default=True,
+            stop_propagation=True,
+            stop_immediate_propagation=True,
+        )  # pyright: ignore[reportOperatorIssue]
 
     def _on_drag(self, event) -> None:
         pass
 
     def _on_drop(self, event) -> None:
         logger.debug("Drop event detected")
-        files: list[dict[str, Any]] = event['dataTransfer']['files']
+        data_transfer: dict[str, Any] = event.get('dataTransfer', {})
+        files: list[dict[str, Any]] = data_transfer.get('files', [])
 
         filepaths: list[str] = [
             str(file.get('pywebviewFullPath'))
