@@ -29,7 +29,7 @@ def PageImageConvert():
         FileFormatField(*[
             (q, q.upper())
             for q in PillowBackend.SUPPORTED_OUT_FORMATS
-        ], current_value='mp4'),
+        ], current_value='jpg'),
         ImageQualityField(),
         OutputDirField(),
         api_endpoint=f"{url_for('api_image_convert')}",

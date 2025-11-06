@@ -2,11 +2,17 @@
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
+from file_conversor.backend.gui._api.image.antialias import api_image_antialias
 from file_conversor.backend.gui._api.image.convert import api_image_convert
 
 
 def routes():
     return [
+        FlaskRoute(
+            rule="/api/image/antialias",
+            handler=api_image_antialias,
+            methods=["POST"],
+        ),
         FlaskRoute(
             rule="/api/image/convert",
             handler=api_image_convert,

@@ -1,4 +1,4 @@
-# src/file_conversor/backend/gui/_api/image/convert.py
+# src/file_conversor/backend/gui/_api/image/antialias.py
 
 from flask import json, render_template, request, url_for
 from pathlib import Path
@@ -25,34 +25,35 @@ logger = LOG.getLogger(__name__)
 
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
-    """Thread to handle image converting."""
-    logger.debug(f"Image convert thread received: {params}")
+    """Thread to handle image antialiasing."""
+    logger.debug(f"Image antialias thread received: {params}")
 
-    logger.info(f"[bold]{_('Converting image files')}[/]...")
+    logger.info(f"[bold]{_('Antialiasing image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    format = params['file-format']
     output_dir = Path(params.get('output-dir') or "")
 
-    quality = int(params.get('image-quality') or 100)
+    radius = int(params.get('radius') or 3)
+    algorithm = PillowBackend.AntialiasAlgorithm.from_str(params.get('algorithm') or "median")
 
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.convert(
+        pillow_backend.antialias(
             input_file=input_file,
             output_file=output_file,
-            quality=quality,
+            radius=radius,
+            algorithm=algorithm,
         )
         status.set_progress(progress_mgr.complete_step())
 
     cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{format}")
+    cmd_mgr.run(callback, out_stem="_antialiased")
 
     logger.debug(f"{status}")
 
 
-def api_image_convert():
-    """API endpoint to convert image files."""
-    logger.info(f"[bold]{_('Image convert requested via API.')}[/]")
+def api_image_antialias():
+    """API endpoint to antialias image files."""
+    logger.info(f"[bold]{_('Image antialias requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)

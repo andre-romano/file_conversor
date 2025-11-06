@@ -72,8 +72,8 @@ def antialias(
     radius: Annotated[int, RadiusOption()] = 3,
 
     algorithm: Annotated[str, typer.Option("--algorithm", "-a",
-                                           help=f'{_("Algorithm to use. Available algorihtms:")} median, mode.',
-                                           callback=lambda x: check_valid_options(x, ["median", "mode"]),
+                                           help=f'{_("Algorithm to use. Available algorihtms:")} {", ".join(PillowBackend.AntialiasAlgorithm.get_dict())}.',
+                                           callback=lambda x: check_valid_options(x, PillowBackend.AntialiasAlgorithm.get_dict()),
                                            )] = "median",
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
@@ -86,7 +86,7 @@ def antialias(
             input_file=input_file,
             output_file=output_file,
             radius=radius,
-            algorithm=algorithm,
+            algorithm=PillowBackend.AntialiasAlgorithm.from_str(algorithm),
         )
         progress_mgr.complete_step()
 

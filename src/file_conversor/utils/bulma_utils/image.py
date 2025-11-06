@@ -3,7 +3,7 @@
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
+from file_conversor.backend.image import PillowBackend
 
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
@@ -37,6 +37,39 @@ def ImageQualityField():
     )
 
 
+def ImageRadiusField():
+    """Create a form field for image radius adjustment."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) >= 1",
+            current_value='3',
+            _name="radius",
+            _type="number",
+            step="1",
+            help=_("Box radius (in pixels). Must be a positive integer."),
+        ),
+        label_text=_("Box Radius (px)"),
+    )
+
+
+def ImageAntialiasAlgorithmField():
+    """Create a form field for selecting antialias algorithm."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in PillowBackend.AntialiasAlgorithm.get_dict()
+            ],
+            current_value='median',
+            _name="algorithm",
+            help=_("Select the antialias algorithm to use."),
+        ),
+        label_text=_("Algorithm"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
+    "ImageRadiusField",
+    "ImageAntialiasAlgorithmField",
 ]

@@ -4,6 +4,7 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
+from enum import Enum
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from PIL.ExifTags import TAGS
 
@@ -27,6 +28,21 @@ class PillowBackend(AbstractBackend):
     """
     A class that provides an interface for handling image files using ``pillow``.
     """
+    class AntialiasAlgorithm(Enum):
+        MEDIAN = ImageFilter.MedianFilter
+        MODE = ImageFilter.ModeFilter
+
+        @classmethod
+        def from_str(cls, name: str):
+            name = name.lower()
+            return cls.get_dict()[name]
+
+        @classmethod
+        def get_dict(cls):
+            return {
+                "median": cls.MEDIAN,
+                "mode": cls.MODE,
+            }
 
     PILLOW_FILTERS: dict[str, type[ImageFilter.BuiltinFilter]] = {
         "blur": ImageFilter.BLUR,
@@ -319,7 +335,7 @@ class PillowBackend(AbstractBackend):
         output_file: str | Path,
         input_file: str | Path,
         radius: int,
-        algorithm: str = "median",
+        algorithm: AntialiasAlgorithm = AntialiasAlgorithm.MEDIAN,
     ):
         """
         Applies antialias to an input image file using Median or Mode algorithms.
@@ -338,10 +354,7 @@ class PillowBackend(AbstractBackend):
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
-        img = img.filter(
-            ImageFilter.MedianFilter(radius) if algorithm == "median" else
-            ImageFilter.ModeFilter(radius)
-        )
+        img = img.filter(algorithm.value(radius))
         self._save(
             img,
             output_file,
