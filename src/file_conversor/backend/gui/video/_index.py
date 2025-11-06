@@ -67,12 +67,6 @@ def video_index():
             'subtitle': _("Get information about a audio/video file."),
             'url': url_for('video_info'),
         },
-        {
-            'image': url_for('icons', filename='tasks.ico'),
-            'title': _("List available codecs"),
-            'subtitle': _("List available video formats and codecs."),
-            'url': url_for('video_list_formats'),
-        }
     ]
     return render_template_string(str(
         PageCardGrid(

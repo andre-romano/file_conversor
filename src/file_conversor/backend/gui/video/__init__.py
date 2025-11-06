@@ -9,7 +9,6 @@ from file_conversor.backend.gui.video.compress import video_compress
 from file_conversor.backend.gui.video.convert import video_convert
 from file_conversor.backend.gui.video.enhance import video_enhance
 from file_conversor.backend.gui.video.info import video_info
-from file_conversor.backend.gui.video.list_formats import video_list_formats
 from file_conversor.backend.gui.video.mirror import video_mirror
 from file_conversor.backend.gui.video.resize import video_resize
 from file_conversor.backend.gui.video.rotate import video_rotate
@@ -41,10 +40,6 @@ def routes():
         FlaskRoute(
             rule="/video/info",
             handler=video_info,
-        ),
-        FlaskRoute(
-            rule="/video/list_formats",
-            handler=video_list_formats,
         ),
         FlaskRoute(
             rule="/video/mirror",
