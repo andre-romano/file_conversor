@@ -1,8 +1,13 @@
 # src/file_conversor/backend/gui/video/convert.py
 
-from flask import render_template, url_for
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.audio_video import FFmpegBackend
+
+from file_conversor.utils.bulma_utils import *
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -15,10 +20,69 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-def video_convert():
-    return render_template(
-        'video/convert.jinja2',
-        breadcrumb_items=[
+def TabGeneral() -> list | tuple:
+    return [
+        InputFilesField(
+            *[f for f in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS],
+            description=_("Video files"),
+        ),
+        FileFormatField(*[
+            (q, q.upper())
+            for q in filter(lambda x: x.lower() != 'null', FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)
+        ], current_value='mp4'),
+        OutputDirField(),
+    ]
+
+
+def TabAdvanced() -> list | tuple:
+    return [
+        AudioBitrateField(),
+        VideoBitrateField(),
+        AudioCodecField(),
+        VideoCodecField(),
+        VideoEncodingSpeedField(),
+        VideoQualityField(),
+        ResolutionField(),
+        FPSField(),
+        BrightnessField(),
+        ContrastField(),
+        ColorField(),
+        GammaField(),
+        RotationField(),
+        MirrorAxisField(),
+        DeshakeField(),
+        UnsharpField(),
+    ]
+
+
+def PageVideoConvert():
+    return PageForm(
+        Tabs(
+            {
+                'label': _('General'),
+                'icon': 'cog',
+                'content': TabGeneral(),
+            },
+            {
+                'label': _('Advanced'),
+                'icon': 'tools',
+                'content': TabAdvanced(),
+            },
+            active_tab=_('General'),
+            _class="""
+                is-toggle 
+                is-toggle-rounded 
+                is-flex 
+                is-full-width 
+                is-flex-direction-column 
+                is-align-items-center
+                mb-4
+            """,
+            _class_headers="mb-4",
+            _class_content="is-full-width",
+        ),
+        api_endpoint=f"{url_for('api_video_convert')}",
+        nav_items=[
             {
                 'label': _("Home"),
                 'url': url_for('index'),
@@ -33,4 +97,11 @@ def video_convert():
                 'active': True,
             },
         ],
+        _title=f"{_('Video Convert')} - File Conversor",
     )
+
+
+def video_convert():
+    return render_template_string(str(
+        PageVideoConvert()
+    ))

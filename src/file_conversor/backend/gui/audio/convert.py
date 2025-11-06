@@ -24,8 +24,8 @@ logger = LOG.getLogger()
 def PageAudioConvert():
     return PageForm(
         InputFilesField(
-            *[f for f in FFmpegBackend.SUPPORTED_IN_AUDIO_FORMATS],
-            description=_("Audio files"),
+            *[f for f in FFmpegBackend.SUPPORTED_IN_FORMATS],
+            description=_("Audio and Video files"),
         ),
         FileFormatField(*[
             (q, q.upper())

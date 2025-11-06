@@ -1,8 +1,10 @@
-# src\file_conversor\utils\bulma_utils.py
+# src\file_conversor\utils\bulma_utils\general.py
 
 from typing import Any
 
 # user-provided modules
+from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
+
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -88,39 +90,9 @@ def OverwriteFilesField():
     )
 
 
-def AudioBitrateField():
-    """Create a form field for audio bitrate input."""
-    return FormFieldHorizontal(
-        FormFieldInput(
-            validation_expr="Number.parseInt(value) >= 0",
-            current_value=CONFIG['audio-bitrate'],
-            _name="audio-bitrate",
-            _type="number",
-            help=_("Set audio bitrate (in kbps). Type 0 to keep original audio bitrate."),
-        ),
-        label_text=_("Audio Bitrate (kbps)"),
-    )
-
-
-def VideoBitrateField():
-    """Create a form field for video bitrate input."""
-    return FormFieldHorizontal(
-        FormFieldInput(
-            validation_expr="Number.parseInt(value) >= 0",
-            current_value=CONFIG['video-bitrate'],
-            _name="video-bitrate",
-            _type="number",
-            help=_("Set video bitrate (in kbps). Type 0 to keep original video bitrate."),
-        ),
-        label_text=_("Video Bitrate (kbps)"),
-    )
-
-
 __all__ = [
     "InputFilesField",
     "OutputDirField",
     "FileFormatField",
     "OverwriteFilesField",
-    "AudioBitrateField",
-    "VideoBitrateField",
 ]

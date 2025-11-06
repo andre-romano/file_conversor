@@ -26,9 +26,9 @@ def parse_js_to_py(value: str) -> Any:
         elif value.lower() in ('null', 'none', 'undefined'):
             return None
         # Handle numeric values
-        elif re.match(r'^-?\d+(\.\d+)?$', value):
-            if '.' in value:
-                return float(value)
+        elif re.match(r'^-?\d+((\.|,)\d+)?$', value):
+            if '.' in value or ',' in value:
+                return float(value.replace(',', '.'))
             else:
                 return int(value)
         # Handle JSON arrays and objects
@@ -163,6 +163,11 @@ def format_bitrate(bps: int) -> str:
     return f"{bps} bps"
 
 
+def format_alphabetical(text: str) -> str:
+    """Format text to be alphabetical only (remove non-alphabetical characters)."""
+    return re.sub(r'[^a-zA-Z]', ' ', text)
+
+
 def format_file_types_webview(*file_types: str, description: str = "") -> str:
     """
     Format file types for PyWebView file dialogs.
@@ -173,9 +178,9 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
     :return: Formatted file types string for PyWebView.
     """
     if not file_types:
-        return f'{_("All Files")} (*.*)'
+        return f'{format_alphabetical(_("All Files"))} (*.*)'
     parsed_types = [ft if ft.startswith("*.") else f"*.{ft.lstrip('.')}" for ft in file_types]
-    return f'{description} ({";".join(parsed_types)})'
+    return f'{format_alphabetical(description)} ({";".join(parsed_types)})'
 
 
 def format_py_to_js(value: Any) -> str:
