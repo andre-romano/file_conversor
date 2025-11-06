@@ -49,7 +49,7 @@ def TabAdvanced() -> list | tuple:
         ColorField(),
         GammaField(),
         RotationField(),
-        MirrorAxisField(),
+        AxisField(),
         DeshakeField(),
         UnsharpField(),
     ]
