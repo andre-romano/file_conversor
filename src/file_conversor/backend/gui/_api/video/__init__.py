@@ -9,6 +9,7 @@ from file_conversor.backend.gui._api.video.enhance import api_video_enhance
 from file_conversor.backend.gui._api.video.info import api_video_info
 from file_conversor.backend.gui._api.video.mirror import api_video_mirror
 from file_conversor.backend.gui._api.video.resize import api_video_resize
+from file_conversor.backend.gui._api.video.rotate import api_video_rotate
 
 
 def routes():
@@ -46,6 +47,11 @@ def routes():
         FlaskRoute(
             rule="/api/video/resize",
             handler=api_video_resize,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/video/rotate",
+            handler=api_video_rotate,
             methods=["POST"],
         ),
     ]
