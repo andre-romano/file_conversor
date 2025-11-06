@@ -218,6 +218,21 @@ def GammaField():
     )
 
 
+def SharpnessField():
+    """Create a form field for sharpness adjustment."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="!isNaN(parseFloat(value))",
+            current_value=str(1.0),
+            _name="sharpness",
+            _type="number",
+            step="0.1",
+            help=_("Adjust sharpness level. Default is 1.0. Values >1.0 increase sharpness, <1.0 decrease."),
+        ),
+        label_text=_("Sharpness"),
+    )
+
+
 def RotationField():
     """Create a form field for video rotation selection."""
     return FormFieldHorizontal(
@@ -285,6 +300,7 @@ __all__ = [
     "ContrastField",
     "ColorField",
     "GammaField",
+    "SharpnessField",
     "RotationField",
     "AxisField",
     "DeshakeField",

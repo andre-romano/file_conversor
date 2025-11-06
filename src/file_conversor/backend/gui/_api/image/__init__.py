@@ -6,6 +6,7 @@ from file_conversor.backend.gui._api.image.antialias import api_image_antialias
 from file_conversor.backend.gui._api.image.blur import api_image_blur
 from file_conversor.backend.gui._api.image.compress import api_image_compress
 from file_conversor.backend.gui._api.image.convert import api_image_convert
+from file_conversor.backend.gui._api.image.enhance import api_image_enhance
 
 
 def routes():
@@ -28,6 +29,11 @@ def routes():
         FlaskRoute(
             rule="/api/image/convert",
             handler=api_image_convert,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/image/enhance",
+            handler=api_image_enhance,
             methods=["POST"],
         ),
     ]
