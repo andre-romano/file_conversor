@@ -98,10 +98,59 @@ def ImageDPIField():
     )
 
 
+def ImageRotationField():
+    """Create a form field for image rotation."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) >= -360 && Number.parseInt(value) <= 360",
+            current_value='0',
+            _name="image-rotation",
+            _type="number",
+            step="90",
+            help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise) and 360 (clockwise) rotation."),
+        ),
+        label_text=_("Rotation (deg)"),
+    )
+
+
+def ImageScaleField():
+    """Create a form field for image scale adjustment."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseFloat(value) > 0",
+            current_value='1.0',
+            _name="image-scale",
+            _type="number",
+            step="0.1",
+            help=_("Scale factor for resizing the image. Must be a positive number."),
+        ),
+        label_text=_("Scale Factor"),
+    )
+
+
+def ImageResampleAlgorithmField():
+    """Create a form field for selecting resample algorithm."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in PillowBackend.RESAMPLING_OPTIONS
+            ],
+            current_value=CONFIG["image-resampling"],
+            _name="image-resampling",
+            help=_("Select the resampling algorithm to use when resizing images."),
+        ),
+        label_text=_("Resampling Algorithm"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
     "ImageRadiusField",
     "ImageAntialiasAlgorithmField",
     "ImageFilterField",
     "ImageDPIField",
+    "ImageRotationField",
+    "ImageScaleField",
+    "ImageResampleAlgorithmField",
 ]
