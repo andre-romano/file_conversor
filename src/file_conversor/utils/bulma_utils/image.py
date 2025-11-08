@@ -68,8 +68,24 @@ def ImageAntialiasAlgorithmField():
     )
 
 
+def ImageFilterField():
+    """Create a form field for image filter options."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in PillowBackend.PILLOW_FILTERS
+            ],
+            _name="filter",
+            help=_("Select the filter to apply to the image."),
+        ),
+        label_text=_("Filter"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
     "ImageRadiusField",
     "ImageAntialiasAlgorithmField",
+    "ImageFilterField",
 ]

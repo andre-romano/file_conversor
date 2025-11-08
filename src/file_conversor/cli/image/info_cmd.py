@@ -19,6 +19,7 @@ from file_conversor.cli.image._typer import COMMAND_NAME, INFO_NAME
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
+from file_conversor.utils.backend import PillowParser
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -82,13 +83,11 @@ def info(
         metadata = pillow_backend.info(input_file)
 
         # 📁 Informações gerais do arquivo
-        formatted.append(f"  - {_('Name')}: {input_file}")
-        formatted.append(f"  - {_('Format')}: {in_ext.upper()}")
-        if metadata:
-            for tag, value in metadata.items():
-                tag_name = PillowBackend.Exif_TAGS.get(tag, f"{tag}")
-                formatted.append(f"  - {tag_name}: {value}")
+        parser = PillowParser(pillow_backend, Path(input_file))
+        parser.run()
 
         # Agrupar e exibir tudo com Rich
-        group = Group(*formatted)
+        group = Group(
+            *parser.get_exif_info().rich(),
+        )
         print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
