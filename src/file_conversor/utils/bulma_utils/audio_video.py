@@ -249,8 +249,8 @@ def RotationField():
     )
 
 
-def AxisField():
-    """Create a form field for video mirroring axis selection."""
+def MirrorAxisField():
+    """Create a form field for video/audio/image mirroring axis selection."""
     return FormFieldHorizontal(
         FormFieldSelect(
             *[
@@ -302,7 +302,7 @@ __all__ = [
     "GammaField",
     "SharpnessField",
     "RotationField",
-    "AxisField",
+    "MirrorAxisField",
     "DeshakeField",
     "UnsharpField",
 ]

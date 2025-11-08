@@ -83,9 +83,25 @@ def ImageFilterField():
     )
 
 
+def ImageDPIField():
+    """Create a form field for DPI selection."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) > 0",
+            current_value=str(CONFIG["image-dpi"]),
+            _name="image-dpi",
+            _type="number",
+            step="100",
+            help=_("Dots per inch (DPI) for rendering the image. Must be a positive integer."),
+        ),
+        label_text=_("DPI"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
     "ImageRadiusField",
     "ImageAntialiasAlgorithmField",
     "ImageFilterField",
+    "ImageDPIField",
 ]

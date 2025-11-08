@@ -30,7 +30,7 @@ def TabGeneral() -> list | tuple:
             (q, q.upper())
             for q in filter(lambda x: x.lower() != 'null', FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)
         ], current_value='mp4'),
-        AxisField(),
+        MirrorAxisField(),
         OutputDirField(),
     ]
 

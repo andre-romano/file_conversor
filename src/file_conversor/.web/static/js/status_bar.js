@@ -37,6 +37,7 @@ function alpineConfigStatusBar() {
             this.time = 0;
 
             this.status_id = status_id;
+            console.log("Starting status bar:", this, " - ID:", this.status_id);
             await this.update();
         },
         updateTime() {
@@ -79,9 +80,9 @@ function alpineConfigStatusBar() {
         },
         async update() {
             try {
-                const response = await fetch(`/api/status?status_id=${this.status_id}`, {
-                    method: 'GET',
-                });
+                const url = `/api/status?status_id=${this.status_id}`;
+                const method = 'GET';
+                const response = await fetch(url, { method });
                 /* Expects a JSON response with at least:
                 {
                     "status": <string>, // "processing", "completed", "failed"
@@ -92,7 +93,7 @@ function alpineConfigStatusBar() {
                 */
 
                 if (!response.ok) {
-                    throw new Error(`${response.status} ${response.statusText}`);
+                    throw new Error(`${response.statusText} (${response.status}): ${url} (${method})`);
                 }
 
                 const data = await response.json();

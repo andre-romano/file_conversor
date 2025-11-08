@@ -9,6 +9,8 @@ from file_conversor.backend.gui._api.image.convert import api_image_convert
 from file_conversor.backend.gui._api.image.enhance import api_image_enhance
 from file_conversor.backend.gui._api.image.filter import api_image_filter
 from file_conversor.backend.gui._api.image.info import api_image_info
+from file_conversor.backend.gui._api.image.mirror import api_image_mirror
+from file_conversor.backend.gui._api.image.render import api_image_render
 
 
 def routes():
@@ -46,6 +48,16 @@ def routes():
         FlaskRoute(
             rule="/api/image/info",
             handler=api_image_info,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/image/mirror",
+            handler=api_image_mirror,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/image/render",
+            handler=api_image_render,
             methods=["POST"],
         ),
     ]

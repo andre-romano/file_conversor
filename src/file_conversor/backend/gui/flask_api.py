@@ -14,7 +14,7 @@ from file_conversor.backend.gui.flask_api_status import *
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.formatters import parse_js_to_py
+from file_conversor.utils.formatters import escape_xml, format_traceback_html, format_traceback_str, parse_js_to_py
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -50,11 +50,11 @@ class FlaskApi:
             ))
             logger.info(f"[bold]{_('Processing completed successfully.')}[/]")
         except Exception as e:
-            logger.error(f"{_('Processing error')}: {repr(e)}")
+            logger.error(format_traceback_str(e, debug=STATE["debug"]))
             progress = status.get_progress()
             status.set(FlaskApiStatusError(
                 id=status.get_id(),
-                exception=repr(e),
+                exception=format_traceback_html(e, debug=STATE["debug"]),
                 progress=None if progress is None or progress < 0 else progress,
             ))
 
@@ -157,19 +157,16 @@ class FlaskApi:
         try:
             logger.info(f"[bold]{_('File processing requested via API.')}[/]")
             data = cls.get_form_data()
-            data['status_id'] = cls._add_status().get_id()
+            status = cls._add_status()
+            data['status_id'] = status.get_id()
             threading.Thread(target=cls._execute_thread, args=(data, callback), daemon=True).start()
-            return json.dumps({
-                'status': 'processing',
-                'status_id': data['status_id'],
-                'message': _('Processing ...'),
-            }), 200
+            return json.dumps(status.json()), 200
         except Exception as e:
-            logger.error(f"{_('Start file processing error')}: {repr(e)}")
-            return json.dumps({
-                'status': 'error',
-                'message': repr(e),
-            }), 500
+            logger.error(format_traceback_str(e, debug=STATE["debug"]))
+            return json.dumps(FlaskApiStatusError(
+                id=status.get_id(),
+                exception=format_traceback_html(e, debug=STATE["debug"]),
+            ).json()), 500
 
 
 __all__ = ["FlaskApi"]

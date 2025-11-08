@@ -133,6 +133,19 @@ body nav.navbar .navbar-menu .navbar-dropdown {
     }
 }
 
+/* MODAL */
+body .modal-card,
+body .modal-content {
+    min-width: 40rem !important;
+    width: auto !important;
+    max-width: 80vw !important;
+}
+
+body .modal-content,
+body .modal-card-foot {
+    background-color: var(--bulma-modal-card-body-background-color);
+}
+
 /* CARDS */
 body div.card {
     border: solid 1px var(--bulma-navbar-border-color);

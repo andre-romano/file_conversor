@@ -3,15 +3,43 @@
 import json
 import math
 import re
+import traceback
 import typer
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable, Sequence
 
 # user-provided modules
 from file_conversor.config.locale import get_translation
 
 _ = get_translation()
+
+
+def escape_xml(text: Any | str | None) -> str:
+    """
+    Escape invalid characters for XML.
+    """
+    if text is None:
+        return ""
+    text = str(text)
+    return (
+        text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+            .replace("'", "&apos;")
+    )
+
+
+def parse_traceback_list(exc: Exception) -> list[str]:
+    """
+    Parse traceback to get specific frame.
+
+    :param exc: Exception object.
+
+    :return: List of str.
+    """
+    return traceback.format_exc().splitlines()
 
 
 def parse_js_to_py(value: str) -> Any:
@@ -190,3 +218,41 @@ def format_py_to_js(value: Any) -> str:
         # Strip quotes and wrap in backticks
         return f"`{data[1:-1]}`"
     return data
+
+
+def format_traceback_str(exc: Exception, debug: bool = True) -> str:
+    """
+    Format exception traceback as string.
+
+    :param exc: Exception object.
+    :param debug: bool: Whether to include detailed traceback information.
+
+    :return: Formatted traceback string.
+    """
+    exc_formatted = f'[bold red]{type(exc).__name__}[/]: {str(exc)}'
+    if not debug:
+        return exc_formatted
+
+    stack_str_list = parse_traceback_list(exc)
+    return '\n'.join(stack_str_list[:-1] + [exc_formatted])
+
+
+def format_traceback_html(exc: Exception, debug: bool = True) -> str:
+    """
+    Format exception traceback as HTML.
+
+    :param exc: Exception object.
+    :param debug: bool: Whether to include detailed traceback information.
+
+    :return: Formatted traceback HTML.
+    """
+    tab = "&nbsp;&nbsp;"
+    exc_formatted = f'<b style="color:red;">{type(exc).__name__}</b>: {str(exc)}'
+    if not debug:
+        return exc_formatted
+
+    stack_str_list = parse_traceback_list(exc)
+    return '<br>'.join([
+        escape_xml(s).replace(' ', "&nbsp;").replace('\t', tab).replace('\n', '<br>')
+        for s in stack_str_list[:-1]
+    ] + [exc_formatted])

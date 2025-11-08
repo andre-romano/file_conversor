@@ -24,7 +24,10 @@ def ModalCard(
         _class_head: str = "",
         _class_body: str = "",
         _class_foot: str = "",
-        **kwargs
+        kwargs_head: dict[str, Any] = {},
+        kwargs_body: dict[str, Any] = {},
+        kwargs_footer: dict[str, Any] = {},
+        **kwargs,
 ):
     """
     Create a modal card component.
@@ -32,13 +35,20 @@ def ModalCard(
     :param _class_head: Additional CSS classes to apply to the modal header.
     :param _class_body: Additional CSS classes to apply to the modal body.
     :param _class_foot: Additional CSS classes to apply to the modal footer.
+    :param kwargs_head: Additional attributes to apply to the modal header.
+    :param kwargs_body: Additional attributes to apply to the modal body.
+    :param kwargs_footer: Additional attributes to apply to the modal footer.
+    :param kwargs: Additional attributes to apply to the modal container.
     """
     with _Modal(**kwargs) as modal:
         # Modal card
         with div(_class="modal-card"):
 
             # Modal header
-            with header(_class=f"modal-card-head {_class_head}"):
+            with header(
+                _class=f"modal-card-head {_class_head}",
+                **kwargs_head,
+            ):
                 p(
                     "",
                     _class="modal-card-title",
@@ -59,6 +69,7 @@ def ModalCard(
             section(
                 "",
                 _class=f"modal-card-body {_class_body}",
+                **kwargs_body,
                 **{
                     ":class": "{ 'is-hidden': $store.modal.body == '' }",
                     "x-html": "$store.modal.body",
@@ -69,8 +80,8 @@ def ModalCard(
             footer(
                 "",
                 _class=f"modal-card-foot {_class_foot}",
+                **kwargs_footer,
                 **{
-                    ":class": "{ 'is-hidden': $store.modal.footer == '' }",
                     "x-html": "$store.modal.footer",
                 }
             )

@@ -10,10 +10,9 @@ function alpineConfigForm() {
     Alpine.store('form', {
         async submit(form, api_endpoint) {
             try {
-                const response = await fetch(api_endpoint, {
-                    method: 'POST',
-                    body: new FormData(form),
-                });
+                const method = 'POST';
+                const body = new FormData(form);
+                const response = await fetch(api_endpoint, { method, body });
                 /* Expects a JSON response with at least:
                 {
                     "status_id": <int>,
@@ -21,25 +20,23 @@ function alpineConfigForm() {
                     "exception": <string> (optional)
                 }
                 */
-                const data = await response.json();
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (err) {
+                    console.warn("Submit - JSON parse error:", err);
+                }
+                console.log("Submit - Parsed data:", data);
                 if (!response.ok) {
-                    await alpineConfigModal().load(
-                        `${response.statusText}`,
-                        `${data.exception || 'Unknown error'}: ${data.message || ''}`,
-                        '',
-                        true,
-                    );
-                    return;
+                    throw new Error(data.message || `${response.statusText} (${response.status}): ${api_endpoint} (${method})`);
                 }
                 let status_bar = alpineConfigStatusBar();
-                await status_bar.start(data.status_id);
+                await status_bar.start(data.id);
             } catch (error) {
-                await alpineConfigModal().load(
-                    'Error',
-                    `An error occurred: ${error.message}`,
-                    '',
-                    true,
-                );
+                await alpineConfigModal().load({
+                    title: 'Form Submit Error',
+                    body: `${error.message}`,
+                });
             }
         },
     });
