@@ -12,6 +12,12 @@ function alpineConfigForm() {
             try {
                 const method = 'POST';
                 const body = new FormData(form);
+                // Ensure unchecked checkboxes are sent as 'off'
+                document.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    if (!body.has(input.name)) {
+                        body.append(input.name, 'off');
+                    }
+                });
                 const response = await fetch(api_endpoint, { method, body });
                 /* Expects a JSON response with at least:
                 {

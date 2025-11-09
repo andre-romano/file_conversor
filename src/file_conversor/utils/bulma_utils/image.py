@@ -3,7 +3,7 @@
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.image import PillowBackend
+from file_conversor.backend.image import PillowBackend, Img2PDFBackend
 
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
@@ -144,6 +144,49 @@ def ImageResampleAlgorithmField():
     )
 
 
+def ImageFitField():
+    """Create a form field for image fit option."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in Img2PDFBackend().FIT_MODES
+            ],
+            current_value=CONFIG["image-fit"],
+            _name="image-fit",
+            help=_("Select how to fit the image into the page when converting to PDF. Valid only if page size is defined."),
+        ),
+        label_text=_("Image Fit"),
+    )
+
+
+def ImagePageSizeField():
+    """Create a form field for image page size option."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            ('null', _('Not defined')),
+            *[
+                (k, k.upper())
+                for k in Img2PDFBackend().PAGE_LAYOUT
+            ],
+            current_value=CONFIG["image-page-size"],
+            _name="image-page-size",
+            help=_("Select the page size for the output PDF. If not defined, PDF size will match image size."),
+        ),
+        label_text=_("Page Size"),
+    )
+
+
+def ImageSetMetadataField():
+    """Create a form field for setting image metadata option."""
+    return FormFieldCheckbox(
+        current_value="off",
+        _name="image-set-metadata",
+        help=_("Include image metadata (EXIF, IPTC, etc) in the output file."),
+        label_text=_("Set Metadata"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
     "ImageRadiusField",
@@ -153,4 +196,7 @@ __all__ = [
     "ImageRotationField",
     "ImageScaleField",
     "ImageResampleAlgorithmField",
+    "ImageFitField",
+    "ImagePageSizeField",
+    "ImageSetMetadataField",
 ]

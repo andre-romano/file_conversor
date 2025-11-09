@@ -60,7 +60,7 @@ def parse_js_to_py(value: str) -> Any:
             else:
                 return int(value)
         # Handle JSON arrays and objects
-        elif (value.startswith('[') and value.endswith(']')) or (value.startswith('{') and value.endswith('}')):
+        elif value[0] in ('[', '{', '(') and value[-1] in (']', '}', ')'):
             return json.loads(value.replace("'", '"'))
     except Exception:
         pass
@@ -213,6 +213,8 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
 
 def format_py_to_js(value: Any) -> str:
     """Convert Python value to JavaScript-compatible string."""
+    if isinstance(value, Path):
+        value = str(value.resolve())
     data = json.dumps(value)
     if data[0] in ('"', "'") and data[-1] in ('"', "'"):
         # Strip quotes and wrap in backticks

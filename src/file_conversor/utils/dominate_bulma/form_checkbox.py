@@ -67,7 +67,7 @@ def FormFieldCheckbox(
             **kwargs,
         ),
         _class_control="is-flex is-flex-direction-column is-flex-grow-1",
-        current_value=current_value,
+        current_value="on" if current_value in ["true", "on", "yes", True] else "off",
         help=help,
         x_data=x_data,
         x_init=x_init,

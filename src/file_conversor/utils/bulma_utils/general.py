@@ -1,5 +1,6 @@
 # src\file_conversor\utils\bulma_utils\general.py
 
+from pathlib import Path
 from typing import Any
 
 # user-provided modules
@@ -59,6 +60,35 @@ def OutputDirField():
     )
 
 
+def OutputFileField(
+    *file_types: str,
+    description: str = "",
+    current_value: str = "",
+):
+    """
+    Create a FormFieldOutputFile for selecting output file.
+
+    :param file_types: File type patterns (e.g., '.pdf', '.docx').
+    :param description: Description for the file types (e.g., 'PDF Files').
+    :param current_value: The current output full file path.
+    """
+    return FormFieldHorizontal(
+        FormFieldOutputFile(
+            _name="output-file",
+            help=_("Select the output filename to save the file."),
+            file_types=[
+                format_file_types_webview(
+                    *file_types,
+                    description=description,
+                ),
+            ],
+            path=(Path(current_value).parent if current_value else Path()).resolve(),
+            current_value=current_value,
+        ),
+        label_text=_("Output File"),
+    )
+
+
 def FileFormatField(
     *options: tuple[str, str],
     current_value: str | None = None,
@@ -93,6 +123,7 @@ def OverwriteFilesField():
 __all__ = [
     "InputFilesField",
     "OutputDirField",
+    "OutputFileField",
     "FileFormatField",
     "OverwriteFilesField",
 ]

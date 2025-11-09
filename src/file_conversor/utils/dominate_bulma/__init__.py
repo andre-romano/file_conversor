@@ -13,6 +13,7 @@ from file_conversor.utils.dominate_bulma.form_field import *
 from file_conversor.utils.dominate_bulma.form_file_list import *
 from file_conversor.utils.dominate_bulma.form_input import *
 from file_conversor.utils.dominate_bulma.form_output_dir import *
+from file_conversor.utils.dominate_bulma.form_output_file import *
 from file_conversor.utils.dominate_bulma.form_radio import *
 from file_conversor.utils.dominate_bulma.form_select import *
 from file_conversor.utils.dominate_bulma.form_textarea import *

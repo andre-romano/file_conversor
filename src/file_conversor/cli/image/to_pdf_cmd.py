@@ -1,5 +1,5 @@
 
-# src\file_conversor\cli\multimedia\image_cmd.py
+# src\file_conversor\cli\image\to_pdf_cmd.py
 
 import typer
 

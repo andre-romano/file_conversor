@@ -1,6 +1,6 @@
 # src\file_conversor\backend\gui\_webview_api.py
 
-import threading
+import re
 import webview
 
 from webview.dom import DOMEventHandler
@@ -259,9 +259,13 @@ class WebViewAPI:
         if not file_types:
             return list(result)
 
-        suffix = file_types[0].split("*")[-1]
+        match = re.search(r"\(\*(\.[^);]+)", file_types[0])
+        if not match:
+            return list(result)
+
+        suffix = match.group(1)
         res = f"{Path(result[0]).with_suffix(suffix).resolve()}"
-        logger.debug(f"Adjusted saved file: {res}")
+        logger.debug(f"Adjusted saved file: '{res}'")
         return [res]
 
 
