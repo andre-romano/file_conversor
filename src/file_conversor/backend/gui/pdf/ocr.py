@@ -3,7 +3,7 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.pdf import PyPDFBackend
+from file_conversor.backend.pdf import OcrMyPDFBackend
 
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
@@ -23,7 +23,7 @@ logger = LOG.getLogger()
 def PagePDFOcr():
     return PageForm(
         InputFilesField(
-            *PyPDFBackend.SUPPORTED_IN_FORMATS,
+            *OcrMyPDFBackend.SUPPORTED_IN_FORMATS,
             description=_("PDF files"),
         ),
         PDFLanguageField(),
