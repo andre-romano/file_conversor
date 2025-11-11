@@ -1,4 +1,4 @@
-# src/file_conversor/backend/gui/_api/pdf/extract_img.py
+# src/file_conversor/backend/gui/_api/pdf/extract.py
 
 from flask import json, render_template, request, url_for
 from pathlib import Path
@@ -8,9 +8,10 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend.pdf import PyMuPDFBackend
+from file_conversor.backend.pdf import PyPDFBackend
 
 from file_conversor.utils import CommandManager, ProgressManager
+from file_conversor.utils.formatters import parse_pdf_pages
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -25,29 +26,33 @@ logger = LOG.getLogger()
 
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
-    """Thread to handle PDF image extraction."""
-    logger.debug(f"PDF image extraction thread received: {params}")
+    """Thread to handle PDF page extraction."""
+    logger.debug(f"PDF page extraction thread received: {params}")
     input_files: list[Path] = [Path(i) for i in params['input-files']]
     output_dir: Path = Path(params['output-dir'])
 
-    logger.info(f"[bold]{_('Extracting images from PDF files')}[/]...")
-    pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
+    pages = str(params['pages'])
+    password = str(params['password']) or None
+
+    logger.info(f"[bold]{_('Extracting pages from PDF files')}[/]...")
+    backend = PyPDFBackend(verbose=STATE["verbose"])
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        pymupdf_backend.extract_images(
-            # files
+        backend.extract(
             input_file=input_file,
-            output_dir=output_dir,
+            output_file=output_file,
+            password=password,
+            pages=parse_pdf_pages(pages),
             progress_callback=lambda p: status.set_progress(progress_mgr.update_progress(p))
         )
         status.set_progress(progress_mgr.complete_step())
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=True)  # allow overwrite to avoid detecting PDF file as existing
-    cmd_mgr.run(callback)
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_extracted")
 
     logger.debug(f"{status}")
 
 
-def api_pdf_extract_img():
-    """API endpoint to extract images from PDF documents."""
-    logger.info(f"[bold]{_('PDF image extraction requested via API.')}[/]")
+def api_pdf_extract():
+    """API endpoint to extract pages from PDF documents."""
+    logger.info(f"[bold]{_('PDF page extraction requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)

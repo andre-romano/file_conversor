@@ -38,7 +38,7 @@ def PDFCompressionField():
     )
 
 
-def PasswordField(
+def PDFPasswordField(
         _validation_expr: str = "value.length > 0",
         _name: str = "password",
         help: str = _("Password used to encrypt/decrypt the PDF files."),
@@ -74,8 +74,29 @@ def PDFEncryptionAlgorithmField():
     )
 
 
+def PDFPagesField(
+        _validation_expr: str = "value.length > 0",
+        _name: str = "pages",
+        help: str = _("PDF pages to extract (comma-separated list). Format 'start-end'."),
+        label_text: str = _("Pages"),
+        **kwargs: Any,
+):
+    """Create a form field for specifying PDF pages to extract."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr=_validation_expr,
+            _type="text",
+            _name=_name,
+            help=help,
+            **kwargs,
+        ),
+        label_text=label_text,
+    )
+
+
 __all__ = [
     "PDFCompressionField",
-    "PasswordField",
+    "PDFPasswordField",
     "PDFEncryptionAlgorithmField",
+    "PDFPagesField",
 ]

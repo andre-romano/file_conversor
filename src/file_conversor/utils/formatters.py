@@ -120,21 +120,24 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
     return rotation_dict
 
 
-def parse_pdf_pages(pages: list[str] | None) -> list[int]:
+def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
     if not pages:
         pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
-        pages = [p.strip() for p in str(pages_str).split(",")]
+        pages = str(pages_str)
+
+    if isinstance(pages, str):
+        pages = [p.strip() for p in pages.split(",")]
 
     # parse user input
     pages_list: list[int] = []
     for arg in pages:
-        match = re.compile(r'(\d+)-(\d*){0,1}').search(arg)
+        match = re.compile(r'(\d+)(-(\d*)){0,1}').search(arg)
         if not match:
-            raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'begin-end'")}.")
+            raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'page' or 'begin-end'")}.")
 
         # check user input
         begin = int(match.group(1)) - 1
-        end = int(match.group(2)) - 1
+        end = int(match.group(3)) - 1 if match.group(3) else begin
 
         if end < begin:
             raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")

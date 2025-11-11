@@ -26,7 +26,7 @@ def PagePDFDecrypt():
             *PyPDFBackend.SUPPORTED_IN_FORMATS,
             description=_("PDF files"),
         ),
-        PasswordField(
+        PDFPasswordField(
             _name="password",
             help=_("Password used to decrypt the PDF files."),
             label_text=_("Password"),
