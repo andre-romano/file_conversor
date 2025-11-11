@@ -11,6 +11,7 @@ from file_conversor.backend.gui._api.doc import routes as doc_api_routes
 from file_conversor.backend.gui._api.ebook import routes as ebook_api_routes
 from file_conversor.backend.gui._api.hash import routes as hash_api_routes
 from file_conversor.backend.gui._api.image import routes as image_api_routes
+from file_conversor.backend.gui._api.pdf import routes as pdf_api_routes
 from file_conversor.backend.gui._api.ppt import routes as ppt_api_routes
 from file_conversor.backend.gui._api.video import routes as video_api_routes
 from file_conversor.backend.gui._api.xls import routes as xls_api_routes
@@ -34,6 +35,7 @@ def routes():
         *ebook_api_routes(),
         *hash_api_routes(),
         *image_api_routes(),
+        *pdf_api_routes(),
         *ppt_api_routes(),
         *video_api_routes(),
         *xls_api_routes(),
