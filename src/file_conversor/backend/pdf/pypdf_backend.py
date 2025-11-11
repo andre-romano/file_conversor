@@ -7,6 +7,7 @@ This module provides functionalities for handling PDF files using ``pypdf`` back
 from pypdf import PdfReader, PdfWriter
 from pypdf.constants import UserAccessPermissions
 
+from enum import Enum
 from pathlib import Path
 
 from typing import Any, Callable, Iterable, Sequence
@@ -35,6 +36,34 @@ class PyPDFBackend(AbstractBackend):
         "pdf": {},
     }
     EXTERNAL_DEPENDENCIES = set([])
+
+    class EncryptionAlgorithm(Enum):
+        """PDF encryption algorithms."""
+
+        AES_256 = "AES-256"
+        AES_256_R5 = "AES-256-R5"
+        AES_128 = "AES-128"
+        RC4_128 = "RC4-128"
+        RC4_40 = "RC4-40"
+
+        @classmethod
+        def get_dict(cls):
+            """Get dictionary of encryption algorithms."""
+            return {
+                "AES-256": PyPDFBackend.EncryptionAlgorithm.AES_256,
+                "AES-256-R5": PyPDFBackend.EncryptionAlgorithm.AES_256_R5,
+                "AES-128": PyPDFBackend.EncryptionAlgorithm.AES_128,
+                "RC4-128": PyPDFBackend.EncryptionAlgorithm.RC4_128,
+                "RC4-40": PyPDFBackend.EncryptionAlgorithm.RC4_40,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            """Get encryption algorithm from string."""
+            alg_dict = cls.get_dict()
+            if name not in alg_dict:
+                raise ValueError(f"Encryption algorithm '{name}' is invalid. Valid options are: {', '.join(alg_dict.keys())}.")
+            return alg_dict[name]
 
     @staticmethod
     def len(
@@ -244,7 +273,7 @@ class PyPDFBackend(AbstractBackend):
                 permission_print_low_quality: bool = True,
                 permission_print_high_quality: bool = True,
                 permission_all: bool = False,
-                encryption_algorithm: str = "AES-256",
+                encryption_algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256,
                 progress_callback: Callable[[float], Any] | None = None,
                 ):
         """
@@ -285,7 +314,7 @@ class PyPDFBackend(AbstractBackend):
         :param permission_print_high_quality: User can PRINT pdf (high quality). Requires `permission_print_low_quality=True`. Defaults to True (allow).
         :param permission_all: User has ALL PERMISSIONS. If True, it overrides all other permissions. Defaults to False (not set).
 
-        :param encryption_algorithm: Encryption algorithm used. Valid options are "RC4-40", "RC4-128", "AES-128", "AES-256-R5", or "AES-256". Defaults to "AES-256" (for enhanced security and compatibility).
+        :param encryption_algorithm: Encryption algorithm used. Defaults to "AES-256" (for enhanced security and compatibility).
         :param progress_callback: Progress callback (0-100). Defaults to None.
 
         :raises FileNotFoundError: if input file not found
@@ -296,9 +325,6 @@ class PyPDFBackend(AbstractBackend):
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
-
-            if encryption_algorithm not in (None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"):
-                raise ValueError(f"Encryption algorithm '{encryption_algorithm}' is invalid.  Valid options are 'RC4-40', 'RC4-128', 'AES-128', 'AES-256-R5', or 'AES-256'.")
 
             # set user permissions
             permissions = UserAccessPermissions(0)
@@ -334,7 +360,7 @@ class PyPDFBackend(AbstractBackend):
                 owner_password=owner_password,
                 user_password=user_password if user_password else owner_password,
                 permissions_flag=permissions,
-                algorithm=encryption_algorithm,
+                algorithm=encryption_algorithm.value,
                 use_128bit=True,
             )
 

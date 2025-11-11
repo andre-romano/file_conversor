@@ -3,7 +3,7 @@
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.pdf import GhostscriptBackend, PikePDFBackend
+from file_conversor.backend.pdf import GhostscriptBackend, PikePDFBackend, PyPDFBackend
 
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
@@ -38,6 +38,44 @@ def PDFCompressionField():
     )
 
 
+def PasswordField(
+        _validation_expr: str = "value.length > 0",
+        _name: str = "password",
+        help: str = _("Password used to encrypt/decrypt the PDF files."),
+        label_text: str = _("Password"),
+        **kwargs: Any,
+):
+    """Create a form field for PDF password input."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr=_validation_expr,
+            _type="password",
+            _name=_name,
+            help=help,
+            **kwargs,
+        ),
+        label_text=label_text,
+    )
+
+
+def PDFEncryptionAlgorithmField():
+    """Create a form field for PDF encryption algorithm selection."""
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in PyPDFBackend.EncryptionAlgorithm.get_dict()
+            ],
+            current_value="AES-256",
+            _name="pdf-encryption-algorithm",
+            help=_("Select the PDF encryption algorithm to use. Stronger algorithms (e.g., AES-256) provide better security."),
+        ),
+        label_text=_("PDF Encryption Algorithm"),
+    )
+
+
 __all__ = [
     "PDFCompressionField",
+    "PasswordField",
+    "PDFEncryptionAlgorithmField",
 ]

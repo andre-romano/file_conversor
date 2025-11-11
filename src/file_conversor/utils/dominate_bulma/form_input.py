@@ -34,7 +34,7 @@ def FormFieldInput(
     _type: str = "text",
     current_value: str = "",
     label_text: str = "",
-    validation_expr: str = "",
+    validation_expr: str = "true",
     button: dict[str, Any] | None = None,
     x_data: str = "",
     x_init: str = "",

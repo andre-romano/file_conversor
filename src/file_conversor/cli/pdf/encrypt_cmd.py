@@ -122,8 +122,8 @@ def encrypt(
                                             )] = False,
     encrypt_algo: Annotated[str, typer.Option("--encryption", "-enc",
                                               help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
-                                              callback=lambda x: check_valid_options(x, valid_options=[None, "RC4-40", "RC4-128", "AES-128", "AES-256-R5", "AES-256"])
-                                              )] = "AES-256",
+                                              callback=lambda x: check_valid_options(x, valid_options=PyPDFBackend.EncryptionAlgorithm.get_dict()),
+                                              )] = PyPDFBackend.EncryptionAlgorithm.AES_256.value,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
@@ -151,7 +151,7 @@ def encrypt(
             permission_print_high_quality=allow_print_hq,
             permission_all=allow_all,
 
-            encryption_algorithm=encrypt_algo,
+            encryption_algorithm=PyPDFBackend.EncryptionAlgorithm.from_str(encrypt_algo),
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()

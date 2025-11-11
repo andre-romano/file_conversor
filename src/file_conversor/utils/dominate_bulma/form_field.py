@@ -13,7 +13,7 @@ def FormField(
     label_text: str = "",
     help: str = "",
     icons: dict[str, Any] | None = None,
-    current_value: str | None = None,
+    current_value: Any = None,
     validation_expr: str = "true",
     has_addons: bool = False,
     _class: str = "",
