@@ -99,12 +99,6 @@ def index():
                 'url': url_for('hash_index'),
             },
             {
-                'image': url_for('icons', filename='pipeline.ico'),
-                'title': _("Pipeline Tools"),
-                'subtitle': _("Pipeline file processing (task automation)"),
-                'url': url_for('pipeline_index'),
-            },
-            {
                 'image': url_for('icons', filename='config.ico'),
                 'title': _("Configuration"),
                 'subtitle': _("Configure application default options"),

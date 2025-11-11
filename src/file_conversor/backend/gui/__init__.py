@@ -14,7 +14,6 @@ from file_conversor.backend.gui.ebook import routes as ebook_routes
 from file_conversor.backend.gui.hash import routes as hash_routes
 from file_conversor.backend.gui.image import routes as image_routes
 from file_conversor.backend.gui.pdf import routes as pdf_routes
-from file_conversor.backend.gui.pipeline import routes as pipeline_routes
 from file_conversor.backend.gui.ppt import routes as ppt_routes
 from file_conversor.backend.gui.text import routes as text_routes
 from file_conversor.backend.gui.video import routes as video_routes
@@ -87,7 +86,6 @@ fapp.add_route(hash_routes())
 
 # UTILS CONFIG
 fapp.add_route(config_routes())
-fapp.add_route(pipeline_routes())
 
 fapp.add_route(icons_routes())
 fapp.add_route(index_routes())
