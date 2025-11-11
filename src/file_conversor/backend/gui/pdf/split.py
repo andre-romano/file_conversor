@@ -1,8 +1,13 @@
 # src/file_conversor/backend/gui/pdf/split.py
 
-from flask import render_template, url_for
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.pdf import PyPDFBackend
+
+from file_conversor.utils.bulma_utils import *
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -15,10 +20,16 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-def pdf_split():
-    return render_template(
-        'pdf/split.jinja2',
-        breadcrumb_items=[
+def PagePDFSplit():
+    return PageForm(
+        InputFilesField(
+            *PyPDFBackend.SUPPORTED_IN_FORMATS,
+            description=_("PDF files"),
+        ),
+        PDFPasswordField(),
+        OutputDirField(),
+        api_endpoint=f"{url_for('api_pdf_split')}",
+        nav_items=[
             {
                 'label': _("Home"),
                 'url': url_for('index'),
@@ -33,4 +44,11 @@ def pdf_split():
                 'active': True,
             },
         ],
+        _title=f"{_('Split PDF')} - File Conversor",
     )
+
+
+def pdf_split():
+    return render_template_string(str(
+        PagePDFSplit()
+    ))

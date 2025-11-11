@@ -12,6 +12,7 @@ from file_conversor.backend.gui._api.pdf.merge import api_pdf_merge
 from file_conversor.backend.gui._api.pdf.ocr import api_pdf_ocr
 from file_conversor.backend.gui._api.pdf.repair import api_pdf_repair
 from file_conversor.backend.gui._api.pdf.rotate import api_pdf_rotate
+from file_conversor.backend.gui._api.pdf.split import api_pdf_split
 
 
 def routes():
@@ -64,6 +65,11 @@ def routes():
         FlaskRoute(
             rule="/api/pdf/rotate",
             handler=api_pdf_rotate,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/pdf/split",
+            handler=api_pdf_split,
             methods=["POST"],
         ),
     ]
