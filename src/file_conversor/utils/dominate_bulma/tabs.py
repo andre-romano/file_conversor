@@ -28,7 +28,7 @@ class TabsStyle:
 
 def Tabs(
     *tabs: dict[str, Any],
-    active_tab: str,
+    active_tab: str = "",
     _class: str = "",
     _class_headers: str = "",
     _class_content: str = "",
@@ -46,10 +46,17 @@ def Tabs(
     :param _class_headers: Additional CSS classes for the tab headers.
     :param _class_content: Additional CSS classes for the tab content area.
     """
+    if not tabs:
+        raise ValueError("At least one tab must be provided.")
+
+    active_tab = active_tab or tabs[0]['label']
+    if all(tab['label'] != active_tab for tab in tabs):
+        raise ValueError("The active_tab must match one of the provided tab labels.")
+
     with div(_class=f"tabs {_class}", **{
-        "x-data": """{
-            activeTab: '%s',
-        }""" % (active_tab)
+        "x-data": f"""{{
+            activeTab: '{active_tab}',
+        }}""",
     }, **kwargs) as tabs_div:
         with ul(_class=f"tab-headers {_class_headers}"):
             for tab in tabs:

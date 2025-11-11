@@ -3,6 +3,7 @@
 :root {
     --bulma-navbar-height: 2.85rem;
     --bulma-navbar-border-color: #c7c7c7;
+    --bulma-tab-border-color: #929292;
     --bulma-footer-background-color: var(--bulma-scheme-main);
     --bulma-main-app-margin: 20px;
     --bulma-shadow: 0px 0px 15px 2px rgba(70, 70, 70, 0.4);
@@ -15,6 +16,20 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+}
+
+
+/* Font smoothing for better text rendering */
+html,
+body,
+input,
+button {
+    text-rendering: geometricPrecision;
+    /* Other options: geometricPrecision, optimizeSpeed, optimizeLegibility */
+    -webkit-font-smoothing: antialiased;
+    /* Better contrast (thin, crisp text) */
+    -moz-osx-font-smoothing: grayscale;
+    /* Firefox macOS equivalent */
 }
 
 html.has-status-bar-fixed-bottom,
@@ -149,6 +164,21 @@ body .modal-card-foot {
 /* CARDS */
 body div.card {
     border: solid 1px var(--bulma-navbar-border-color);
+}
+
+/* TABS */
+body .tabs .tab-headers a {
+    border-color: var(--bulma-tab-border-color);
+}
+
+/* input */
+body input.input,
+body textarea.textarea {
+    --bulma-input-placeholder-color: #878787;
+}
+
+body input[type="checkbox"] {
+    border: var(--bulma-navbar-border-color);
 }
 
 /* FOOTER */
