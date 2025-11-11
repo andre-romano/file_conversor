@@ -187,6 +187,36 @@ def ImageSetMetadataField():
     )
 
 
+def ImageUnsharpStrengthField():
+    """Create a form field for image unsharp strength adjustment."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) >= 1",
+            current_value='130',
+            _name="image-unsharp-strength",
+            _type="number",
+            step="10",
+            help=_("Unsharp strength, in percent. Must be a positive integer."),
+        ),
+        label_text=_("Strength (%)"),
+    )
+
+
+def ImageUnsharpThresholdField():
+    """Create a form field for image unsharp threshold adjustment."""
+    return FormFieldHorizontal(
+        FormFieldInput(
+            validation_expr="Number.parseInt(value) >= 1",
+            current_value='4',
+            _name="image-unsharp-threshold",
+            _type="number",
+            step="1",
+            help=_("Threshold controls the minimum brightness change that will be sharpened. Must be a positive integer."),
+        ),
+        label_text=_("Threshold"),
+    )
+
+
 __all__ = [
     "ImageQualityField",
     "ImageRadiusField",
@@ -199,4 +229,6 @@ __all__ = [
     "ImageFitField",
     "ImagePageSizeField",
     "ImageSetMetadataField",
+    "ImageUnsharpStrengthField",
+    "ImageUnsharpThresholdField",
 ]

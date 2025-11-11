@@ -54,7 +54,7 @@ def unsharp(
 
     radius: Annotated[int, RadiusOption()] = 2,
 
-    strenght: Annotated[int, typer.Option("--strenght", "-s",
+    strength: Annotated[int, typer.Option("--strenght", "-s",
                                           help=f'{_("Unsharp strength, in percent")}',
                                           min=1,
                                           )] = 130,
@@ -75,7 +75,7 @@ def unsharp(
             input_file=input_file,
             output_file=output_file,
             radius=radius,
-            percent=strenght,
+            percent=strength,
             threshold=threshold,
         )
         progress_mgr.complete_step()

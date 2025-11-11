@@ -14,6 +14,7 @@ from file_conversor.backend.gui._api.image.render import api_image_render
 from file_conversor.backend.gui._api.image.resize import api_image_resize
 from file_conversor.backend.gui._api.image.rotate import api_image_rotate
 from file_conversor.backend.gui._api.image.to_pdf import api_image_to_pdf
+from file_conversor.backend.gui._api.image.unsharp import api_image_unsharp
 
 
 def routes():
@@ -76,6 +77,11 @@ def routes():
         FlaskRoute(
             rule="/api/image/to_pdf",
             handler=api_image_to_pdf,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/image/unsharp",
+            handler=api_image_unsharp,
             methods=["POST"],
         ),
     ]
