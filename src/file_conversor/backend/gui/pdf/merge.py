@@ -1,8 +1,14 @@
 # src/file_conversor/backend/gui/pdf/merge.py
 
-from flask import render_template, url_for
+from pathlib import Path
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.pdf import PyPDFBackend
+
+from file_conversor.utils.bulma_utils import *
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -15,10 +21,22 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-def pdf_merge():
-    return render_template(
-        'pdf/merge.jinja2',
-        breadcrumb_items=[
+def PagePDFMerge():
+    return PageForm(
+        InputFilesField(
+            *PyPDFBackend.SUPPORTED_IN_FORMATS,
+            description=_("PDF files"),
+        ),
+        PDFPasswordField(),
+        OutputFileField(
+            *[
+                (f, f'{f.upper()} {_("file")}')
+                for f in PyPDFBackend.SUPPORTED_OUT_FORMATS
+            ],
+            current_value=str(Path().resolve() / "output.pdf"),
+        ),
+        api_endpoint=f"{url_for('api_pdf_merge')}",
+        nav_items=[
             {
                 'label': _("Home"),
                 'url': url_for('index'),
@@ -28,9 +46,16 @@ def pdf_merge():
                 'url': url_for('pdf_index'),
             },
             {
-                'label': _("Merge"),
+                'label': _("Merge PDFs"),
                 'url': url_for('pdf_merge'),
                 'active': True,
             },
         ],
+        _title=f"{_('Merge PDFs')} - File Conversor",
     )
+
+
+def pdf_merge():
+    return render_template_string(str(
+        PagePDFMerge()
+    ))

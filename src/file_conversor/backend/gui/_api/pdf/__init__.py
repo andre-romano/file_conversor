@@ -8,6 +8,7 @@ from file_conversor.backend.gui._api.pdf.decrypt import api_pdf_decrypt
 from file_conversor.backend.gui._api.pdf.encrypt import api_pdf_encrypt
 from file_conversor.backend.gui._api.pdf.extract_img import api_pdf_extract_img
 from file_conversor.backend.gui._api.pdf.extract import api_pdf_extract
+from file_conversor.backend.gui._api.pdf.merge import api_pdf_merge
 
 
 def routes():
@@ -40,6 +41,11 @@ def routes():
         FlaskRoute(
             rule="/api/pdf/extract",
             handler=api_pdf_extract,
+            methods=["POST"],
+        ),
+        FlaskRoute(
+            rule="/api/pdf/merge",
+            handler=api_pdf_merge,
             methods=["POST"],
         ),
     ]

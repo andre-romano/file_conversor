@@ -39,11 +39,12 @@ def PDFCompressionField():
 
 
 def PDFPasswordField(
-        _validation_expr: str = "value.length > 0",
-        _name: str = "password",
-        help: str = _("Password used to encrypt/decrypt the PDF files."),
-        label_text: str = _("Password"),
-        **kwargs: Any,
+    _validation_expr: str = "value.length >= 0",
+    _name: str = "password",
+    _placeholder=_('Enter password (optional)'),
+    help: str = _("Password used to encrypt/decrypt the PDF files."),
+    label_text: str = _("Password"),
+    **kwargs: Any,
 ):
     """Create a form field for PDF password input."""
     return FormFieldHorizontal(
@@ -51,6 +52,7 @@ def PDFPasswordField(
             validation_expr=_validation_expr,
             _type="password",
             _name=_name,
+            _placeholder=_placeholder,
             help=help,
             **kwargs,
         ),

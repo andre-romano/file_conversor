@@ -28,6 +28,7 @@ def TabGeneral() -> list | tuple:
         ),
         PDFEncryptionAlgorithmField(),
         PDFPasswordField(
+            _validation_expr="value.length > 0",
             _name="owner-password",
             help=_("Owner password used to encrypt the PDF files. Owner has ALL THE PERMISSIONS."),
             label_text=_("Owner Password"),
@@ -39,9 +40,7 @@ def TabGeneral() -> list | tuple:
 def TabAdvanced() -> list | tuple:
     return [
         PDFPasswordField(
-            _validation_expr="value.length >= 0",
             _name="user-password",
-            _placeholder=_('Enter user password (optional)'),
             help=_("User password used to encrypt the PDF files. User has ONLY THE PERMISSIONS specified below. Leave blank if not needed."),
             label_text=_("User Password"),
         ),

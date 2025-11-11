@@ -31,13 +31,7 @@ def PagePDFExtract():
             help=_("Pages to extract from the PDF. Use commas to separate pages and hyphens for ranges (e.g., 1,3-5)."),
             label_text=_("Pages"),
         ),
-        PDFPasswordField(
-            _validation_expr="value.length >= 0",
-            _name="password",
-            _placeholder=_('Enter password (optional)'),
-            help=_("Password to decrypt protected PDF files."),
-            label_text=_("Password"),
-        ),
+        PDFPasswordField(),
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_extract')}",
         nav_items=[

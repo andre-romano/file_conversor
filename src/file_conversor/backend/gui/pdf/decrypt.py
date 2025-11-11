@@ -27,9 +27,8 @@ def PagePDFDecrypt():
             description=_("PDF files"),
         ),
         PDFPasswordField(
-            _name="password",
-            help=_("Password used to decrypt the PDF files."),
-            label_text=_("Password"),
+            _validation_expr="value.length > 0",
+            _placeholder=_("Enter the password to decrypt the PDF file"),
         ),
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_decrypt')}",
