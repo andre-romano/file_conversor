@@ -83,6 +83,6 @@ def extract_img(
             progress_callback=progress_mgr.update_progress
         )
         progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=True)  # allow overwrite to avoid detecting PDF file as existing
     cmd_mgr.run(callback)
     logger.info(f"{_('Extract images')}: [bold green]{_('SUCCESS')}[/].")
