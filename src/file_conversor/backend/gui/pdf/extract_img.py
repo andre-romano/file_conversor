@@ -1,8 +1,13 @@
 # src/file_conversor/backend/gui/pdf/extract_img.py
 
-from flask import render_template, url_for
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.pdf import PyMuPDFBackend
+
+from file_conversor.utils.bulma_utils import *
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -15,10 +20,15 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-def pdf_extract_img():
-    return render_template(
-        'pdf/extract_img.jinja2',
-        breadcrumb_items=[
+def PagePDFExtractImg():
+    return PageForm(
+        InputFilesField(
+            *PyMuPDFBackend.SUPPORTED_IN_FORMATS,
+            description=_("PDF files"),
+        ),
+        OutputDirField(),
+        api_endpoint=f"{url_for('api_pdf_extract_img')}",
+        nav_items=[
             {
                 'label': _("Home"),
                 'url': url_for('index'),
@@ -28,9 +38,16 @@ def pdf_extract_img():
                 'url': url_for('pdf_index'),
             },
             {
-                'label': _("Extract images"),
+                'label': _("Extract Images"),
                 'url': url_for('pdf_extract_img'),
                 'active': True,
             },
         ],
+        _title=f"{_('Extract Images')} - File Conversor",
     )
+
+
+def pdf_extract_img():
+    return render_template_string(str(
+        PagePDFExtractImg()
+    ))
