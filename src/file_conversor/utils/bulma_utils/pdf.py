@@ -11,7 +11,7 @@ from file_conversor.utils.dominate_bulma import *
 from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State
-from file_conversor.config.locale import get_translation
+from file_conversor.config.locale import get_language_name, get_translation
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -102,14 +102,14 @@ def PDFLanguageField():
         install_deps=CONFIG['install-deps'],
         verbose=STATE['verbose'],
     )
-    languages = list(backend.get_available_languages().union(backend.get_available_remote_languages()))
-    languages.sort()
+    languages = [
+        (k, get_language_name(k))
+        for k in backend.get_available_languages().union(backend.get_available_remote_languages())
+    ]
+    languages.sort(key=lambda x: x[1])  # sort by language name
     return FormFieldHorizontal(
         FormFieldSelect(
-            *[
-                (k, k.upper())
-                for k in languages
-            ],
+            *languages,
             current_value="eng",
             _name="pdf-language",
             help=_("Select the OCR language to use."),

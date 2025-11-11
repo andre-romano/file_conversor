@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:f04899cf893064e53a21e6837f5124be5cf92aa6ac74c716ef34e85bae8c177a"
+content_hash = "sha256:16f0a44f2bd28f2859ed9663c1e887de4ffabd15131f3385148dacc33e9f0856"
 
 [[metadata.targets]]
 requires_python = "~=3.13.6"
@@ -998,6 +998,21 @@ groups = ["default"]
 marker = "python_full_version ~= \"3.13.6\""
 files = [
     {file = "proxy_tools-0.1.0.tar.gz", hash = "sha256:ccb3751f529c047e2d8a58440d86b205303cf0fe8146f784d1cbcd94f0a28010"},
+]
+
+[[package]]
+name = "pycountry"
+version = "24.6.1"
+requires_python = ">=3.8"
+summary = "ISO country, subdivision, language, currency and script definitions and their translations"
+groups = ["default"]
+marker = "python_full_version ~= \"3.13.6\""
+dependencies = [
+    "importlib-resources>5.12.0; python_version < \"3.9\"",
+]
+files = [
+    {file = "pycountry-24.6.1-py3-none-any.whl", hash = "sha256:f1a4fb391cd7214f8eefd39556d740adcc233c778a27f8942c8dca351d6ce06f"},
+    {file = "pycountry-24.6.1.tar.gz", hash = "sha256:b61b3faccea67f87d10c1f2b0fc0be714409e8fcdcc1315613174f6466c10221"},
 ]
 
 [[package]]
