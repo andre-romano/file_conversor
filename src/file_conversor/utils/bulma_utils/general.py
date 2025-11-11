@@ -1,7 +1,7 @@
 # src\file_conversor\utils\bulma_utils\general.py
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 # user-provided modules
 from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
@@ -61,15 +61,13 @@ def OutputDirField():
 
 
 def OutputFileField(
-    *file_types: str,
-    description: str = "",
+    *file_types: tuple[str, str],
     current_value: str = "",
 ):
     """
     Create a FormFieldOutputFile for selecting output file.
 
-    :param file_types: File type patterns (e.g., '.pdf', '.docx').
-    :param description: Description for the file types (e.g., 'PDF Files').
+    :param file_types: A list of tuples with format (file_type, description).
     :param current_value: The current output full file path.
     """
     return FormFieldHorizontal(
@@ -78,9 +76,9 @@ def OutputFileField(
             help=_("Select the output filename to save the file."),
             file_types=[
                 format_file_types_webview(
-                    *file_types,
-                    description=description,
-                ),
+                    ftype,
+                    description=desc,
+                ) for ftype, desc in file_types
             ],
             path=(Path(current_value).parent if current_value else Path()).resolve(),
             current_value=current_value,

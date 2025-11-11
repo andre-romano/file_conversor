@@ -191,9 +191,17 @@ def format_bitrate(bps: int) -> str:
     return f"{bps} bps"
 
 
-def format_alphabetical(text: str) -> str:
-    """Format text to be alphabetical only (remove non-alphabetical characters)."""
-    return re.sub(r'[^a-zA-Z]', ' ', text)
+def format_alphanumeric(text: str) -> str:
+    """Format text to be alphanumeric only (remove non-alphanumeric characters)."""
+    formatted = re.sub(r'[^a-zA-Z0-9_ ]', ' ', text)
+    formatted = re.sub(r'áàâäãå', 'a', formatted)
+    formatted = re.sub(r'éèëê', 'e', formatted)
+    formatted = re.sub(r'íïìî', 'i', formatted)
+    formatted = re.sub(r'óòöôõ', 'o', formatted)
+    formatted = re.sub(r'úüùû', 'u', formatted)
+    formatted = re.sub(r'ç', 'c', formatted)
+    formatted = re.sub(r'ñ', 'n', formatted)
+    return formatted.strip()
 
 
 def format_file_types_webview(*file_types: str, description: str = "") -> str:
@@ -206,9 +214,9 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
     :return: Formatted file types string for PyWebView.
     """
     if not file_types:
-        return f'{format_alphabetical(_("All Files"))} (*.*)'
+        return f'{format_alphanumeric(_("All Files"))} (*.*)'
     parsed_types = [ft if ft.startswith("*.") else f"*.{ft.lstrip('.')}" for ft in file_types]
-    return f'{format_alphabetical(description)} ({";".join(parsed_types)})'
+    return f'{format_alphanumeric(description)} ({";".join(parsed_types)})'
 
 
 def format_py_to_js(value: Any) -> str:

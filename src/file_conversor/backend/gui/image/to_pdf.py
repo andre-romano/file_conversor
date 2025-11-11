@@ -31,8 +31,10 @@ def PageImageToPDF():
         ImageFitField(),
         ImagePageSizeField(),
         OutputFileField(
-            *[f for f in Img2PDFBackend.SUPPORTED_OUT_FORMATS],
-            description=_("Output file"),
+            *[
+                (f, f'{f.upper()} {_("file")}')
+                for f in Img2PDFBackend.SUPPORTED_OUT_FORMATS
+            ],
             current_value=str(Path().resolve() / "output.pdf"),
         ),
         ImageSetMetadataField(),

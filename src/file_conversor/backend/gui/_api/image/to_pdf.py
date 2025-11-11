@@ -61,7 +61,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
             page_size=page_sz,
             include_metadata=image_set_metadata,
         )
-        progress_mgr.complete_step()
+        status.set_progress(progress_mgr.complete_step())
 
     logger.debug(f"{status}")
 

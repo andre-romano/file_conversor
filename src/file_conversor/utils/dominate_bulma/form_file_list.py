@@ -150,7 +150,7 @@ def FormFileList(
                     const fileExt = file.split('.').pop().toLowerCase();
                     for (const type of this.file_types) {{
                         const file_types = type.split('(')[1].split(')')[0].split(';');
-                        if (file_types.includes(`*.` + fileExt)) {{
+                        if (file_types.includes(`*.${{fileExt}}`) || file_types.includes(`*.*`)) {{
                             return true;
                         }}
                     }}
@@ -167,6 +167,7 @@ def FormFileList(
                         const lastSeenWin = file.lastIndexOf(`\\\\`);
                         this.lastPath = file.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
                     }});
+                    this.$nextTick(() => {{ }});
                 }},
                 async openFileDialog() {{
                     const fileList = await pywebview.api.open_file_dialog({{
@@ -192,7 +193,6 @@ def FormFileList(
                     // Listen for filesDropped event
                     window.addEventListener('filesDropped', async (event) => {{
                         this._updateFiles(event.detail.files);
-                        this.$nextTick(() => {{ }});
                     }});
                 }},
             }}"""
