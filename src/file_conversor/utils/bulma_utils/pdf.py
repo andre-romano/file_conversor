@@ -3,7 +3,7 @@
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.pdf import GhostscriptBackend, PikePDFBackend, PyPDFBackend
+from file_conversor.backend.pdf import GhostscriptBackend, PikePDFBackend, PyPDFBackend, OcrMyPDFBackend
 
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
@@ -96,9 +96,32 @@ def PDFPagesField(
     )
 
 
+def PDFLanguageField():
+    """Create a form field for specifying OCR languages."""
+    backend = OcrMyPDFBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE['verbose'],
+    )
+    languages = list(backend.get_available_languages().union(backend.get_available_remote_languages()))
+    languages.sort()
+    return FormFieldHorizontal(
+        FormFieldSelect(
+            *[
+                (k, k.upper())
+                for k in languages
+            ],
+            current_value="eng",
+            _name="pdf-language",
+            help=_("Select the OCR language to use."),
+        ),
+        label_text=_("OCR Language"),
+    )
+
+
 __all__ = [
     "PDFCompressionField",
     "PDFPasswordField",
     "PDFEncryptionAlgorithmField",
     "PDFPagesField",
+    "PDFLanguageField",
 ]
