@@ -1,8 +1,13 @@
 # src/file_conversor/backend/gui/text/convert.py
 
-from flask import render_template, url_for
+from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend import TextBackend
+
+from file_conversor.utils.bulma_utils import *
+from file_conversor.utils.dominate_bulma import *
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -15,10 +20,21 @@ _ = get_translation()
 logger = LOG.getLogger()
 
 
-def text_convert():
-    return render_template(
-        'text/convert.jinja2',
-        breadcrumb_items=[
+def PageTextConvert():
+    return PageForm(
+        InputFilesField(
+            *TextBackend.SUPPORTED_IN_FORMATS,
+            description=_("Text files"),
+        ),
+        FileFormatField(
+            *[
+                (f, f.upper())
+                for f in TextBackend.SUPPORTED_OUT_FORMATS
+            ],
+        ),
+        OutputDirField(),
+        api_endpoint=f"{url_for('api_text_convert')}",
+        nav_items=[
             {
                 'label': _("Home"),
                 'url': url_for('index'),
@@ -33,4 +49,11 @@ def text_convert():
                 'active': True,
             },
         ],
+        _title=f"{_('Convert Text')} - File Conversor",
     )
+
+
+def text_convert():
+    return render_template_string(str(
+        PageTextConvert()
+    ))
