@@ -6,9 +6,11 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.office import DOC_BACKEND
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.doc._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
-from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -37,19 +39,9 @@ def PageConvert():
         OverwriteFilesField(),
         api_endpoint=f"{url_for('api_doc_convert')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Document Tools"),
-                'url': url_for('doc_index'),
-            },
-            {
-                'label': _("Convert"),
-                'url': url_for('doc_convert'),
-                'active': True,
-            },
+            home_nav_item(),
+            doc_index_nav_item(),
+            doc_convert_nav_item(active=True),
         ],
         _title=f"{_('Convert Doc')} - File Conversor",
     )

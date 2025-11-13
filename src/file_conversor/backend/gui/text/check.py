@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend import TextBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.text._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -28,19 +31,9 @@ def PageTextCheck():
         ),
         api_endpoint=f"{url_for('api_text_check')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Text"),
-                'url': url_for('text_index'),
-            },
-            {
-                'label': _("Check"),
-                'url': url_for('text_check'),
-                'active': True,
-            },
+            home_nav_item(),
+            text_index_nav_item(),
+            text_check_nav_item(active=True),
         ],
         _title=f"{_('Check Text')} - File Conversor",
     )

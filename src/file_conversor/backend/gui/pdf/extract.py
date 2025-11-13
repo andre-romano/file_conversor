@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.pdf import PyPDFBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.pdf._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -26,28 +29,14 @@ def PagePDFExtract():
             *PyPDFBackend.SUPPORTED_IN_FORMATS,
             description=_("PDF files"),
         ),
-        PDFPagesField(
-            _name="pages",
-            help=_("Pages to extract from the PDF. Use commas to separate pages and hyphens for ranges (e.g., 1,3-5)."),
-            label_text=_("Pages"),
-        ),
+        PDFPagesField(),
         PDFPasswordField(),
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_extract')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("PDF"),
-                'url': url_for('pdf_index'),
-            },
-            {
-                'label': _("Extract Pages"),
-                'url': url_for('pdf_extract'),
-                'active': True,
-            },
+            home_nav_item(),
+            pdf_index_nav_item(),
+            pdf_extract_nav_item(active=True),
         ],
         _title=f"{_('Extract Pages')} - File Conversor",
     )

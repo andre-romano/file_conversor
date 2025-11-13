@@ -6,6 +6,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.hash_backend import HashBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.hash._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -33,19 +36,9 @@ def PageHashCreate():
         ),
         api_endpoint=f"{url_for('api_hash_create')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Hash"),
-                'url': url_for('hash_index'),
-            },
-            {
-                'label': _("Create"),
-                'url': url_for('hash_create'),
-                'active': True,
-            },
+            home_nav_item(),
+            hash_index_nav_item(),
+            hash_create_nav_item(active=True),
         ],
         _title=f"{_('Hash Create')} - File Conversor",
     )

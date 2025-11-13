@@ -6,6 +6,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.pdf import PyPDFBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.pdf._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -37,19 +40,9 @@ def PagePDFMerge():
         ),
         api_endpoint=f"{url_for('api_pdf_merge')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("PDF"),
-                'url': url_for('pdf_index'),
-            },
-            {
-                'label': _("Merge PDFs"),
-                'url': url_for('pdf_merge'),
-                'active': True,
-            },
+            home_nav_item(),
+            pdf_index_nav_item(),
+            pdf_merge_nav_item(active=True),
         ],
         _title=f"{_('Merge PDFs')} - File Conversor",
     )

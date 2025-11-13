@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.image import PyMuSVGBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.image._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -36,19 +39,9 @@ def PageImageRender():
         OutputDirField(),
         api_endpoint=f"{url_for('api_image_render')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Image"),
-                'url': url_for('image_index'),
-            },
-            {
-                'label': _("Render"),
-                'url': url_for('image_render'),
-                'active': True,
-            },
+            home_nav_item(),
+            image_index_nav_item(),
+            image_render_nav_item(active=True),
         ],
         _title=f"{_('Image Render')} - File Conversor",
     )

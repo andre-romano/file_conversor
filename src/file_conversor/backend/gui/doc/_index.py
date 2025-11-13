@@ -3,6 +3,9 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.doc._dom_page import *
+
 from file_conversor.utils.dominate_bulma import *
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -30,15 +33,8 @@ def doc_index():
         PageCardGrid(
             *tools,
             nav_items=[
-                {
-                    'label': _("Home"),
-                    'url': url_for('index'),
-                },
-                {
-                    'label': _("Document"),
-                    'url': url_for('doc_index'),
-                    'active': True,
-                },
+                home_nav_item(),
+                doc_index_nav_item(active=True),
             ],
             _title=f"{_('Document Tools')} - File Conversor",
         )))

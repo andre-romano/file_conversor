@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.image import PillowBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.image._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -30,19 +33,9 @@ def PageImageMirror():
         OutputDirField(),
         api_endpoint=f"{url_for('api_image_mirror')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Image"),
-                'url': url_for('image_index'),
-            },
-            {
-                'label': _("Mirror"),
-                'url': url_for('image_mirror'),
-                'active': True,
-            },
+            home_nav_item(),
+            image_index_nav_item(),
+            image_mirror_nav_item(active=True),
         ],
         _title=f"{_('Image Mirror')} - File Conversor",
     )

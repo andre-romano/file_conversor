@@ -3,6 +3,9 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.config._dom_page import *
+
 from file_conversor.backend.gui.config._tab_audio_video import TabConfigAudioVideo
 from file_conversor.backend.gui.config._tab_general import TabConfigGeneral
 from file_conversor.backend.gui.config._tab_image import TabConfigImage
@@ -66,15 +69,8 @@ def PageConfig():
         ),
         api_endpoint=f"{url_for('api_config')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Configuration"),
-                'url': url_for('config_index'),
-                'active': True,
-            },
+            home_nav_item(),
+            config_index_nav_item(active=True),
         ],
         _title=_("Config - File Conversor"),
     )

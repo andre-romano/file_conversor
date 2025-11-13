@@ -1,0 +1,31 @@
+# src\file_conversor\backend\gui\_dom_page.py
+
+from flask import url_for
+from typing import Any
+
+# user-provided modules
+from file_conversor.config import Configuration, Environment, Log, State
+from file_conversor.config.locale import get_translation
+
+# Get app config
+CONFIG = Configuration.get_instance()
+STATE = State.get_instance()
+LOG = Log.get_instance()
+
+_ = get_translation()
+logger = LOG.getLogger()
+
+
+def home_nav_item(
+    active: bool = False
+) -> dict[str, Any]:
+    return {
+        'label': _("Home"),
+        'url': url_for('index'),
+        'active': active,
+    }
+
+
+__all__ = [
+    'home_nav_item',
+]

@@ -3,6 +3,10 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.ppt._dom_page import *
+
+from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -30,15 +34,8 @@ def ppt_index():
         PageCardGrid(
             *tools,
             nav_items=[
-                {
-                    'label': _("Home"),
-                    'url': url_for('index'),
-                },
-                {
-                    'label': _("Presentation"),
-                    'url': url_for('ppt_index'),
-                    'active': True,
-                },
+                home_nav_item(),
+                ppt_index_nav_item(active=True),
             ],
             _title=f"{_('Presentation Tools')} - File Conversor",
         )

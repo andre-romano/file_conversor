@@ -3,6 +3,9 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import home_nav_item
+from file_conversor.backend.gui.audio._dom_page import audio_index_nav_item
+
 from file_conversor.utils.dominate_bulma import *
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -42,15 +45,8 @@ def audio_index():
     return render_template_string(str(PageCardGrid(
         *tools,
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Audio"),
-                'url': url_for('audio_index'),
-                'active': True,
-            },
+            home_nav_item(),
+            audio_index_nav_item(active=True),
         ],
         _title=f"{_('Audio Tools')} - File Conversor",
     )))

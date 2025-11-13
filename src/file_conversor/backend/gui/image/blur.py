@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.image import PillowBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.image._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -30,19 +33,9 @@ def PageImageBlur():
         OutputDirField(),
         api_endpoint=f"{url_for('api_image_blur')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Image"),
-                'url': url_for('image_index'),
-            },
-            {
-                'label': _("Blur"),
-                'url': url_for('image_blur'),
-                'active': True,
-            },
+            home_nav_item(),
+            image_index_nav_item(),
+            image_blur_nav_item(active=True),
         ],
         _title=f"{_('Image Blur')} - File Conversor",
     )

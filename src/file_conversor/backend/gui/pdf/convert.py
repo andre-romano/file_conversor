@@ -6,6 +6,9 @@ from flask import render_template, render_template_string, url_for
 from file_conversor.backend.office import DOC_BACKEND
 from file_conversor.backend.pdf import PyMuPDFBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.pdf._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -30,7 +33,10 @@ def PagePDFConvert():
         FileFormatField(
             *[
                 (f, f.upper())
-                for f in {**DOC_BACKEND.SUPPORTED_OUT_FORMATS, **PyMuPDFBackend.SUPPORTED_OUT_FORMATS}
+                for f in {
+                    **DOC_BACKEND.SUPPORTED_OUT_FORMATS,
+                    **PyMuPDFBackend.SUPPORTED_OUT_FORMATS
+                }
             ],
             current_value="docx",
         ),
@@ -38,19 +44,9 @@ def PagePDFConvert():
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_convert')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("PDF"),
-                'url': url_for('pdf_index'),
-            },
-            {
-                'label': _("Convert"),
-                'url': url_for('pdf_convert'),
-                'active': True,
-            },
+            home_nav_item(),
+            pdf_index_nav_item(),
+            pdf_convert_nav_item(active=True),
         ],
         _title=f"{_('PDF Convert')} - File Conversor",
     )

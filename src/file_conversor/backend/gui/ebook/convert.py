@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.ebook import CalibreBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.ebook._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -33,19 +36,9 @@ def PageEbookConvert():
         OutputDirField(),
         api_endpoint=f"{url_for('api_ebook_convert')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Ebook"),
-                'url': url_for('ebook_index'),
-            },
-            {
-                'label': _("Convert"),
-                'url': url_for('ebook_convert'),
-                'active': True,
-            },
+            home_nav_item(),
+            ebook_index_nav_item(),
+            ebook_convert_nav_item(active=True),
         ],
         _title=f"{_('Ebook Convert')} - File Conversor",
     )

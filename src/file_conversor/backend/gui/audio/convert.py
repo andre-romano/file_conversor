@@ -5,9 +5,11 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.audio_video import FFmpegBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.audio._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
-from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -35,19 +37,9 @@ def PageAudioConvert():
         AudioBitrateField(),
         api_endpoint=url_for('api_audio_convert'),
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("Audio"),
-                'url': url_for('audio_index'),
-            },
-            {
-                'label': _("Convert"),
-                'url': url_for('audio_convert'),
-                'active': True,
-            },
+            home_nav_item(),
+            audio_index_nav_item(),
+            audio_convert_nav_item(active=True),
         ],
         _title=f"{_('Audio Convert')} - File Conversor",
     )

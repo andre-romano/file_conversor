@@ -3,6 +3,10 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.xls._dom_page import *
+
+from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -30,15 +34,8 @@ def xls_index():
         PageCardGrid(
             *tools,
             nav_items=[
-                {
-                    'label': _("Home"),
-                    'url': url_for('index'),
-                },
-                {
-                    'label': _("Spreadsheet"),
-                    'url': url_for('xls_index'),
-                    'active': True,
-                },
+                home_nav_item(),
+                xls_index_nav_item(active=True),
             ],
             _title=f"{_('Spreadsheet Tools')} - File Conversor",
         )

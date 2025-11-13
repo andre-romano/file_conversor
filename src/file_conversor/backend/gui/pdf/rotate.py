@@ -5,6 +5,9 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.pdf import PyPDFBackend
 
+from file_conversor.backend.gui._dom_page import *
+from file_conversor.backend.gui.pdf._dom_page import *
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -31,19 +34,9 @@ def PagePDFRepair():
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_rotate')}",
         nav_items=[
-            {
-                'label': _("Home"),
-                'url': url_for('index'),
-            },
-            {
-                'label': _("PDF"),
-                'url': url_for('pdf_index'),
-            },
-            {
-                'label': _("Rotate"),
-                'url': url_for('pdf_rotate'),
-                'active': True,
-            },
+            home_nav_item(),
+            pdf_index_nav_item(),
+            pdf_rotate_nav_item(active=True),
         ],
         _title=f"{_('Rotate PDF')} - File Conversor",
     )
