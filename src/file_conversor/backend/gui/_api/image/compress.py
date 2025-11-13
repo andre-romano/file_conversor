@@ -5,12 +5,10 @@ from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.image import CompressBackend
-
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.utils import CommandManager, ProgressManager
+from file_conversor.cli.image.compress_cmd import execute_image_compress_cmd
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -28,30 +26,17 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle image compression."""
     logger.debug(f"Image compress thread received: {params}")
 
-    logger.info(f"[bold]{_('Compressing image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
     output_dir = Path(params.get('output-dir') or "")
 
     quality = int(params.get('quality') or 100)
 
-    backend = CompressBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_image_compress_cmd(
+        input_files=input_files,
+        quality=quality,
+        output_dir=output_dir,
+        progress_callback=status.set_progress,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        backend.compress(
-            input_file=input_file,
-            output_file=output_file,
-            quality=quality,
-        )
-        status.set_progress(progress_mgr.complete_step())
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_compressed")
-
-    logger.debug(f"{status}")
 
 
 def api_image_compress():

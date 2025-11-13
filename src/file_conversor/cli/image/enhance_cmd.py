@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -52,6 +52,35 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_enhance_cmd(
+    input_files: List[Path],
+    brightness: float,
+    contrast: float,
+    color: float,
+    sharpness: float,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.enhance(
+            input_file=input_file,
+            output_file=output_file,
+            color_factor=color,
+            brightness_factor=brightness,
+            contrast_factor=contrast,
+            sharpness_factor=sharpness,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_enhanced")
+
+    logger.info(f"{_('Image enhance')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=ENHANCE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -68,7 +97,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ENHANCE_NAME} input_file.jpg -cl 0.85 -b 1.10`        
     """)
 def enhance(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
 
     brightness: Annotated[float, BrightnessOption()] = 1.00,
 
@@ -80,27 +109,17 @@ def enhance(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
     if brightness == 1.00 and contrast == 1.00 and color == 1.00 and sharpness == 1.00:
         brightness = typer.prompt("Brightness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
         contrast = typer.prompt("Contrast factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
         color = typer.prompt("Color factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
         sharpness = typer.prompt("Sharpness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
 
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.enhance(
-            input_file=input_file,
-            output_file=output_file,
-            color_factor=color,
-            brightness_factor=brightness,
-            contrast_factor=contrast,
-            sharpness_factor=sharpness,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_enhanced")
-
-    logger.info(f"{_('Image enhance')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_enhance_cmd(
+        input_files=input_files,
+        brightness=brightness,
+        contrast=contrast,
+        color=color,
+        sharpness=sharpness,
+        output_dir=output_dir,
+    )

@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -52,6 +52,26 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_hash_check_cmd(
+    input_files: List[Path],
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    hash_backend = HashBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"{_('Checking file')} '{input_file}' ...")
+        hash_backend.check(
+            input_file=input_file,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p)),
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback)
+
+    logger.info(f"{_('Hash check')}: [bold green]{_('SUCCESS')}[/].")
+
+
 @typer_cmd.command(
     name=CHECK_NAME,
     help=f"""
@@ -64,19 +84,8 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {CHECK_NAME} file.sha1 file.sha3_512` 
 """)
 def check(
-    input_files: Annotated[List[str], InputFilesArgument(HashBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(HashBackend)],
 ):
-    hash_backend = HashBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"{_('Checking file')} '{input_file}' ...")
-        hash_backend.check(
-            input_file=input_file,
-            progress_callback=progress_mgr.update_progress,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback)
-
-    logger.info(f"{_('Hash check')}: [bold green]{_('SUCCESS')}[/].")
+    execute_hash_check_cmd(
+        input_files=input_files,
+    )

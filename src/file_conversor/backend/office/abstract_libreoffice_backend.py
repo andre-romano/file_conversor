@@ -59,7 +59,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
 
     def convert(
         self,
-        files: list[tuple[Path | str, Path | str]],
+        files: list[tuple[Path, Path]],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         """
@@ -72,8 +72,8 @@ class AbstractLibreofficeBackend(AbstractBackend):
         for input_file, output_file in files:
             self.check_file_exists(input_file)
 
-            input_path = Path(input_file).resolve()
-            output_path = Path(output_file).resolve()
+            input_path = input_file.resolve()
+            output_path = output_file.resolve()
 
             output_dir = output_path.parent
             output_format = output_path.suffix.lstrip(".").lower()

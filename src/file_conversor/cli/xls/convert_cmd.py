@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -16,6 +16,7 @@ from file_conversor.cli.xls._typer import COMMAND_NAME, CONVERT_NAME
 from file_conversor.config import Configuration, Environment, Log, State, get_translation
 
 from file_conversor.utils import CommandManager, ProgressManager
+from file_conversor.utils.formatters import format_in_out_files_tuple
 from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -54,29 +55,19 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
-@typer_cmd.command(
-    name=CONVERT_NAME,
-    help=f"""
-        {_('Convert spreadsheet files into other formats (requires Microsoft Office / LibreOffice).')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:** 
+def execute_xls_convert_cmd(
+    input_files: List[Path],
+    format: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+) -> None:
+    """Execute the convert command."""
 
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.ods -o output_file.xls`
-
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.xlsx -o output_file.pdf`
-    """)
-def convert(
-    input_files: Annotated[List[str], InputFilesArgument(XLS_BACKEND)],
-    format: Annotated[str, (XLS_BACKEND)],
-    output_dir: Annotated[Path, OutputDirOption()] = Path(),
-):
-    files: list[tuple[Path | str, Path | str]] = []
-    for input_file in input_files:
-        output_file = output_dir / CommandManager.get_output_file(input_file, suffix=f".{format}")
-        if not STATE["overwrite-output"] and output_file.exists():
-            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
-        files.append((input_file, output_file))
+    files = format_in_out_files_tuple(
+        input_files=input_files,
+        output_dir=output_dir,
+        format=format,
+    )
 
     xls_backend = XLS_BACKEND(
         install_deps=CONFIG['install-deps'],
@@ -87,7 +78,31 @@ def convert(
         # Perform conversion
         xls_backend.convert(
             files=files,
-            file_processed_callback=lambda _: progress_mgr.complete_step()
+            file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
         )
 
     logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+@typer_cmd.command(
+    name=CONVERT_NAME,
+    help=f"""
+        {_('Convert spreadsheet files into other formats (requires Microsoft Office / LibreOffice).')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:**
+
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.ods -o output_file.xls`
+
+        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.xlsx -o output_file.pdf`
+    """)
+def convert(
+    input_files: Annotated[List[Path], InputFilesArgument(XLS_BACKEND)],
+    format: Annotated[str, FormatOption(XLS_BACKEND)],
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
+):
+    execute_xls_convert_cmd(
+        input_files=input_files,
+        format=format,
+        output_dir=output_dir,
+    )

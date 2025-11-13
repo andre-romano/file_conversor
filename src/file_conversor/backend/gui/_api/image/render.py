@@ -5,12 +5,10 @@ from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.image import PyMuSVGBackend
-
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.utils import CommandManager, ProgressManager
+from file_conversor.cli.image.render_cmd import execute_image_render_cmd
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -35,23 +33,13 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     file_format = params['file-format']
     image_dpi = int(params['image-dpi'])
 
-    backend = PyMuSVGBackend(
-        verbose=STATE["verbose"],
+    execute_image_render_cmd(
+        input_files=input_files,
+        format=file_format,
+        dpi=image_dpi,
+        output_dir=output_dir,
+        progress_callback=status.set_progress,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            dpi=image_dpi,
-        )
-        status.set_progress(progress_mgr.complete_step())
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{file_format}")
-
-    logger.debug(f"{status}")
 
 
 def api_image_render():

@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -53,6 +53,28 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_pdf_decrypt_cmd(
+    input_files: List[Path],
+    password: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.decrypt(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_decrypted")
+    logger.info(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")
+
+
 # pdf decrypt
 @typer_cmd.command(
     name=DECRYPT_NAME,
@@ -70,7 +92,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {DECRYPT_NAME} input_file.pdf -p 1234`
     """)
 def decrypt(
-    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PyPDFBackend)],
     password: Annotated[str, typer.Option("--password", "-p",
                                           help=_("Password used for decryption."),
                                           prompt=f"{_('Password for decryption (password will not be displayed, for your safety)')}",
@@ -78,16 +100,8 @@ def decrypt(
                                           )],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        pypdf_backend.decrypt(
-            input_file=input_file,
-            output_file=output_file,
-            password=password,
-            progress_callback=progress_mgr.update_progress
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_decrypted")
-    logger.info(f"{_('Decryption')}: [bold green]{_('SUCCESS')}[/].")
+    execute_pdf_decrypt_cmd(
+        input_files=input_files,
+        password=password,
+        output_dir=output_dir,
+    )

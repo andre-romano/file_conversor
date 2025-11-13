@@ -30,7 +30,6 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle image info."""
     logger.debug(f"Image info thread received: {params}")
 
-    logger.info(f"[bold]{_('Getting information about image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
     output_dir = Path(params.get('output-dir') or "")
 

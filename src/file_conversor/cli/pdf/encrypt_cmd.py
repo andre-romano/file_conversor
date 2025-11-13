@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -54,6 +54,62 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_pdf_encrypt_cmd(
+    input_files: List[Path],
+
+    decrypt_password: str | None,
+
+    owner_password: str,
+    user_password: str | None,
+
+    allow_annotate: bool,
+    allow_fill_forms: bool,
+    allow_modify: bool,
+    allow_modify_pages: bool,
+    allow_copy: bool,
+    allow_accessibility: bool,
+    allow_print_lq: bool,
+    allow_print_hq: bool,
+    allow_all: bool,
+
+    encrypt_algo: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        pypdf_backend.encrypt(
+            # files
+            input_file=input_file,
+            output_file=output_file,
+
+            # passwords
+            owner_password=owner_password,
+            user_password=user_password,
+            decrypt_password=decrypt_password,
+
+            # permissions
+            permission_annotate=allow_annotate,
+            permission_fill_forms=allow_fill_forms,
+            permission_modify=allow_modify,
+            permission_modify_pages=allow_modify_pages,
+            permission_copy=allow_copy,
+            permission_accessibility=allow_accessibility,
+            permission_print_low_quality=allow_print_lq,
+            permission_print_high_quality=allow_print_hq,
+            permission_all=allow_all,
+
+            encryption_algorithm=PyPDFBackend.EncryptionAlgorithm.from_str(encrypt_algo),
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_encrypted")
+    logger.info(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
+
+
 @typer_cmd.command(
     name=ENCRYPT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -70,7 +126,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ENCRYPT_NAME} input_file.pdf -op 1234 --up 0000 -an -co`
     """)
 def encrypt(
-    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PyPDFBackend)],
     owner_password: Annotated[str, typer.Option("--owner-password", "-op",
                                                 help=_("Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF file."),
                                                 prompt=f"{_('Owner password for encryption (password will not be displayed, for your safety)')}",
@@ -127,34 +183,20 @@ def encrypt(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        pypdf_backend.encrypt(
-            # files
-            input_file=input_file,
-            output_file=output_file,
-
-            # passwords
-            owner_password=owner_password,
-            user_password=user_password,
-            decrypt_password=decrypt_password,
-
-            # permissions
-            permission_annotate=allow_annotate,
-            permission_fill_forms=allow_fill_forms,
-            permission_modify=allow_modify,
-            permission_modify_pages=allow_modify_pages,
-            permission_copy=allow_copy,
-            permission_accessibility=allow_accessibility,
-            permission_print_low_quality=allow_print_lq,
-            permission_print_high_quality=allow_print_hq,
-            permission_all=allow_all,
-
-            encryption_algorithm=PyPDFBackend.EncryptionAlgorithm.from_str(encrypt_algo),
-            progress_callback=progress_mgr.update_progress
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_encrypted")
-    logger.info(f"{_('Encryption')}: [bold green]{_('SUCCESS')}[/].")
+    execute_pdf_encrypt_cmd(
+        input_files=input_files,
+        decrypt_password=decrypt_password,
+        owner_password=owner_password,
+        user_password=user_password,
+        allow_annotate=allow_annotate,
+        allow_fill_forms=allow_fill_forms,
+        allow_modify=allow_modify,
+        allow_modify_pages=allow_modify_pages,
+        allow_copy=allow_copy,
+        allow_accessibility=allow_accessibility,
+        allow_print_lq=allow_print_lq,
+        allow_print_hq=allow_print_hq,
+        allow_all=allow_all,
+        encrypt_algo=encrypt_algo,
+        output_dir=output_dir,
+    )

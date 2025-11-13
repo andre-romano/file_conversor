@@ -8,10 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend import TextBackend
-
-from file_conversor.utils import CommandManager, ProgressManager
-
+from file_conversor.cli.text.convert_cmd import execute_text_convert_cmd
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -32,18 +29,12 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     file_format: str = params['file-format']
 
-    text_backend = TextBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        text_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{file_format}")
-
-    logger.debug(f"{status}")
+    execute_text_convert_cmd(
+        input_files=input_files,
+        format=file_format,
+        output_dir=output_dir,
+        progress_callback=status.set_progress,
+    )
 
 
 def api_text_convert():

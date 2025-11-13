@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -33,6 +33,28 @@ typer_cmd = typer.Typer()
 EXTERNAL_DEPENDENCIES = HashBackend.EXTERNAL_DEPENDENCIES
 
 
+def execute_hash_create_cmd(
+    input_files: List[Path],
+    output_file: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    if not STATE["overwrite-output"]:
+        check_path_exists(output_file, exists=False)
+
+    hash_backend = HashBackend(
+        verbose=STATE["verbose"],
+    )
+    with ProgressManager() as progress_mgr:
+        hash_backend.generate(
+            input_files=input_files,
+            output_file=output_file,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p)),
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    logger.info(f"{_('Hash creation')}: [bold green]{_('SUCCESS')}[/].")
+
+
 @typer_cmd.command(
     name=CREATE_NAME,
     help=f"""
@@ -46,23 +68,12 @@ EXTERNAL_DEPENDENCIES = HashBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {CREATE_NAME} file1.jpg file2.pdf -f sha1 -od D:/Downloads` 
 """)
 def create(
-    input_files: Annotated[List[str], InputFilesArgument()],
+    input_files: Annotated[List[Path], InputFilesArgument()],
     format: Annotated[str, FormatOption(HashBackend)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     output_file = output_dir / f"CHECKSUM.{format}"
-    if not STATE["overwrite-output"]:
-        check_path_exists(output_file, exists=False)
-
-    hash_backend = HashBackend(
-        verbose=STATE["verbose"],
+    execute_hash_create_cmd(
+        input_files=input_files,
+        output_file=output_file,
     )
-    with ProgressManager() as progress_mgr:
-        hash_backend.generate(
-            input_files=input_files,
-            output_file=output_file,
-            progress_callback=progress_mgr.update_progress,
-        )
-        progress_mgr.complete_step()
-
-    logger.info(f"{_('Hash creation')}: [bold green]{_('SUCCESS')}[/].")

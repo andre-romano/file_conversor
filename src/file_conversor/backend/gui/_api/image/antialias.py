@@ -5,12 +5,10 @@ from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.image import PillowBackend
-
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.utils import CommandManager, ProgressManager
+from file_conversor.cli.image.antialias_cmd import execute_image_antialias_cmd
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -28,29 +26,19 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle image antialiasing."""
     logger.debug(f"Image antialias thread received: {params}")
 
-    logger.info(f"[bold]{_('Antialiasing image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
-    radius = int(params.get('radius') or 3)
-    algorithm = PillowBackend.AntialiasAlgorithm.from_str(params.get('algorithm') or "median")
+    radius = int(params['radius'])
+    algorithm = params['algorithm']
 
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.antialias(
-            input_file=input_file,
-            output_file=output_file,
-            radius=radius,
-            algorithm=algorithm,
-        )
-        status.set_progress(progress_mgr.complete_step())
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_antialiased")
-
-    logger.debug(f"{status}")
+    execute_image_antialias_cmd(
+        input_files=input_files,
+        radius=radius,
+        algorithm=algorithm,
+        output_dir=output_dir,
+        progress_callback=status.set_progress,
+    )
 
 
 def api_image_antialias():

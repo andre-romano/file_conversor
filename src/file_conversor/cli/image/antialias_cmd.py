@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -53,6 +53,31 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_antialias_cmd(
+    input_files: List[Path],
+    radius: int,
+    algorithm: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.antialias(
+            input_file=input_file,
+            output_file=output_file,
+            radius=radius,
+            algorithm=PillowBackend.AntialiasAlgorithm.from_str(algorithm),
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_antialiased")
+
+    logger.info(f"{_('Image antialiasing')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=ANTIALIAS_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -67,7 +92,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ANTIALIAS_NAME} input_file.jpg -r 2 -a mode`        
     """)
 def antialias(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
 
     radius: Annotated[int, RadiusOption()] = 3,
 
@@ -78,19 +103,9 @@ def antialias(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.antialias(
-            input_file=input_file,
-            output_file=output_file,
-            radius=radius,
-            algorithm=PillowBackend.AntialiasAlgorithm.from_str(algorithm),
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_antialiased")
-
-    logger.info(f"{_('Image antialiasing')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_antialias_cmd(
+        input_files=input_files,
+        radius=radius,
+        algorithm=algorithm,
+        output_dir=output_dir,
+    )

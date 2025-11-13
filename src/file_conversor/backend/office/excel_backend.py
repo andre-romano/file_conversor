@@ -55,7 +55,7 @@ class ExcelBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        files: list[tuple[Path | str, Path | str]],
+        files: list[tuple[Path, Path]],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         """

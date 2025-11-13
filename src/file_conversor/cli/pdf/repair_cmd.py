@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Callable, Any, Annotated, List
 
 from rich import print
 
@@ -54,6 +54,33 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_pdf_repair_cmd(
+    input_files: List[Path],
+    password: str | None,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pikepdf_backend.compress(
+            # files
+            input_file=input_file,
+            output_file=output_file,
+
+            # options
+            decrypt_password=password,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_repaired")
+
+    logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
+
+
 @typer_cmd.command(
     name=REPAIR_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -68,25 +95,12 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {REPAIR_NAME} input_file.pdf -od D:/Downloads` 
 """)
 def repair(
-    input_files: Annotated[List[str], InputFilesArgument(PikePDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PikePDFBackend)],
     password: Annotated[str | None, PasswordOption()] = None,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        print(f"Processing '{output_file}' ... ")
-        pikepdf_backend.compress(
-            # files
-            input_file=input_file,
-            output_file=output_file,
-
-            # options
-            decrypt_password=password,
-            progress_callback=progress_mgr.update_progress
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_repaired")
-
-    logger.info(f"{_('Repair PDF')}: [bold green]{_('SUCCESS')}[/].")
+    execute_pdf_repair_cmd(
+        input_files=input_files,
+        password=password,
+        output_dir=output_dir,
+    )

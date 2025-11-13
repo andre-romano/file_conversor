@@ -10,8 +10,11 @@ from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 # user-provided modules
-from file_conversor.config.locale import get_translation
+from file_conversor.config import State, get_translation
 
+from file_conversor.utils.command_manager import CommandManager
+
+STATE = State.get_instance()
 _ = get_translation()
 
 
@@ -269,3 +272,27 @@ def format_traceback_html(exc: Exception, debug: bool = True) -> str:
         escape_xml(s).replace(' ', "&nbsp;").replace('\t', tab).replace('\n', '<br>')
         for s in stack_str_list[:-1]
     ] + [exc_formatted])
+
+
+def format_in_out_files_tuple(
+    input_files: list[Path],
+    format: str,
+    output_dir: Path,
+):
+    """
+    Get input and output files for conversion.
+
+    :param input_files: List of input file paths.
+    :param format: Output file format.
+    :param output_dir: Output directory path.
+
+    :raises FileExistsError: if output file exists and overwrite is disabled.
+    """
+    files = [
+        (input_file, output_dir / CommandManager.get_output_file(input_file, suffix=f".{format}"))
+        for input_file in input_files
+    ]
+    for input_file, output_file in files:
+        if not STATE["overwrite-output"] and output_file.exists():
+            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
+    return files

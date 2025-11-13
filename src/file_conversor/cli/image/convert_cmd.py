@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 from rich import print
 
 # user-provided modules
@@ -59,6 +59,30 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_convert_cmd(
+    input_files: List[Path],
+    format: str,
+    quality: int,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda progress: None,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+            quality=quality,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
+    logger.info(f"{_('Image convertion')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=CONVERT_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -73,23 +97,14 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.bmp -f png -od D:/Downloads`
     """)
 def convert(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
     format: Annotated[str, FormatOption(PillowBackend)],
     quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-            quality=quality,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{format}")
-
-    logger.info(f"{_('Image convertion')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_convert_cmd(
+        input_files=input_files,
+        format=format,
+        quality=quality,
+        output_dir=output_dir,
+    )

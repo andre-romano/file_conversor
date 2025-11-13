@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -62,6 +62,31 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_rotate_cmd(
+    input_files: List[Path],
+    rotation: int,
+    resampling: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.rotate(
+            input_file=input_file,
+            output_file=output_file,
+            rotate=rotation,
+            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_rotated")
+
+    logger.info(f"{_('Image rotation')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=ROTATE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -78,7 +103,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.jpg -r -180 -o`
     """)
 def rotate(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
     rotation: Annotated[int, typer.Option("--rotation", "-r",
                                           help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise rotation) and 360 (clockwise rotation)."),
                                           min=-360, max=360,
@@ -91,19 +116,9 @@ def rotate(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.rotate(
-            input_file=input_file,
-            output_file=output_file,
-            rotate=rotation,
-            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_rotated")
-
-    logger.info(f"{_('Image rotation')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_rotate_cmd(
+        input_files=input_files,
+        rotation=rotation,
+        resampling=resampling,
+        output_dir=output_dir,
+    )

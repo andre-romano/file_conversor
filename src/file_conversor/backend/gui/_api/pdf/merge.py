@@ -8,10 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend.pdf import PyPDFBackend
-
-from file_conversor.utils import CommandManager, ProgressManager
-from file_conversor.utils.validators import check_path_exists
+from file_conversor.cli.pdf.merge_cmd import execute_pdf_merge_cmd
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -33,24 +30,12 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     password = str(params['password']) or None
 
-    logger.info(f"[bold]{_('Merging PDF files')}[/]...")
-    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
-    if not STATE["overwrite-output"]:
-        check_path_exists(output_file, exists=False)
-
-    backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
-        print(f"Processing '{output_file}' ...")
-        backend.merge(
-            # files
-            input_files=input_files,
-            output_file=output_file,
-            password=password,
-            progress_callback=lambda p: status.set_progress(progress_mgr.update_progress(p)),
-        )
-        status.set_progress(progress_mgr.complete_step())
-
-    logger.debug(f"{status}")
+    execute_pdf_merge_cmd(
+        input_files=input_files,
+        password=password,
+        output_file=output_file,
+        progress_callback=status.set_progress,
+    )
 
 
 def api_pdf_merge():

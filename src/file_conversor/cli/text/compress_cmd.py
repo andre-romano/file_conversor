@@ -3,7 +3,7 @@
 
 import typer
 
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
 from rich import print
@@ -54,6 +54,25 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_text_compress_cmd(
+    input_files: List[Path],
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    text_backend = TextBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        text_backend.minify(
+            input_file=input_file,
+            output_file=output_file,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem=f"_compressed")
+    logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")
+
+
 # text compress
 @typer_cmd.command(
     name=COMPRESS_NAME,
@@ -68,17 +87,10 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} file1.json` 
 """)
 def compress(
-    input_files: Annotated[List[str], InputFilesArgument(TextBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(TextBackend)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    text_backend = TextBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        text_backend.minify(
-            input_file=input_file,
-            output_file=output_file,
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem=f"_compressed")
-    logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")
+    execute_text_compress_cmd(
+        input_files=input_files,
+        output_dir=output_dir,
+    )

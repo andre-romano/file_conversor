@@ -5,7 +5,7 @@ import typer
 
 from rich import print
 
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
 # user-provided modules
@@ -53,6 +53,28 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_video_check_cmd(
+    input_files: List[Path],
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    # init ffmpeg
+    backend = FFprobeBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        # display current progress
+        parser = FFprobeParser(backend, input_file)
+        parser.run()
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
+    logger.info(f"{_('FFMpeg check')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
 @typer_cmd.command(
     name=CHECK_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -67,19 +89,6 @@ ctx_menu.register_callback(register_ctx_menu)
 def check(
     input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend)],
 ):
-    # init ffmpeg
-    backend = FFprobeBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_video_check_cmd(
+        input_files=input_files,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        # display current progress
-        parser = FFprobeParser(backend, input_file)
-        parser.run()
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{format}")
-
-    logger.info(f"{_('FFMpeg check')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

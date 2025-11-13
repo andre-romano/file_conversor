@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -17,6 +17,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.utils.formatters import format_in_out_files_tuple
 from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
 
 
@@ -56,6 +57,34 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_doc_convert_cmd(
+    input_files: List[Path],
+    format: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+) -> None:
+    files = format_in_out_files_tuple(
+        input_files=input_files,
+        output_dir=output_dir,
+        format=format,
+    )
+
+    doc_backend = DOC_BACKEND(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+
+    with ProgressManager(len(input_files)) as progress_mgr:
+        logger.info(f"[bold]{_('Converting files')}[/] ...")
+        # Perform conversion
+        doc_backend.convert(
+            files=files,
+            file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
+        )
+
+    logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
@@ -71,29 +100,12 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f docx`
     """)
 def convert(
-    input_files: Annotated[List[str], InputFilesArgument(DOC_BACKEND)],
+    input_files: Annotated[List[Path], InputFilesArgument(DOC_BACKEND)],
     format: Annotated[str, FormatOption(DOC_BACKEND)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-
-    files: list[tuple[Path | str, Path | str]] = []
-    for input_file in input_files:
-        output_file = output_dir / CommandManager.get_output_file(input_file, suffix=f".{format}")
-        if not STATE["overwrite-output"] and output_file.exists():
-            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
-        files.append((input_file, output_file))
-
-    doc_backend = DOC_BACKEND(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_doc_convert_cmd(
+        input_files=input_files,
+        format=format,
+        output_dir=output_dir,
     )
-
-    with ProgressManager(len(input_files)) as progress_mgr:
-        logger.info(f"[bold]{_('Converting files')}[/] ...")
-        # Perform conversion
-        doc_backend.convert(
-            files=files,
-            file_processed_callback=lambda _: progress_mgr.complete_step()
-        )
-
-    logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

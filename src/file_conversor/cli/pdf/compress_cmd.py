@@ -5,7 +5,7 @@ import tempfile
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -59,6 +59,44 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_pdf_compress_cmd(
+    input_files: List[Path],
+    compression: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
+    gs_backend = GhostscriptBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE['verbose'],
+    )
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            gs_out = Path(temp_dir) / CommandManager.get_output_file(input_file, stem="_gs")
+            gs_backend.compress(
+                input_file=input_file,
+                output_file=gs_out,
+                compression_level=GhostscriptBackend.Compression.from_str(compression),
+                progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+            )
+            progress_callback(progress_mgr.complete_step())
+
+            pikepdf_backend.compress(
+                # files
+                input_file=gs_out,
+                output_file=output_file,
+                progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+            )
+            progress_callback(progress_mgr.complete_step())
+            print(f"Processing '{output_file}' ... OK")
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_compressed")
+
+    logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
 @typer_cmd.command(
     name=COMPRESS_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -77,39 +115,17 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file.pdf -o`
     """)
 def compress(
-    input_files: Annotated[List[str], InputFilesArgument(GhostscriptBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(GhostscriptBackend)],
     compression: Annotated[str, typer.Option("--compression", "-c",
                                              help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
                                              callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                              )] = CONFIG["pdf-compression"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
-    gs_backend = GhostscriptBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE['verbose'],
+    execute_pdf_compress_cmd(
+        input_files=input_files,
+        compression=compression,
+        output_dir=output_dir,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            gs_out = Path(temp_dir) / CommandManager.get_output_file(input_file, stem="_gs")
-            gs_backend.compress(
-                input_file=input_file,
-                output_file=gs_out,
-                compression_level=GhostscriptBackend.Compression.from_str(compression),
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-
-            pikepdf_backend.compress(
-                # files
-                input_file=gs_out,
-                output_file=output_file,
-                progress_callback=progress_mgr.update_progress
-            )
-            progress_mgr.complete_step()
-            print(f"Processing '{output_file}' ... OK")
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_compressed")
 
     logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

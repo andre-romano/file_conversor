@@ -10,8 +10,6 @@ from file_conversor.cli.audio._ffmpeg_cmd import ffmpeg_audio_run
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.utils import CommandManager, ProgressManager
-
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 

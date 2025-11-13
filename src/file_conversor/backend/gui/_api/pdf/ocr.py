@@ -8,13 +8,9 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend.pdf import OcrMyPDFBackend
-
-from file_conversor.utils import CommandManager, ProgressManager
-
+from file_conversor.cli.pdf.ocr_cmd import execute_pdf_ocr_cmd
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
-from file_conversor.utils.rich_utils import get_progress_bar
 
 # Get app config
 CONFIG = Configuration.get_instance()
@@ -33,46 +29,11 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     languages = [str(params['pdf-language'])]
 
-    logger.info(f"[bold]{_('Performing OCR on PDF pages')}[/]...")
-    ocrmypdf_backend = OcrMyPDFBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE['verbose'],
+    execute_pdf_ocr_cmd(
+        input_files=input_files,
+        languages=languages,
+        output_dir=output_dir,
     )
-    local_langs: set[str] = ocrmypdf_backend.get_available_languages()
-    remote_langs: set[str] = set()
-
-    install_langs = set(languages) - local_langs
-    if install_langs:
-        remote_langs = ocrmypdf_backend.get_available_remote_languages()
-        if install_langs - remote_langs:
-            print(f"{_('Available remote languages')}: {', '.join(remote_langs)}")
-            print(f"{_('Languages requested')}: {', '.join(install_langs)}")
-            raise ValueError(f"{_('Some languages are not available for installation')}.")
-
-        with get_progress_bar() as progress:
-            for lang in install_langs:
-                task = progress.add_task(f"{_('Installing language')} '{lang}' ...", total=100)
-                ocrmypdf_backend.install_language(
-                    lang=lang,
-                    progress_callback=lambda p: progress.update(task, completed=p),
-                )
-                progress.update(task, completed=100)
-
-    for input_file in input_files:
-        input_file = Path(input_file).resolve()
-        output_file = output_dir / CommandManager.get_output_file(input_file, stem="_ocr")
-        if not STATE["overwrite-output"] and output_file.exists():
-            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
-
-        print(f"Processing '{output_file}' ...")
-
-        ocrmypdf_backend.to_pdf(
-            input_file=input_file,
-            output_file=output_file,
-            languages=languages,
-        )
-
-    logger.debug(f"{status}")
 
 
 def api_pdf_ocr():

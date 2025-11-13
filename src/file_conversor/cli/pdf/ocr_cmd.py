@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -55,34 +55,11 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
-@typer_cmd.command(
-    name=OCR_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
-    help=f"""
-        {_('Create a searchable PDF file from scanned documents using OCR.')}
-
-        {_('Outputs a text searchable PDF file.')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:** 
-
-        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf -l all`
-
-        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf -l eng`
-
-        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf input_file2.pdf -l eng -l por`
-
-        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf input_file2.pdf -l eng -od "D:\\Downloads"`
-    """)
-def ocr(
-    input_files: Annotated[List[str], InputFilesArgument(OcrMyPDFBackend)],
-
-    languages: Annotated[List[str], typer.Option(
-        "--languages", "-l",
-        help=_("Languages to use for OCR (three character language codes). Format: LANG (e.g., 'eng', 'por'). Type 'all' to query all available languages."),
-    )],
-
-    output_dir: Annotated[Path, OutputDirOption()] = Path(),
+def execute_pdf_ocr_cmd(
+    input_files: List[Path],
+    languages: List[str],
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
 ):
     ocrmypdf_backend = OcrMyPDFBackend(
         install_deps=CONFIG['install-deps'],
@@ -114,7 +91,7 @@ def ocr(
                 )
                 progress.update(task, completed=100)
 
-    for input_file in input_files:
+    for idx, input_file in enumerate(input_files):
         input_file = Path(input_file).resolve()
         output_file = output_dir / CommandManager.get_output_file(input_file, stem="_ocr")
         if not STATE["overwrite-output"] and output_file.exists():
@@ -127,5 +104,42 @@ def ocr(
             output_file=output_file,
             languages=languages,
         )
+        progress_callback(100.0 * (float(idx + 1) / len(input_files)))
 
     logger.info(f"{_('File OCR')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+@typer_cmd.command(
+    name=OCR_NAME,
+    rich_help_panel=RICH_HELP_PANEL,
+    help=f"""
+        {_('Create a searchable PDF file from scanned documents using OCR.')}
+
+        {_('Outputs a text searchable PDF file.')}
+    """,
+    epilog=f"""
+        **{_('Examples')}:** 
+
+        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf -l all`
+
+        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf -l eng`
+
+        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf input_file2.pdf -l eng -l por`
+
+        - `file_conversor {COMMAND_NAME} {OCR_NAME} input_file.pdf input_file2.pdf -l eng -od "D:\\Downloads"`
+    """)
+def ocr(
+    input_files: Annotated[List[Path], InputFilesArgument(OcrMyPDFBackend)],
+
+    languages: Annotated[List[str], typer.Option(
+        "--languages", "-l",
+        help=_("Languages to use for OCR (three character language codes). Format: LANG (e.g., 'eng', 'por'). Type 'all' to query all available languages."),
+    )],
+
+    output_dir: Annotated[Path, OutputDirOption()] = Path(),
+):
+    execute_pdf_ocr_cmd(
+        input_files=input_files,
+        languages=languages,
+        output_dir=output_dir,
+    )

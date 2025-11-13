@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -54,6 +54,29 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_pdf_split_cmd(
+    input_files: List[Path],
+    password: str | None,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        print(f"Processing '{output_file}' ... ")
+        pypdf_backend.split(
+            input_file=input_file,
+            output_file=output_file,
+            password=password,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p)),
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=True)  # avoid issues with existing files
+    cmd_mgr.run(callback)
+    logger.info(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
+
+
 # pdf split
 @typer_cmd.command(
     name=SPLIT_NAME,
@@ -79,21 +102,12 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {SPLIT_NAME} input_file.pdf` 
 """)
 def split(
-    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PyPDFBackend)],
     password: Annotated[str | None, PasswordOption()] = None,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        print(f"Processing '{output_file}' ... ")
-        pypdf_backend.split(
-            input_file=input_file,
-            output_file=output_file,
-            password=password,
-            progress_callback=progress_mgr.update_progress,
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=True)  # avoid issues with existing files
-    cmd_mgr.run(callback)
-    logger.info(f"{_('Split pages')}: [bold green]{_('SUCCESS')}[/].")
+    execute_pdf_split_cmd(
+        input_files=input_files,
+        password=password,
+        output_dir=output_dir,
+    )

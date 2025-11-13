@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -57,6 +57,33 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_resize_cmd(
+    input_files: List[Path],
+    scale: float | None,
+    width: int | None,
+    resampling: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.resize(
+            input_file=input_file,
+            output_file=output_file,
+            scale=parse_image_resize_scale(scale, width, quiet=STATE["quiet"]),
+            width=width,
+            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_resized")
+
+    logger.info(f"{_('Image resize')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
 @typer_cmd.command(
     name=RESIZE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -81,7 +108,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {RESIZE_NAME} input_file.jpg -od D:/Downloads -w 1024`
     """)
 def resize(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
     scale: Annotated[float | None, typer.Option("--scale", "-s",
                                                 help=f"{_("Scale image proportion. Valid values start at 0.1. Defaults to")} None (use width to scale image).",
                                                 callback=lambda x: check_positive_integer(x),
@@ -98,19 +125,10 @@ def resize(
                                             )] = CONFIG["image-resampling"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.resize(
-            input_file=input_file,
-            output_file=output_file,
-            scale=parse_image_resize_scale(scale, width, quiet=STATE["quiet"]),
-            width=width,
-            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_resized")
-
-    logger.info(f"{_('Image resize')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+    execute_image_resize_cmd(
+        input_files=input_files,
+        scale=scale,
+        width=width,
+        resampling=resampling,
+        output_dir=output_dir,
+    )

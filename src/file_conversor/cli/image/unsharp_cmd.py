@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -34,6 +34,33 @@ typer_cmd = typer.Typer()
 EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
 
 
+def execute_image_unsharp_cmd(
+    input_files: List[Path],
+    radius: int,
+    strength: int,
+    threshold: int,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.unsharp_mask(
+            input_file=input_file,
+            output_file=output_file,
+            radius=radius,
+            percent=strength,
+            threshold=threshold,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_unsharpened")
+
+    logger.info(f"{_('Image unsharp')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=UNSHARP_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -50,7 +77,7 @@ EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
         - `file_conversor {COMMAND_NAME} {UNSHARP_NAME} input_file.jpg -s 100 -t 15`        
     """)
 def unsharp(
-    input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
 
     radius: Annotated[int, RadiusOption()] = 2,
 
@@ -59,7 +86,6 @@ def unsharp(
                                           min=1,
                                           )] = 130,
 
-
     threshold: Annotated[int, typer.Option("--threshold", "-t",
                                            help=f'{_("Threshold controls the minimum brightness change that will be sharpened")}',
                                            min=1,
@@ -67,20 +93,10 @@ def unsharp(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.unsharp_mask(
-            input_file=input_file,
-            output_file=output_file,
-            radius=radius,
-            percent=strength,
-            threshold=threshold,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_unsharpened")
-
-    logger.info(f"{_('Image unsharp')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_unsharp_cmd(
+        input_files=input_files,
+        radius=radius,
+        strength=strength,
+        threshold=threshold,
+        output_dir=output_dir,
+    )

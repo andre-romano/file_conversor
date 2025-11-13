@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -52,6 +52,25 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_text_check_cmd(
+    input_files: List[Path],
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    text_backend = TextBackend(verbose=STATE["verbose"])
+    logger.info(f"{_('Checking files')} ...")
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        text_backend.check(
+            input_file=input_file,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback)
+
+    logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")
+
+
 # text check
 @typer_cmd.command(
     name=CHECK_NAME,
@@ -66,15 +85,8 @@ ctx_menu.register_callback(register_ctx_menu)
 - `file_conversor {COMMAND_NAME} {CHECK_NAME} file1.json file2.yaml` 
 """)
 def check(
-    input_files: Annotated[List[str], InputFilesArgument(TextBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(TextBackend)],
 ):
-    text_backend = TextBackend(verbose=STATE["verbose"])
-    logger.info(f"{_('Checking files')} ...")
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        text_backend.check(
-            input_file=input_file,
-        )
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback)
-    logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")
+    execute_text_check_cmd(
+        input_files=input_files,
+    )

@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -53,6 +53,29 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_filter_cmd(
+    input_files: List[Path],
+    filters: List[str],
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        pillow_backend.filter(
+            input_file=input_file,
+            output_file=output_file,
+            filters=filters,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_filtered")
+
+    logger.info(f"{_('Image filter')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=FILTER_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -78,18 +101,8 @@ def filter(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        pillow_backend.filter(
-            input_file=input_file,
-            output_file=output_file,
-            filters=filters,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_filtered")
-
-    logger.info(f"{_('Image filter')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_filter_cmd(
+        input_files=[Path(f) for f in input_files],
+        filters=filters,
+        output_dir=output_dir,
+    )

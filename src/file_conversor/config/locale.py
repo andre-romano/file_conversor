@@ -144,3 +144,13 @@ def get_language_name(lang_code: str) -> str:
     except Exception as e:
         print(f"[bold]WARNING[/]: Could not parse language code '{lang_code}'. Falling back to '{lang_code}'.")
         return lang_code
+
+
+__all__ = [
+    "AVAILABLE_LANGUAGES",
+    "get_default_language",
+    "normalize_lang_code",
+    "get_system_locale",
+    "get_translation",
+    "get_language_name",
+]

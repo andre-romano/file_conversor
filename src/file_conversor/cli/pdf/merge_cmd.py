@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -36,6 +36,31 @@ typer_cmd = typer.Typer()
 EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
 
 
+def execute_pdf_merge_cmd(
+    input_files: List[Path],
+    password: str | None,
+    output_file: Path | None,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
+    if not STATE["overwrite-output"]:
+        check_path_exists(output_file, exists=False)
+
+    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    with ProgressManager() as progress_mgr:
+        print(f"Processing '{output_file}' ...")
+        pypdf_backend.merge(
+            # files
+            input_files=input_files,
+            output_file=output_file,
+            password=password,
+            progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    logger.info(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/].")
+
+
 @typer_cmd.command(
     name=MERGE_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -60,24 +85,12 @@ EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {MERGE_NAME} "input_file1.pdf" "input_file2.pdf" -p "unlock_password" -of output_file.pdf` 
     """)
 def merge(
-    input_files: Annotated[List[str], InputFilesArgument(PyPDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(PyPDFBackend)],
     password: Annotated[str | None, PasswordOption()] = None,
     output_file: Annotated[Path | None, OutputFileOption(PyPDFBackend)] = None,
 ):
-    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
-    if not STATE["overwrite-output"]:
-        check_path_exists(output_file, exists=False)
-
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
-    with ProgressManager() as progress_mgr:
-        print(f"Processing '{output_file}' ...")
-        pypdf_backend.merge(
-            # files
-            input_files=input_files,
-            output_file=output_file,
-            password=password,
-            progress_callback=progress_mgr.update_progress
-        )
-        progress_mgr.complete_step()
-
-    logger.info(f"{_('Merge pages')}: [bold green]{_('SUCCESS')}[/].")
+    execute_pdf_merge_cmd(
+        input_files=input_files,
+        password=password,
+        output_file=output_file,
+    )

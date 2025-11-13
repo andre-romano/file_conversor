@@ -76,11 +76,6 @@ def info(
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
     for input_file in input_files:
-        formatted = []
-        in_ext = Path(input_file).suffix[1:]
-
-        logger.info(f"{_('Parsing metadata for')} '{input_file}' ...")
-        metadata = pillow_backend.info(input_file)
 
         # 📁 Informações gerais do arquivo
         parser = PillowParser(pillow_backend, Path(input_file))

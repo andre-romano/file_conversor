@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend.office import DOC_BACKEND
+from file_conversor.cli.doc.convert_cmd import execute_doc_convert_cmd
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -25,28 +25,17 @@ logger = LOG.getLogger()
 def doc_convert_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle document conversion."""
     logger.debug(f"Document conversion thread received: {params}")
-    output_dir: Path = Path(params['output-dir'])
-    output_format: str = params['file-format']
+
     input_files: list[Path] = [Path(i) for i in params['input-files']]
+    output_dir: Path = Path(params['output-dir'])
+    file_format: str = str(params['file-format'])
 
-    files: list[tuple[Path | str, Path | str]] = [
-        (input_path, output_dir / f"{input_path.stem}.{output_format}")
-        for input_path in input_files
-    ]
-    total_files = len(files)
-
-    logger.info(f"[bold]{_('Converting files')}[/]...")
-    doc_backend = DOC_BACKEND(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_doc_convert_cmd(
+        input_files=input_files,
+        format=file_format,
+        output_dir=output_dir,
+        progress_callback=status.set_progress,
     )
-    doc_backend.convert(
-        files=files,
-        file_processed_callback=lambda _: status.set_progress(int(
-            (status.get_progress() or 0) + (100.0 / total_files)
-        )),
-    )
-    logger.debug(f"{status}")
 
 
 def api_doc_convert():

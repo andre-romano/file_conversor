@@ -8,11 +8,8 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.backend.hash_backend import HashBackend
 
-from file_conversor.utils import CommandManager, ProgressManager
-from file_conversor.utils.backend import FFprobeParser
-
+from file_conversor.cli.hash.check_cmd import execute_hash_check_cmd
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -28,26 +25,13 @@ logger = LOG.getLogger(__name__)
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle hash checking."""
     logger.debug(f"Hash check thread received: {params}")
+
     input_files: list[Path] = [Path(i) for i in params['input-files']]
 
-    logger.info(f"[bold]{_('Checking hash files')}[/]...")
-    backend = HashBackend(
-        verbose=STATE["verbose"],
+    execute_hash_check_cmd(
+        input_files=input_files,
+        progress_callback=status.set_progress,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"{_('Checking file')} '{input_file}' ...")
-        backend.check(
-            input_file=input_file,
-            progress_callback=lambda p: status.set_progress(progress_mgr.update_progress(p)),
-        )
-        status.set_progress(progress_mgr.complete_step())
-
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback)
-
-    status.set_message(f"""<b style='color: green;'>{_('Hash check SUCCESS.')}</b>""")
-    logger.debug(f"{status}")
 
 
 def api_hash_check():

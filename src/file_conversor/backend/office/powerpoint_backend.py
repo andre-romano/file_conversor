@@ -53,13 +53,13 @@ class PowerPointBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        files: list[tuple[Path | str, Path | str]],
+        files: list[tuple[Path, Path]],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         with Win32Com(self.PROG_ID, visible=None) as powerpoint:
             for input_file, output_file in files:
-                input_path = Path(input_file).resolve()
-                output_path = Path(output_file).resolve()
+                input_path = input_file.resolve()
+                output_path = output_file.resolve()
 
                 self.check_file_exists(str(input_path))
 

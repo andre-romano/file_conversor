@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -55,6 +55,40 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_to_pdf_cmd(
+    input_files: List[Path],
+    dpi: int,
+    fit: str,
+    page_size: str | None,
+    set_metadata: bool,
+    output_file: Path | None,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
+    if not STATE["overwrite-output"]:
+        check_path_exists(output_file, exists=False)
+
+    img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
+    # display current progress
+    with ProgressManager() as progress_mgr:
+        page_sz: tuple | None = None
+        if page_size in Img2PDFBackend.PAGE_LAYOUT:
+            page_sz = Img2PDFBackend.PAGE_LAYOUT[page_size]
+        elif page_size:
+            page_sz = tuple(page_size)
+
+        img2pdf_backend.to_pdf(
+            input_files=input_files,
+            output_file=output_file,
+            dpi=dpi,
+            image_fit=Img2PDFBackend.FIT_MODES[fit],
+            page_size=page_sz,
+            include_metadata=set_metadata,
+        )
+        progress_callback(progress_mgr.complete_step())
+    logger.info(f"{_('PDF generation')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=TO_PDF_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -79,7 +113,7 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
-    input_files: Annotated[List[str], InputFilesArgument(Img2PDFBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(Img2PDFBackend)],
     dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
     fit: Annotated[str, typer.Option("--fit", "-f",
                                      help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG["image-fit"]}",
@@ -99,26 +133,11 @@ def to_pdf(
 
     output_file: Annotated[Path | None, OutputFileOption(Img2PDFBackend)] = None,
 ):
-    output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
-    if not STATE["overwrite-output"]:
-        check_path_exists(output_file, exists=False)
-
-    img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
-    # display current progress
-    with ProgressManager() as progress_mgr:
-        page_sz: tuple | None = None
-        if page_size in Img2PDFBackend.PAGE_LAYOUT:
-            page_sz = Img2PDFBackend.PAGE_LAYOUT[page_size]
-        elif page_size:
-            page_sz = tuple(page_size)
-
-        img2pdf_backend.to_pdf(
-            input_files=input_files,
-            output_file=output_file,
-            dpi=dpi,
-            image_fit=Img2PDFBackend.FIT_MODES[fit],
-            page_size=page_sz,
-            include_metadata=set_metadata,
-        )
-        progress_mgr.complete_step()
-    logger.info(f"{_('PDF generation')}: [green bold]{_('SUCCESS')}[/]")
+    execute_image_to_pdf_cmd(
+        input_files=input_files,
+        dpi=dpi,
+        fit=fit,
+        page_size=page_size,
+        set_metadata=set_metadata,
+        output_file=output_file,
+    )

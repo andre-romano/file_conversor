@@ -5,7 +5,7 @@ import typer
 
 from rich import print
 
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
 # user-provided modules
@@ -54,6 +54,31 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_ebook_convert_cmd(
+    input_files: List[Path],
+    format: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+) -> None:
+    """Execute ebook conversion command."""
+    calibre_backend = CalibreBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        calibre_backend.convert(
+            input_file=input_file,
+            output_file=output_file,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_suffix=f".{format}")
+
+    logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
@@ -68,21 +93,12 @@ ctx_menu.register_callback(register_ctx_menu)
 def convert(
     input_files: Annotated[List[Path], InputFilesArgument(CalibreBackend.SUPPORTED_IN_FORMATS)],
 
-    file_format: Annotated[str, FormatOption(CalibreBackend.SUPPORTED_OUT_FORMATS)],
+    format: Annotated[str, FormatOption(CalibreBackend.SUPPORTED_OUT_FORMATS)],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    calibre_backend = CalibreBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_ebook_convert_cmd(
+        input_files=input_files,
+        format=format,
+        output_dir=output_dir,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        calibre_backend.convert(
-            input_file=input_file,
-            output_file=output_file,
-        )
-        progress_mgr.complete_step()
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_suffix=f".{file_format}")
-    logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

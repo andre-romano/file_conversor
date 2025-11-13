@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -54,6 +54,32 @@ ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
 
 
+def execute_image_compress_cmd(
+    input_files: List[Path],
+    quality: int,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    compress_backend = CompressBackend(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+    )
+
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        logger.info(f"Processing '{output_file}' ... ")
+        compress_backend.compress(
+            input_file=input_file,
+            output_file=output_file,
+            quality=quality,
+        )
+        progress_callback(progress_mgr.complete_step())
+
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr.run(callback, out_stem="_compressed")
+
+    logger.info(f"{_('Image compression')}: [green bold]{_('SUCCESS')}[/]")
+
+
 @typer_cmd.command(
     name=COMPRESS_NAME,
     rich_help_panel=RICH_HELP_PANEL,
@@ -70,25 +96,12 @@ ctx_menu.register_callback(register_ctx_menu)
         - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file.png -od D:/Downloads -o`
     """)
 def compress(
-    input_files: Annotated[List[str], InputFilesArgument(CompressBackend)],
+    input_files: Annotated[List[Path], InputFilesArgument(CompressBackend)],
     quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    compress_backend = CompressBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
+    execute_image_compress_cmd(
+        input_files=input_files,
+        quality=quality,
+        output_dir=output_dir,
     )
-
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
-        logger.info(f"Processing '{output_file}' ... ")
-        compress_backend.compress(
-            input_file=input_file,
-            output_file=output_file,
-            quality=quality,
-        )
-        progress_mgr.complete_step()
-
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
-    cmd_mgr.run(callback, out_stem="_compressed")
-
-    logger.info(f"{_('Image compression')}: [green bold]{_('SUCCESS')}[/]")
