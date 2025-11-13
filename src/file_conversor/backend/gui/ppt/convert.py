@@ -35,7 +35,6 @@ def PageConvert():
             for f in PPT_BACKEND.SUPPORTED_OUT_FORMATS
         ], current_value="pdf"),
         OutputDirField(),
-        OverwriteFilesField(),
         api_endpoint=f"{url_for('api_ppt_convert')}",
         nav_items=[
             home_nav_item(),

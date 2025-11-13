@@ -36,7 +36,6 @@ def PageConvert():
             for f in DOC_BACKEND.SUPPORTED_OUT_FORMATS
         ]),
         OutputDirField(),
-        OverwriteFilesField(),
         api_endpoint=f"{url_for('api_doc_convert')}",
         nav_items=[
             home_nav_item(),

@@ -3,11 +3,13 @@
 import subprocess
 import shutil
 import sys
+import platformdirs
 
 from importlib.resources import files
 from importlib.metadata import version
 
 from pathlib import Path
+from enum import Enum
 
 # user provided imports
 from file_conversor.config.log import Log
@@ -19,6 +21,72 @@ logger = Log.get_instance().getLogger(__name__)
 class Environment:
 
     __instance = None
+
+    class UserFolder(Enum):
+        @classmethod
+        def RUNTIME(cls) -> Path:
+            return platformdirs.user_runtime_path().resolve()
+
+        @classmethod
+        def DATA(cls) -> Path:
+            return platformdirs.user_data_path().resolve()
+
+        @classmethod
+        def CONFIG(cls) -> Path:
+            return platformdirs.user_config_path().resolve()
+
+        @classmethod
+        def CACHE(cls) -> Path:
+            return platformdirs.user_cache_path().resolve()
+
+        @classmethod
+        def LOG(cls) -> Path:
+            return platformdirs.user_log_path().resolve()
+
+        @classmethod
+        def STATE(cls) -> Path:
+            return platformdirs.user_state_path().resolve()
+
+        @classmethod
+        def MUSIC(cls) -> Path:
+            return platformdirs.user_music_path().resolve()
+
+        @classmethod
+        def PICTURES(cls) -> Path:
+            return platformdirs.user_pictures_path().resolve()
+
+        @classmethod
+        def VIDEOS(cls) -> Path:
+            return platformdirs.user_videos_path().resolve()
+
+        @classmethod
+        def DOCUMENTS(cls) -> Path:
+            return platformdirs.user_documents_path().resolve()
+
+        @classmethod
+        def DOWNLOADS(cls) -> Path:
+            return platformdirs.user_downloads_path().resolve()
+
+        @classmethod
+        def DESKTOP(cls) -> Path:
+            return platformdirs.user_desktop_path().resolve()
+
+    class SiteFolder(Enum):
+        @classmethod
+        def RUNTIME(cls) -> Path:
+            return platformdirs.site_runtime_path().resolve()
+
+        @classmethod
+        def DATA(cls) -> Path:
+            return platformdirs.site_data_path().resolve()
+
+        @classmethod
+        def CONFIG(cls) -> Path:
+            return platformdirs.site_config_path().resolve()
+
+        @classmethod
+        def CACHE(cls) -> Path:
+            return platformdirs.site_cache_path().resolve()
 
     @classmethod
     def remove(cls, src: str | Path, globs: str = "*", remove_src: bool = True, no_exists_ok: bool = True):

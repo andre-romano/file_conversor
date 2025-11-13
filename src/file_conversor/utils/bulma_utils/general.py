@@ -4,8 +4,6 @@ from pathlib import Path
 from typing import Any, Sequence
 
 # user-provided modules
-from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
-
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.dominate_bulma import *
 
@@ -68,7 +66,7 @@ def OutputFileField(
     Create a FormFieldOutputFile for selecting output file.
 
     :param file_types: A list of tuples with format (file_type, description).
-    :param current_value: The current output full file path.
+    :param current_value: The current output filename. If provided, it will be appended to the last opened directory.
     """
     return FormFieldHorizontal(
         FormFieldOutputFile(
@@ -80,7 +78,6 @@ def OutputFileField(
                     description=desc,
                 ) for ftype, desc in file_types
             ],
-            path=(Path(current_value).parent if current_value else Path()).resolve(),
             current_value=current_value,
         ),
         label_text=_("Output File"),

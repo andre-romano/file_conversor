@@ -24,6 +24,23 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
+class WebViewState:
+    """State shared between the webview and the main application."""
+
+    # Global last open directory
+    _lastOpenDir: Path = Environment.UserFolder.DOWNLOADS()
+
+    @classmethod
+    def get_last_open_dir(cls) -> Path:
+        return cls._lastOpenDir
+
+    @classmethod
+    def set_last_open_dir(cls, path: str | Path) -> None:
+        if isinstance(path, str):
+            path = Path(path)
+        cls._lastOpenDir = path.resolve()
+
+
 class WebViewAPI:
     """API exposed to the webview JavaScript context."""
 
@@ -69,6 +86,11 @@ class WebViewAPI:
             for file in files
             if file.get('pywebviewFullPath')
         ]
+
+        if filepaths:
+            dir_name = Path(filepaths[0]).parent
+            WebViewState.set_last_open_dir(dir_name)
+
         logger.debug(f"Dropped files: {filepaths}")
         self._get_window().evaluate_js("""
             window.dispatchEvent(new CustomEvent('filesDropped', {
@@ -195,6 +217,10 @@ class WebViewAPI:
         logger.debug("Window icon set.")
         return True
 
+    def get_last_open_dir(self) -> str:
+        """Get the last opened directory."""
+        return str(WebViewState.get_last_open_dir())
+
     def open_folder_dialog(self, options: dict[str, Any]) -> list[str]:
         """
         Open a folder in the system file explorer.
@@ -205,9 +231,12 @@ class WebViewAPI:
         window = self._get_window()
         result = window.create_file_dialog(
             dialog_type=webview.FileDialog.FOLDER,
-            directory=options.get("path") or str(Path().resolve()),
+            directory=options.get("path") or self.get_last_open_dir(),
             allow_multiple=bool(options.get("multiple", False)),
         )
+        if result:
+            dir_path = Path(result[0])
+            WebViewState.set_last_open_dir(dir_path)
         logger.debug(f"Selected save file: {result}")
         return list(result or [])
 
@@ -224,12 +253,15 @@ class WebViewAPI:
         window = self._get_window()
         result = window.create_file_dialog(
             dialog_type=webview.FileDialog.OPEN,
-            directory=options.get("path") or str(Path().resolve()),
+            directory=options.get("path") or self.get_last_open_dir(),
             allow_multiple=bool(options.get("multiple", False)),                  # allow selecting multiple files
             file_types=options.get("file_types") or [
                 format_file_types_webview(),  # filter for all files
             ],
         )
+        if result:
+            dir_path = Path(result[0]).parent
+            WebViewState.set_last_open_dir(dir_path)
         logger.debug(f"Selected files: {result}")
         return list(result or [])
 
@@ -246,10 +278,13 @@ class WebViewAPI:
         window = self._get_window()
         result = window.create_file_dialog(
             dialog_type=webview.FileDialog.SAVE,
-            directory=options.get("path") or str(Path().resolve()),
-            save_filename=options.get("filename", ""),
+            directory=options.get("path") or self.get_last_open_dir(),
+            save_filename=Path(options.get("filename", "")).name,
             file_types=options.get("file_types", [format_file_types_webview()]),
         )
+        if result:
+            dir_path = Path(result[0]).parent
+            WebViewState.set_last_open_dir(dir_path)
         logger.debug(f"Selected save file: {result}")
         if not result:
             return []

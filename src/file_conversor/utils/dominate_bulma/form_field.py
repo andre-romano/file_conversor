@@ -37,35 +37,29 @@ def FormField(
     with div(
         _class=f"field is-full-width {_class}",
         **{
-            'x-data': """{
-                help: %s,
-                value: %s,
+            'x-data': f"""{{
+                help: {format_py_to_js(help)},
+                value: {format_py_to_js(current_value)},
                 isValid: false,
-                validate(value){
+                validate(value){{
                     console.log('Validating field with value:', value);
-                    this.isValid = %s ;
+                    this.isValid = {validation_expr} ;
                     const parentForm = this.$el.closest('form[x-data]');
-                    if(parentForm){
+                    if(parentForm){{
                         const parentData = Alpine.$data(parentForm);
                         parentData.updateValidity();
-                    } else {
+                    }} else {{
                         console.log('No parent form found');
-                    }
+                    }}
                     return this.isValid ;
-                },
-                init() {
+                }},
+                init() {{
                     this.$watch('value', this.validate.bind(this));
                     this.validate(this.value);   
-                    %s ;                 
-                },
-                %s
-            }""" % (
-                format_py_to_js(help),
-                format_py_to_js(current_value),
-                validation_expr,
-                x_init,
-                x_data,
-            ),
+                    {x_init} ;                 
+                }},
+                {x_data}
+            }}""",
         },
         **kwargs,
     ) as field:

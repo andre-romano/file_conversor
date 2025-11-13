@@ -36,7 +36,7 @@ def PagePDFMerge():
                 (f, f'{f.upper()} {_("file")}')
                 for f in PyPDFBackend.SUPPORTED_OUT_FORMATS
             ],
-            current_value=str(Path().resolve() / "output.pdf"),
+            current_value="output.pdf",
         ),
         api_endpoint=f"{url_for('api_pdf_merge')}",
         nav_items=[

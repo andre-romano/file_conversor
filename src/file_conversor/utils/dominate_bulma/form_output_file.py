@@ -1,5 +1,7 @@
 # src\file_conversor\utils\bulma\form_output_file.py
 
+import os
+
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -14,7 +16,6 @@ def FormFieldOutputFile(
     help: str,
     _name: str,
     file_types: Sequence[str],
-    path: str | Path = "",
     x_data: str = "",
     x_init: str = "",
     **kwargs,
@@ -39,28 +40,29 @@ def FormFieldOutputFile(
             "_title": help,
             "@click": "saveFileDialog",
         },
-        x_data=f"""
-            lastPath: {format_py_to_js(path)},
-            async updateLastPath(path) {{
-                const lastSeen = path.lastIndexOf(`/`);
-                const lastSeenWin = path.lastIndexOf(`\\\\`);
-                this.lastPath = path.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
-            }},
+        x_data=f"""            
             async saveFileDialog() {{
-                const fileList = await pywebview.api.save_file_dialog({{
-                    path: this.lastPath,
+                const fileList = await pywebview.api.save_file_dialog({{                    
                     filename: this.value,
                     file_types: {format_py_to_js(file_types)},
                 }});
                 console.log('Save file dialog returned:', fileList);
                 if (fileList && fileList.length > 0) {{
                     this.value = fileList[0];
-                    this.updateLastPath(fileList[0]);
                 }}
             }},
             {x_data}
         """,
-        x_init=x_init,
+        x_init=f"""
+            let thisObj = this;
+            window.addEventListener('pywebviewready', async () => {{
+                const dir = await pywebview.api.get_last_open_dir();
+                if (thisObj.value && thisObj.value !== '') {{
+                    thisObj.value = dir + '{os.sep if os.sep == '/' else r'\\'}' + thisObj.value;
+                }}
+            }});
+            {x_init}
+        """,
         **kwargs,
     )
 

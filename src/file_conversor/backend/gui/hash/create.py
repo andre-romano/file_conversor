@@ -32,7 +32,7 @@ def PageHashCreate():
                 (f, f'{f.upper()} {_("file")}')
                 for f in HashBackend.SUPPORTED_OUT_FORMATS
             ],
-            current_value=str(Path().resolve() / "output.sha256"),
+            current_value="output.sha256",
         ),
         api_endpoint=f"{url_for('api_hash_create')}",
         nav_items=[

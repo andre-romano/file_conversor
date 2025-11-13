@@ -30,16 +30,22 @@ def FormFieldOutputDirectory(
             "_title": help,
             "@click": "openFolderDialog",
         },
-        x_data="""
-            async openFolderDialog() {
-                const folderList = await pywebview.api.open_folder_dialog({ });
-                if (folderList && folderList.length > 0) {
+        x_data=f"""
+            async openFolderDialog() {{
+                const folderList = await pywebview.api.open_folder_dialog({{ }});
+                if (folderList && folderList.length > 0) {{
                     this.value = folderList[0];
-                }
-            },
-            %s
-        """ % x_data,
-        x_init=x_init,
+                }}
+            }},
+            {x_data}
+        """,
+        x_init=f"""
+            let thisObj = this;
+            window.addEventListener('pywebviewready', async () => {{
+                thisObj.value = await pywebview.api.get_last_open_dir();
+            }});
+            {x_init}
+        """,
         **kwargs,
     )
 

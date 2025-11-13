@@ -141,7 +141,6 @@ def FormFileList(
                 filesStr: '',
                 files: [],
                 isValid: false,
-                lastPath: '',            
                 file_types: {format_py_to_js(file_types)},
                 _validate_file(file) {{
                     if (this.file_types.length === 0) {{
@@ -162,16 +161,11 @@ def FormFileList(
                         if (!this.files.includes(file) && this._validate_file(file)) {{
                             this.files.push(file);
                         }}
-                        // get last path, for windows and unix compatibility
-                        const lastSeen = file.lastIndexOf(`/`);
-                        const lastSeenWin = file.lastIndexOf(`\\\\`);
-                        this.lastPath = file.substring(0, Math.max(lastSeen, lastSeenWin) + 1);
                     }});
                     this.$nextTick(() => {{ }});
                 }},
                 async openFileDialog() {{
-                    const fileList = await pywebview.api.open_file_dialog({{
-                        path: this.lastPath,
+                    const fileList = await pywebview.api.open_file_dialog({{                        
                         multiple: {format_py_to_js(multiple)},
                         file_types: this.file_types,
                     }});
