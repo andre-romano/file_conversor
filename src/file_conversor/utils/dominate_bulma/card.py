@@ -5,11 +5,13 @@ from typing import Any
 from file_conversor.utils.dominate_utils import *
 
 
-def Card(content: Any = None,
-         top_image: Any = None,
-         header_data: dict[str, Any] | None = None,
-         footer_data: list[dict[str, Any]] | None = None
-         ):
+def Card(
+    content: Any = None,
+        top_image: Any = None,
+        header_data: dict[str, Any] | None = None,
+        footer_data: list[dict[str, Any]] | None = None,
+        **kwargs,
+):
     """
     Create a card component.
 
@@ -18,7 +20,7 @@ def Card(content: Any = None,
     :param header_data: The card header content. {"title": str, "icon": FontAwesomeIcon}
     :param footer_data: The card footer content. list[{"text": str, "link": str}]
     """
-    with div(_class="card") as card:
+    with div(_class="card", **kwargs) as card:
         # Card image section
         if top_image:
             with div(_class="card-image") as card_image:

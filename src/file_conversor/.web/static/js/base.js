@@ -34,3 +34,25 @@ window.addEventListener('pywebviewready', async () => {
     await window.pywebview.api.set_title({ title: title });
     console.log('Set window title:', title);
 });
+
+window.addEventListener('beforeunload', () => {
+    console.log('Window is about to unload');
+    setTimeout(() => {
+        try {
+            const modal = Alpine.store('modal');
+            modal.load({
+                title: 'Loading ...',
+                body: 'The application is loading next page. Please wait ...',
+                footer: `
+                <div class="is-flex is-justify-content-flex-end is-full-width">
+                <button class="button is-success is-loading" disabled>Loading...</button>
+                </div>
+                `,
+                closeable: false,
+            });
+            document.body.classList.add('is-cursor-wait');
+        } catch (e) {
+            console.log("No modal available:", e);
+        }
+    }, 150);
+});

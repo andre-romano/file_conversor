@@ -166,6 +166,20 @@ body div.card {
     border: solid 1px var(--bulma-navbar-border-color);
 }
 
+/* CELLS */
+body .cell,
+body .cell>a,
+body .cell .card,
+body .cell .card>.card-content {
+    height: 100%;
+}
+
+body .cell .card>.card-content {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+}
+
 /* TABS */
 body .tabs .tab-headers a {
     border-color: var(--bulma-tab-border-color);

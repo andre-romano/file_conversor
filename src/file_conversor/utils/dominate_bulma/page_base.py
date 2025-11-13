@@ -62,6 +62,11 @@ def PageBase(
         with cast(dominate.tags.body, component.body) as body:
             body.set_attribute("style", f"zoom: {CONFIG['gui-zoom']}%;")
 
+            body.set_attribute("x-data", f"""{{ }}""")
+            body.set_attribute(":class", f"""{{
+                'is-cursor-wait': $store.status_bar.started && ! $store.status_bar.finished,
+            }}""")
+
             # modal
             ModalCard(
                 _class_head="p-5",

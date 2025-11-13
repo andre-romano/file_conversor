@@ -59,13 +59,15 @@ def PageCardGrid(
             *[
                 Cell(
                     a(
-                        Card(Media(
-                            left=Figure(_src=item['image'], _class="is-48x48"),
-                            content=div(
-                                p(item['title'], _class="title is-4"),
-                                p(item['subtitle'], _class="subtitle is-6"),
+                        Card(
+                            Media(
+                                left=Figure(_src=item['image'], _class="is-48x48"),
+                                content=div(
+                                    p(item['title'], _class="title is-4"),
+                                    p(item['subtitle'], _class="subtitle is-6"),
+                                ),
                             ),
-                        )),
+                        ),
                         _href=item['url'],
                     )
                 )
