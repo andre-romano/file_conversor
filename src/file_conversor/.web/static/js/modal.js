@@ -19,7 +19,16 @@ function alpineConfigModal() {
             // placeholder for any loading logic if needed
             this.title = opts.title || '';
             this.body = opts.body || '';
-            this.footer = opts.footer || '';
+            this.footer = opts.footer || `
+                <div class="buttons is-right is-full-width">
+                    <button class="button is-primary" 
+                            :class="{ 'is-hidden': !$store.modal.closeable }"        
+                            @click="$store.modal.show = false" 
+                            >
+                        Close
+                    </button>
+                </div>        
+            `;
             this.closeable = opts.closeable !== undefined ? opts.closeable : true;
             this.show = true;
         }

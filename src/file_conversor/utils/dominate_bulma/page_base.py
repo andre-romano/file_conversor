@@ -71,7 +71,7 @@ def PageBase(
             ModalCard(
                 _class_head="p-5",
                 _class_body="p-5",
-                _class_foot="p-5",
+                _class_foot="p-4",
             )
 
             # navbar

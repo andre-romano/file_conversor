@@ -2,12 +2,16 @@
 
 :root {
     --bulma-navbar-height: 2.85rem;
+    --bulma-status-bar-height: 2rem;
+
     --bulma-navbar-border-color: #c7c7c7;
-    --bulma-tab-border-color: #929292;
+    --bulma-hover-border-color: #828282;
+    --bulma-tab-border-color: #c0bfbf;
+    --bulma-modal-card-head-background-color: var(--bulma-scheme-main);
     --bulma-footer-background-color: var(--bulma-scheme-main);
+
     --bulma-main-app-margin: 20px;
     --bulma-shadow: 0px 0px 15px 2px rgba(70, 70, 70, 0.4);
-    --bulma-status-bar-height: 2rem;
 }
 
 html,
@@ -156,14 +160,27 @@ body .modal-content {
     max-width: 80vw !important;
 }
 
-body .modal-content,
+body .modal-card-head,
 body .modal-card-foot {
-    background-color: var(--bulma-modal-card-body-background-color);
+    background-color: var(--bulma-modal-card-head-background-color);
+}
+
+body .modal-card-foot {
+    border-top: solid 1px var(--bulma-navbar-border-color);
 }
 
 /* CARDS */
-body div.card {
+body .card {
     border: solid 1px var(--bulma-navbar-border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border 0.3s ease;
+}
+
+body .card:hover {
+    border: solid 1px var(--bulma-hover-border-color);
+    box-shadow: 0px 8px 14px 2px rgba(0, 0, 0, 0.4);
+    transform: translateY(-6px);
+    z-index: 20;
 }
 
 /* CELLS */
@@ -182,7 +199,11 @@ body .cell .card>.card-content {
 
 /* TABS */
 body .tabs .tab-headers a {
-    border-color: var(--bulma-tab-border-color);
+    border: solid 1px var(--bulma-tab-border-color);
+}
+
+body .tabs .tab-headers a:hover {
+    border: solid 1px var(--bulma-hover-border-color);
 }
 
 /* input */
@@ -193,6 +214,15 @@ body textarea.textarea {
 
 body input[type="checkbox"] {
     border: var(--bulma-navbar-border-color);
+}
+
+/* buttons */
+body button.button {
+    border: solid 1px var(--bulma-navbar-border-color) !important;
+}
+
+body button.button:hover {
+    border: solid 1px var(--bulma-hover-border-color) !important;
 }
 
 /* FOOTER */
