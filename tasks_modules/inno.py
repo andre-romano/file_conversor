@@ -17,6 +17,7 @@ INNO_ISS = INNO_PATH / "setup.iss"
 INSTALL_PATH = Path("build") / PROJECT_NAME
 
 INNO_APP_EXE = Path(zip.APP_EXE.name)
+INNO_APP_GUI_EXE = Path(zip.APP_GUI_EXE.name)
 
 
 @task
@@ -78,6 +79,10 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 
 ; Adds app_folder to the SYSTEM PATH (requires admin privileges)
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
+
+[Icons]
+Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{{app}}\python\Lib\site-packages\{PROJECT_NAME}\.icons\icon.ico"
+Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{{app}}\python\Lib\site-packages\{PROJECT_NAME}\.icons\icon.ico"
 
 [Run]
 StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated

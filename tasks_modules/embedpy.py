@@ -19,6 +19,7 @@ PORTABLE_PIP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / "pip.exe"
 PORTABLE_APP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / f"{PROJECT_NAME}.exe"
 
 PORTABLE_SHIM_BAT = BUILD_DIR / f"{PROJECT_NAME}.bat"
+PORTABLE_SHIM_VBS = BUILD_DIR / f"{PROJECT_NAME}-gui.vbs"
 
 
 def get_pip_install_cmd(*modules: str):
@@ -231,6 +232,14 @@ def create_shim(c: InvokeContext):
     result = c.run(f'"{PORTABLE_SHIM_BAT.resolve()}" --version')
     if (result is None) or (result.return_code != 0):
         raise RuntimeError(f"Failed to run shim for '{PROJECT_NAME}': {result}")
+
+    PORTABLE_SHIM_VBS.write_text(rf'''
+    Set WshShell = CreateObject("WScript.Shell")
+    WshShell.Run """{PORTABLE_SHIM_BAT.resolve()}"" gui start", 0, False
+    ''', encoding="utf-8")
+    if not PORTABLE_SHIM_VBS.exists():
+        raise RuntimeError(f"Failed to create VBS shim for '{PROJECT_NAME}'")
+
     print(f"[bold] Creating shim ... [/][bold green]OK[/]")
 
 
