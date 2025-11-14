@@ -43,6 +43,7 @@ class Configuration:
             "image-resampling": "bicubic",  # Default image resampling algorithm
             "pdf-compression": "medium",  # Default PDF compression level
             "gui-zoom": 100,            # Default GUI zoom level
+            "gui-output-dir": str(Environment.UserFolder.DOWNLOADS()),  # Default output directory
         }
 
         self.load()

@@ -16,6 +16,7 @@ def FormFieldOutputFile(
     help: str,
     _name: str,
     file_types: Sequence[str],
+    _readonly: bool = False,
     x_data: str = "",
     x_init: str = "",
     **kwargs,
@@ -26,17 +27,18 @@ def FormFieldOutputFile(
     :param help: Optional help text.
     :param _name: The name attribute for the select element.
     :param file_types: List of accepted file types (e.g., ['.pdf', '.docx']).
-    :param path: Initial path for the file dialog.
+    :param _readonly: Whether the input field is read-only.
     :param x_data: Additional x-data for the component.
     :param x_init: Additional x-init for the component.
     """
     return FormFieldInput(
         validation_expr="value.length > 0",
+        _readonly=_readonly,
         _name=_name,
         help=help,
         button={
             "icon": {"name": "file-export"},
-            "_class": "is-info",
+            "_class": "ml-2 is-info",
             "_title": help,
             "@click": "saveFileDialog",
         },

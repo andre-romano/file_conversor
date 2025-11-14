@@ -26,6 +26,11 @@ def TabConfigGeneral() -> tuple | list:
     languages.sort(key=lambda x: x[1])  # sort by language name
 
     return (
+        OutputDirField(
+            _name="gui-output-dir",
+            help=_("Select the default output directory for saving converted files."),
+            label_text=_("Output Directory"),
+        ),
         FormFieldHorizontal(
             FormFieldSelect(
                 *languages,

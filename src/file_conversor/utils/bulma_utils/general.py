@@ -48,13 +48,17 @@ def InputFilesField(
     )
 
 
-def OutputDirField():
+def OutputDirField(
+    _name: str = "output-dir",
+    help: str = _("Select the output directory to save the file."),
+    label_text: str = _("Output Directory"),
+):
     return FormFieldHorizontal(
         FormFieldOutputDirectory(
-            _name="output-dir",
-            help=_("Select the output directory to save the file."),
+            _name=_name,
+            help=help,
         ),
-        label_text=_("Output Directory"),
+        label_text=label_text,
     )
 
 

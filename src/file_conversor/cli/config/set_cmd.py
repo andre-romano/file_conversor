@@ -1,6 +1,7 @@
 
 # src\file_conversor\cli\config\set_cmd.py
 
+from pathlib import Path
 import typer
 
 from typing import Annotated
@@ -16,7 +17,7 @@ from file_conversor.backend import Img2PDFBackend, PillowBackend, FFmpegBackend,
 from file_conversor.config import Configuration, State, Log, locale, get_translation, AVAILABLE_LANGUAGES
 
 from file_conversor.utils.typer_utils import VideoEncodingSpeedOption, VideoQualityOption
-from file_conversor.utils.validators import check_is_bool_or_none, check_positive_integer, check_valid_options, check_ip_format
+from file_conversor.utils.validators import check_dir_exists, check_is_bool_or_none, check_positive_integer, check_valid_options, check_ip_format
 
 # app configuration
 CONFIG = Configuration.get_instance()
@@ -110,11 +111,15 @@ def set(
                                                  callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
                                                  )] = CONFIG["pdf-compression"],
 
-
     gui_zoom: Annotated[int, typer.Option("--gui-zoom", "-gz",
                                           help=_("GUI zoom level. Valid values are >= 1 (100 = normal size, 150 = 1.5x size, etc)."),
                                           min=1,
                                           )] = CONFIG["gui-zoom"],
+
+    gui_output_dir: Annotated[Path, typer.Option("--gui-output-dir", "-god",
+                                                 help=f"{_('GUI output directory')}. {_('Defaults to')} {CONFIG["gui-output-dir"]}.",
+                                                 callback=lambda x: check_dir_exists(x),
+                                                 )] = CONFIG["gui-output-dir"],
 ):
     # update the configuration dictionary
     CONFIG.update({
@@ -133,6 +138,7 @@ def set(
         "image-resampling": image_resampling,
         "pdf-compression": pdf_compression,
         "gui-zoom": gui_zoom,
+        "gui-output-dir": gui_output_dir,
     })
     CONFIG.save()
     show_cmd.show()

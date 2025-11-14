@@ -28,7 +28,7 @@ class WebViewState:
     """State shared between the webview and the main application."""
 
     # Global last open directory
-    _lastOpenDir: Path = Environment.UserFolder.DOWNLOADS()
+    _lastOpenDir: Path = Path(CONFIG['gui-output-dir']).resolve()
 
     @classmethod
     def get_last_open_dir(cls) -> Path:
