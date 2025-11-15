@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-11-14 13:40-0300\n"
+"POT-Creation-Date: 2025-11-15 15:54-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: hi_IN <LL@li.org>\n"
@@ -301,15 +301,15 @@ msgstr "सर्वर बंद करने में असमर्थ"
 msgid "Home"
 msgstr "घर"
 
-#: src/file_conversor/backend/gui/_webview_api.py:53
+#: src/file_conversor/backend/gui/_webview_api.py:64
 msgid "No webview window found."
 msgstr "कोई वेबव्यू विंडो नहीं मिली."
 
-#: src/file_conversor/backend/gui/flask_api.py:51
+#: src/file_conversor/backend/gui/flask_api.py:56
 msgid "Processing completed successfully."
 msgstr "प्रसंस्करण सफलतापूर्वक पूरा हुआ."
 
-#: src/file_conversor/backend/gui/flask_api.py:158
+#: src/file_conversor/backend/gui/flask_api.py:168
 msgid "File processing requested via API."
 msgstr "एपीआई के माध्यम से फ़ाइल प्रसंस्करण का अनुरोध किया गया।"
 
@@ -546,23 +546,23 @@ msgstr "वेबव्यू विंडो प्रारंभ हो र�
 msgid "Webview window closed."
 msgstr "वेबव्यू विंडो बंद हो गई."
 
-#: src/file_conversor/backend/gui/web_app.py:168
+#: src/file_conversor/backend/gui/web_app.py:163
 msgid "Waiting for Flask to be ready ..."
 msgstr "फ्लास्क के तैयार होने की प्रतीक्षा की जा रही है..."
 
-#: src/file_conversor/backend/gui/web_app.py:173
+#: src/file_conversor/backend/gui/web_app.py:168
 msgid "Access the app at"
 msgstr "ऐप पर पहुंचें"
 
-#: src/file_conversor/backend/gui/web_app.py:174
+#: src/file_conversor/backend/gui/web_app.py:169
 msgid "Press Ctrl+C to exit."
 msgstr "बाहर निकलने के लिए Ctrl+C दबाएँ।"
 
-#: src/file_conversor/backend/gui/web_app.py:177
+#: src/file_conversor/backend/gui/web_app.py:172
 msgid "Shutting down main thread..."
 msgstr "मुख्य थ्रेड बंद किया जा रहा है..."
 
-#: src/file_conversor/backend/gui/web_app.py:179
+#: src/file_conversor/backend/gui/web_app.py:174
 msgid "[bold] Shutting down the application ... [/]"
 msgstr "[बोल्ड] एप्लिकेशन को बंद किया जा रहा है...[/]"
 
@@ -707,16 +707,26 @@ msgstr "वीडियो रूपांतरण के लिए वां�
 msgid "Video Format"
 msgstr "वीडियो प्रारूप"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:34
+#: src/file_conversor/backend/gui/config/_tab_general.py:31
+msgid "Select the default output directory for saving converted files."
+msgstr ""
+"परिवर्तित फ़ाइलों को सहेजने के लिए डिफ़ॉल्ट आउटपुट निर्देशिका का चयन करें।"
+
+#: src/file_conversor/backend/gui/config/_tab_general.py:32
+#: src/file_conversor/utils/bulma_utils/general.py:60
+msgid "Output Directory"
+msgstr "आउटपुट निर्देशिका"
+
+#: src/file_conversor/backend/gui/config/_tab_general.py:39
 msgid "Select the desired language for the user interface."
 msgstr "यूजर इंटरफेस के लिए वांछित भाषा का चयन करें।"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:36
+#: src/file_conversor/backend/gui/config/_tab_general.py:41
 #: src/file_conversor/backend/pdf/ocrmypdf_backend.py:89
 msgid "Language"
 msgstr "भाषा"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:44
+#: src/file_conversor/backend/gui/config/_tab_general.py:49
 msgid ""
 "Set the default zoom level for the user interface. Valid values are >= 1 "
 "(100 = normal size, 150 = 1.5x size, etc)."
@@ -724,15 +734,15 @@ msgstr ""
 "उपयोगकर्ता इंटरफ़ेस के लिए डिफ़ॉल्ट ज़ूम स्तर सेट करें। मान्य मान >= 1 (100 "
 "= सामान्य आकार, 150 = 1.5x आकार, आदि) हैं।"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:56
+#: src/file_conversor/backend/gui/config/_tab_general.py:61
 msgid "GUI Zoom Level (%)"
 msgstr "जीयूआई ज़ूम स्तर (%)"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:61
+#: src/file_conversor/backend/gui/config/_tab_general.py:66
 msgid "Automatic install of missing dependencies, on demand."
 msgstr "मांग पर लापता निर्भरता की स्वचालित स्थापना।"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:62
+#: src/file_conversor/backend/gui/config/_tab_general.py:67
 msgid ""
 "If enabled, the application will attempt to automatically install any "
 "missing dependencies when needed."
@@ -1611,7 +1621,7 @@ msgstr "भ्रष्टाचार/असंगतियों के लि
 #: src/file_conversor/cli/audio/check_cmd.py:85
 #: src/file_conversor/cli/audio/convert_cmd.py:69
 #: src/file_conversor/cli/audio/info_cmd.py:75
-#: src/file_conversor/cli/config/set_cmd.py:41
+#: src/file_conversor/cli/config/set_cmd.py:42
 #: src/file_conversor/cli/config/show_cmd.py:36
 #: src/file_conversor/cli/doc/convert_cmd.py:94
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
@@ -1712,22 +1722,22 @@ msgstr "फ़ाइल पार्स करने में त्रुट�
 msgid "Configure default options"
 msgstr "डिफ़ॉल्ट विकल्प कॉन्फ़िगर करें"
 
-#: src/file_conversor/cli/config/set_cmd.py:38
+#: src/file_conversor/cli/config/set_cmd.py:39
 msgid "Configure the default options for the app."
 msgstr "ऐप के लिए डिफ़ॉल्ट विकल्प कॉन्फ़िगर करें."
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:51
 msgid "Set preferred language for app (if available). Available languages:"
 msgstr "ऐप के लिए पसंदीदा भाषा सेट करें (यदि उपलब्ध हो)। उपलब्ध भाषाएँ:"
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:51
 msgid ""
 "Defaults to system preffered language or 'en_US' (English - United States)"
 msgstr ""
 "सिस्टम से पहले की भाषा या 'en_us' (अंग्रेजी - संयुक्त राज्य अमेरिका) के लिए "
 "चूक"
 
-#: src/file_conversor/cli/config/set_cmd.py:55
+#: src/file_conversor/cli/config/set_cmd.py:56
 msgid ""
 "Install missing external dependencies action. 'True' for auto install. "
 "'False' to not install missing dependencies. 'None' to ask user for action."
@@ -1736,7 +1746,7 @@ msgstr ""
 " निर्भरता को स्थापित नहीं करने के लिए 'गलत'। कार्रवाई के लिए उपयोगकर्ता से "
 "पूछने के लिए 'कोई नहीं'।"
 
-#: src/file_conversor/cli/config/set_cmd.py:60
+#: src/file_conversor/cli/config/set_cmd.py:61
 msgid ""
 "Set preferred listen port for app (if available). Ports below 1024 require "
 "root privileges. Defaults to 5000."
@@ -1744,38 +1754,38 @@ msgstr ""
 "ऐप के लिए पसंदीदा श्रवण पोर्ट सेट करें (यदि उपलब्ध हो)। 1024 से नीचे के "
 "पोर्ट को रूट विशेषाधिकारों की आवश्यकता होती है। 5000 पर डिफ़ॉल्ट."
 
-#: src/file_conversor/cli/config/set_cmd.py:65
+#: src/file_conversor/cli/config/set_cmd.py:66
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "Audio bitrate in kbps."
 msgstr "केबीपीएस में ऑडियो बिटरेट।"
 
-#: src/file_conversor/cli/config/set_cmd.py:65
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:66
+#: src/file_conversor/cli/config/set_cmd.py:71
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "If 0, let FFmpeg decide best bitrate."
 msgstr "यदि 0, तो FFMPEG को सबसे अच्छा बिटरेट तय करें।"
 
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:71
 #: src/file_conversor/utils/typer_utils.py:181
 msgid "Video bitrate in kbps."
 msgstr "KBPS में वीडियो बिटरेट।"
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:76
 msgid "Video format."
 msgstr "वीडियो प्रारूप।"
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:76
 msgid "Available formats:"
 msgstr "उपलब्ध प्रारूप:"
 
-#: src/file_conversor/cli/config/set_cmd.py:84
+#: src/file_conversor/cli/config/set_cmd.py:85
 msgid ""
 "Image quality (for ``image convert`` command). Valid values are between "
 "1-100."
 msgstr ""
 "छवि गुणवत्ता (`` छवि कन्वर्ट`` कमांड के लिए)। मान्य मान 1-100 के बीच हैं।"
 
-#: src/file_conversor/cli/config/set_cmd.py:89
+#: src/file_conversor/cli/config/set_cmd.py:90
 msgid ""
 "Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
 "values are between 40-3600."
@@ -1783,7 +1793,7 @@ msgstr ""
 "डॉट्स प्रति इंच (dpi) में छवि गुणवत्ता (`` छवि to_pdf`` कमांड के लिए)। मान्य"
 " मान 40-3600 के बीच हैं।"
 
-#: src/file_conversor/cli/config/set_cmd.py:94
+#: src/file_conversor/cli/config/set_cmd.py:95
 msgid ""
 "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
 "defined. Valid values are"
@@ -1791,7 +1801,7 @@ msgstr ""
 "छवि फिट (`` छवि to_pdf`` कमांड के लिए)। यदि ``--पेज-आकार`` को परिभाषित किया "
 "गया है, तो मान्य है। मान्य मान हैं"
 
-#: src/file_conversor/cli/config/set_cmd.py:99
+#: src/file_conversor/cli/config/set_cmd.py:100
 msgid ""
 "Page size (for ``image to_pdf`` command). Format (width, height). Other "
 "valid values are:"
@@ -1799,14 +1809,15 @@ msgstr ""
 "पृष्ठ का आकार (`` छवि to_pdf`` कमांड के लिए)। प्रारूप (चौड़ाई, ऊंचाई)। अन्य "
 "मान्य मान हैं:"
 
-#: src/file_conversor/cli/config/set_cmd.py:104
+#: src/file_conversor/cli/config/set_cmd.py:105
 #: src/file_conversor/cli/image/resize_cmd.py:123
 #: src/file_conversor/cli/image/rotate_cmd.py:113
 msgid "Resampling algorithm. Valid values are"
 msgstr "पुनरुत्थान एल्गोरिथ्म। मान्य मान हैं"
 
-#: src/file_conversor/cli/config/set_cmd.py:104
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:105
+#: src/file_conversor/cli/config/set_cmd.py:110
+#: src/file_conversor/cli/config/set_cmd.py:120
 #: src/file_conversor/cli/image/resize_cmd.py:123
 #: src/file_conversor/cli/image/rotate_cmd.py:113
 #: src/file_conversor/cli/image/to_pdf_cmd.py:119
@@ -1814,7 +1825,7 @@ msgstr "पुनरुत्थान एल्गोरिथ्म। मा�
 msgid "Defaults to"
 msgstr "के लिए चूक"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:110
 #: src/file_conversor/cli/pdf/compress_cmd.py:120
 msgid "Compression level (high compression = low quality). Valid values are"
 msgstr "संपीड़न स्तर (उच्च संपीड़न = निम्न गुणवत्ता)। मान्य मान हैं"
@@ -1827,11 +1838,15 @@ msgstr ""
 "जीयूआई ज़ूम स्तर। मान्य मान >= 1 (100 = सामान्य आकार, 150 = 1.5x आकार, आदि) "
 "हैं।"
 
-#: src/file_conversor/cli/config/set_cmd.py:139
+#: src/file_conversor/cli/config/set_cmd.py:120
+msgid "GUI output directory"
+msgstr "जीयूआई आउटपुट निर्देशिका"
+
+#: src/file_conversor/cli/config/set_cmd.py:145
 msgid "Configuration file"
 msgstr "विन्यास संचिका"
 
-#: src/file_conversor/cli/config/set_cmd.py:139
+#: src/file_conversor/cli/config/set_cmd.py:145
 msgid "updated"
 msgstr "अद्यतन"
 
@@ -3383,51 +3398,47 @@ msgstr "देशाटन"
 msgid "Enable unsharp filter to enhance video sharpness."
 msgstr "वीडियो की तीव्रता बढ़ाने के लिए अनशार्प फ़िल्टर सक्षम करें।"
 
-#: src/file_conversor/utils/bulma_utils/general.py:37
+#: src/file_conversor/utils/bulma_utils/general.py:43
 msgid "Input Files"
 msgstr "इनपुट फ़ाइलें"
 
-#: src/file_conversor/utils/bulma_utils/general.py:38
+#: src/file_conversor/utils/bulma_utils/general.py:44
 msgid "Select (or drag) the input files."
 msgstr "इनपुट फ़ाइलों का चयन करें (या खींचें)।"
 
-#: src/file_conversor/utils/bulma_utils/general.py:39
+#: src/file_conversor/utils/bulma_utils/general.py:45
 msgid "Add file"
 msgstr "फ़ाइल जोड़ें"
 
-#: src/file_conversor/utils/bulma_utils/general.py:40
+#: src/file_conversor/utils/bulma_utils/general.py:46
 msgid "Remove file"
 msgstr "फ़ाइल हटाएँ"
 
-#: src/file_conversor/utils/bulma_utils/general.py:55
+#: src/file_conversor/utils/bulma_utils/general.py:59
 msgid "Select the output directory to save the file."
 msgstr "फ़ाइल को सहेजने के लिए आउटपुट निर्देशिका का चयन करें।"
 
-#: src/file_conversor/utils/bulma_utils/general.py:57
-msgid "Output Directory"
-msgstr "आउटपुट निर्देशिका"
-
-#: src/file_conversor/utils/bulma_utils/general.py:74
+#: src/file_conversor/utils/bulma_utils/general.py:84
 msgid "Select the output filename to save the file."
 msgstr "फ़ाइल को सहेजने के लिए आउटपुट फ़ाइल नाम का चयन करें।"
 
-#: src/file_conversor/utils/bulma_utils/general.py:83
+#: src/file_conversor/utils/bulma_utils/general.py:93
 msgid "Output File"
 msgstr "आउटपुट फ़ाइल"
 
-#: src/file_conversor/utils/bulma_utils/general.py:102
+#: src/file_conversor/utils/bulma_utils/general.py:112
 msgid "Select the output file format."
 msgstr "आउटपुट फ़ाइल स्वरूप का चयन करें."
 
-#: src/file_conversor/utils/bulma_utils/general.py:104
+#: src/file_conversor/utils/bulma_utils/general.py:114
 msgid "Output Format"
 msgstr "आउटपुट स्वरूप"
 
-#: src/file_conversor/utils/bulma_utils/general.py:113
+#: src/file_conversor/utils/bulma_utils/general.py:123
 msgid "Overwrite Existing Files"
 msgstr "मौजूदा फ़ाइलों को अधिलेखित करें"
 
-#: src/file_conversor/utils/bulma_utils/general.py:114
+#: src/file_conversor/utils/bulma_utils/general.py:124
 msgid "Allow overwriting of existing files."
 msgstr "मौजूदा फ़ाइलों को ओवरराइट करने की अनुमति दें."
 
@@ -3614,11 +3625,11 @@ msgstr "उपयोग करने के लिए ओसीआर भाष�
 msgid "OCR Language"
 msgstr "ओसीआर भाषा"
 
-#: src/file_conversor/utils/dominate_bulma/page_form.py:53
+#: src/file_conversor/utils/dominate_bulma/page_form.py:56
 msgid "Execute"
 msgstr "निष्पादित करना"
 
-#: src/file_conversor/utils/dominate_bulma/page_form.py:55
+#: src/file_conversor/utils/dominate_bulma/page_form.py:58
 msgid "Execute operation"
 msgstr "ऑपरेशन निष्पादित करें"
 

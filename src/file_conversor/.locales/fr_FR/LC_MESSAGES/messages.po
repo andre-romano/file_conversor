@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-11-14 13:40-0300\n"
+"POT-Creation-Date: 2025-11-15 15:54-0300\n"
 "PO-Revision-Date: 2025-08-20 16:52-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
@@ -304,15 +304,15 @@ msgstr "Impossible d'arrêter le serveur"
 msgid "Home"
 msgstr "Maison"
 
-#: src/file_conversor/backend/gui/_webview_api.py:53
+#: src/file_conversor/backend/gui/_webview_api.py:64
 msgid "No webview window found."
 msgstr "Aucune fenêtre d'affichage Web trouvée."
 
-#: src/file_conversor/backend/gui/flask_api.py:51
+#: src/file_conversor/backend/gui/flask_api.py:56
 msgid "Processing completed successfully."
 msgstr "Traitement terminé avec succès."
 
-#: src/file_conversor/backend/gui/flask_api.py:158
+#: src/file_conversor/backend/gui/flask_api.py:168
 msgid "File processing requested via API."
 msgstr "Traitement des fichiers demandé via API."
 
@@ -553,23 +553,23 @@ msgstr "Démarrage de la fenêtre d'affichage Web..."
 msgid "Webview window closed."
 msgstr "Fenêtre d'affichage Web fermée."
 
-#: src/file_conversor/backend/gui/web_app.py:168
+#: src/file_conversor/backend/gui/web_app.py:163
 msgid "Waiting for Flask to be ready ..."
 msgstr "En attendant que Flask soit prêt..."
 
-#: src/file_conversor/backend/gui/web_app.py:173
+#: src/file_conversor/backend/gui/web_app.py:168
 msgid "Access the app at"
 msgstr "Accédez à l'application sur"
 
-#: src/file_conversor/backend/gui/web_app.py:174
+#: src/file_conversor/backend/gui/web_app.py:169
 msgid "Press Ctrl+C to exit."
 msgstr "Appuyez sur Ctrl+C pour quitter."
 
-#: src/file_conversor/backend/gui/web_app.py:177
+#: src/file_conversor/backend/gui/web_app.py:172
 msgid "Shutting down main thread..."
 msgstr "Arrêt du thread principal..."
 
-#: src/file_conversor/backend/gui/web_app.py:179
+#: src/file_conversor/backend/gui/web_app.py:174
 msgid "[bold] Shutting down the application ... [/]"
 msgstr "[gras] Arrêt de l'application... [/]"
 
@@ -714,16 +714,27 @@ msgstr "Sélectionnez le format vidéo souhaité pour les conversions vidéo."
 msgid "Video Format"
 msgstr "Format vidéo"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:34
+#: src/file_conversor/backend/gui/config/_tab_general.py:31
+msgid "Select the default output directory for saving converted files."
+msgstr ""
+"Sélectionnez le répertoire de sortie par défaut pour enregistrer les "
+"fichiers convertis."
+
+#: src/file_conversor/backend/gui/config/_tab_general.py:32
+#: src/file_conversor/utils/bulma_utils/general.py:60
+msgid "Output Directory"
+msgstr "Répertoire de sortie"
+
+#: src/file_conversor/backend/gui/config/_tab_general.py:39
 msgid "Select the desired language for the user interface."
 msgstr "Sélectionnez la langue souhaitée pour l'interface utilisateur."
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:36
+#: src/file_conversor/backend/gui/config/_tab_general.py:41
 #: src/file_conversor/backend/pdf/ocrmypdf_backend.py:89
 msgid "Language"
 msgstr "Langue"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:44
+#: src/file_conversor/backend/gui/config/_tab_general.py:49
 msgid ""
 "Set the default zoom level for the user interface. Valid values are >= 1 "
 "(100 = normal size, 150 = 1.5x size, etc)."
@@ -731,15 +742,15 @@ msgstr ""
 "Définissez le niveau de zoom par défaut pour l'interface utilisateur. Les "
 "valeurs valides sont >= 1 (100 = taille normale, 150 = 1,5x taille, etc.)."
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:56
+#: src/file_conversor/backend/gui/config/_tab_general.py:61
 msgid "GUI Zoom Level (%)"
 msgstr "Niveau de zoom de l'interface graphique (%)"
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:61
+#: src/file_conversor/backend/gui/config/_tab_general.py:66
 msgid "Automatic install of missing dependencies, on demand."
 msgstr "Installation automatique des dépendances manquantes, sur demande."
 
-#: src/file_conversor/backend/gui/config/_tab_general.py:62
+#: src/file_conversor/backend/gui/config/_tab_general.py:67
 msgid ""
 "If enabled, the application will attempt to automatically install any "
 "missing dependencies when needed."
@@ -1638,7 +1649,7 @@ msgstr ""
 #: src/file_conversor/cli/audio/check_cmd.py:85
 #: src/file_conversor/cli/audio/convert_cmd.py:69
 #: src/file_conversor/cli/audio/info_cmd.py:75
-#: src/file_conversor/cli/config/set_cmd.py:41
+#: src/file_conversor/cli/config/set_cmd.py:42
 #: src/file_conversor/cli/config/show_cmd.py:36
 #: src/file_conversor/cli/doc/convert_cmd.py:94
 #: src/file_conversor/cli/ebook/convert_cmd.py:88
@@ -1740,24 +1751,24 @@ msgstr "Erreur lors de l'analyse du fichier"
 msgid "Configure default options"
 msgstr "Configurer les options par défaut"
 
-#: src/file_conversor/cli/config/set_cmd.py:38
+#: src/file_conversor/cli/config/set_cmd.py:39
 msgid "Configure the default options for the app."
 msgstr "Configurez les options par défaut de l'application."
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:51
 msgid "Set preferred language for app (if available). Available languages:"
 msgstr ""
 "Définissez le langage préféré pour l'application (si disponible). Langues "
 "disponibles:"
 
-#: src/file_conversor/cli/config/set_cmd.py:50
+#: src/file_conversor/cli/config/set_cmd.py:51
 msgid ""
 "Defaults to system preffered language or 'en_US' (English - United States)"
 msgstr ""
 "Par défaut, la langue du système préfabriqué ou «EN_US» (anglais - États-"
 "Unis)"
 
-#: src/file_conversor/cli/config/set_cmd.py:55
+#: src/file_conversor/cli/config/set_cmd.py:56
 msgid ""
 "Install missing external dependencies action. 'True' for auto install. "
 "'False' to not install missing dependencies. 'None' to ask user for action."
@@ -1766,7 +1777,7 @@ msgstr ""
 "l'installation automatique. «Faux» pour ne pas installer les dépendances "
 "manquantes. «Aucun» pour demander à l'utilisateur l'action."
 
-#: src/file_conversor/cli/config/set_cmd.py:60
+#: src/file_conversor/cli/config/set_cmd.py:61
 msgid ""
 "Set preferred listen port for app (if available). Ports below 1024 require "
 "root privileges. Defaults to 5000."
@@ -1775,31 +1786,31 @@ msgstr ""
 "ports inférieurs à 1024 nécessitent les privilèges root. La valeur par "
 "défaut est 5 000."
 
-#: src/file_conversor/cli/config/set_cmd.py:65
+#: src/file_conversor/cli/config/set_cmd.py:66
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "Audio bitrate in kbps."
 msgstr "Bitrate audio dans KBPS."
 
-#: src/file_conversor/cli/config/set_cmd.py:65
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:66
+#: src/file_conversor/cli/config/set_cmd.py:71
 #: src/file_conversor/utils/typer_utils.py:171
 msgid "If 0, let FFmpeg decide best bitrate."
 msgstr "Si 0, laissez FFMPEG décider du meilleur débit binaire."
 
-#: src/file_conversor/cli/config/set_cmd.py:70
+#: src/file_conversor/cli/config/set_cmd.py:71
 #: src/file_conversor/utils/typer_utils.py:181
 msgid "Video bitrate in kbps."
 msgstr "Bitrate vidéo dans KBPS."
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:76
 msgid "Video format."
 msgstr "Format vidéo."
 
-#: src/file_conversor/cli/config/set_cmd.py:75
+#: src/file_conversor/cli/config/set_cmd.py:76
 msgid "Available formats:"
 msgstr "Formats disponibles:"
 
-#: src/file_conversor/cli/config/set_cmd.py:84
+#: src/file_conversor/cli/config/set_cmd.py:85
 msgid ""
 "Image quality (for ``image convert`` command). Valid values are between "
 "1-100."
@@ -1807,7 +1818,7 @@ msgstr ""
 "Qualité d'image (pour la commande `` Image Convert` '). Les valeurs valides "
 "se situent entre 1 et 100."
 
-#: src/file_conversor/cli/config/set_cmd.py:89
+#: src/file_conversor/cli/config/set_cmd.py:90
 msgid ""
 "Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid "
 "values are between 40-3600."
@@ -1815,7 +1826,7 @@ msgstr ""
 "Qualité d'image dans des points par pouce (DPI) (pour la commande `` Image "
 "TO_PDF`` '). Les valeurs valides se situent entre 40 et 3600."
 
-#: src/file_conversor/cli/config/set_cmd.py:94
+#: src/file_conversor/cli/config/set_cmd.py:95
 msgid ""
 "Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is "
 "defined. Valid values are"
@@ -1823,7 +1834,7 @@ msgstr ""
 "Image Fit (pour la commande `` Image TO_PDF` '). VALIDE UNIQUEMENT si `` "
 "--page-size` 'est défini. Les valeurs valides sont"
 
-#: src/file_conversor/cli/config/set_cmd.py:99
+#: src/file_conversor/cli/config/set_cmd.py:100
 msgid ""
 "Page size (for ``image to_pdf`` command). Format (width, height). Other "
 "valid values are:"
@@ -1831,14 +1842,15 @@ msgstr ""
 "Taille de la page (pour `` Image TO_PDF` 'Commande). Format (largeur, "
 "hauteur). Les autres valeurs valides sont:"
 
-#: src/file_conversor/cli/config/set_cmd.py:104
+#: src/file_conversor/cli/config/set_cmd.py:105
 #: src/file_conversor/cli/image/resize_cmd.py:123
 #: src/file_conversor/cli/image/rotate_cmd.py:113
 msgid "Resampling algorithm. Valid values are"
 msgstr "Algorithme de rééchantillonnage. Les valeurs valides sont"
 
-#: src/file_conversor/cli/config/set_cmd.py:104
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:105
+#: src/file_conversor/cli/config/set_cmd.py:110
+#: src/file_conversor/cli/config/set_cmd.py:120
 #: src/file_conversor/cli/image/resize_cmd.py:123
 #: src/file_conversor/cli/image/rotate_cmd.py:113
 #: src/file_conversor/cli/image/to_pdf_cmd.py:119
@@ -1846,7 +1858,7 @@ msgstr "Algorithme de rééchantillonnage. Les valeurs valides sont"
 msgid "Defaults to"
 msgstr "Par défaut"
 
-#: src/file_conversor/cli/config/set_cmd.py:109
+#: src/file_conversor/cli/config/set_cmd.py:110
 #: src/file_conversor/cli/pdf/compress_cmd.py:120
 msgid "Compression level (high compression = low quality). Valid values are"
 msgstr ""
@@ -1861,11 +1873,15 @@ msgstr ""
 "Niveau de zoom de l'interface graphique. Les valeurs valides sont >= 1 (100 "
 "= taille normale, 150 = 1,5x taille, etc.)."
 
-#: src/file_conversor/cli/config/set_cmd.py:139
+#: src/file_conversor/cli/config/set_cmd.py:120
+msgid "GUI output directory"
+msgstr "Répertoire de sortie de l'interface graphique"
+
+#: src/file_conversor/cli/config/set_cmd.py:145
 msgid "Configuration file"
 msgstr "Fichier de configuration"
 
-#: src/file_conversor/cli/config/set_cmd.py:139
+#: src/file_conversor/cli/config/set_cmd.py:145
 msgid "updated"
 msgstr "mis à jour"
 
@@ -3456,51 +3472,47 @@ msgstr "Secouer"
 msgid "Enable unsharp filter to enhance video sharpness."
 msgstr "Activez le filtre flou pour améliorer la netteté de la vidéo."
 
-#: src/file_conversor/utils/bulma_utils/general.py:37
+#: src/file_conversor/utils/bulma_utils/general.py:43
 msgid "Input Files"
 msgstr "Fichiers d'entrée"
 
-#: src/file_conversor/utils/bulma_utils/general.py:38
+#: src/file_conversor/utils/bulma_utils/general.py:44
 msgid "Select (or drag) the input files."
 msgstr "Sélectionnez (ou faites glisser) les fichiers d'entrée."
 
-#: src/file_conversor/utils/bulma_utils/general.py:39
+#: src/file_conversor/utils/bulma_utils/general.py:45
 msgid "Add file"
 msgstr "Ajouter un fichier"
 
-#: src/file_conversor/utils/bulma_utils/general.py:40
+#: src/file_conversor/utils/bulma_utils/general.py:46
 msgid "Remove file"
 msgstr "Supprimer le fichier"
 
-#: src/file_conversor/utils/bulma_utils/general.py:55
+#: src/file_conversor/utils/bulma_utils/general.py:59
 msgid "Select the output directory to save the file."
 msgstr "Sélectionnez le répertoire de sortie pour enregistrer le fichier."
 
-#: src/file_conversor/utils/bulma_utils/general.py:57
-msgid "Output Directory"
-msgstr "Répertoire de sortie"
-
-#: src/file_conversor/utils/bulma_utils/general.py:74
+#: src/file_conversor/utils/bulma_utils/general.py:84
 msgid "Select the output filename to save the file."
 msgstr "Sélectionnez le nom du fichier de sortie pour enregistrer le fichier."
 
-#: src/file_conversor/utils/bulma_utils/general.py:83
+#: src/file_conversor/utils/bulma_utils/general.py:93
 msgid "Output File"
 msgstr "Fichier de sortie"
 
-#: src/file_conversor/utils/bulma_utils/general.py:102
+#: src/file_conversor/utils/bulma_utils/general.py:112
 msgid "Select the output file format."
 msgstr "Sélectionnez le format du fichier de sortie."
 
-#: src/file_conversor/utils/bulma_utils/general.py:104
+#: src/file_conversor/utils/bulma_utils/general.py:114
 msgid "Output Format"
 msgstr "Format de sortie"
 
-#: src/file_conversor/utils/bulma_utils/general.py:113
+#: src/file_conversor/utils/bulma_utils/general.py:123
 msgid "Overwrite Existing Files"
 msgstr "Écraser les fichiers existants"
 
-#: src/file_conversor/utils/bulma_utils/general.py:114
+#: src/file_conversor/utils/bulma_utils/general.py:124
 msgid "Allow overwriting of existing files."
 msgstr "Autoriser l'écrasement des fichiers existants."
 
@@ -3689,11 +3701,11 @@ msgstr "Sélectionnez la langue OCR à utiliser."
 msgid "OCR Language"
 msgstr "Langue OCR"
 
-#: src/file_conversor/utils/dominate_bulma/page_form.py:53
+#: src/file_conversor/utils/dominate_bulma/page_form.py:56
 msgid "Execute"
 msgstr "Exécuter"
 
-#: src/file_conversor/utils/dominate_bulma/page_form.py:55
+#: src/file_conversor/utils/dominate_bulma/page_form.py:58
 msgid "Execute operation"
 msgstr "Exécuter l'opération"
 
