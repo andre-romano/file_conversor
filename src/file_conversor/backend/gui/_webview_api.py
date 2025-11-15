@@ -95,6 +95,7 @@ class WebViewAPI:
             for file in files
             if file.get('pywebviewFullPath')
         ]
+        filepaths.sort()
 
         if filepaths:
             dir_name = Path(filepaths[0]).parent
@@ -240,16 +241,17 @@ class WebViewAPI:
         :param path: Optional initial directory path.
         """
         window = self._get_window()
-        result = window.create_file_dialog(
+        result = list(window.create_file_dialog(
             dialog_type=webview.FileDialog.FOLDER,
             directory=options.get("path") or self.get_last_open_dir(),
             allow_multiple=bool(options.get("multiple", False)),
-        )
+        ) or [])
+        result.sort()
         if result:
             dir_path = Path(result[0])
             WebViewState.set_last_open_dir(dir_path)
         logger.debug(f"Selected save file: {result}")
-        return list(result or [])
+        return result
 
     def open_file_dialog(self, options: dict[str, Any]) -> list[str]:
         """
@@ -262,19 +264,20 @@ class WebViewAPI:
         :return: List of selected file paths.
         """
         window = self._get_window()
-        result = window.create_file_dialog(
+        result = list(window.create_file_dialog(
             dialog_type=webview.FileDialog.OPEN,
             directory=options.get("path") or self.get_last_open_dir(),
             allow_multiple=bool(options.get("multiple", False)),                  # allow selecting multiple files
             file_types=options.get("file_types") or [
                 format_file_types_webview(),  # filter for all files
             ],
-        )
+        ) or [])
+        result.sort()
         if result:
             dir_path = Path(result[0]).parent
             WebViewState.set_last_open_dir(dir_path)
         logger.debug(f"Selected files: {result}")
-        return list(result or [])
+        return result
 
     def save_file_dialog(self, options: dict[str, Any]) -> list[str]:
         """
@@ -287,27 +290,29 @@ class WebViewAPI:
         :return: The selected file path.
         """
         window = self._get_window()
-        result = window.create_file_dialog(
+        result = list(window.create_file_dialog(
             dialog_type=webview.FileDialog.SAVE,
             directory=options.get("path") or self.get_last_open_dir(),
             save_filename=Path(options.get("filename", "")).name,
             file_types=options.get("file_types", [format_file_types_webview()]),
-        )
-        if result:
-            dir_path = Path(result[0]).parent
-            WebViewState.set_last_open_dir(dir_path)
+        ) or [])
+        result.sort()
+
         logger.debug(f"Selected save file: {result}")
         if not result:
-            return []
+            return result
+
+        dir_path = Path(result[0]).parent
+        WebViewState.set_last_open_dir(dir_path)
 
         # adjust file suffix based on selected file type
         file_types: list[str] = options.get("file_types", [])
         if not file_types:
-            return list(result)
+            return result
 
         match = re.search(r"\(\*(\.[^);]+)", file_types[0])
         if not match:
-            return list(result)
+            return result
 
         suffix = match.group(1)
         res = f"{Path(result[0]).with_suffix(suffix).resolve()}"

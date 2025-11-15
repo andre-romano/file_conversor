@@ -1,12 +1,16 @@
 # src\file_conversor\utils\bulma\form_file_list.py
 
+from turtle import up
 from typing import Any, Sequence
 
 from file_conversor.utils.dominate_utils import *
 from file_conversor.utils.formatters import format_py_to_js
 
 
-def _SelectBox():
+def _SelectBox(
+        size: int = 8,
+        _multiple: bool = True,
+):
     """
     Create the select box for the file list.
 
@@ -14,6 +18,9 @@ def _SelectBox():
     - files: list of available files
     - selected: list of selected files
     - isValid: boolean indicating if the selection is valid
+
+    :param size: The number of visible options in the select box.
+    :param _multiple: Whether to allow multiple selection.
 
     :return: The select box element.
     """
@@ -29,8 +36,8 @@ def _SelectBox():
             },
         ):
             with select(
-                _multiple=True,
-                _size="8",
+                _multiple=_multiple,
+                _size=size,
                 _class="is-flex-grow-1",
                 _style="cursor: unset;",
                 **{
@@ -38,8 +45,13 @@ def _SelectBox():
                     ":title": "help",
                 },
             ):
-                with template(**{"x-for": "opt in files"}):
-                    option(**{":value": "opt", "x-text": "opt"})
+                with template(**{"x-for": "(opt, index) in files", ":key": "opt"}):
+                    option(
+                        **{
+                            ":value": "opt",
+                            "x-text": "`#${index + 1} - ${opt}`",
+                        }
+                    )
         p(
             _class="help",
             **{
@@ -57,6 +69,8 @@ def _SelectButtons(
         input_name: str,
         add_help: str,
         remove_help: str,
+        up_help: str,
+        down_help: str,
 ):
     """
     Create the select buttons for the file list.
@@ -73,37 +87,79 @@ def _SelectButtons(
         _class="control is-flex is-flex-direction-column is-justify-content-flex-start is-align-items-start ml-2"
     ) as control_right:
 
-        # Upload button
-        with div(_class="is-48x48 mb-2"):
-            input_(
-                _type="text",
-                _name=input_name,
-                _hidden=True,
-                **{
-                    "x-model": "filesStr",
-                },
-            )
+        with div(_class="is-flex"):
+            # Upload button
             with button(
-                _class="button is-info is-48x48 has-border",
+                _class="button is-success is-48x48 has-border",
                 _title=add_help,
                 **{
                     "@click.prevent": "openFileDialog"
                 },
             ):
                 i(_class="fa-solid fa-plus")
+                input_(
+                    _type="text",
+                    _name=input_name,
+                    _hidden=True,
+                    **{
+                        "x-model": "filesStr",
+                    },
+                )
 
-        # Delete button
-        with button(
-            _class="button is-danger is-48x48 has-border",
-            _title=remove_help,
-            **{
-                "@click.prevent": """                
-                    files = files.filter(file => !selected.includes(file));
-                    selected = [];
-                """
-            },
-        ):
-            i(_class="fa-solid fa-trash")
+            # Delete button
+            with button(
+                _class="button is-danger is-48x48 has-border ml-1",
+                _title=remove_help,
+                **{
+                    "@click.prevent": """                
+                        files = files.filter(file => !selected.includes(file));
+                        selected = [];
+                    """
+                },
+            ):
+                i(_class="fa-solid fa-trash")
+
+        # another set of buttons below
+        with div(_class="is-flex mt-2"):
+            # Up button
+            with button(
+                _class="button is-info is-48x48 has-border",
+                _title=up_help,
+                **{
+                    "@click.prevent": """                
+                        selected.forEach(file => {
+                            const index = files.indexOf(file);
+                            if (index > 0) {
+                                // swap with the previous item
+                                [files[index - 1], files[index]] = [files[index], files[index - 1]];
+                            }
+                        });
+                        files = [...files]; // trigger reactivity
+                    """
+                },
+            ):
+                i(_class="fa-solid fa-arrow-up")
+
+            # Down button
+            with button(
+                _class="button is-link is-outlined is-48x48 has-border ml-1",
+                _title=down_help,
+                **{
+                    "@click.prevent": """                
+                        selected.forEach(file => {
+                            const index = files.indexOf(file);
+                            if (index < files.length - 1) {
+                                // swap with the next item
+                                [files[index + 1], files[index]] = [files[index], files[index + 1]];
+                                console.log('Moved down:', file);
+                                console.log('Selected:', selected);
+                            }
+                        });
+                        files = [...files]; // trigger reactivity
+                    """
+                },
+            ):
+                i(_class="fa-solid fa-arrow-down")
 
     return control_right
 
@@ -115,8 +171,10 @@ def FormFileList(
         multiple: bool = True,
         file_types: Sequence[str] | None = None,
         help_text: str = "",
-        add_help: str = "Add file",
-        remove_help: str = "Remove file",
+        btn_add_help: str = "Add file",
+        btn_remove_help: str = "Remove file",
+        btn_up_help: str = "Move file up",
+        btn_down_help: str = "Move file down",
         reverse: bool = False,
 ):
     """
@@ -203,15 +261,19 @@ def FormFileList(
                 # Right-side controls
                 _SelectButtons(
                     input_name=input_name,
-                    add_help=add_help,
-                    remove_help=remove_help,
+                    add_help=btn_add_help,
+                    remove_help=btn_remove_help,
+                    up_help=btn_up_help,
+                    down_help=btn_down_help,
                 )
             else:
                 # Left-side controls
                 _SelectButtons(
                     input_name=input_name,
-                    add_help=add_help,
-                    remove_help=remove_help,
+                    add_help=btn_add_help,
+                    remove_help=btn_remove_help,
+                    up_help=btn_up_help,
+                    down_help=btn_down_help,
                 )
                 # Right-side file list
                 _SelectBox()

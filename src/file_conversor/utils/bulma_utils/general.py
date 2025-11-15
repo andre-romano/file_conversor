@@ -36,8 +36,8 @@ def InputFilesField(
         validation_expr="value.length > 0",
         label_text=_("Input Files"),
         help_text=_("Select (or drag) the input files."),
-        add_help=_("Add file"),
-        remove_help=_("Remove file"),
+        btn_add_help=_("Add file"),
+        btn_remove_help=_("Remove file"),
         file_types=[
             format_file_types_webview(
                 *file_types,
