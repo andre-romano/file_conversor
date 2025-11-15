@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import sys
 import platformdirs
+import platform
 
 from importlib.resources import files
 from importlib.metadata import version
@@ -162,6 +163,11 @@ class Environment:
             raise FileExistsError(f"File '{path}' already exists")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.touch(mode=mode, exist_ok=exists_ok)
+
+    @classmethod
+    def get_system_platform(cls) -> str:
+        """Get the current system platform."""
+        return platform.system()
 
     @classmethod
     def get_executable(cls) -> str:

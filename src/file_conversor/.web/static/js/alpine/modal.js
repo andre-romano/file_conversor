@@ -2,7 +2,7 @@
 
 /* global Alpine */
 
-function alpineConfigModal() {
+export function alpineConfigModal() {
     let modal = Alpine.store('modal');
 
     if (modal) return modal;
@@ -31,14 +31,16 @@ function alpineConfigModal() {
             `;
             this.closeable = opts.closeable !== undefined ? opts.closeable : true;
             this.show = true;
+        },
+        init() {
+            const thisObj = this;
+            // Close modal on ESC key press
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    thisObj.show = thisObj.closeable ? false : thisObj.show;
+                }
+            });
         }
     });
     return Alpine.store('modal');
 }
-
-document.addEventListener('alpine:init', () => {
-    if (window.alpine_modal_ready) return;
-    window.alpine_modal_ready = true;
-
-    alpineConfigModal();
-});

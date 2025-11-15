@@ -85,15 +85,12 @@ def PageBase(
             StatusBar()
 
             # scripts
-            script(_src="/static/js/modal.js", _defer=True)
-            script(_src="/static/js/status_bar.js", _defer=True)
-            script(_src="/static/js/form.js", _defer=True)
-            script(_src="/static/js/base.js", _defer=True)
+            script(_src="/static/js/base.js", _type="module", _defer=True)
 
             # alpine
-            script(_src="/static/js/alpine.mask.min.js", _defer=True)
-            script(_src="/static/js/alpine.sort.min.js", _defer=True)
-            script(_src="/static/js/alpine.min.js", _defer=True)
+            script(_src="/static/js/libs/alpine.mask.min.js", _defer=True)
+            script(_src="/static/js/libs/alpine.sort.min.js", _defer=True)
+            script(_src="/static/js/libs/alpine.min.js", _defer=True)
     return component
 
 

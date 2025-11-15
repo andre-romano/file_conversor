@@ -1,8 +1,11 @@
 // src\file_conversor\.web\static\js\form.js
 
-/* global Alpine, alpineConfigModal, alpineConfigStatusBar */
+import { alpineConfigModal } from "./modal.js";
+import { alpineConfigStatusBar } from "./status_bar.js";
 
-function alpineConfigForm() {
+/* global Alpine */
+
+export function alpineConfigForm() {
     let formStore = (Alpine.store('form'));
 
     if (formStore) return formStore;
@@ -49,10 +52,3 @@ function alpineConfigForm() {
 
     return Alpine.store('form');
 }
-
-document.addEventListener('alpine:init', () => {
-    if (window.alpine_form_ready) return;
-    window.alpine_form_ready = true;
-
-    alpineConfigForm();
-});

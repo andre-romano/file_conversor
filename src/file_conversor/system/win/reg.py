@@ -220,3 +220,9 @@ class WinRegFile:
                 reg_key.add_value(name, content)
 
         logger.info(f"Input file '{input_path}' loaded")
+
+
+__all__ = [
+    "WinRegFile",
+    "WinRegKey",
+]

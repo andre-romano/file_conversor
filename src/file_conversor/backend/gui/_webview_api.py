@@ -29,6 +29,15 @@ class WebViewState:
 
     # Global last open directory
     _lastOpenDir: Path = Path(CONFIG['gui-output-dir']).resolve()
+    _icon_configured: bool = False
+
+    @classmethod
+    def is_icon_configured(cls) -> bool:
+        return cls._icon_configured
+
+    @classmethod
+    def set_icon_configured(cls, value: bool) -> None:
+        cls._icon_configured = value
 
     @classmethod
     def get_last_open_dir(cls) -> Path:
@@ -204,18 +213,20 @@ class WebViewAPI:
         logger.debug(f"Window title set to '{title}'.")
         return True
 
-    def set_icon(self) -> bool:
+    def set_icon(self) -> None:
         """Set the window icon (Windows only)."""
-        res = set_window_icon(
-            self._get_window().title,
-            icon_path=Environment.get_app_icon(),
-            cx=128, cy=128,
-        )
-        if not res:
-            logger.warning("Failed to set window icon.")
-            return False
-        logger.debug("Window icon set.")
-        return True
+        if WebViewState.is_icon_configured():
+            return
+        try:
+            set_window_icon(
+                self._get_window().title,
+                icon_path=Environment.get_app_icon(),
+                cx=128, cy=128,
+            )
+            WebViewState.set_icon_configured(True)
+            logger.info("Window icon set.")
+        except Exception as e:
+            logger.warning(f"Failed to set window icon - {repr(e)}")
 
     def get_last_open_dir(self) -> str:
         """Get the last opened directory."""

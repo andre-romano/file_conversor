@@ -103,3 +103,9 @@ class WinContextMenu:
                 }),
             ])
         logger.debug(f"Added commands for '{root_key}'")
+
+
+__all__ = [
+    "WinContextMenu",
+    "WinContextCommand",
+]

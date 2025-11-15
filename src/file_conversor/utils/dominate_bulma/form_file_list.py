@@ -162,7 +162,6 @@ def FormFileList(
                             this.files.push(file);
                         }}
                     }});
-                    this.$nextTick(() => {{ }});
                 }},
                 async openFileDialog() {{
                     const fileList = await pywebview.api.open_file_dialog({{                        
@@ -184,9 +183,9 @@ def FormFileList(
                             console.log('No parent form found');
                         }}
                     }});   
-                    // Listen for filesDropped event
-                    window.addEventListener('filesDropped', async (event) => {{
-                        this._updateFiles(event.detail.files);
+                    // watch alpine store 'drag_drop' for dropped files
+                    this.$watch('$store.drag_drop.files', value => {{
+                        this._updateFiles(value);
                     }});
                 }},
             }}"""

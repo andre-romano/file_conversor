@@ -1,8 +1,10 @@
 // src\file_conversor\.web\static\js\status_bar.js
 
-/* global Alpine, alpineConfigModal  */
+/* global Alpine  */
 
-function alpineConfigStatusBar() {
+import { alpineConfigModal } from "./modal.js";
+
+export function alpineConfigStatusBar() {
     let status_bar = Alpine.store('status_bar');
 
     if (status_bar) return status_bar;
@@ -136,10 +138,3 @@ function alpineConfigStatusBar() {
     });
     return Alpine.store('status_bar');
 }
-
-document.addEventListener('alpine:init', () => {
-    if (window.alpine_status_bar_ready) return;
-    window.alpine_status_bar_ready = true;
-
-    alpineConfigStatusBar();
-});

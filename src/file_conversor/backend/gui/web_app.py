@@ -126,11 +126,6 @@ class WebApp:
         logger.info(f"[bold]{_('Webview window closed.')}[/]")
 
     def __init_webview(self) -> None:
-        self.evaluate_js(r"""
-        window.addEventListener('pywebviewready', async () => {
-            pywebview.api.set_icon();
-        });
-        """)
         # Listen for reloads (new pages)
         self.window.events.loaded += self.webview_api._on_load  # pyright: ignore[reportOperatorIssue]
 

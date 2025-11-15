@@ -18,6 +18,23 @@ else:
     ctypes = None
 
 
+def _get_window_hwnd(window_title: str) -> int:
+    """
+    Get the window handle (HWND) for a given window title.
+
+    :param window_title: The title of the window.
+    :return: The HWND of the window.
+    :raises RuntimeError: If the window is not found or ctypes is unavailable.
+    """
+    if ctypes is None:
+        raise RuntimeError(f"ctypes is not available on this platform ({platform.system()}).")
+
+    hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
+    if hwnd == 0:
+        raise RuntimeError(f"user32.FindWindowW: Window with title '{window_title}' not found.")
+    return hwnd
+
+
 def is_admin() -> bool:
     """True if app running with admin priviledges, False otherwise."""
     try:
@@ -63,7 +80,7 @@ def set_window_icon(
     icon_path: str | Path,
     cx: int = 0,
     cy: int = 0,
-) -> bool:
+):
     """
     Set the icon of a window given its title.
 
@@ -72,14 +89,13 @@ def set_window_icon(
     :param cx: Width position of the icon.
     :param cy: Height position of the icon.
 
-    :return: True if successful, False otherwise.
+    :raises RuntimeError: If an error occurs while setting the window icon.
     """
+    print(f"Setting window icon for '{window_title}' from '{icon_path}' (Windows)...")
     if ctypes is None:
-        return False
+        raise RuntimeError(f"ctypes is not available on this platform ({platform.system()}).")
 
-    hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
-    if hwnd == 0:
-        return False
+    hwnd = _get_window_hwnd(window_title)
 
     hicon = ctypes.windll.user32.LoadImageW(
         0,  # hInstance
@@ -90,8 +106,15 @@ def set_window_icon(
         0x00000010,  # LR_LOADFROMFILE
     )
     if hicon == 0:
-        return False
+        raise RuntimeError(f"user32.LoadImageW: Failed to load icon from '{icon_path}'.")
 
     ctypes.windll.user32.SendMessageW(hwnd, 0x80, 0, hicon)  # WM_SETICON (small)
     ctypes.windll.user32.SendMessageW(hwnd, 0x80, 1, hicon)  # WM_SETICON (big)
-    return True
+
+
+__all__ = [
+    "is_admin",
+    "reload_user_path",
+    "restart_explorer",
+    "set_window_icon",
+]
