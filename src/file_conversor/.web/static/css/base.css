@@ -216,6 +216,12 @@ body input[type="checkbox"] {
     border: var(--bulma-navbar-border-color);
 }
 
+/* select */
+body .select select[multiple] {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
 /* buttons */
 body button.button {
     border: solid 1px var(--bulma-navbar-border-color) !important;

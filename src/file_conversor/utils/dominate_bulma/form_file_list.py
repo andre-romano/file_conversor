@@ -38,7 +38,7 @@ def _SelectBox(
             with select(
                 _multiple=_multiple,
                 _size=size,
-                _class="is-flex-grow-1",
+                _class="is-full-width",
                 _style="cursor: unset;",
                 **{
                     "x-model": "selected",
