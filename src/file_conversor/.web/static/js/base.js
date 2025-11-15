@@ -6,6 +6,10 @@ import alpineStoreConfig from "./alpine/__init__.js";
 
 import { windowEventHandler, documentEventHandler } from "./events/__init__.js";
 
+// Expose event handlers globally
+window.windowEventHandler = windowEventHandler;
+window.documentEventHandler = documentEventHandler;
+
 export function set_zoom(zoom_level) {
     zoom_level = parseInt(zoom_level);
     document.body.style.zoom = `${zoom_level}%`;

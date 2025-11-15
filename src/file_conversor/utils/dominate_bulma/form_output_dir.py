@@ -46,7 +46,7 @@ def FormFieldOutputDirectory(
         """,
         x_init=f"""
             let thisObj = this;
-            window.addEventListener('pywebviewready', async () => {{
+            windowEventHandler.on('pywebviewready', async () => {{
                 thisObj.value = await pywebview.api.get_last_open_dir();
             }});
             {x_init}

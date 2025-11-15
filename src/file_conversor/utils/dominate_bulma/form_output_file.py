@@ -57,7 +57,7 @@ def FormFieldOutputFile(
         """,
         x_init=f"""
             let thisObj = this;
-            window.addEventListener('pywebviewready', async () => {{
+            windowEventHandler.on('pywebviewready', async () => {{
                 const dir = await pywebview.api.get_last_open_dir();
                 if (thisObj.value && thisObj.value !== '') {{
                     thisObj.value = dir + '{os.sep if os.sep == '/' else r'\\'}' + thisObj.value;

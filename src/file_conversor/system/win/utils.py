@@ -91,7 +91,6 @@ def set_window_icon(
 
     :raises RuntimeError: If an error occurs while setting the window icon.
     """
-    print(f"Setting window icon for '{window_title}' from '{icon_path}' (Windows)...")
     if ctypes is None:
         raise RuntimeError(f"ctypes is not available on this platform ({platform.system()}).")
 
