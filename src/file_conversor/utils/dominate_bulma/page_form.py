@@ -3,6 +3,8 @@
 from typing import Any
 
 # user-provided modules
+from file_conversor.utils.bulma_utils.general import OverwriteFilesField
+
 from file_conversor.utils.dominate_bulma.form_button import Button
 from file_conversor.utils.dominate_bulma.form import Form
 from file_conversor.utils.dominate_bulma.breadcrumb import Breadcrumb
@@ -49,6 +51,7 @@ def PageForm(
     return PageBase(
         Form(
             *form_fields,
+            OverwriteFilesField(),
             Button(
                 _("Execute"),
                 _class="is-primary",

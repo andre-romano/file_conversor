@@ -29,6 +29,13 @@ class FlaskApi:
     _status: dict[str, FlaskApiStatus] = {}
 
     @classmethod
+    def _set_state(cls, params: dict[str, Any]) -> None:
+        """Set the application state based on the provided parameters."""
+        STATE['quiet'] = bool(params.get('quiet', False))
+        STATE['verbose'] = bool(params.get('verbose', False))
+        STATE['overwrite-output'] = bool(params.get('overwrite-output', False))
+
+    @classmethod
     def _execute_thread(
         cls,
         params: dict[str, Any],
@@ -37,6 +44,8 @@ class FlaskApi:
         """Thread to handle file processing."""
         try:
             logger.debug(f"Processing thread started ...")
+            cls._set_state(params)
+
             status = cls._get_status(params['status_id'])
             status.set_progress(-1)  # indeterminate progress
 

@@ -34,7 +34,7 @@ def PageConvert():
         FileFormatField(*[
             (f, f.upper())
             for f in DOC_BACKEND.SUPPORTED_OUT_FORMATS
-        ]),
+        ], current_value="pdf"),
         OutputDirField(),
         api_endpoint=f"{url_for('api_doc_convert')}",
         nav_items=[
