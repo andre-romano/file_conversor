@@ -6,6 +6,8 @@ import webview
 from webview.dom import DOMEventHandler
 from pathlib import Path
 from typing import Any, Sequence
+from natsort import natsorted, ns
+
 
 # user-provided modules
 from file_conversor.config import Configuration, Environment, Log, State
@@ -95,7 +97,7 @@ class WebViewAPI:
             for file in files
             if file.get('pywebviewFullPath')
         ]
-        filepaths.sort()
+        filepaths = natsorted(filepaths, alg=ns.PATH)  # natural sort for paths
 
         if filepaths:
             dir_name = Path(filepaths[0]).parent
@@ -246,7 +248,7 @@ class WebViewAPI:
             directory=options.get("path") or self.get_last_open_dir(),
             allow_multiple=bool(options.get("multiple", False)),
         ) or [])
-        result.sort()
+        result = natsorted(result, alg=ns.PATH)  # natural sort for paths
         if result:
             dir_path = Path(result[0])
             WebViewState.set_last_open_dir(dir_path)
@@ -272,7 +274,7 @@ class WebViewAPI:
                 format_file_types_webview(),  # filter for all files
             ],
         ) or [])
-        result.sort()
+        result = natsorted(result, alg=ns.PATH)  # natural sort for paths
         if result:
             dir_path = Path(result[0]).parent
             WebViewState.set_last_open_dir(dir_path)

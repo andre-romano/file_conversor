@@ -27,6 +27,7 @@ dependencies = [
     "pywebview>=6.1",
     "pycountry>=24.6.1",
     "platformdirs>=4.5.0",
+    "natsort>=8.4.0",
 ]
 requires-python = ">=3.13.6"
 readme = "README.md"
