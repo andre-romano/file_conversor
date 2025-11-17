@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-import toml
+import tomllib
 import re
 
 
@@ -46,7 +46,8 @@ def add_version(version: str, amount: int = 1):
 def get_python_version():
     MIN = ""
     MAX = ""
-    pyproject = toml.load("pyproject.toml")
+    with open("pyproject.toml", "rb") as f:
+        pyproject = tomllib.load(f)
     if "project" in pyproject:
         if "requires-python" in pyproject["project"]:
             requires_python = pyproject["project"]["requires-python"].split(",")
