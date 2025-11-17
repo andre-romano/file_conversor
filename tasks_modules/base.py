@@ -96,7 +96,7 @@ def requirements(c: InvokeContext, prod: bool = True):
 @task(pre=[clean_htmlcov, locales.build,])
 def tests(c: InvokeContext, args: str = ""):
     print("[bold] Running tests ... [/]")
-    result = c.run(f"pdm run pytest {args.split()}")
+    result = c.run(f"pdm run pytest {args.strip()}")
     assert (result is not None) and (result.return_code == 0)
     print("[bold] Running tests ... [/][bold green]OK[/]")
 
