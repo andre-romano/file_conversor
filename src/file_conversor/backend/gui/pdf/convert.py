@@ -41,6 +41,7 @@ def PagePDFConvert():
             current_value="docx",
         ),
         ImageDPIField(),
+        PDFPasswordField(),
         OutputDirField(),
         api_endpoint=f"{url_for('api_pdf_convert')}",
         nav_items=[

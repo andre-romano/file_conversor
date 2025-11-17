@@ -86,7 +86,7 @@ def execute_ppt_convert_cmd(
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
-        {_('Convert presentation files into other formats (requires Microsoft Office / LibreOffice).')}
+        {_('Convert presentation files into other formats (requires LibreOffice).')}
     """,
     epilog=f"""
         **{_('Examples')}:** 

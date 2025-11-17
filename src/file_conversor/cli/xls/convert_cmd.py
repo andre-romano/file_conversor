@@ -87,7 +87,7 @@ def execute_xls_convert_cmd(
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
-        {_('Convert spreadsheet files into other formats (requires Microsoft Office / LibreOffice).')}
+        {_('Convert spreadsheet files into other formats (requires LibreOffice).')}
     """,
     epilog=f"""
         **{_('Examples')}:**

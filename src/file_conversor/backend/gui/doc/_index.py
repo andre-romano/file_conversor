@@ -25,7 +25,7 @@ def doc_index():
         {
             'image': url_for('icons', filename='convert.ico'),
             'title': _("Convert files"),
-            'subtitle': _("Convert document files into other formats (requires Microsoft Office / LibreOffice)."),
+            'subtitle': _("Convert document files into other formats (requires LibreOffice)."),
             'url': url_for('doc_convert'),
         },
     ]

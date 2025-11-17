@@ -88,7 +88,7 @@ def execute_doc_convert_cmd(
 @typer_cmd.command(
     name=CONVERT_NAME,
     help=f"""
-        {_('Convert document files into other formats (requires Microsoft Office / LibreOffice).')}
+        {_('Convert document files into other formats (requires LibreOffice).')}
     """,
     epilog=f"""
         **{_('Examples')}:** 

@@ -20,7 +20,6 @@ class LibreofficeWriterBackend(AbstractLibreofficeBackend):
         "doc": {},
         "docx": {},
         "odt": {},
-        "pdf": {},
     }
     SUPPORTED_OUT_FORMATS = {
         "doc": {},

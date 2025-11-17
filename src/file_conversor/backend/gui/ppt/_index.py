@@ -26,7 +26,7 @@ def ppt_index():
         {
             'image': url_for('icons', filename='convert.ico'),
             'title': _("Convert files"),
-            'subtitle': _("Convert presentation files into other formats (requires Microsoft Office / LibreOffice)."),
+            'subtitle': _("Convert presentation files into other formats (requires LibreOffice)."),
             'url': url_for('ppt_convert'),
         },
     ]

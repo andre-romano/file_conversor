@@ -27,17 +27,19 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle PDF compression."""
     logger.debug(f"PDF compression thread received: {params}")
 
-    input_files: list[Path] = [Path(i) for i in params['input-files']]
-    output_dir: Path = Path(params['output-dir'])
+    input_files = [Path(i) for i in params['input-files']]
+    output_dir = Path(params['output-dir'])
 
-    file_format: str = str(params['file-format'])
-    image_dpi: int = int(params['image-dpi'])
+    file_format = str(params['file-format'])
+    image_dpi = int(params['image-dpi'])
+    password = params['password'] or None
 
     execute_pdf_convert_cmd(
         input_files=input_files,
         output_dir=output_dir,
         format=file_format,
         dpi=image_dpi,
+        password=password,
         progress_callback=status.set_progress,
     )
 

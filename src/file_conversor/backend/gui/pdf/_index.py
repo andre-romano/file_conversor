@@ -73,7 +73,7 @@ def pdf_index():
         {
             'image': url_for('icons', filename='convert.ico'),
             'title': _("Convert"),
-            'subtitle': _("Convert a PDF file to a different format (might require Microsoft Word / LibreOffice)."),
+            'subtitle': _("Convert a PDF file to a different format (might require LibreOffice)."),
             'url': url_for('pdf_convert'),
         },
         {

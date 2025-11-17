@@ -79,7 +79,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
             output_format = output_path.suffix.lstrip(".").lower()
 
             # Execute command
-            Environment.run(
+            process = Environment.run(
                 str(self._libreoffice_bin),
                 "--headless",
                 "--convert-to",
@@ -88,5 +88,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
                 str(output_dir),
                 str(input_path)
             )
+            if any([p.startswith("Error:") for p in (process.stdout or "", process.stderr or "")]):
+                raise RuntimeError(f"LibreOffice conversion failed: {process.stdout or ''} {process.stderr or ''}")
             if file_processed_callback:
                 file_processed_callback(input_path)

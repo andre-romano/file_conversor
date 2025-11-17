@@ -28,6 +28,7 @@ dependencies = [
     "pycountry>=24.6.1",
     "platformdirs>=4.5.0",
     "natsort>=8.4.0",
+    "pdf2docx>=0.5.8",
 ]
 requires-python = ">=3.12,<=3.13.7"
 readme = "README.md"

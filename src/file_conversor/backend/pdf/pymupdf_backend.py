@@ -53,6 +53,7 @@ class PyMuPDFBackend(AbstractBackend):
                 output_file: str | Path,
                 input_file: str | Path,
                 dpi: int = 200,
+                password: str | None = None,
                 ):
         """
         Convert input files into output file.
@@ -60,6 +61,7 @@ class PyMuPDFBackend(AbstractBackend):
         :param output_file: Output file
         :param input_file: Input file. 
         :param dpi: DPI for rendering images. Defaults to 200.
+        :param password: Password for encrypted PDF files. Defaults to None.
 
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
@@ -71,6 +73,10 @@ class PyMuPDFBackend(AbstractBackend):
 
         # open file
         with fitz.open(str(input_file)) as doc:
+            if doc.is_encrypted:
+                if not password:
+                    raise ValueError(_("Password is required for encrypted PDF files"))
+                doc.authenticate(password or "")
             # => .png, .jpg, .svg OUTPUT
             for page in doc:
                 pix = page.get_pixmap(dpi=dpi)  # type: ignore
