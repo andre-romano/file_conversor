@@ -25,6 +25,7 @@ jobs:
       - id: extract
         run: |
           bash ./scripts/get_python_version.sh >> $GITHUB_OUTPUT
+          bash ./scripts/get_python_version.sh
 
   test:
     name: Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
