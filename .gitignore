@@ -26,6 +26,7 @@ SQLServer
 
 # release notes 
 RELEASE_NOTES.md
+CHANGELOG.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
