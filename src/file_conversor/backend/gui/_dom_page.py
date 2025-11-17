@@ -20,7 +20,7 @@ def home_nav_item(
     active: bool = False
 ) -> dict[str, Any]:
     return {
-        'label': _("Home"),
+        'label': "Home",
         'url': url_for('index'),
         'active': active,
     }

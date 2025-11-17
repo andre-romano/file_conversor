@@ -4,6 +4,7 @@ from typing import Any
 from flask import render_template_string, send_from_directory, url_for
 
 # user-provided modules
+from file_conversor.backend.gui._dom_page import home_nav_item
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
 from file_conversor.utils.dominate_bulma import *
@@ -28,7 +29,7 @@ def PageIndex(
     return PageCardGrid(
         *items,
         nav_items=nav_items,
-        _title=f"{_('Home')} - File Conversor",
+        _title=f"Home - File Conversor",
     )
 
 
@@ -39,19 +40,19 @@ def index():
             {
                 'image': url_for('icons', filename='docx.ico'),
                 'title': _("Document Tools"),
-                'subtitle': f"{_('Document file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                'subtitle': f"{_('Document file manipulation')} {_('(requires LibreOffice)')})",
                 'url': url_for('doc_index'),
             },
             {
                 'image': url_for('icons', filename='xls.ico'),
                 'title': _("Spreadsheet Tools"),
-                'subtitle': f"{_('Spreadsheet file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                'subtitle': f"{_('Spreadsheet file manipulation')} {_('(requires LibreOffice)')})",
                 'url': url_for('xls_index'),
             },
             {
                 'image': url_for('icons', filename='ppt.ico'),
                 'title': _("Presentation Tools"),
-                'subtitle': f"{_('Presentation file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+                'subtitle': f"{_('Presentation file manipulation')} {_('(requires LibreOffice)')})",
                 'url': url_for('ppt_index'),
             },
 
@@ -105,11 +106,7 @@ def index():
                 'url': url_for('config_index'),
             },
             nav_items=[
-                {
-                    'label': _("Home"),
-                    'url': '/',
-                    'active': True,
-                },
+                home_nav_item(active=True),
             ],
         )
     ))

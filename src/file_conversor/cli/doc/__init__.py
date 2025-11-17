@@ -14,6 +14,6 @@ _ = get_translation()
 
 doc_cmd = typer.Typer(
     name=COMMAND_NAME,
-    help=f"{_('Document file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+    help=f"{_('Document file manipulation')} {_('(requires LibreOffice)')})",
 )
 doc_cmd.add_typer(convert_cmd)

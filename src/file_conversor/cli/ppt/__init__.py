@@ -13,6 +13,6 @@ _ = get_translation()
 
 ppt_cmd = typer.Typer(
     name=COMMAND_NAME,
-    help=f"{_('Presentation file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+    help=f"{_('Presentation file manipulation')} {_('(requires LibreOffice)')})",
 )
 ppt_cmd.add_typer(convert_cmd)

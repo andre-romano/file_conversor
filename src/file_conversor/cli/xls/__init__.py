@@ -13,6 +13,6 @@ _ = get_translation()
 
 xls_cmd = typer.Typer(
     name=COMMAND_NAME,
-    help=f"{_('Spreadsheet file manipulation')} {_('(requires MS Office / LibreOffice)')})",
+    help=f"{_('Spreadsheet file manipulation')} {_('(requires LibreOffice)')})",
 )
 xls_cmd.add_typer(convert_cmd)
