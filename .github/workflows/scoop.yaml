@@ -26,7 +26,12 @@ jobs:
       - id: extract
         run: |
           bash ./scripts/get_python_version.sh >> $GITHUB_OUTPUT
-          bash ./scripts/get_python_version.sh
+
+      - name: Verify extraction
+        run: |
+          echo $GITHUB_OUTPUT
+          echo "Min Python: ${{ steps.extract.outputs.min }}"
+          echo "Max Python: ${{ steps.extract.outputs.max }}"
 
   build:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
