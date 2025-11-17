@@ -87,10 +87,12 @@ Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}
 Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Setting permissions to all users ..."; Filename: "icacls.exe"; Parameters: """{{app}}"" /grant *S-1-5-32-545:(OI)(CI)F /T"; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated; Check: IsAdmin()
+
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated
 StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser
 
 ''', encoding="utf-8")

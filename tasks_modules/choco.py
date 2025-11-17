@@ -22,6 +22,7 @@ A powerful Python-based CLI tool for converting, compressing, and manipulating a
 **Summary**:
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
+    - [GUI - Graphical user interface](#gui---graphical-user-interface)
     - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
   - [Why use File Conversor?](#why-use-file-conversor)
   - [Features](#features)
@@ -39,6 +40,12 @@ A powerful Python-based CLI tool for converting, compressing, and manipulating a
 ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/assets/cli_demo.gif)
 
 Run ``file_conversor -h`` to explore all available commands and options.
+
+### GUI - Graphical user interface
+
+![cli_terminal_demo](https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/assets/gui.jpg)
+
+Run ``file_conversor gui start`` to launch the GUI application or double click the Windows Shortcut.
 
 ### Windows Context Menu (Windows OS only)
 

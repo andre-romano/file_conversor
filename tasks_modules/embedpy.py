@@ -235,7 +235,15 @@ def create_shim(c: InvokeContext):
 
     PORTABLE_SHIM_VBS.write_text(rf'''
     Set WshShell = CreateObject("WScript.Shell")
-    WshShell.Run """{PORTABLE_SHIM_BAT.resolve().name}"" gui start", 0, False
+
+    ' Folder where the VBS script is located
+    scriptFolder = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
+
+    ' Full path to the .bat file
+    batPath = scriptFolder & "\{PORTABLE_SHIM_BAT.name}"
+
+    ' Run hidden (0), don't wait (False)
+    WshShell.Run """" & batPath & """ gui start", 0, False
     ''', encoding="utf-8")
     if not PORTABLE_SHIM_VBS.exists():
         raise RuntimeError(f"Failed to create VBS shim for '{PROJECT_NAME}'")
