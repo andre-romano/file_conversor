@@ -8,6 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- insertion marker -->
 ## Unreleased
 
-<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/2c5cfb6b87a78850d130ae2cabbadb3fb91874a3...HEAD)</small>
+<small>[Compare with latest](https://github.com/andre-romano/file_conversor/compare/560474774c85ebad1ba5c76d2b15881663eb0655...HEAD)</small>
 
 <!-- insertion marker -->
