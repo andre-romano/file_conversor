@@ -30,8 +30,6 @@
         "**/.DS_Store": true,
         "**/htmlcov": true,
         "**/Thumbs.db": true,
-        "**/*.spec": true,
-        "**/pdm.lock/**": true,
     },
     "search.exclude": {
         "**/node_modules": true,
