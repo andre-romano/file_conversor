@@ -12,10 +12,26 @@ permissions:
   contents: write # allow pushing changes
 
 jobs:
+  read-python-version:
+    runs-on: ubuntu-latest
+
+    outputs:
+      PY_MIN: ${{ steps.extract.outputs.min }}
+      PY_MAX: ${{ steps.extract.outputs.max }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: extract
+        run: |
+          bash ./scripts/get_python_version.sh >> $GITHUB_OUTPUT
+
   build:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     name: Scoop package CD
     runs-on: windows-latest
+    needs: [read-python-version]
 
     steps:
       - name: Checkout repository
@@ -28,22 +44,22 @@ jobs:
           scoop_update: "true"
           update_path: "true"
 
-      - name: Set up Python
+      - name: Set up Python ${{ needs.read-python-version.outputs.PY_MAX }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13.7"
+          python-version: ${{ needs.read-python-version.outputs.PY_MAX }}
 
-      - name: Cache PDM dependencies
+      - name: Cache PDM dependencies for Python ${{ needs.read-python-version.outputs.PY_MAX }}
         uses: actions/cache@v4
         with:
           path: |
             __pypackages__/
             .venv/
-          key: ${{ runner.os }}-pdm-python-${{ matrix.python-version }}-${{ hashFiles('**/pdm.lock') }}
+          key: ${{ runner.os }}-pdm-python-${{ needs.read-python-version.outputs.PY_MAX }}-${{ hashFiles('**/pdm.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pdm-python-${{ matrix.python-version }}-
+            ${{ runner.os }}-pdm-python-${{ needs.read-python-version.outputs.PY_MAX }}-
 
-      - name: Install Python dependencies
+      - name: Install Python ${{ needs.read-python-version.outputs.PY_MAX }} dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pdm invoke

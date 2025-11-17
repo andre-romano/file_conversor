@@ -26,6 +26,14 @@ def clean_whl(c: InvokeContext):
     remove_path("dist/*.tar.gz")
 
 
+@task
+def check_requirements(c: InvokeContext):
+    print("[bold]Checking requirements ... [/]")
+    result = c.run(f"pdm run pip check")
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold]Checking requirements ... [/][bold green]OK[/]")
+
+
 @task(pre=[locales.build])
 def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ...[/]")
@@ -48,7 +56,7 @@ def remove_includes(c: InvokeContext):
     print("[bold]Removing MANIFEST.in includes ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_whl, copy_includes,], post=[remove_includes,])
+@task(pre=[check_requirements, clean_whl, copy_includes,], post=[remove_includes,])
 def build(c: InvokeContext):
     print(f"[bold] Building PyPi package ... [/]")
     result = c.run(f"pdm build")
