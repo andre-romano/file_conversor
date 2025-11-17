@@ -39,9 +39,9 @@ jobs:
           path: |
             __pypackages__/
             .venv/
-          key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+          key: ${{ runner.os }}-pdm-python-${{ matrix.python-version }}-${{ hashFiles('**/pdm.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pdm-
+            ${{ runner.os }}-pdm-python-${{ matrix.python-version }}-
 
       - name: Install Python dependencies
         run: |
