@@ -9,7 +9,7 @@ from typing import Annotated, Any, Callable, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend.office import DOC_BACKEND
+from file_conversor.backend.office import LibreofficeWriterBackend
 from file_conversor.backend.pdf import PyMuPDFBackend
 
 from file_conversor.cli.pdf._typer import OTHERS_PANEL as RICH_HELP_PANEL
@@ -39,7 +39,7 @@ typer_cmd = typer.Typer()
 
 EXTERNAL_DEPENDENCIES = set([
     *PyMuPDFBackend.EXTERNAL_DEPENDENCIES,
-    *DOC_BACKEND.EXTERNAL_DEPENDENCIES,
+    *LibreofficeWriterBackend.EXTERNAL_DEPENDENCIES,
 ])
 
 
@@ -74,7 +74,7 @@ def execute_pdf_convert_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ) -> None:
-    if format in DOC_BACKEND.SUPPORTED_OUT_FORMATS:
+    if format in LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS:
         execute_doc_convert_cmd(
             input_files=input_files,
             format=format,
@@ -124,7 +124,7 @@ def convert(
     input_files: Annotated[List[Path], InputFilesArgument(["pdf"])],
     format: Annotated[str, FormatOption({
         **PyMuPDFBackend.SUPPORTED_OUT_FORMATS,
-        **DOC_BACKEND.SUPPORTED_OUT_FORMATS,
+        **LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS,
     })],
     dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),

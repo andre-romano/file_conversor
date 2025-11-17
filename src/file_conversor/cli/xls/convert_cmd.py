@@ -9,7 +9,7 @@ from typing import Annotated, Any, Callable, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import XLS_BACKEND
+from file_conversor.backend import LibreofficeCalcBackend
 
 from file_conversor.cli.xls._typer import COMMAND_NAME, CONVERT_NAME
 
@@ -32,13 +32,13 @@ logger = LOG.getLogger(__name__)
 # typer PANELS
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = XLS_BACKEND.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = LibreofficeCalcBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()
     # WordBackend commands
-    for ext in XLS_BACKEND.SUPPORTED_IN_FORMATS:
+    for ext in LibreofficeCalcBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name=f"to_{ext}",
@@ -46,7 +46,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             )
-            for ext in XLS_BACKEND.SUPPORTED_OUT_FORMATS
+            for ext in LibreofficeCalcBackend.SUPPORTED_OUT_FORMATS
         ])
 
 
@@ -69,14 +69,14 @@ def execute_xls_convert_cmd(
         format=format,
     )
 
-    xls_backend = XLS_BACKEND(
+    backend = LibreofficeCalcBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
     with ProgressManager(len(input_files)) as progress_mgr:
         logger.info(f"[bold]{_('Converting files')}[/] ...")
         # Perform conversion
-        xls_backend.convert(
+        backend.convert(
             files=files,
             file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
         )
@@ -97,8 +97,8 @@ def execute_xls_convert_cmd(
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.xlsx -o output_file.pdf`
     """)
 def convert(
-    input_files: Annotated[List[Path], InputFilesArgument(XLS_BACKEND)],
-    format: Annotated[str, FormatOption(XLS_BACKEND)],
+    input_files: Annotated[List[Path], InputFilesArgument(LibreofficeCalcBackend)],
+    format: Annotated[str, FormatOption(LibreofficeCalcBackend)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_xls_convert_cmd(

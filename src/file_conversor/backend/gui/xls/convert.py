@@ -4,7 +4,7 @@ from typing import Any
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.office import XLS_BACKEND
+from file_conversor.backend.office import LibreofficeCalcBackend
 
 from file_conversor.backend.gui._dom_page import *
 from file_conversor.backend.gui.xls._dom_page import *
@@ -27,12 +27,12 @@ logger = LOG.getLogger()
 def PageConvert():
     return PageForm(
         InputFilesField(
-            *[f for f in XLS_BACKEND.SUPPORTED_IN_FORMATS],
+            *[f for f in LibreofficeCalcBackend.SUPPORTED_IN_FORMATS],
             description=_("Spreadsheet files"),
         ),
         FileFormatField(*[
             (f, f.upper())
-            for f in XLS_BACKEND.SUPPORTED_OUT_FORMATS
+            for f in LibreofficeCalcBackend.SUPPORTED_OUT_FORMATS
         ], current_value="pdf"),
         OutputDirField(),
         api_endpoint=f"{url_for('api_xls_convert')}",

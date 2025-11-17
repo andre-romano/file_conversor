@@ -9,7 +9,7 @@ from typing import Annotated, Any, Callable, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import PPT_BACKEND
+from file_conversor.backend import LibreofficeImpressBackend
 
 from file_conversor.cli.ppt._typer import COMMAND_NAME, CONVERT_NAME
 
@@ -32,13 +32,13 @@ logger = LOG.getLogger(__name__)
 # typer PANELS
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = PPT_BACKEND.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = LibreofficeImpressBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()
     # WordBackend commands
-    for ext in PPT_BACKEND.SUPPORTED_IN_FORMATS:
+    for ext in LibreofficeImpressBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name=f"to_{ext}",
@@ -46,7 +46,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             )
-            for ext in PPT_BACKEND.SUPPORTED_OUT_FORMATS
+            for ext in LibreofficeImpressBackend.SUPPORTED_OUT_FORMATS
         ])
 
 
@@ -67,7 +67,7 @@ def execute_ppt_convert_cmd(
         format=format,
     )
 
-    ppt_backend = PPT_BACKEND(
+    backend = LibreofficeImpressBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
@@ -75,7 +75,7 @@ def execute_ppt_convert_cmd(
     with ProgressManager(len(input_files)) as progress_mgr:
         logger.info(f"[bold]{_('Converting files')}[/] ...")
         # Perform conversion
-        ppt_backend.convert(
+        backend.convert(
             files=files,
             file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
         )
@@ -96,8 +96,8 @@ def execute_ppt_convert_cmd(
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pptx -o output_file.pdf`
     """)
 def convert(
-    input_files: Annotated[List[Path], InputFilesArgument(PPT_BACKEND)],
-    format: Annotated[str, FormatOption(PPT_BACKEND)],
+    input_files: Annotated[List[Path], InputFilesArgument(LibreofficeImpressBackend)],
+    format: Annotated[str, FormatOption(LibreofficeImpressBackend)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_ppt_convert_cmd(

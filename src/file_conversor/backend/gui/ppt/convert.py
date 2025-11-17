@@ -4,7 +4,7 @@ from flask import render_template, render_template_string, url_for
 from typing import Any
 
 # user-provided modules
-from file_conversor.backend.office import PPT_BACKEND
+from file_conversor.backend.office import LibreofficeImpressBackend
 
 from file_conversor.backend.gui._dom_page import *
 from file_conversor.backend.gui.ppt._dom_page import *
@@ -27,12 +27,12 @@ logger = LOG.getLogger()
 def PageConvert():
     return PageForm(
         InputFilesField(*[
-            f for f in PPT_BACKEND.SUPPORTED_IN_FORMATS],
+            f for f in LibreofficeImpressBackend.SUPPORTED_IN_FORMATS],
             description=_("Presentation files")
         ),
         FileFormatField(*[
             (f, f.upper())
-            for f in PPT_BACKEND.SUPPORTED_OUT_FORMATS
+            for f in LibreofficeImpressBackend.SUPPORTED_OUT_FORMATS
         ], current_value="pdf"),
         OutputDirField(),
         api_endpoint=f"{url_for('api_ppt_convert')}",

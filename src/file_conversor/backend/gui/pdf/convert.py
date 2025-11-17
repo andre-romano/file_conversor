@@ -3,7 +3,7 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.office import DOC_BACKEND
+from file_conversor.backend.office import LibreofficeWriterBackend
 from file_conversor.backend.pdf import PyMuPDFBackend
 
 from file_conversor.backend.gui._dom_page import *
@@ -34,7 +34,7 @@ def PagePDFConvert():
             *[
                 (f, f.upper())
                 for f in {
-                    **DOC_BACKEND.SUPPORTED_OUT_FORMATS,
+                    **LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS,
                     **PyMuPDFBackend.SUPPORTED_OUT_FORMATS
                 }
             ],

@@ -4,7 +4,7 @@ from typing import Any
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.office import DOC_BACKEND
+from file_conversor.backend.office import LibreofficeWriterBackend
 
 from file_conversor.backend.gui._dom_page import *
 from file_conversor.backend.gui.doc._dom_page import *
@@ -28,12 +28,12 @@ def PageConvert():
 
     return PageForm(
         InputFilesField(
-            *[f for f in DOC_BACKEND.SUPPORTED_IN_FORMATS],
+            *[f for f in LibreofficeWriterBackend.SUPPORTED_IN_FORMATS],
             description=_("Document files")
         ),
         FileFormatField(*[
             (f, f.upper())
-            for f in DOC_BACKEND.SUPPORTED_OUT_FORMATS
+            for f in LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS
         ], current_value="pdf"),
         OutputDirField(),
         api_endpoint=f"{url_for('api_doc_convert')}",

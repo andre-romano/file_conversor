@@ -9,7 +9,7 @@ from typing import Annotated, Any, Callable, List
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import DOC_BACKEND
+from file_conversor.backend import LibreofficeWriterBackend
 
 from file_conversor.cli.doc._typer import COMMAND_NAME, CONVERT_NAME
 
@@ -34,13 +34,13 @@ logger = LOG.getLogger(__name__)
 # typer PANELS
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = DOC_BACKEND.EXTERNAL_DEPENDENCIES
+EXTERNAL_DEPENDENCIES = LibreofficeWriterBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
     icons_folder_path = Environment.get_icons_folder()
     # WordBackend commands
-    for ext in DOC_BACKEND.SUPPORTED_IN_FORMATS:
+    for ext in LibreofficeWriterBackend.SUPPORTED_IN_FORMATS:
         ctx_menu.add_extension(f".{ext}", [
             WinContextCommand(
                 name=f"to_{ext}",
@@ -48,7 +48,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
                 command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}"',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             )
-            for ext in DOC_BACKEND.SUPPORTED_OUT_FORMATS
+            for ext in LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS
         ])
 
 
@@ -69,7 +69,7 @@ def execute_doc_convert_cmd(
         format=format,
     )
 
-    doc_backend = DOC_BACKEND(
+    backend = LibreofficeWriterBackend(
         install_deps=CONFIG['install-deps'],
         verbose=STATE["verbose"],
     )
@@ -77,7 +77,7 @@ def execute_doc_convert_cmd(
     with ProgressManager(len(input_files)) as progress_mgr:
         logger.info(f"[bold]{_('Converting files')}[/] ...")
         # Perform conversion
-        doc_backend.convert(
+        backend.convert(
             files=files,
             file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
         )
@@ -100,8 +100,8 @@ def execute_doc_convert_cmd(
         - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.pdf -f docx`
     """)
 def convert(
-    input_files: Annotated[List[Path], InputFilesArgument(DOC_BACKEND)],
-    format: Annotated[str, FormatOption(DOC_BACKEND)],
+    input_files: Annotated[List[Path], InputFilesArgument(LibreofficeWriterBackend)],
+    format: Annotated[str, FormatOption(LibreofficeWriterBackend)],
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_doc_convert_cmd(
