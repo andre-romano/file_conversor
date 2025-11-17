@@ -45,7 +45,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
                 }, buckets=[
                     "extras",
                 ], env=[
-                    r"C:\Users\Andre\scoop\apps\libreoffice\current\LibreOffice\program"
+                    rf"{Path.home()}\scoop\apps\libreoffice\current\LibreOffice\program"
                 ]),
                 BrewPackageManager({
                     "soffice": "libreoffice"

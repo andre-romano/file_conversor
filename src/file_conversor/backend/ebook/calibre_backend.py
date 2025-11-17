@@ -70,7 +70,7 @@ class CalibreBackend(AbstractBackend):
                 }, buckets=[
                     "extras",
                 ], env=[
-                    r"C:\Users\Andre\scoop\shims"
+                    rf"{Path.home()}\scoop\shims"
                 ]),
                 BrewPackageManager({
                     "ebook-convert": "calibre"
