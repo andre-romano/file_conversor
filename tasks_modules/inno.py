@@ -47,6 +47,8 @@ def create_manifest(c: InvokeContext):
     if not zip.BUILD_DIR.exists():
         raise RuntimeError(f"Path {zip.BUILD_DIR} does not exist")
 
+    APP_INSTALL_DIR = rf"{{app}}\python\Lib\site-packages\{PROJECT_NAME}"
+
     # setup.iss
     setup_iss_path = Path(f"{INNO_ISS}")
     setup_iss_path.write_text(rf'''
@@ -64,7 +66,7 @@ ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile={ICON_APP.resolve()}
-UninstallDisplayIcon={{app}}\{ICON_APP.parent.parent.name}\{ICON_APP.parent.name}\{ICON_APP.name}
+UninstallDisplayIcon={APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}
 SourceDir={Path(".").resolve()}
 OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
@@ -81,8 +83,8 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Icons]
-Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{{app}}\python\Lib\site-packages\{PROJECT_NAME}\.icons\icon.ico"
-Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{{app}}\python\Lib\site-packages\{PROJECT_NAME}\.icons\icon.ico"
+Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
+Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
 
 [Run]
 StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{src}}"; Flags: runhidden runascurrentuser waituntilterminated

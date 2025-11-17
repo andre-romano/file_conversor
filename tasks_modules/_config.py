@@ -49,6 +49,7 @@ README_PATH = Path("README.md")
 GIT_RELEASE = f"v{PROJECT_VERSION}"
 
 CACHE_DIR = Path(".cache")
+PROJECT_SRC_DIR = Path("src") / PROJECT_NAME
 
 SCRIPTS_PATH = Path(f'scripts')
 INSTALL_PYTHON = SCRIPTS_PATH / 'install_python.ps1'
