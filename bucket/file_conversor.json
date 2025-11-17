@@ -1,10 +1,10 @@
 {
-    "version": "0.7.0",
+    "version": "0.7.1",
     "description": "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)",
     "homepage": "https://github.com/andre-romano/file_conversor",
     "license": "Apache-2.0",
-    "url": "https://github.com/andre-romano/file_conversor/releases/download/v0.7.0/file_conversor-v0.7.0-Win_x64-Installer.exe",
-    "hash": "aef5c413ab70c4f7cc1820ff9ebae2c52a3b116a69487571707526f2fca91de7",
+    "url": "https://github.com/andre-romano/file_conversor/releases/download/v0.7.1/file_conversor-v0.7.1-Win_x64-Installer.exe",
+    "hash": "e4ee4ffba57bf18d1208cf529ffea64bf2e89bcfe7885c94eb78aabdd420ca3b",
     "bin": "file_conversor.bat",
     "pre_install": [
         "$exePath = Get-ChildItem -Path \"$dir\" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName",
