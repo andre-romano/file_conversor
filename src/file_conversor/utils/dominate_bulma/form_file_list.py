@@ -1,6 +1,5 @@
 # src\file_conversor\utils\bulma\form_file_list.py
 
-from turtle import up
 from typing import Any, Sequence
 
 from file_conversor.utils.dominate_utils import *
