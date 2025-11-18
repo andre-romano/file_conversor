@@ -121,12 +121,12 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_choco(c: InvokeContext):
-    remove_path(f"{CHOCO_PATH}/*")
+    remove_path_pattern(f"{CHOCO_PATH}/*")
 
 
 @task(pre=[mkdirs])
 def clean_nupkg(c: InvokeContext):
-    remove_path("dist/*.nupkg")
+    remove_path_pattern("dist/*.nupkg")
 
 
 @task(pre=[clean_choco, ])

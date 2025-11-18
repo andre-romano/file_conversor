@@ -24,7 +24,7 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_app_folder(c: InvokeContext):
-    _config.remove_path(str(APP_FOLDER))
+    _config.remove_path_pattern(str(APP_FOLDER))
 
 
 @task(pre=[mkdirs, locales.build])

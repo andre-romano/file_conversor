@@ -32,14 +32,14 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_build(c: InvokeContext):
-    remove_path(f"build/*")
+    remove_path_pattern(f"build/*")
 
 
 @task(pre=[mkdirs])
 def clean_zip(c: InvokeContext):
-    _config.remove_path(f"{INSTALL_APP_WIN}")
-    _config.remove_path(f"{INSTALL_APP_LIN}")
-    _config.remove_path(f"{INSTALL_APP_MAC}")
+    _config.remove_path_pattern(f"{INSTALL_APP_WIN}")
+    _config.remove_path_pattern(f"{INSTALL_APP_LIN}")
+    _config.remove_path_pattern(f"{INSTALL_APP_MAC}")
 
 
 @task(pre=[clean_zip, embedpy.check],)
@@ -61,7 +61,7 @@ def build(c: InvokeContext):
 @task(pre=[build,],)
 def extract_app(c: InvokeContext):
     print(rf'[bold] Extracting {INSTALL_APP_CURR} ... [/]')
-    _config.remove_path(str(BUILD_DIR))
+    _config.remove_path_pattern(str(BUILD_DIR))
     _config.extract(src=INSTALL_APP_CURR, dst=BUILD_DIR.parent)
     if not BUILD_DIR.exists():
         raise RuntimeError(f"'{BUILD_DIR}' not found")

@@ -111,24 +111,29 @@ def copy(src: Path, dst: Path):
     print(f"[bold green]OK[/]")
 
 
-def remove_path(path_pattern: str, base_path: Path = Path(), dry_run: bool = False, verbose: bool = False):
+def remove_path(path: str | Path, dry_run: bool = False, verbose: bool = False):
+    path = Path(path)
+    if not path.exists():
+        return
+    if verbose:
+        print(f"Cleaning '{path}' ... ", end="")
+    if not dry_run:
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()  # Remove single file
+        if path.exists():
+            raise RuntimeError(f"Cannot remove dir / file '{path}'")
+    if verbose:
+        print("[bold green]OK[/]")
+
+
+def remove_path_pattern(path_pattern: str, base_path: Path = Path(), dry_run: bool = False, verbose: bool = False):
     """Remove dir or file, using globs / wildcards"""
     if not verbose:
         print(f"Cleaning '{base_path}/{path_pattern}' ... ", end="")
-    for path in base_path.rglob(path_pattern):
-        if not path.exists():
-            pass
-        if verbose:
-            print(f"Cleaning '{path}' ... ", end="")
-        if not dry_run:
-            if path.is_dir():
-                shutil.rmtree(path)
-            else:
-                path.unlink()  # Remove single file
-            if path.exists():
-                raise RuntimeError(f"Cannot remove dir / file '{path}'")
-        if verbose:
-            print("[bold green]OK[/]")
+    for path in base_path.rglob(str(path_pattern)):
+        remove_path(path, dry_run=dry_run, verbose=False)
     if not verbose:
         print("[bold green]OK[/]")
 

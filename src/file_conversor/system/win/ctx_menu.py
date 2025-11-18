@@ -98,7 +98,6 @@ class WinContextMenu:
                 }),
                 WinRegKey(rf"{root_key}\shell\{cmd.name}\command").update({
                     "@": cmd.command,
-                    "DelegateExecute": "",
                 }),
             ])
         logger.debug(f"Added commands for '{root_key}'")

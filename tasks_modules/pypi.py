@@ -22,8 +22,8 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_whl(c: InvokeContext):
-    remove_path("dist/*.whl")
-    remove_path("dist/*.tar.gz")
+    remove_path_pattern("dist/*.whl")
+    remove_path_pattern("dist/*.tar.gz")
 
 
 @task
@@ -52,7 +52,7 @@ def remove_includes(c: InvokeContext):
     print("[bold]Removing MANIFEST.in includes ...[/]")
     for path in to_remove:
         if path.exists():
-            _config.remove_path(str(path))
+            _config.remove_path_pattern(str(path))
     print("[bold]Removing MANIFEST.in includes ... [/][bold green]OK[/]")
 
 

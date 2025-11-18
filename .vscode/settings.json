@@ -28,7 +28,6 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/htmlcov": true,
         "**/Thumbs.db": true,
     },
     "search.exclude": {

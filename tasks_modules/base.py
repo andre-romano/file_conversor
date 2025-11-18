@@ -33,44 +33,44 @@ def mkdirs(c: InvokeContext):
 
 @task
 def clean_logs(c: InvokeContext):
-    remove_path(f"**/*.log")
-    remove_path(f"**/*.log.*")
+    remove_path_pattern(f"**/*.log")
+    remove_path_pattern(f"**/*.log.*")
 
 
 @task(pre=[mkdirs])
 def clean_build(c: InvokeContext):
-    remove_path(f"build/*")
+    remove_path_pattern(f"build/*")
 
 
 @task(pre=[mkdirs])
 def clean_dist(c: InvokeContext):
-    remove_path(f"dist/*")
+    remove_path_pattern(f"dist/*")
 
 
 @task(pre=[mkdirs])
 def clean_cache(c: InvokeContext):
-    remove_path(f"{CACHE_DIR}/*")
+    remove_path_pattern(f"{CACHE_DIR}/*")
 
 
 @task(pre=[mkdirs])
 def clean_htmlcov(c: InvokeContext):
-    remove_path(f"htmlcov/*")
+    remove_path_pattern(f"htmlcov/*")
 
 
 @task(pre=[mkdirs])
 def clean_docs(c: InvokeContext):
-    remove_path(f"docs/*")
+    remove_path_pattern(f"docs/*")
 
 
 @task(pre=[mkdirs])
 def clean_changelog(c: InvokeContext):
-    remove_path(f"CHANGELOG.md")
-    remove_path(f"RELEASE_NOTES.md")
+    remove_path_pattern(f"CHANGELOG.md")
+    remove_path_pattern(f"RELEASE_NOTES.md")
 
 
 @task(pre=[mkdirs])
 def clean_requirements(c: InvokeContext):
-    remove_path(f"requirements.txt")
+    remove_path_pattern(f"requirements.txt")
 
 
 @task(pre=[clean_logs,

@@ -44,7 +44,7 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_build(c: InvokeContext):
-    remove_path(f"build/*")
+    remove_path_pattern(f"build/*")
 
 
 @task(pre=[clean_build])
@@ -142,62 +142,29 @@ def clean_unused_files(c: InvokeContext, dry_run: bool = False):
     human_size, size_bytes_orig = _config.get_dir_size(BUILD_DIR)
     print(f"Size BEFORE cleaning: {human_size} ({BUILD_DIR})")
 
-    remove_path("**/test", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/tests", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/testing", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/docs", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/examples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/samples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/Demos", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/demos", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/benchmarks", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/benchmark", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/.git", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/.github", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/__pycache__", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/*.pyc", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/*.pyo", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path("**/*.chm", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/test", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/tests", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/testing", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/docs", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/examples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/samples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/Demos", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/demos", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/benchmarks", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/benchmark", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/.git", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/.github", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/__pycache__", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/*.pyc", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/*.pyo", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    remove_path_pattern("**/*.chm", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
 
     human_size, size_bytes_final = _config.get_dir_size(BUILD_DIR)
     print(f"Size AFTER cleaning: {human_size} ({100 - (size_bytes_final / size_bytes_orig * 100):.2f}%)")
     print(f"[bold] Cleaning unused files ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_unused_files],)
-def compile_all(c: InvokeContext):
-    print(f"[bold] Compile all .py files ... [/]")
-    human_size, size_bytes_orig = _config.get_dir_size(BUILD_DIR)
-    print(f"Size BEFORE compiling: {human_size} ({BUILD_DIR})")
-
-    cmd = " ".join([
-        f'"{PORTABLE_PYTHON_EXE.resolve()}"', "-m",
-        'compileall',
-        '-j', '4',   # parallel compile
-        '-b',
-        '-f',
-        '-q',
-        '--invalidation-mode=unchecked-hash',
-        f'"{PORTABLE_PYTHON_DIR.resolve()}"',
-    ])
-    print(f"$ {cmd}")
-    result = c.run(cmd, out_stream=sys.stdout, err_stream=sys.stderr)
-    if (result is None) or (result.return_code != 0):
-        raise RuntimeError(f"Cannot compile all .py files: {result}")
-
-    # remove all .py files
-    remove_path("**/*.py", base_path=PORTABLE_PYTHON_DIR, verbose=False)
-
-    result = c.run(f'"{PORTABLE_PYTHON_EXE.resolve()}" -m {PROJECT_NAME} --version')
-    if (result is None) or (result.return_code != 0):
-        raise RuntimeError(f"Failed to run package '{PROJECT_NAME}': {result}")
-
-    human_size, size_bytes_final = _config.get_dir_size(BUILD_DIR)
-    print(f"Size AFTER compiling: {human_size} ({100 - (size_bytes_final / size_bytes_orig * 100):.2f}%)")
-    print(f"[bold] Compiling all .py files ... [/][bold green]OK[/]")
-
-
-@task(pre=[install_setuptools, pypi.build], post=[compile_all],)
+@task(pre=[install_setuptools, pypi.build])
 def install_app(c: InvokeContext):
     print(f"[bold] Installing app {PROJECT_NAME} ... [/]")
 

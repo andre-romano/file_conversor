@@ -24,7 +24,7 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_scoop(c: InvokeContext):
-    remove_path(f"{SCOOP_PATH}/*")
+    remove_path_pattern(f"{SCOOP_PATH}/*")
 
 
 @task(pre=[clean_scoop, ])

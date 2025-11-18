@@ -30,12 +30,12 @@ def mkdirs(c: InvokeContext):
 
 @task(pre=[mkdirs])
 def clean_inno(c: InvokeContext):
-    _config.remove_path(f"{INNO_PATH}/*")
+    _config.remove_path_pattern(f"{INNO_PATH}/*")
 
 
 @task(pre=[mkdirs])
 def clean_exe(c: InvokeContext):
-    _config.remove_path(f"{INSTALL_APP_WIN_EXE}")
+    _config.remove_path_pattern(f"{INSTALL_APP_WIN_EXE}")
 
 
 @task(pre=[clean_inno, zip.check])
@@ -127,7 +127,7 @@ def build(c: InvokeContext):
 @task(pre=[build,],)
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/]')
-    _config.remove_path(f"{INSTALL_PATH.relative_to(Path())}/*")
+    _config.remove_path_pattern(f"{INSTALL_PATH.relative_to(Path())}/*")
     INSTALL_PATH.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         rf'"{INSTALL_APP_WIN_EXE}"',

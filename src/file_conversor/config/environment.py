@@ -22,6 +22,7 @@ logger = Log.get_instance().getLogger(__name__)
 class Environment:
 
     __instance = None
+    __APP_NAME = "file_conversor"
 
     class UserFolder(Enum):
         @classmethod
@@ -179,8 +180,7 @@ class Environment:
             res = rf'"{exe}"'
         else:
             python_exe = sys.executable
-            main_py = Path(rf"{cls.get_resources_folder()}/__main__.py")
-            res = rf'"{python_exe}" "{main_py}"'
+            res = rf'"{python_exe}" -m "{cls.get_app_name()}"'
 
         logger.debug(f"Executable cmd: {res}")
         return res
@@ -188,7 +188,8 @@ class Environment:
     @classmethod
     def get_resources_folder(cls) -> Path:
         """Get the absolute path of the included folders in pip."""
-        res_path = Path(str(files("file_conversor"))).resolve()
+        files_obj = files(cls.get_app_name())
+        res_path = Path(str(files_obj)).resolve()
         return res_path
 
     @classmethod
@@ -213,12 +214,17 @@ class Environment:
     @classmethod
     def get_version(cls) -> str:
         """Get the current version of the app."""
-        return version("file_conversor")
+        return version(cls.get_app_name())
 
     @classmethod
     def get_app_icon(cls) -> Path:
         """Get the path to the app icon."""
         return cls.get_icons_folder() / "icon.ico"
+
+    @classmethod
+    def get_app_name(cls) -> str:
+        """Get the app name."""
+        return cls.__APP_NAME
 
     @classmethod
     def get_instance(cls):
