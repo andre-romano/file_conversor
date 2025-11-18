@@ -43,13 +43,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_m4a",
                 description="To M4A",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f m4a "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f m4a "%1""',
                 icon=str(icons_folder_path / 'm4a.ico'),
             ),
             WinContextCommand(
                 name="to_mp3",
                 description="To MP3",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mp3 "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mp3 "%1""',
                 icon=str(icons_folder_path / 'mp3.ico'),
             ),
         ])

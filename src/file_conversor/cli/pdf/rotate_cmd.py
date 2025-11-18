@@ -44,13 +44,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="rotate_anticlock_90",
                 description="Rotate Left",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:-90"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:-90""',
                 icon=str(icons_folder_path / "rotate_left.ico"),
             ),
             WinContextCommand(
                 name="rotate_clock_90",
                 description="Rotate Right",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:90"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r "1-:90""',
                 icon=str(icons_folder_path / "rotate_right.ico"),
             ),
         ])

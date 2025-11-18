@@ -45,7 +45,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="info",
                 description="Get Info",
-                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{INFO_NAME}" "%1""',
+                command=f'cmd.exe /k "{Environment.get_executable()} "{COMMAND_NAME}" "{INFO_NAME}" "%1""',
                 icon=str(icons_folder_path / "info.ico"),
             ),
         ])

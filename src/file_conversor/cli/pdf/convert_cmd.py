@@ -48,13 +48,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png""',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg""',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
         ])
@@ -63,7 +63,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_docx",
                 description="To DOCX",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "docx"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "docx""',
                 icon=str(icons_folder_path / 'docx.ico'),
             ),
         ])

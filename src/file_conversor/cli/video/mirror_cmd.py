@@ -45,13 +45,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="mirror_x",
                 description="Mirror X axis",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a x',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a x"',
                 icon=str(icons_folder_path / "left_right.ico"),
             ),
             WinContextCommand(
                 name="mirror_y",
                 description="Mirror Y axis",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a y',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{MIRROR_NAME}" "%1" -a y"',
                 icon=str(icons_folder_path / "up_down.ico"),
             ),
         ])

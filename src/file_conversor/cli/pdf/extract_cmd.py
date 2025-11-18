@@ -43,7 +43,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="extract",
                 description="Extract",
-                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_NAME}" "%1""',
+                command=f'cmd.exe /k "{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_NAME}" "%1""',
                 icon=str(icons_folder_path / 'extract.ico'),
             ),
         ])

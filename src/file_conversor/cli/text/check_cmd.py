@@ -41,7 +41,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="check",
                 description="Check",
-                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1""',
+                command=f'cmd.exe /k "{Environment.get_executable()} "{COMMAND_NAME}" "{CHECK_NAME}" "%1""',
                 icon=str(icons_folder_path / 'check.ico'),
             ),
         ])
@@ -65,7 +65,7 @@ def execute_text_check_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=True)  # overwrite is True because no output files are generated
     cmd_mgr.run(callback)
 
     logger.info(f"{_('Check')}: [bold green]{_('SUCCESS')}[/].")

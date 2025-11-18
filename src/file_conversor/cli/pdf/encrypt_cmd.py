@@ -43,7 +43,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="encrypt",
                 description="Encrypt",
-                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{ENCRYPT_NAME}" "%1""',
+                command=f'cmd.exe /k "{Environment.get_executable()} "{COMMAND_NAME}" "{ENCRYPT_NAME}" "%1""',
                 icon=str(icons_folder_path / "padlock_locked.ico"),
             ),
         ])

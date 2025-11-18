@@ -42,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="blur",
                 description="Blur",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{FILTER_NAME}" "%1" --filter blur',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{FILTER_NAME}" "%1" --filter blur"',
                 icon=str(icons_folder_path / "blur.ico"),
             ),
         ])

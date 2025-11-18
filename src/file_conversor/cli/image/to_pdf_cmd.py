@@ -44,7 +44,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_pdf",
                 description="To PDF",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{TO_PDF_NAME}" "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{TO_PDF_NAME}" "%1""',
                 icon=str(icons_folder_path / "pdf.ico"),
             ),
         ])

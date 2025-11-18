@@ -44,7 +44,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="extract_img",
                 description="Extract IMG",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_IMG_NAME}" "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{EXTRACT_IMG_NAME}" "%1""',
                 icon=str(icons_folder_path / 'separate.ico'),
             ),
         ])

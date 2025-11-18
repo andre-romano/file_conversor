@@ -46,7 +46,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="resize",
                 description="Resize",
-                command=f'cmd /k "{Environment.get_executable()} "{COMMAND_NAME}" "{RESIZE_NAME}" "%1""',
+                command=f'cmd.exe /k "{Environment.get_executable()} "{COMMAND_NAME}" "{RESIZE_NAME}" "%1""',
                 icon=str(icons_folder_path / "resize.ico"),
             ),
         ])
@@ -67,12 +67,14 @@ def execute_image_resize_cmd(
 ):
     pillow_backend = PillowBackend(verbose=STATE['verbose'])
 
+    scale = parse_image_resize_scale(scale, width, quiet=STATE["quiet"])
+
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         logger.info(f"Processing '{output_file}' ... ")
         pillow_backend.resize(
             input_file=input_file,
             output_file=output_file,
-            scale=parse_image_resize_scale(scale, width, quiet=STATE["quiet"]),
+            scale=scale,
             width=width,
             resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
         )

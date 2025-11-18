@@ -43,31 +43,31 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_xml",
                 description="To XML",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "xml"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "xml""',
                 icon=str(icons_folder_path / 'xml.ico'),
             ),
             WinContextCommand(
                 name="to_json",
                 description="To JSON",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "json"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "json""',
                 icon=str(icons_folder_path / 'json.ico'),
             ),
             WinContextCommand(
                 name="to_yaml",
                 description="To YAML",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "yaml"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "yaml""',
                 icon=str(icons_folder_path / 'yaml.ico'),
             ),
             WinContextCommand(
                 name="to_toml",
                 description="To TOML",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "toml"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "toml""',
                 icon=str(icons_folder_path / 'toml.ico'),
             ),
             WinContextCommand(
                 name="to_ini",
                 description="To INI",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "ini"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "ini""',
                 icon=str(icons_folder_path / 'ini.ico'),
             ),
         ])

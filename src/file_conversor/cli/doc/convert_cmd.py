@@ -45,7 +45,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name=f"to_{ext}",
                 description=f"To {ext.upper()}",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}""',
                 icon=str(icons_folder_path / f"{ext}.ico"),
             )
             for ext in LibreofficeWriterBackend.SUPPORTED_OUT_FORMATS

@@ -42,7 +42,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="antialias",
                 description="Antialias",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{ANTIALIAS_NAME}" "%1" -r 3',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{ANTIALIAS_NAME}" "%1" -r 3"',
                 icon=str(icons_folder_path / "diagonal_line.ico"),
             ),
         ])

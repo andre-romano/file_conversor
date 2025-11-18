@@ -43,7 +43,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="compress",
                 description="Compress",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{COMPRESS_NAME}" "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{COMPRESS_NAME}" "%1""',
                 icon=str(icons_folder_path / 'compress.ico'),
             ),
         ])

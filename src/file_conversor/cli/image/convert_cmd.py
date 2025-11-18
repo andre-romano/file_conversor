@@ -42,13 +42,13 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_jpg",
                 description="To JPG",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg" -q 90',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "jpg" -q 90"',
                 icon=str(icons_folder_path / 'jpg.ico'),
             ),
             WinContextCommand(
                 name="to_png",
                 description="To PNG",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png" -q 90',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "png" -q 90"',
                 icon=str(icons_folder_path / 'png.ico'),
             ),
         ])

@@ -40,7 +40,6 @@ class WinContextCommand:
         self.name = name
         self.description = description
         self.command = command
-        self.multi_select_model = "Document" if multi_select else "Single"
         self.icon = icon
 
 
@@ -96,10 +95,10 @@ class WinContextMenu:
                 WinRegKey(rf"{root_key}\shell\{cmd.name}").update({
                     "MUIVerb": cmd.description,
                     "Icon": cmd.icon if cmd.icon else "",
-                    "MultiSelectModel": cmd.multi_select_model,
                 }),
                 WinRegKey(rf"{root_key}\shell\{cmd.name}\command").update({
                     "@": cmd.command,
+                    "DelegateExecute": "",
                 }),
             ])
         logger.debug(f"Added commands for '{root_key}'")

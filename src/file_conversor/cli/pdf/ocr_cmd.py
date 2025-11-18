@@ -44,7 +44,7 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="ocr",
                 description="OCR",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{OCR_NAME}" "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{OCR_NAME}" "%1""',
                 icon=str(icons_folder_path / 'ocr.ico'),
             ),
         ])

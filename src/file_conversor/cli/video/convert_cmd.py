@@ -52,19 +52,19 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
             WinContextCommand(
                 name="to_mkv",
                 description="To MKV",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mkv "%1" ',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mkv "%1""',
                 icon=str(icons_folder_path / 'mkv.ico'),
             ),
             WinContextCommand(
                 name="to_mp4",
                 description="To MP4",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mp4 "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f mp4 "%1""',
                 icon=str(icons_folder_path / 'mp4.ico'),
             ),
             WinContextCommand(
                 name="to_webm",
                 description="To WEBM",
-                command=f'{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f webm "%1"',
+                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" -f webm "%1""',
                 icon=str(icons_folder_path / 'webm.ico'),
             ),
         ])
