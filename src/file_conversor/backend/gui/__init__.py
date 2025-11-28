@@ -2,7 +2,10 @@
 
 # user-provided modules
 from file_conversor.backend.gui.web_app import WebApp
+
+from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_route import FlaskRoute
+from file_conversor.backend.gui.flask_api_status import *
 
 # routes
 from file_conversor.backend.gui._api import routes as api_routes
@@ -91,4 +94,14 @@ fapp.add_route(icons_routes())
 fapp.add_route(index_routes())
 
 # export
-__all__ = ["WebApp"]
+__all__ = [
+    "WebApp",
+    "FlaskApi",
+    "FlaskRoute",
+    "FlaskApiStatus",
+    'FlaskApiStatusCompleted',
+    'FlaskApiStatusProcessing',
+    'FlaskApiStatusReady',
+    'FlaskApiStatusError',
+    'FlaskApiStatusUnknown',
+]

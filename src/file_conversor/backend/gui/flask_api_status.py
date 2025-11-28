@@ -37,6 +37,12 @@ class FlaskApiStatus:
     def __str__(self) -> str:
         return self.__repr__()
 
+    def __eq__(self, value) -> bool:
+        if not isinstance(value, FlaskApiStatus):
+            return False
+        return (self._id == value._id and
+                self._status == value._status)
+
     def get_id(self) -> str:
         return self._id
 

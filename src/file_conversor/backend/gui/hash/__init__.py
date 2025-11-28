@@ -25,4 +25,10 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'hash_index',
+    'hash_check',
+    'hash_create',
+
+    'routes',
+]

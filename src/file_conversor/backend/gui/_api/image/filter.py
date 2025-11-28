@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.filter_cmd import execute_image_filter_cmd
+from file_conversor.cli.image.filter_cmd import execute_image_filter_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -27,7 +27,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     logger.debug(f"Image filter thread received: {params}")
 
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
     image_filters: list[str] = [params['filter']]
 
@@ -43,3 +43,9 @@ def api_image_filter():
     """API endpoint to filter image files."""
     logger.info(f"[bold]{_('Image filter requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_filter",
+]

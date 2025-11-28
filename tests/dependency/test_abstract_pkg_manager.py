@@ -7,6 +7,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
+from file_conversor.dependency import *
 from file_conversor.dependency import AbstractPackageManager
 
 from tests.utils import Test, DATA_PATH, app_cmd

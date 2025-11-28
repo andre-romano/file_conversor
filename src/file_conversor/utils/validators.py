@@ -146,7 +146,7 @@ def check_positive_integer(num: int | float | None, allow_zero: bool = False):
     """
     Checks if the provided number is a positive integer.
     """
-    if not num:
+    if num is None:
         return num
     if num < 0 or (not allow_zero and num == 0):
         raise typer.BadParameter(_("Must be a positive integer."))
@@ -175,7 +175,7 @@ def check_file_format(filename_or_iter: list | dict | set | str | Path | None, f
         raise TypeError(f"{_('Invalid type')} '{type(filename_or_iter)}' {_('for')} filename_or_iter. {_('Valid values are Iterable | str | None')}.")
     for filename in file_list:
         file_path = Path(filename)
-        file_format = file_path.suffix[1:].lower()
+        file_format = file_path.suffix[1:]
         if format_dict and file_format not in format_dict:
             raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join([str(f) for f in format_dict])}.")
         if exists:

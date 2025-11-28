@@ -43,3 +43,6 @@ def audio_info():
     return render_template_string(str(
         PageAudioInfo()
     ))
+
+
+__all__ = ['audio_info']

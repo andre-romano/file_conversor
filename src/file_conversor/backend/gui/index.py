@@ -5,7 +5,7 @@ from flask import render_template_string, send_from_directory, url_for
 
 # user-provided modules
 from file_conversor.backend.gui._dom_page import home_nav_item
-from file_conversor.backend.gui.flask_route import FlaskRoute
+from file_conversor.backend.gui.flask_route import *
 
 from file_conversor.utils.dominate_bulma import *
 from file_conversor.utils.dominate_utils import *
@@ -121,4 +121,7 @@ def routes():
     ]
 
 
-__all__ = ['routes', 'PageIndex']
+__all__ = [
+    'index',
+    'routes',
+]

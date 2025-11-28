@@ -43,3 +43,6 @@ def audio_check():
     return render_template_string(str(
         PageAudioCheck()
     ))
+
+
+__all__ = ['audio_check']

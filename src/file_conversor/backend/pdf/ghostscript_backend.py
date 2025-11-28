@@ -223,7 +223,9 @@ class GhostscriptBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
         in_path = Path(input_file)
+
         out_path = Path(output_file)
+        out_path = out_path.with_suffix(out_path.suffix.lower())
 
         out_ext = out_path.suffix[1:]
         if out_ext not in self.SUPPORTED_OUT_FORMATS:

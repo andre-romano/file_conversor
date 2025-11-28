@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.ppt.convert_cmd import execute_ppt_convert_cmd
+from file_conversor.cli.ppt.convert_cmd import execute_ppt_convert_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -42,3 +42,9 @@ def api_ppt_convert():
     """API endpoint to convert presentations."""
     logger.info(f"[bold]{_('Presentation conversion requested via API.')}[/]")
     return FlaskApi.execute_response(ppt_convert_thread)
+
+
+__all__ = [
+    "api_ppt_convert",
+    "EXTERNAL_DEPENDENCIES",
+]

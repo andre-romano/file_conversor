@@ -63,9 +63,12 @@ class WordBackend(AbstractMSOfficeBackend):
                 self.check_file_exists(input_file)
 
                 input_path = input_file.resolve()
-                output_path = output_file.resolve()
 
-                out_config = WordBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+                output_path = output_file.resolve()
+                output_path = output_path.with_suffix(output_path.suffix.lower())
+
+                out_ext = output_path.suffix[1:]
+                out_config = WordBackend.SUPPORTED_OUT_FORMATS[out_ext]
 
                 doc = word.Documents.Open(str(input_path))
                 doc.SaveAs(

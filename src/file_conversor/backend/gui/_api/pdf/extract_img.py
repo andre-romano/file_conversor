@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.pdf.extract_img_cmd import execute_pdf_extract_img_cmd
+from file_conversor.cli.pdf.extract_img_cmd import execute_pdf_extract_img_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -25,8 +25,8 @@ logger = LOG.getLogger()
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle PDF image extraction."""
     logger.debug(f"PDF image extraction thread received: {params}")
-    input_files: list[Path] = [Path(i) for i in params['input-files']]
-    output_dir: Path = Path(params['output-dir'])
+    input_files = [Path(i) for i in params['input-files']]
+    output_dir = Path(params['output-dir'])
 
     execute_pdf_extract_img_cmd(
         input_files=input_files,
@@ -41,3 +41,9 @@ def api_pdf_extract_img():
     """API endpoint to extract images from PDF documents."""
     logger.info(f"[bold]{_('PDF image extraction requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_pdf_extract_img",
+]

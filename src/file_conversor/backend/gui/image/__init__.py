@@ -80,4 +80,21 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'image_index',
+    'image_antialias',
+    'image_blur',
+    'image_compress',
+    'image_convert',
+    'image_enhance',
+    'image_filter',
+    'image_info',
+    'image_mirror',
+    'image_render',
+    'image_resize',
+    'image_rotate',
+    'image_to_pdf',
+    'image_unsharp',
+
+    'routes',
+]

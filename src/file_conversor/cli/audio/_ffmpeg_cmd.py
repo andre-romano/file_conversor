@@ -8,13 +8,11 @@ from pathlib import Path
 
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
-from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterDeshake, FFmpegFilterEq, FFmpegFilterHflip, FFmpegFilterMInterpolate, FFmpegFilterScale, FFmpegFilterTranspose, FFmpegFilterUnsharp, FFmpegFilterVflip
+from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.validators import check_valid_options
-from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOption, AxisOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoCodecOption, VideoRotationOption
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -23,6 +21,9 @@ LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)
+
+
+EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
 
 
 def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]

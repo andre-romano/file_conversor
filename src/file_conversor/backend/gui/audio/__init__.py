@@ -30,4 +30,11 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'audio_index',
+    'audio_check',
+    'audio_convert',
+    'audio_info',
+
+    'routes',
+]

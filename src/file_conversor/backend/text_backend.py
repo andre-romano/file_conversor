@@ -190,6 +190,7 @@ class TextBackend(AbstractBackend):
         """
         input_file = Path(input_file)
         output_file = Path(output_file)
+        output_file = output_file.with_suffix(output_file.suffix.lower())
 
         _, in_txt_file = self._get_text_file(input_file, self.SUPPORTED_IN_FORMATS)
         _, out_txt_file = self._get_text_file(output_file, self.SUPPORTED_OUT_FORMATS)
@@ -227,6 +228,7 @@ class TextBackend(AbstractBackend):
         """
         input_file = Path(input_file)
         output_file = Path(output_file)
+        output_file = output_file.with_suffix(output_file.suffix.lower())
 
         _, in_txt_file = self._get_text_file(input_file, self.SUPPORTED_IN_FORMATS)
         _, out_txt_file = self._get_text_file(output_file, self.SUPPORTED_OUT_FORMATS)

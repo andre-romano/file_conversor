@@ -11,6 +11,7 @@ from rich.console import Group
 # user-provided imports
 from file_conversor.backend.image import PillowBackend
 
+from file_conversor.cli.pdf.ocr_cmd import EXTERNAL_DEPENDENCIES
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_utils import *
 
@@ -63,6 +64,8 @@ class _PillowExifInfo:
 
 
 class PillowParser:
+    EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
+
     def __init__(self, backend: PillowBackend, input_file: Path) -> None:
         super().__init__()
         self.input_file = input_file

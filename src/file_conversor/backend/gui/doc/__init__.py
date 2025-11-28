@@ -20,4 +20,9 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'doc_index',
+    'doc_convert',
+
+    'routes',
+]

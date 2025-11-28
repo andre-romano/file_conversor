@@ -25,6 +25,8 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger()
 
+EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
+
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle audio information retrieval."""
@@ -57,3 +59,9 @@ def api_audio_info():
     """API endpoint to get audio file information."""
     logger.info(f"[bold]{_('Audio info requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_audio_info",
+]

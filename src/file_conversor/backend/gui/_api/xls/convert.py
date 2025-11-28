@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.xls.convert_cmd import execute_xls_convert_cmd
+from file_conversor.cli.xls.convert_cmd import execute_xls_convert_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -42,3 +42,9 @@ def api_xls_convert():
     """API endpoint to convert spreadsheets."""
     logger.info(f"[bold]{_('Spreadsheet conversion requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "api_xls_convert",
+    "EXTERNAL_DEPENDENCIES",
+]

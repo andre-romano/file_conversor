@@ -39,7 +39,11 @@ def is_admin() -> bool:
     """True if app running with admin priviledges, False otherwise."""
     try:
         if ctypes:
-            return ctypes.windll.shell32.IsUserAnAdmin()  # pyright: ignore[reportAttributeAccessIssue]
+            res = ctypes.windll.shell32.IsUserAnAdmin()  # pyright: ignore[reportAttributeAccessIssue]
+            if isinstance(res, int):
+                return res != 0
+            if isinstance(res, bool):
+                return res
     except:
         pass
     return False

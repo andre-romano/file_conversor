@@ -20,4 +20,9 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'ebook_index',
+    'ebook_convert',
+
+    'routes',
+]

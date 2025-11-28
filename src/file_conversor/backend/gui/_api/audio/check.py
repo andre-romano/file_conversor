@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.audio.check_cmd import execute_audio_check_cmd
+from file_conversor.cli.audio.check_cmd import execute_audio_check_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -38,3 +38,9 @@ def api_audio_check():
     """API endpoint to check audio files."""
     logger.info(f"[bold]{_('Audio check requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_audio_check",
+]

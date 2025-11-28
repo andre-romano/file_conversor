@@ -43,3 +43,8 @@ def hash_check():
     return render_template_string(str(
         PageHashCheck()
     ))
+
+
+__all__ = [
+    'hash_check',
+]

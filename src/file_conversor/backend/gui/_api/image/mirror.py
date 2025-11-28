@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.mirror_cmd import execute_image_mirror_cmd
+from file_conversor.cli.image.mirror_cmd import execute_image_mirror_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -28,7 +28,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     logger.info(f"[bold]{_('Mirroring image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
     mirror_axis = params['mirror-axis']
 
@@ -44,3 +44,9 @@ def api_image_mirror():
     """API endpoint to mirror image files."""
     logger.info(f"[bold]{_('Image mirror requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_mirror",
+]

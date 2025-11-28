@@ -69,11 +69,14 @@ class ExcelBackend(AbstractMSOfficeBackend):
         with Win32Com(self.PROG_ID, visible=False) as excel:
             for input_file, output_file in files:
                 input_path = Path(input_file).resolve()
+
                 output_path = Path(output_file).resolve()
+                output_path = output_path.with_suffix(output_path.suffix.lower())
 
                 self.check_file_exists(str(input_path))
 
-                out_config = ExcelBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+                out_ext = output_path.suffix[1:]
+                out_config = ExcelBackend.SUPPORTED_OUT_FORMATS[out_ext]
 
                 workbook = excel.Workbooks.Open(str(input_path))
                 if output_path.suffix.lower() == ".pdf":

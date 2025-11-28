@@ -30,4 +30,11 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'text_index',
+    'text_check',
+    'text_compress',
+    'text_convert',
+
+    'routes',
+]

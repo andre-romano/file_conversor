@@ -47,27 +47,24 @@ def parse_traceback_list(exc: Exception) -> list[str]:
 
 def parse_js_to_py(value: str) -> Any:
     # Attempt to convert to appropriate type
-    try:
-        # Handle boolean values
-        if value.lower() in ('true', 'on'):
-            return True
-        elif value.lower() in ('false', 'off'):
-            return False
-        # Handle null value
-        elif value.lower() in ('null', 'none', 'undefined'):
-            return None
-        # Handle numeric values
-        elif re.match(r'^-?\d+((\.|,)\d+)?$', value):
-            if '.' in value or ',' in value:
-                return float(value.replace(',', '.'))
-            else:
-                return int(value)
-        # Handle JSON arrays and objects
-        elif value[0] in ('[', '{', '(') and value[-1] in (']', '}', ')'):
-            return json.loads(value.replace("'", '"'))
-    except Exception:
-        pass
-    return value  # return as string if parsing fails
+    # Handle null value
+    if value is None or value.lower() in ('', 'null', 'none', 'undefined'):
+        return None
+    # Handle boolean values
+    elif value.lower() in ('true', 'on'):
+        return True
+    elif value.lower() in ('false', 'off'):
+        return False
+    # Handle numeric values
+    elif re.match(r'^-?\d+((\.|,)\d+)?$', value):
+        if '.' in value or ',' in value:
+            return float(value.replace(',', '.'))
+        else:
+            return int(value)
+    # Handle JSON arrays and objects
+    elif value[0] in ('[', '{',) and value[-1] in (']', '}',):
+        return json.loads(value.replace("'", '"'))
+    return value  # return as string
 
 
 def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
@@ -99,6 +96,7 @@ def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool
 
 
 def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
+    """Parse PDF rotation argument to dict of page: degree (0-based)."""
     # get rotation dict in format {page: rotation}
     rotation_dict = {}
     for arg in rotation:
@@ -112,7 +110,7 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
         if match.group(3):
             end = int(match.group(3)) - 1
         elif match.group(2):
-            end = last_page
+            end = last_page - 1
         degree = int(match.group(4))
         if end < begin:
             raise RuntimeError(f"{_('Invalid begin-end page interval')}. {_('End Page < Begin Page')} '{arg}'.")
@@ -124,6 +122,7 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
 
 
 def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
+    """Parse PDF pages argument to list of page numbers (0-based)."""
     if not pages:
         pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
         pages = str(pages_str)
@@ -169,19 +168,23 @@ def parse_bytes(target_size: str | None) -> int:
         return 0
     size_unit = target_size[-1].upper()
     size_value = float(target_size[:-1])
-    if size_unit == "K":
+    if size_unit.isdigit():
+        return round(float(target_size))
+    elif size_unit == "K":
         return round(size_value * 1024.0)
     elif size_unit == "M":
         return round(size_value * 1024.0 * 1024.0)
     elif size_unit == "G":
         return round(size_value * 1024.0 * 1024.0 * 1024.0)
-    return round(size_value)
+    elif size_unit == "T":
+        return round(size_value * 1024.0 * 1024.0 * 1024.0 * 1024.0)
+    raise ValueError(f"{_('Invalid size format')} '{target_size}'.")
 
 
 def format_bytes(size: float) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""
     # Size in bytes to a human-readable string
-    for unit in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
         if size < 1024.0:
             return f"{size:.1f} {unit}"
         size /= 1024.0
@@ -189,24 +192,30 @@ def format_bytes(size: float) -> str:
 
 
 def format_bitrate(bps: int) -> str:
-    """Format bitrate in bps, kbps or Mbps"""
-    if bps >= 1_000_000:
-        return f"{bps / 1_000_000:.2f} Mbps"
-    elif bps >= 1000:
-        return f"{bps / 1000:.0f} kbps"
+    """Format bitrate in bps, kbps, Mbps, Gbps, Tbps etc."""
+    if bps >= 1024 * 1024 * 1024 * 1024:
+        return f"{bps / (1024 * 1024 * 1024 * 1024):.1f} Tbps"
+    if bps >= 1024 * 1024 * 1024:
+        return f"{bps / (1024 * 1024 * 1024):.1f} Gbps"
+    if bps >= 1024 * 1024:
+        return f"{bps / (1024 * 1024):.1f} Mbps"
+    elif bps >= 1024:
+        return f"{bps / 1024:.1f} Kbps"
     return f"{bps} bps"
 
 
 def format_alphanumeric(text: str) -> str:
     """Format text to be alphanumeric only (remove non-alphanumeric characters)."""
-    formatted = re.sub(r'[^a-zA-Z0-9_ ]', ' ', text)
-    formatted = re.sub(r'áàâäãå', 'a', formatted)
-    formatted = re.sub(r'éèëê', 'e', formatted)
-    formatted = re.sub(r'íïìî', 'i', formatted)
-    formatted = re.sub(r'óòöôõ', 'o', formatted)
-    formatted = re.sub(r'úüùû', 'u', formatted)
-    formatted = re.sub(r'ç', 'c', formatted)
-    formatted = re.sub(r'ñ', 'n', formatted)
+    formatted = text
+    formatted = re.sub(r'[áàâäãå]', 'a', formatted)
+    formatted = re.sub(r'[éèëê]', 'e', formatted)
+    formatted = re.sub(r'[íïìî]', 'i', formatted)
+    formatted = re.sub(r'[óòöôõ]', 'o', formatted)
+    formatted = re.sub(r'[úüùû]', 'u', formatted)
+    formatted = re.sub(r'[ç]', 'c', formatted)
+    formatted = re.sub(r'[ñ]', 'n', formatted)
+    formatted = re.sub(r'[\s ]+', ' ', formatted)
+    formatted = re.sub(r'[^a-zA-Z0-9_ ]', '', formatted)
     return formatted.strip()
 
 
@@ -221,6 +230,8 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
     """
     if not file_types:
         return f'{format_alphanumeric(_("All Files"))} (*.*)'
+    if not description:
+        description = _("Custom Files")
     parsed_types = [ft if ft.startswith("*.") else f"*.{ft.lstrip('.')}" for ft in file_types]
     return f'{format_alphanumeric(description)} ({";".join(parsed_types)})'
 
@@ -289,7 +300,7 @@ def format_in_out_files_tuple(
     :raises FileExistsError: if output file exists and overwrite is disabled.
     """
     files = [
-        (input_file, output_dir / CommandManager.get_output_file(input_file, suffix=f".{format}"))
+        (input_file, output_dir / CommandManager.get_output_file(input_file, suffix=f".{format.lstrip('.')}"))
         for input_file in input_files
     ]
     for input_file, output_file in files:

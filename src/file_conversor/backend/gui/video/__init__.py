@@ -56,4 +56,16 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'video_index',
+    'video_check',
+    'video_compress',
+    'video_convert',
+    'video_enhance',
+    'video_info',
+    'video_mirror',
+    'video_resize',
+    'video_rotate',
+
+    'routes',
+]

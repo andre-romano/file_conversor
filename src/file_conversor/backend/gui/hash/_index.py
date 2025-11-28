@@ -45,3 +45,8 @@ def hash_index():
             _title=f"{_('Hash Tools')} - File Conversor",
         ))
     )
+
+
+__all__ = [
+    'hash_index',
+]

@@ -20,7 +20,7 @@ logger = LOG.getLogger(__name__)
 
 
 class WinContextCommand:
-    def __init__(self, name: str, description: str, command: str, multi_select: bool = True, icon: str | None = None) -> None:
+    def __init__(self, name: str, description: str, command: str, icon: str | None = None) -> None:
         """
         Creates a windows context menu
 

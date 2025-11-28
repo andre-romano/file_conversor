@@ -92,11 +92,18 @@ class WebApp:
         # new=2 → new tab (recommended)
         webbrowser.open(url, new=2)
 
-    def _run_flask(self):
+    def _run_flask(self, testing: bool = False) -> Flask:
         logger.info(f"{_('Registering routes ...')}")
         for route in self.routes:
             route.register(self.app)
             # logger.debug(f"Route registered: {route.rule} -> {route.options}")
+        if testing:
+            logger.info(f"{_('Returning Flask object in testing mode ...')}")
+            self.app.config.update({
+                'TESTING': True,
+                'SECRET_KEY': 'testing',
+            })
+            return self.app
         logger.info(f"{_('[bold] Starting Flask server ... [/]')}")
         while True:
             try:
@@ -115,6 +122,7 @@ class WebApp:
                 logger.error(f"Error in Flask server: {repr(e)}")
                 time.sleep(0.100)  # Wait before retrying
         logger.info(f"[bold]{_('Flask server stopped.')}[/]")
+        return self.app
 
     def _run_webview(self) -> None:
         logger.info(f"[bold]{_('Starting webview window ...')}[/]")

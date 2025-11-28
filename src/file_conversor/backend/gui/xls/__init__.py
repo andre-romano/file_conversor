@@ -21,4 +21,9 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'xls_index',
+    'xls_convert',
+
+    'routes',
+]

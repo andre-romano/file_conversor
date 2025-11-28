@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.unsharp_cmd import execute_image_unsharp_cmd
+from file_conversor.cli.image.unsharp_cmd import execute_image_unsharp_cmd, EXTERNAL_DEPENDENCIES
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -27,7 +27,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     logger.info(f"[bold]{_('Unsharping image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
     radius = int(params['radius'])
     strength = int(params['image-unsharp-strength'])
@@ -47,3 +47,9 @@ def api_image_unsharp():
     """API endpoint to unsharp image files."""
     logger.info(f"[bold]{_('Image unsharp requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_unsharp",
+]

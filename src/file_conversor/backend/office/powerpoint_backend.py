@@ -59,11 +59,14 @@ class PowerPointBackend(AbstractMSOfficeBackend):
         with Win32Com(self.PROG_ID, visible=None) as powerpoint:
             for input_file, output_file in files:
                 input_path = input_file.resolve()
+
                 output_path = output_file.resolve()
+                output_path = output_path.with_suffix(output_path.suffix.lower())
 
                 self.check_file_exists(str(input_path))
 
-                out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[output_path.suffix[1:]]
+                out_ext = output_path.suffix[1:]
+                out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[out_ext]
 
                 # powerpoint.Visible = True  # needed for powerpoint
                 presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)

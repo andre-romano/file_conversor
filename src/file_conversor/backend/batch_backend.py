@@ -154,7 +154,7 @@ class BatchBackend(AbstractBackend):
             # replace placeholders
             cmd = cmd.replace(f"{{in_file_path}}", f"{input_path.resolve()}")
             cmd = cmd.replace(f"{{in_file_name}}", f"{input_path.with_suffix("").name}")
-            cmd = cmd.replace(f"{{in_file_ext}}", f"{input_path.suffix[1:]}")
+            cmd = cmd.replace(f"{{in_file_ext}}", f"{input_path.suffix[1:].lower()}")
             cmd = cmd.replace(f"{{in_dir}}", f"{in_path}")
             cmd = cmd.replace(f"{{out_dir}}", f"{out_path}")
             # normalize paths

@@ -26,7 +26,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle hash checking."""
     logger.debug(f"Hash check thread received: {params}")
 
-    input_files: list[Path] = [Path(i) for i in params['input-files']]
+    input_files = [Path(i) for i in params['input-files']]
 
     execute_hash_check_cmd(
         input_files=input_files,

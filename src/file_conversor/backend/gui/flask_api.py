@@ -1,12 +1,12 @@
 # src\file_conversor\backend\gui\flask_api.py
 
-import json
 import tempfile
 import threading
 
 from pathlib import Path
-from flask import Flask, request
-from typing import Any, Callable, Self
+from typing import Any, Callable, Iterable, Self
+
+from flask import Flask, Response, request, jsonify
 
 # user-provided modules
 from file_conversor.backend.gui.flask_api_status import *
@@ -67,6 +67,7 @@ class FlaskApi:
                 exception=format_traceback_html(e, debug=STATE["debug"]),
                 progress=None if progress is None or progress < 0 else progress,
             ))
+            raise
 
     @classmethod
     def _add_status(cls) -> FlaskApiStatus:
@@ -133,24 +134,27 @@ class FlaskApi:
         return res, temp_dir
 
     @classmethod
-    def status_response(cls, status_id: str | None) -> tuple[str, int]:
+    def status_response(cls, id: str | None) -> tuple[Response, int]:
         """
         API endpoint to get the application status.
 
-        :param status_id: str | None: The ID of the status to retrieve.
+        :param id: str | None: The ID of the status to retrieve.
 
         :return: tuple[str, int]: ({id:str, status:str, message:str, exception:str, progress:int}, status_code:int)
         """
-        status = cls._get_status(status_id)
+        status = cls._get_status(id)
         ret_code = 200
         if isinstance(status, FlaskApiStatusUnknown):
             ret_code = 404
         elif isinstance(status, FlaskApiStatusError):
             ret_code = 500
-        return json.dumps(status.json()), ret_code
+        return jsonify(status.json()), ret_code
 
     @classmethod
-    def execute_response(cls, callback: Callable[[dict[str, Any], FlaskApiStatus], None]) -> tuple[str, int]:
+    def execute_response(
+        cls,
+        callback: Callable[[dict[str, Any], FlaskApiStatus], None],
+    ) -> tuple[Response, int]:
         """
         API endpoint to process files.
         ```python
@@ -164,17 +168,18 @@ class FlaskApi:
 
         :return: tuple[str, int]: ({status:str, status_id:str, message:str}, 200)
         """
+        status = None
         try:
             logger.info(f"[bold]{_('File processing requested via API.')}[/]")
             data = cls.get_form_data()
             status = cls._add_status()
             data['status_id'] = status.get_id()
             threading.Thread(target=cls._execute_thread, args=(data, callback), daemon=True).start()
-            return json.dumps(status.json()), 200
+            return jsonify(status.json()), 200
         except Exception as e:
             logger.error(format_traceback_str(e, debug=STATE["debug"]))
-            return json.dumps(FlaskApiStatusError(
-                id=status.get_id(),
+            return jsonify(FlaskApiStatusError(
+                id=status.get_id() if status else -1,
                 exception=format_traceback_html(e, debug=STATE["debug"]),
             ).json()), 500
 

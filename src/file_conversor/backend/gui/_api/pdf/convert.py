@@ -9,7 +9,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.pdf.convert_cmd import execute_pdf_convert_cmd
+from file_conversor.cli.pdf.convert_cmd import execute_pdf_convert_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -48,3 +48,9 @@ def api_pdf_convert():
     """API endpoint to convert PDF documents."""
     logger.info(f"[bold]{_('PDF conversion requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_pdf_convert",
+]

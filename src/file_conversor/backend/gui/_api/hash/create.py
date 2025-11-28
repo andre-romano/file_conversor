@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.hash.create_cmd import execute_hash_create_cmd
+from file_conversor.cli.hash.create_cmd import execute_hash_create_cmd, EXTERNAL_DEPENDENCIES
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -25,8 +25,8 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle hash creating."""
     logger.debug(f"Hash create thread received: {params}")
 
-    input_files: list[Path] = [Path(i) for i in params['input-files']]
-    output_file = Path(params.get('output-file') or "")
+    input_files = [Path(i) for i in params['input-files']]
+    output_file = Path(params['output-file'])
 
     execute_hash_create_cmd(
         input_files=input_files,
@@ -39,3 +39,9 @@ def api_hash_create():
     """API endpoint to create hash files."""
     logger.info(f"[bold]{_('Hash create requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_hash_create",
+]

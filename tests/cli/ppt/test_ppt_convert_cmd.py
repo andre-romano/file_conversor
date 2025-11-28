@@ -16,14 +16,14 @@ class TestPptConvert:
             (DATA_PATH / "test.pptx", tmp_path / "test.odp"),
         ]
 
-        # for in_path, out_path in test_cases:
-        #     process = Test.run(
-        #         COMMAND_NAME,CONVERT_NAME, str(in_path),
-        #         *Test.get_format_params(out_path),
-        #         *Test.get_out_dir_params(out_path),
-        #     )
-        # assert process.returncode == 0
-        # assert out_path.exists()
+        for in_path, out_path in test_cases:
+            process = Test.run(
+                COMMAND_NAME, CONVERT_NAME, str(in_path),
+                *Test.get_format_params(out_path),
+                *Test.get_out_dir_params(out_path),
+            )
+        assert process.returncode == 0
+        assert out_path.exists()
 
     def test_ppt_convert_help(self,):
         Test.invoke_test_help(COMMAND_NAME, CONVERT_NAME)

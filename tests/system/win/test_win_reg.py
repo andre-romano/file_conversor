@@ -6,8 +6,7 @@ import pytest
 from file_conversor.system.win import WinRegFile, WinRegKey
 
 
-@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
-class TestWindowsFeatures:
+class TestWinReg:
     def test_winregkey_add_and_del_value(self,):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.add_value("TestValue", "TestContent")

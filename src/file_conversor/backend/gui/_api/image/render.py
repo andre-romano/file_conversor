@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.render_cmd import execute_image_render_cmd
+from file_conversor.cli.image.render_cmd import execute_image_render_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -28,7 +28,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     logger.info(f"[bold]{_('Rendering image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
     file_format = params['file-format']
     image_dpi = int(params['image-dpi'])
@@ -46,3 +46,9 @@ def api_image_render():
     """API endpoint to render image files."""
     logger.info(f"[bold]{_('Image render requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_render",
+]

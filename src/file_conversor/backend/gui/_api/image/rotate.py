@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.rotate_cmd import execute_image_rotate_cmd
+from file_conversor.cli.image.rotate_cmd import execute_image_rotate_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -28,10 +28,10 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
 
     logger.info(f"[bold]{_('Rotating image files')}[/]...")
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
     rotation = int(params['image-rotation'])
-    resampling = params['image-resampling']
+    resampling = str(params['image-resampling'])
 
     execute_image_rotate_cmd(
         input_files=input_files,
@@ -46,3 +46,9 @@ def api_image_rotate():
     """API endpoint to rotate image files."""
     logger.info(f"[bold]{_('Image rotate requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_rotate",
+]

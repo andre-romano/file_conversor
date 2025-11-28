@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.image.enhance_cmd import execute_image_enhance_cmd
+from file_conversor.cli.image.enhance_cmd import execute_image_enhance_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -27,12 +27,12 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     logger.debug(f"Image enhance thread received: {params}")
 
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
+    output_dir = Path(params['output-dir'])
 
-    color = float(params.get('color') or 1.0)
-    brightness = float(params.get('brightness') or 1.0)
-    contrast = float(params.get('contrast') or 1.0)
-    sharpness = float(params.get('sharpness') or 1.0)
+    color = float(params['color'])
+    brightness = float(params['brightness'])
+    contrast = float(params['contrast'])
+    sharpness = float(params['sharpness'])
 
     execute_image_enhance_cmd(
         input_files=input_files,
@@ -49,3 +49,9 @@ def api_image_enhance():
     """API endpoint to enhance image files."""
     logger.info(f"[bold]{_('Image enhance requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_enhance",
+]

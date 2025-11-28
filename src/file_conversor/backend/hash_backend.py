@@ -112,6 +112,8 @@ class HashBackend(AbstractBackend):
         """
         res = ""
         output_file = Path(output_file)
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
         out_ext = output_file.suffix[1:]
 
         input_len = len(input_files)

@@ -21,4 +21,9 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'ppt_index',
+    'ppt_convert',
+
+    'routes',
+]

@@ -88,6 +88,8 @@ class CompressBackend(AbstractBackend):
         """
         # Execute the command
         output_file = Path(output_file)
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
         out_ext = output_file.suffix[1:]
 
         out_opts = CompressBackend.SUPPORTED_OUT_FORMATS[out_ext]

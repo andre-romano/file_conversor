@@ -10,7 +10,10 @@ from file_conversor.backend.image import PillowBackend
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
+from file_conversor.cli.pdf.ocr_cmd import EXTERNAL_DEPENDENCIES
+
 from file_conversor.utils.backend import PillowParser
+
 from file_conversor.utils.bulma_utils import *
 from file_conversor.utils.dominate_utils import *
 
@@ -25,13 +28,14 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+EXTERNAL_DEPENDENCIES = PillowParser.EXTERNAL_DEPENDENCIES
+
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle image info."""
     logger.debug(f"Image info thread received: {params}")
 
     input_files = [Path(i) for i in params['input-files']]
-    output_dir = Path(params.get('output-dir') or "")
 
     backend = PillowBackend(
         verbose=STATE["verbose"],
@@ -55,3 +59,9 @@ def api_image_info():
     """API endpoint to get information about image files."""
     logger.info(f"[bold]{_('Image info requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "api_image_info",
+]

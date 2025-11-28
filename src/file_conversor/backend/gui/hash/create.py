@@ -48,3 +48,8 @@ def hash_create():
     return render_template_string(str(
         PageHashCreate()
     ))
+
+
+__all__ = [
+    'hash_create',
+]

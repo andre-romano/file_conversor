@@ -13,7 +13,7 @@ from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpe
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.formatters import parse_bytes
+from file_conversor.utils.formatters import normalize_degree, parse_bytes
 from file_conversor.utils.validators import check_valid_options
 
 # get app config
@@ -25,7 +25,10 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-def ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
+EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
+
+
+def ffmpeg_cli_cmd(
     input_files: List[Path],
 
     file_format: str,
@@ -77,28 +80,46 @@ def ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     audio_filters: list[FFmpegFilter] = list()
     video_filters: list[FFmpegFilter] = list()
 
-    if resolution is not None:
+    if resolution:
         video_filters.append(FFmpegFilterScale(*resolution.split(":")))
 
     if fps is not None:
-        video_filters.append(FFmpegFilterMInterpolate(fps=fps))
+        if fps < 1:
+            raise ValueError(f"{_('Invalid FPS value')}: {fps}")
+        elif fps > 0:
+            video_filters.append(FFmpegFilterMInterpolate(fps=fps))
 
     if brightness != 1.0 or contrast != 1.0 or color != 1.0 or gamma != 1.0:
         video_filters.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=color, gamma=gamma))
 
     if rotation is not None:
-        if rotation in (90, -90):
-            direction = {90: 1, -90: 2}[rotation]
+        rotation = normalize_degree(rotation)
+        if rotation == 0:
+            pass
+        elif rotation in (90, 270):
+            direction = {
+                90: 1,
+                270: 2,
+            }[rotation]
             video_filters.append(FFmpegFilterTranspose(direction=direction))
+        elif rotation in (180,):
+            video_filters.append(FFmpegFilterTranspose(direction=1))
+            video_filters.append(FFmpegFilterTranspose(direction=1))
         else:
-            video_filters.append(FFmpegFilterTranspose(direction=1))
-            video_filters.append(FFmpegFilterTranspose(direction=1))
+            raise ValueError(f"{_('Invalid rotation value')}: {rotation}")
 
     if mirror_axis is not None:
-        if mirror_axis == "x":
+        if mirror_axis == "":
+            pass
+        elif mirror_axis == "x":
             video_filters.append(FFmpegFilterHflip())
-        else:
+        elif mirror_axis == "y":
             video_filters.append(FFmpegFilterVflip())
+        elif mirror_axis == "xy":
+            video_filters.append(FFmpegFilterHflip())
+            video_filters.append(FFmpegFilterVflip())
+        else:
+            raise ValueError(f"{_('Invalid mirror axis value')}: {mirror_axis}")
 
     if deshake:
         video_filters.append(FFmpegFilterDeshake())
@@ -175,3 +196,9 @@ def ffmpeg_cli_cmd(  # pyright: ignore[reportUnusedFunction]
     cmd_mgr.run(callback, out_suffix=f".{file_format}", out_stem=out_stem)
 
     logger.info(f"{_('FFMpeg result')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+__all__ = [
+    "ffmpeg_cli_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

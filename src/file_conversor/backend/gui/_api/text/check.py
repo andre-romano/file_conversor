@@ -8,7 +8,8 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.text.check_cmd import execute_text_check_cmd
+from file_conversor.cli.text.check_cmd import execute_text_check_cmd, EXTERNAL_DEPENDENCIES
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -36,3 +37,9 @@ def api_text_check():
     """API endpoint to check text."""
     logger.info(f"[bold]{_('Text check requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "api_text_check",
+    "EXTERNAL_DEPENDENCIES",
+]

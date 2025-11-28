@@ -8,7 +8,8 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.text.convert_cmd import execute_text_convert_cmd
+from file_conversor.cli.text.convert_cmd import execute_text_convert_cmd, EXTERNAL_DEPENDENCIES
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -41,3 +42,9 @@ def api_text_convert():
     """API endpoint to convert text."""
     logger.info(f"[bold]{_('Text convert requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "api_text_convert",
+    "EXTERNAL_DEPENDENCIES",
+]

@@ -50,3 +50,6 @@ def audio_index():
         ],
         _title=f"{_('Audio Tools')} - File Conversor",
     )))
+
+
+__all__ = ['audio_index']

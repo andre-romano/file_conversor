@@ -49,3 +49,6 @@ def audio_convert():
     return render_template_string(str(
         PageAudioConvert()
     ))
+
+
+__all__ = ['audio_convert']

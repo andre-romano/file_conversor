@@ -72,4 +72,19 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'pdf_index',
+    'pdf_compress',
+    'pdf_convert',
+    'pdf_decrypt',
+    'pdf_encrypt',
+    'pdf_extract_img',
+    'pdf_extract',
+    'pdf_merge',
+    'pdf_ocr',
+    'pdf_repair',
+    'pdf_rotate',
+    'pdf_split',
+
+    'routes',
+]

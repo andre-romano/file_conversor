@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd
+from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd, EXTERNAL_DEPENDENCIES
 
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
@@ -28,21 +28,33 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle video resizing."""
     logger.debug(f"Video resize thread received: {params}")
 
+    input_files = [Path(i) for i in params['input-files']]
+    output_dir = Path(params['output-dir'])
+
+    file_format = params['file-format']
+
+    audio_bitrate = params['audio-bitrate']
+    video_bitrate = params['video-bitrate']
+
+    video_encoding_speed = params['video-encoding-speed']
+    video_quality = params['video-quality']
+
+    resolution = params['resolution'] or None
+
     logger.info(f"[bold]{_('Resizing video files')}[/]...")
     ffmpeg_cli_cmd(
-        input_files=[Path(i) for i in params['input-files']],
-        file_format=params['file-format'],
+        input_files=input_files,
+        file_format=file_format,
 
-        audio_bitrate=int(params.get('audio-bitrate') or 0),
-        video_bitrate=int(params.get('video-bitrate') or 0),
+        audio_bitrate=audio_bitrate,
+        video_bitrate=video_bitrate,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
 
-        video_encoding_speed=params.get('video-encoding-speed') or None,
-        video_quality=params.get('video-quality') or None,
+        resolution=resolution,
 
-        resolution=params.get('resolution') or None,
-
+        output_dir=output_dir,
         out_stem="_resized",
-        output_dir=Path(params.get('output-dir') or ""),
         progress_callback=lambda p, pm: status.set_progress(pm.update_progress(p)),
     )
 
@@ -53,3 +65,9 @@ def api_video_resize():
     """API endpoint to resize video files."""
     logger.info(f"[bold]{_('Video resize requested via API.')}[/]")
     return FlaskApi.execute_response(_api_thread)
+
+
+__all__ = [
+    "api_video_resize",
+    "EXTERNAL_DEPENDENCIES",
+]

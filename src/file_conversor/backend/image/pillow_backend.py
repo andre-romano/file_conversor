@@ -135,7 +135,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         with self._open(input_file) as img:
@@ -183,8 +186,12 @@ class PillowBackend(AbstractBackend):
         if quality < 1 or quality > 100:
             raise ValueError(f"{_('Invalid quality level. Valid values are')} 1-100.")
 
-        output_ext = Path(output_file).suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[output_ext]["format"]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
+
+        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         self._save(
@@ -198,10 +205,10 @@ class PillowBackend(AbstractBackend):
 
     def rotate(
         self,
-            output_file: str | Path,
-            input_file: str | Path,
-            rotate: int,
-            resampling: Image.Resampling = Image.Resampling.BICUBIC,
+        output_file: str | Path,
+        input_file: str | Path,
+        rotate: int,
+        resampling: Image.Resampling = Image.Resampling.BICUBIC,
     ):
         """
         Rotate input file by X degrees (clockwise).
@@ -218,7 +225,11 @@ class PillowBackend(AbstractBackend):
         # parse rotation argument
         rotate = normalize_degree(rotate)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
+
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -243,7 +254,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -276,7 +290,11 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
+
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -313,7 +331,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -350,7 +371,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -387,7 +411,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
@@ -442,7 +469,10 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        out_ext = Path(output_file).suffix[1:]
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
+
+        out_ext = output_file.suffix[1:]
         format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)

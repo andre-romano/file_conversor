@@ -152,7 +152,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
         check_file_format(self._input_file, self.SUPPORTED_IN_FORMATS)
 
         # set the input format options based on the file extension
-        in_ext = self._input_file.suffix[1:]
+        in_ext = self._input_file.suffix[1:].lower()
         for k, v in self.SUPPORTED_IN_FORMATS[in_ext].items():
             self._in_opts.extend([str(k), str(v)])
 
@@ -171,6 +171,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         # create out dir (if it does not exists)
         self._output_file = Path(output_file).resolve()
+        self._output_file = self._output_file.with_suffix(self._output_file.suffix.lower())
+
         if self._output_file.name == "-":
             logger.warning("Null container selected. No output file will be created.")
             out_ext = "null"

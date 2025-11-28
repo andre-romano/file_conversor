@@ -82,7 +82,7 @@ export function alpineConfigStatusBar() {
         },
         async update() {
             try {
-                const url = `/api/status?status_id=${this.status_id}`;
+                const url = `/api/status?id=${this.status_id}`;
                 const method = 'GET';
                 const response = await fetch(url, { method });
                 /* Expects a JSON response with at least:

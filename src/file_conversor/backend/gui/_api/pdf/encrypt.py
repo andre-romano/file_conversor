@@ -25,26 +25,25 @@ logger = LOG.getLogger()
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle PDF encryption."""
     logger.debug(f"PDF encryption thread received: {params}")
-    input_files: list[Path] = [Path(i) for i in params['input-files']]
-    output_dir: Path = Path(params['output-dir'])
+    input_files = [Path(i) for i in params['input-files']]
+    output_dir = Path(params['output-dir'])
 
-    encrypt_algo: str = str(params['pdf-encryption-algorithm'])
-    decrypt_password: str | None = params.get('decrypt-password')
-    owner_password: str = str(params['owner-password'])
-    user_password: str | None = str(params['user-password']) or None
+    encrypt_algo = str(params['pdf-encryption-algorithm'])
+    owner_password = str(params['owner-password'])
+    user_password = params['user-password'] or None
 
-    allow_annotations: bool = bool(params['allow-annotations'])
-    allow_fill_forms: bool = bool(params['allow-fill-forms'])
-    allow_modify: bool = bool(params['allow-modify'])
-    allow_modify_pages: bool = bool(params['allow-modify-pages'])
-    allow_copy: bool = bool(params['allow-copy'])
-    allow_accessibility: bool = bool(params['allow-accessibility'])
-    allow_print_lq: bool = bool(params['allow-print-lq'])
-    allow_print_hq: bool = bool(params['allow-print-hq'])
+    allow_annotations = bool(params['allow-annotations'])
+    allow_fill_forms = bool(params['allow-fill-forms'])
+    allow_modify = bool(params['allow-modify'])
+    allow_modify_pages = bool(params['allow-modify-pages'])
+    allow_copy = bool(params['allow-copy'])
+    allow_accessibility = bool(params['allow-accessibility'])
+    allow_print_lq = bool(params['allow-print-lq'])
+    allow_print_hq = bool(params['allow-print-hq'])
 
     execute_pdf_encrypt_cmd(
         input_files=input_files,
-        decrypt_password=decrypt_password,
+        decrypt_password=None,
         owner_password=owner_password,
         user_password=user_password,
         allow_annotate=allow_annotations,

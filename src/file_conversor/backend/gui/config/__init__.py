@@ -14,4 +14,8 @@ def routes():
     ]
 
 
-__all__ = ['routes']
+__all__ = [
+    'config_index',
+
+    'routes',
+]
