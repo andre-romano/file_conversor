@@ -84,7 +84,7 @@ class GitBackend(AbstractBackend):
 
         :raises RuntimeError: if the GitHub API request fails
         """
-        http_backend = HttpBackend(verbose=False)
+        http_backend = HttpBackend.get_instance(verbose=False)
         res = http_backend.get_json(
             url=f"https://api.github.com/repos/{user_name}/{repo_name}/contents/{path}",
             params={"ref": branch} if branch else None,

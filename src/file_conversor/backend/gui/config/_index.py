@@ -12,6 +12,7 @@ from file_conversor.backend.gui.config._tab_image import TabConfigImage
 from file_conversor.backend.gui.config._tab_network import TabConfigNetwork
 from file_conversor.backend.gui.config._tab_pdf import TabConfigPDF
 
+from file_conversor.backend.gui.web_app import WebApp
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
@@ -67,6 +68,16 @@ def PageConfig():
             _class_headers="mb-4",
             _class_content="is-full-width",
         ),
+        buttons=[
+            Button(
+                _("Reset"),
+                _class="is-danger",
+                _title=_("Reset configuration to defaults"),
+                **{
+                    '@click': f'await pywebview.api.reset_config(); window.location.reload();',
+                },
+            ),
+        ],
         api_endpoint=f"{url_for('api_config')}",
         nav_items=[
             home_nav_item(),

@@ -98,6 +98,10 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# requests cache
+.http_cache.sqlite
+http_cache.sqlite
+
 # Scrapy stuff:
 .scrapy
 

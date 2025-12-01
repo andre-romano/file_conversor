@@ -93,10 +93,10 @@ class OcrMyPDFBackend(AbstractBackend):
             **self.TESSDATA_REPOSITORY,
             file_path=f"{lang}.traineddata",
         )
-        http_backend = HttpBackend(verbose=self._verbose)
+        http_backend = HttpBackend.get_instance(verbose=self._verbose)
         http_backend.download(
             url=lang_url,
-            dest_folder=lang_file,
+            dest_file=lang_file,
             progress_callback=progress_callback,
         )
 

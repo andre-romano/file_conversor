@@ -60,6 +60,22 @@ def TabConfigGeneral() -> tuple | list:
             ),
             label_text=_("GUI Zoom Level (%)"),
         ),
+        FormFieldHorizontal(
+            FormFieldInput(
+                validation_expr="Number.parseInt(value) >= 60",
+                current_value=CONFIG['cache-expire-after'],
+                _name="cache-expire-after",
+                _type="number",
+                help=_("HTTP cache expiration time in seconds (e.g., 1h = 3600 secs, 1d = 86400 secs). Minimum of 60 seconds."),
+            ),
+            label_text=_("HTTP Cache Expiration (secs)"),
+        ),
+        FormFieldCheckbox(
+            current_value=CONFIG['cache-enabled'],
+            _name="cache-enabled",
+            label_text=_('Enable HTTP cache.'),
+            help=_('If enabled, the application will use HTTP cache to improve performance.'),
+        ),
         FormFieldCheckbox(
             current_value=CONFIG['install-deps'],
             _name="install-deps",

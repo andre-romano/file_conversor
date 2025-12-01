@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:15a20fd5a87212556c4584ba431d6af6b51e609f496afd4cd4e685467b791c61"
+content_hash = "sha256:bb1c2f59e98b280a07ac9d73a0002bdf3ed2327d564f64ea1df73b1e6c81f17c"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<=3.13.7"
@@ -22,6 +22,17 @@ dependencies = [
 files = [
     {file = "astroid-4.0.2-py3-none-any.whl", hash = "sha256:d7546c00a12efc32650b19a2bb66a153883185d3179ab0d4868086f807338b9b"},
     {file = "astroid-4.0.2.tar.gz", hash = "sha256:ac8fb7ca1c08eb9afec91ccc23edbd8ac73bb22cbdd7da1d488d9fb8d6579070"},
+]
+
+[[package]]
+name = "attrs"
+version = "25.4.0"
+requires_python = ">=3.9"
+summary = "Classes Without Boilerplate"
+groups = ["default"]
+files = [
+    {file = "attrs-25.4.0-py3-none-any.whl", hash = "sha256:adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373"},
+    {file = "attrs-25.4.0.tar.gz", hash = "sha256:16d5969b87f0859ef33a48b35d55ac1be6e42ae49d5e853b597db70c35c57e11"},
 ]
 
 [[package]]
@@ -72,6 +83,22 @@ groups = ["default"]
 files = [
     {file = "bottle-0.13.4-py2.py3-none-any.whl", hash = "sha256:045684fbd2764eac9cdeb824861d1551d113e8b683d8d26e296898d3dd99a12e"},
     {file = "bottle-0.13.4.tar.gz", hash = "sha256:787e78327e12b227938de02248333d788cfe45987edca735f8f88e03472c3f47"},
+]
+
+[[package]]
+name = "cattrs"
+version = "25.3.0"
+requires_python = ">=3.9"
+summary = "Composable complex class support for attrs and dataclasses."
+groups = ["default"]
+dependencies = [
+    "attrs>=25.4.0",
+    "exceptiongroup>=1.1.1; python_version < \"3.11\"",
+    "typing-extensions>=4.14.0",
+]
+files = [
+    {file = "cattrs-25.3.0-py3-none-any.whl", hash = "sha256:9896e84e0a5bf723bc7b4b68f4481785367ce07a8a02e7e9ee6eb2819bc306ff"},
+    {file = "cattrs-25.3.0.tar.gz", hash = "sha256:1ac88d9e5eda10436c4517e390a4142d88638fe682c436c93db7ce4a277b884a"},
 ]
 
 [[package]]
@@ -1566,6 +1593,25 @@ files = [
 ]
 
 [[package]]
+name = "requests-cache"
+version = "1.2.1"
+requires_python = ">=3.8"
+summary = "A persistent cache for python requests"
+groups = ["default"]
+dependencies = [
+    "attrs>=21.2",
+    "cattrs>=22.2",
+    "platformdirs>=2.5",
+    "requests>=2.22",
+    "url-normalize>=1.4",
+    "urllib3>=1.25.5",
+]
+files = [
+    {file = "requests_cache-1.2.1-py3-none-any.whl", hash = "sha256:1285151cddf5331067baa82598afe2d47c7495a1334bfe7a7d329b43e9fd3603"},
+    {file = "requests_cache-1.2.1.tar.gz", hash = "sha256:68abc986fdc5b8d0911318fbb5f7c80eebcd4d01bfacc6685ecf8876052511d1"},
+]
+
+[[package]]
 name = "requests-toolbelt"
 version = "1.0.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1747,6 +1793,20 @@ groups = ["default", "dev"]
 files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
+]
+
+[[package]]
+name = "url-normalize"
+version = "2.2.1"
+requires_python = ">=3.8"
+summary = "URL normalization for Python"
+groups = ["default"]
+dependencies = [
+    "idna>=3.3",
+]
+files = [
+    {file = "url_normalize-2.2.1-py3-none-any.whl", hash = "sha256:3deb687587dc91f7b25c9ae5162ffc0f057ae85d22b1e15cf5698311247f567b"},
+    {file = "url_normalize-2.2.1.tar.gz", hash = "sha256:74a540a3b6eba1d95bdc610c24f2c0141639f3ba903501e61a52a8730247ff37"},
 ]
 
 [[package]]

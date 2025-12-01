@@ -5,7 +5,7 @@ from typing import Any
 # user-provided modules
 from file_conversor.utils.bulma_utils.general import OverwriteFilesField
 
-from file_conversor.utils.dominate_bulma.form_button import Button
+from file_conversor.utils.dominate_bulma.form_button import Button, ButtonsContainer
 from file_conversor.utils.dominate_bulma.form import Form
 from file_conversor.utils.dominate_bulma.breadcrumb import Breadcrumb
 from file_conversor.utils.dominate_bulma.page_base import PageBase
@@ -29,6 +29,7 @@ def PageForm(
         api_endpoint: str,
         nav_items: list[dict[str, Any]],
         _title: str,
+        buttons: list[Any] | None = None,
         **kwargs: Any,
 ):
     """
@@ -47,23 +48,27 @@ def PageForm(
     :param api_endpoint: The API endpoint to submit the form to.
     :param nav_items: The breadcrumb navigation items.
     :param _title: The title of the page.
+    :param buttons: Additional buttons to include in the form (optional).
     """
     return PageBase(
         Form(
             *form_fields,
             OverwriteFilesField(),
-            Button(
-                _("Execute"),
-                _class="is-primary",
-                _title=_("Execute operation"),
-                **{
-                    ':class': """{
+            ButtonsContainer(
+                Button(
+                    _("Execute"),
+                    _class="is-primary",
+                    _title=_("Execute operation"),
+                    **{
+                        ':class': """{
                         'is-loading': checkLoading(),
                         'is-cursor-progress': checkLoading(),
                     }""",
-                    ':disabled': '!isValid || checkLoading()',
-                    '@click': f'$store.form.submit($el.closest("form[x-data]"), `{api_endpoint}`)',
-                },
+                        ':disabled': '!isValid || checkLoading()',
+                        '@click': f'$store.form.submit($el.closest("form[x-data]"), `{api_endpoint}`)',
+                    },
+                ),
+                *(buttons or []),
             ),
             _class='is-flex is-flex-direction-column is-align-items-flex-end is-full-width',
             **{'x-data': r"""{ 

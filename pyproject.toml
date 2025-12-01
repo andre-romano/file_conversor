@@ -29,6 +29,7 @@ dependencies = [
     "platformdirs>=4.5.0",
     "natsort>=8.4.0",
     "pdf2docx>=0.5.8",
+    "requests-cache>=1.2.1",
 ]
 requires-python = ">=3.12,<=3.13.7"
 readme = "README.md"

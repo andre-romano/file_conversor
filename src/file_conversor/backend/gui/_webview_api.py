@@ -114,6 +114,12 @@ class WebViewAPI:
     # COMMANDS #
     # ######### #
 
+    def reset_config(self):
+        """Reset the application configuration to factory defaults."""
+        CONFIG.reset_factory_default()
+        CONFIG.save()
+        logger.info("Configuration reset to factory defaults.")
+
     def get_config(self) -> dict[str, Any]:
         """Get the current application configuration."""
         return CONFIG.to_dict()

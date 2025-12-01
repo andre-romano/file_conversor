@@ -47,6 +47,18 @@ EXTERNAL_DEPENDENCIES = set()
     """,
 )
 def set(
+    cache_enabled: Annotated[bool, typer.Option("--cache-enabled", "-ce",
+                                                help=_("Enable or disable HTTP cache."),
+                                                callback=check_is_bool_or_none,
+                                                is_flag=True,
+                                                )] = CONFIG["cache-enabled"],
+
+
+    cache_expire_after: Annotated[int, typer.Option("--cache-expire-after", "-cea",
+                                                    help=_("Set HTTP cache expiration time in seconds."),
+                                                    min=1,
+                                                    )] = CONFIG["cache-expire-after"],
+
     language: Annotated[str, typer.Option("--language", "-l",
                                           help=f'{_("Set preferred language for app (if available). Available languages:")} {", ".join(sorted(AVAILABLE_LANGUAGES))}. {_("Defaults to system preffered language or 'en_US' (English - United States)")}.',
                                           callback=lambda x: check_valid_options(x, AVAILABLE_LANGUAGES),
@@ -123,6 +135,8 @@ def set(
 ):
     # update the configuration dictionary
     CONFIG.update({
+        "cache-enabled": cache_enabled,
+        "cache-expire-after": cache_expire_after,
         "port": port,
         "language": language,
         "install-deps": None if install_deps == "None" or install_deps is None else bool(install_deps),

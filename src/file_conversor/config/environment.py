@@ -212,6 +212,14 @@ class Environment:
         return locales_path
 
     @classmethod
+    def get_data_folder(cls) -> Path:
+        """Get the app data folder."""
+        data_path = cls.SiteFolder.DATA() / cls.get_app_name()
+        data_path.mkdir(parents=True, exist_ok=True)
+        # logger.debug(f"App data path: {data_path}")
+        return data_path
+
+    @classmethod
     def get_version(cls) -> str:
         """Get the current version of the app."""
         return version(cls.get_app_name())

@@ -5,6 +5,24 @@ from typing import Any
 from file_conversor.utils.dominate_utils import *
 
 
+def ButtonsContainer(
+    *buttons: Any,
+    _class: str = "",
+    **kwargs,
+):
+    """
+    Create a container for buttons.
+
+    :param buttons: The button elements to include in the container.
+    :param _class: Additional CSS classes for the container.
+    """
+    return div(
+        *buttons,
+        _class=f"buttons {_class}",
+        **kwargs,
+    )
+
+
 def Button(
     *content: Any,
     _class: str = "",
@@ -34,5 +52,6 @@ def Button(
 
 
 __all__ = [
+    "ButtonsContainer",
     "Button",
 ]
