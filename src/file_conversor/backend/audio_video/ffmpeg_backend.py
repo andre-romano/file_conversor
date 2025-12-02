@@ -361,3 +361,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         if pass_num in (0, 2):
             self._clean_two_pass_log_file(logfile)
+
+
+__all__ = [
+    "FFmpegBackend",
+]

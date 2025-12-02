@@ -20,3 +20,7 @@ config_cmd = typer.Typer(
 )
 config_cmd.add_typer(show_cmd)
 config_cmd.add_typer(set_cmd)
+
+__all__ = [
+    "config_cmd",
+]

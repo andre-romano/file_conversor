@@ -76,3 +76,8 @@ class PDF2DOCXBackend(AbstractBackend):
         converter.convert(
             str(output_file),
         )
+
+
+__all__ = [
+    "PDF2DOCXBackend",
+]

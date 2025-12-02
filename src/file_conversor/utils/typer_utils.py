@@ -279,3 +279,33 @@ def DeshakeOption() -> OptionInfo:
         help=f'{_("Deshake video (attempt to fix vertical/horizontal span from handrecoding)")}. {_('Defaults to False (do not apply filter)')}.',
         is_flag=True,
     )
+
+
+__all__ = [
+    "InputFilesArgument",
+    "FormatOption",
+    "OutputDirOption",
+    "OutputFileOption",
+    "QualityOption",
+    "AxisOption",
+    "DPIOption",
+    "BrightnessOption",
+    "ContrastOption",
+    "ColorOption",
+    "SharpnessOption",
+    "RadiusOption",
+    "PasswordOption",
+    "TargetFileSizeOption",
+    "AudioBitrateOption",
+    "VideoBitrateOption",
+    "AudioCodecOption",
+    "VideoCodecOption",
+    "VideoEncodingSpeedOption",
+    "VideoQualityOption",
+    "ResolutionOption",
+    "FPSOption",
+    "VideoRotationOption",
+    "GammaOption",
+    "UnsharpOption",
+    "DeshakeOption",
+]

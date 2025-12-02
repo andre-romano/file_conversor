@@ -155,3 +155,8 @@ class AbstractPackageManager:
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         raise NotImplementedError("Method not overloaded.")
+
+
+__all__ = [
+    "AbstractPackageManager",
+]

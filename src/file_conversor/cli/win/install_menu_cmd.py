@@ -71,3 +71,9 @@ def install_menu(
         logger.warning("Restart explorer.exe or log off from Windows, to make changes effective immediately.")
 
     logger.info(f"{_('Context Menu Install')}: [bold green]{_('SUCCESS')}[/].")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

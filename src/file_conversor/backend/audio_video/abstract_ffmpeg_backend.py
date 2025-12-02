@@ -107,3 +107,8 @@ class AbstractFFmpegBackend(AbstractBackend):
         # check ffmpeg
         self._ffmpeg_bin = self.find_in_path("ffmpeg")
         self._ffprobe_bin = self.find_in_path("ffprobe")
+
+
+__all__ = [
+    "AbstractFFmpegBackend",
+]

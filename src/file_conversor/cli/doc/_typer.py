@@ -9,3 +9,9 @@ COMMAND_NAME = "doc"
 
 # SUBCOMMANDS
 CONVERT_NAME = "convert"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CONVERT_NAME",
+]

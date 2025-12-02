@@ -90,3 +90,10 @@ def check(
     execute_text_check_cmd(
         input_files=input_files,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_text_check_cmd",
+]

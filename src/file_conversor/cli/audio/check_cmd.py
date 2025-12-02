@@ -90,3 +90,10 @@ def check(
     input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS)],
 ):
     execute_audio_check_cmd(input_files)
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_audio_check_cmd",
+]

@@ -41,3 +41,7 @@ video_cmd.add_typer(check_cmd)
 video_cmd.add_typer(info_cmd)
 video_cmd.add_typer(list_formats_cmd)
 video_cmd.add_typer(execute_cmd)
+
+__all__ = [
+    "video_cmd",
+]

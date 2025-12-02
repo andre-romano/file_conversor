@@ -143,3 +143,10 @@ def ocr(
         languages=languages,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_ocr_cmd",
+]

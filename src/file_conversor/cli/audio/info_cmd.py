@@ -101,3 +101,9 @@ def info(
         except Exception as e:
             logger.error(f"{_('Error parsing file')} '{filename}': {e}")
             continue
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

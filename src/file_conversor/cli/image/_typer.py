@@ -27,3 +27,21 @@ RESIZE_NAME = "resize"
 ROTATE_NAME = "rotate"
 TO_PDF_NAME = "to-pdf"
 UNSHARP_NAME = "unsharp"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "ANTIALIAS_NAME",
+    "BLUR_NAME",
+    "COMPRESS_NAME",
+    "CONVERT_NAME",
+    "ENHANCE_NAME",
+    "FILTER_NAME",
+    "INFO_NAME",
+    "MIRROR_NAME",
+    "RENDER_NAME",
+    "RESIZE_NAME",
+    "ROTATE_NAME",
+    "TO_PDF_NAME",
+    "UNSHARP_NAME",
+]

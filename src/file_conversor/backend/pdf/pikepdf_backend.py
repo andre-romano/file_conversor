@@ -90,3 +90,8 @@ class PikePDFBackend(AbstractBackend):
                      object_stream_mode=ObjectStreamMode(ObjectStreamMode.generate),  # generate streams as needed (max compression)
                      linearize=linearize,
                      )
+
+
+__all__ = [
+    "PikePDFBackend",
+]

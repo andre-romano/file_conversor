@@ -10,3 +10,9 @@ COMMAND_NAME = "gui"
 
 # SUBCOMMANDS
 START_NAME = "start"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "START_NAME",
+]

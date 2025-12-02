@@ -44,3 +44,9 @@ EXTERNAL_DEPENDENCIES = set()
 def restart_explorer():
     logger.info(f"{_('Restarting explorer.exe')} ...")
     win.restart_explorer()
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

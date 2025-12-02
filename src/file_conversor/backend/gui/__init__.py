@@ -1,10 +1,10 @@
 # src\file_conversor\backend\gui\__init__.py
 
 # user-provided modules
-from file_conversor.backend.gui.web_app import WebApp
+from file_conversor.backend.gui.web_app import *
 
-from file_conversor.backend.gui.flask_api import FlaskApi
-from file_conversor.backend.gui.flask_route import FlaskRoute
+from file_conversor.backend.gui.flask_api import *
+from file_conversor.backend.gui.flask_route import *
 from file_conversor.backend.gui.flask_api_status import *
 
 # routes

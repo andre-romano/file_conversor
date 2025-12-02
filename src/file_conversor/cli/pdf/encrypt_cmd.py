@@ -200,3 +200,10 @@ def encrypt(
         encrypt_algo=encrypt_algo,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_encrypt_cmd",
+]

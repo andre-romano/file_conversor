@@ -100,3 +100,10 @@ def unsharp(
         threshold=threshold,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_image_unsharp_cmd",
+]

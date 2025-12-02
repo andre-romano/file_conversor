@@ -103,3 +103,8 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
         with open(output_file, "wb") as fp:
             fp.write(process.stdout)
         return process
+
+
+__all__ = [
+    "_MozJPEGBackend",
+]

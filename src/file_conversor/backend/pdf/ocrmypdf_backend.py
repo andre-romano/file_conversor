@@ -26,7 +26,6 @@ _ = get_translation()
 
 
 class OcrMyPDFBackend(AbstractBackend):
-    TESSDATA_REMOTE_LANGS: set[str] | None = None
     TESSDATA_DIR: Path | None = None
 
     TESSDATA_REPOSITORY = {
@@ -134,10 +133,7 @@ class OcrMyPDFBackend(AbstractBackend):
         """
         Get available remote languages for OCR.
         """
-        if self.TESSDATA_REMOTE_LANGS is not None:
-            return self.TESSDATA_REMOTE_LANGS
-
-        self.TESSDATA_REMOTE_LANGS = set()
+        remote_langs = set()
         for file_info in GitBackend.get_info_api(
             **self.TESSDATA_REPOSITORY,
         ):
@@ -145,8 +141,8 @@ class OcrMyPDFBackend(AbstractBackend):
                 continue
             lang = file_info["name"][:-len(".traineddata")]
             if lang and lang not in ("configs", "tessdata_best", "tessdata_fast"):
-                self.TESSDATA_REMOTE_LANGS.add(lang)
-        return self.TESSDATA_REMOTE_LANGS
+                remote_langs.add(lang)
+        return remote_langs
 
     def get_available_languages(self) -> set[str]:
         """
@@ -198,3 +194,8 @@ class OcrMyPDFBackend(AbstractBackend):
             skip_text=True,  # skip OCR if text is already present
             progress_bar=True,
         )
+
+
+__all__ = [
+    "OcrMyPDFBackend",
+]

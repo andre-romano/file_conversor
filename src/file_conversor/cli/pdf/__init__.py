@@ -41,3 +41,7 @@ pdf_cmd.add_typer(ocr_cmd)
 pdf_cmd.add_typer(convert_cmd)
 pdf_cmd.add_typer(extract_img_cmd)
 pdf_cmd.add_typer(repair_cmd)
+
+__all__ = [
+    "pdf_cmd",
+]

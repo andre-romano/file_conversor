@@ -48,3 +48,8 @@ def get_progress_bar() -> Progress | DummyProgress:
         "[bold white][progress.percentage]{task.percentage:>3.0f}%",
         TimeRemainingColumn(),
     )
+
+
+__all__ = [
+    "get_progress_bar",
+]

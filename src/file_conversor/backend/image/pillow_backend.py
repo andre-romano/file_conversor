@@ -530,3 +530,8 @@ class PillowBackend(AbstractBackend):
 
         # save image
         img.save(output_file, format=format, **params)
+
+
+__all__ = [
+    "PillowBackend",
+]

@@ -113,3 +113,8 @@ class AbstractMSOfficeBackend(AbstractBackend):
             return False
         finally:
             pythoncom.CoUninitialize()
+
+
+__all__ = [
+    "AbstractMSOfficeBackend",
+]

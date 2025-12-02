@@ -117,3 +117,8 @@ class Img2PDFBackend(AbstractBackend):
 
         with open(output_path, "wb") as f:
             f.write(buffer)
+
+
+__all__ = [
+    "Img2PDFBackend",
+]

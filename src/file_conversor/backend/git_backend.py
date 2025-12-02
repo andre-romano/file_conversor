@@ -9,7 +9,7 @@ from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.backend.http_backend import HttpBackend
+from file_conversor.backend.http_backend import HttpBackend, NetworkError
 
 from file_conversor.config import Environment, Log, get_translation
 
@@ -90,13 +90,13 @@ class GitBackend(AbstractBackend):
             params={"ref": branch} if branch else None,
         )
         if isinstance(res, dict) and res.get("status", "200") != "200":
-            raise RuntimeError(f"{_('Failed to retrieve info from GitHub API')}: {res.get('status', '200')} - {res.get('message', '')}")
+            raise NetworkError(f"{_('Failed to retrieve info from GitHub API')}: {res.get('status', '200')} - {res.get('message', '')}")
         if isinstance(res, dict):
             return [res]
         elif isinstance(res, list):
             return res
         else:
-            raise RuntimeError(f"{_('Failed to retrieve info from GitHub API')}: {type(res)}")
+            raise NetworkError(f"{_('Failed to retrieve info from GitHub API')}: {type(res)}")
 
     @staticmethod
     def check_repository(path: str | Path) -> Path:
@@ -233,3 +233,8 @@ class GitBackend(AbstractBackend):
             stderr=None,
         )
         return process
+
+
+__all__ = [
+    "GitBackend",
+]

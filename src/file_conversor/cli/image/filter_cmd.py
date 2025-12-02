@@ -106,3 +106,10 @@ def filter(
         filters=filters,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_image_filter_cmd",
+]

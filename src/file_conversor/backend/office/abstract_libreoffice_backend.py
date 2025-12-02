@@ -92,3 +92,8 @@ class AbstractLibreofficeBackend(AbstractBackend):
                 raise RuntimeError(f"LibreOffice conversion failed: {process.stdout or ''} {process.stderr or ''}")
             if file_processed_callback:
                 file_processed_callback(input_path)
+
+
+__all__ = [
+    "AbstractLibreofficeBackend",
+]

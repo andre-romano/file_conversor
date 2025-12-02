@@ -406,3 +406,8 @@ class PyPDFBackend(AbstractBackend):
             writer.write(output_path)
             if progress_callback:
                 progress_callback(100.0)
+
+
+__all__ = [
+    "PyPDFBackend",
+]

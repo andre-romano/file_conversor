@@ -10,3 +10,10 @@ COMMAND_NAME = "config"
 # SUBCOMMANDS
 SET_NAME = "set"
 SHOW_NAME = "show"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "SET_NAME",
+    "SHOW_NAME",
+]

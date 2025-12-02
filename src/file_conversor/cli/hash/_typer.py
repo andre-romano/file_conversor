@@ -10,3 +10,10 @@ COMMAND_NAME = "hash"
 # SUBCOMMANDS
 CHECK_NAME = "check"
 CREATE_NAME = "create"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CHECK_NAME",
+    "CREATE_NAME",
+]

@@ -12,3 +12,11 @@ COMMAND_NAME = "audio"
 CHECK_NAME = "check"
 CONVERT_NAME = "convert"
 INFO_NAME = "info"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CHECK_NAME",
+    "CONVERT_NAME",
+    "INFO_NAME",
+]

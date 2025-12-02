@@ -91,3 +91,16 @@ def FFmpegFilterUnsharp(luma_msize_x: int = 5, luma_msize_y: int = 5, luma_amoun
 # DESHAKE
 def FFmpegFilterDeshake() -> FFmpegFilter:
     return FFmpegFilter("deshake")
+
+
+__all__ = [
+    "FFmpegFilter",
+    "FFmpegFilterEq",
+    "FFmpegFilterScale",
+    "FFmpegFilterTranspose",
+    "FFmpegFilterHflip",
+    "FFmpegFilterVflip",
+    "FFmpegFilterMInterpolate",
+    "FFmpegFilterUnsharp",
+    "FFmpegFilterDeshake",
+]

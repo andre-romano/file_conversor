@@ -157,3 +157,9 @@ def set(
     CONFIG.save()
     show_cmd.show()
     logger.info(f"{_('Configuration file')} {_('updated')}.")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

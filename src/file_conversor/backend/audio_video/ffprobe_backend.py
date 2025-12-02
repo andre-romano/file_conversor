@@ -121,3 +121,8 @@ class FFprobeBackend(AbstractFFmpegBackend):
             f"{file_path}",
         )
         return json.loads(result.stdout)
+
+
+__all__ = [
+    "FFprobeBackend",
+]

@@ -89,3 +89,10 @@ def check(
     execute_hash_check_cmd(
         input_files=input_files,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_hash_check_cmd",
+]

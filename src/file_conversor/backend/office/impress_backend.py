@@ -43,3 +43,8 @@ class LibreofficeImpressBackend(AbstractLibreofficeBackend):
             install_deps=install_deps,
             verbose=verbose,
         )
+
+
+__all__ = [
+    "LibreofficeImpressBackend",
+]

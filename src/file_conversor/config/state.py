@@ -126,3 +126,8 @@ class State:
     def update(self, new: dict):
         for key, value in new.items():
             self[key] = value
+
+
+__all__ = [
+    "State",
+]

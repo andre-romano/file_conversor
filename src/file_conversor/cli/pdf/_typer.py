@@ -28,3 +28,27 @@ REPAIR_NAME = "repair"
 
 ROTATE_NAME = "rotate"
 SPLIT_NAME = "split"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "SECURITY_PANEL",
+    "TRANSFORMATION_PANEL",
+    "OTHERS_PANEL",
+
+    "COMPRESS_NAME",
+    "CONVERT_NAME",
+
+    "DECRYPT_NAME",
+    "ENCRYPT_NAME",
+
+    "EXTRACT_NAME",
+    "EXTRACT_IMG_NAME",
+
+    "MERGE_NAME",
+    "OCR_NAME",
+    "REPAIR_NAME",
+
+    "ROTATE_NAME",
+    "SPLIT_NAME",
+]

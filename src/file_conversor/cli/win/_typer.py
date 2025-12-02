@@ -15,3 +15,11 @@ COMMAND_NAME = "win"
 INSTALL_MENU_NAME = "install-menu"
 UNINSTALL_MENU_NAME = "uninstall-menu"
 RESTART_EXPLORER_NAME = "restart-explorer"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "INSTALL_MENU_NAME",
+    "UNINSTALL_MENU_NAME",
+    "RESTART_EXPLORER_NAME",
+]

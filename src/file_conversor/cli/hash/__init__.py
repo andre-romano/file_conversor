@@ -18,3 +18,7 @@ hash_cmd = typer.Typer(
 )
 hash_cmd.add_typer(create_cmd)
 hash_cmd.add_typer(check_cmd)
+
+__all__ = [
+    "hash_cmd",
+]

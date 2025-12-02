@@ -12,7 +12,6 @@ from file_conversor.backend.gui.config._tab_image import TabConfigImage
 from file_conversor.backend.gui.config._tab_network import TabConfigNetwork
 from file_conversor.backend.gui.config._tab_pdf import TabConfigPDF
 
-from file_conversor.backend.gui.web_app import WebApp
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 

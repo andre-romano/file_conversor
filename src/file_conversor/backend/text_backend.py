@@ -235,3 +235,8 @@ class TextBackend(AbstractBackend):
 
         data = in_txt_file.read()
         out_txt_file.minify(data)
+
+
+__all__ = [
+    "TextBackend",
+]

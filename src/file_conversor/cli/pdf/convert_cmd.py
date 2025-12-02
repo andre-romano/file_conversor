@@ -146,3 +146,10 @@ def convert(
         password=password,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_convert_cmd",
+]

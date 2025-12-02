@@ -116,3 +116,8 @@ COMMANDS_LIST.extend([
         "rich_help_panel": UTILS_CONFIG_PANEL,
     },
 ])
+
+__all__ = [
+    "PYTHON_VERSION",
+    "COMMANDS_LIST",
+]

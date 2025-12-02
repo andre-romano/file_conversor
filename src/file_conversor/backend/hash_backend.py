@@ -157,3 +157,8 @@ class HashBackend(AbstractBackend):
             progress = 100.0 * (float(idx) / len(lines))
             if progress_callback:
                 progress_callback(progress)
+
+
+__all__ = [
+    "HashBackend",
+]

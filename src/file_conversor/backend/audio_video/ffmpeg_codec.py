@@ -282,3 +282,8 @@ for codec_name, impl in [("av1_nvenc", "nvenc"),
                               )
 
 FFmpegVideoCodec.register("mpeg4", name="mpeg4")
+
+__all__ = [
+    "FFmpegAudioCodec",
+    "FFmpegVideoCodec",
+]

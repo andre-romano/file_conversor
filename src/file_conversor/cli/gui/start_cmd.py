@@ -44,3 +44,9 @@ def start_gui():
     logger.info(f"[bold]{_('Starting the graphical user interface')} ...[/]")
     webapp = WebApp.get_instance()
     webapp.run()
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

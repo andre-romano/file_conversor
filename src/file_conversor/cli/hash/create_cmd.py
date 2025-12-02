@@ -77,3 +77,10 @@ def create(
         input_files=input_files,
         output_file=output_file,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_hash_create_cmd",
+]

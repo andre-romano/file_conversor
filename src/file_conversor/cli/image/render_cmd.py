@@ -108,3 +108,10 @@ def render(
         dpi=dpi,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_image_render_cmd",
+]

@@ -56,3 +56,9 @@ def uninstall_menu():
     winreg_backend.delete_keys(ctx_menu.get_reg_file())
 
     logger.info(f"{_('Context Menu Uninstall')}: [bold green]{_('SUCCESS')}[/].")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

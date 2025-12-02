@@ -141,3 +141,10 @@ def to_pdf(
         set_metadata=set_metadata,
         output_file=output_file,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_image_to_pdf_cmd",
+]

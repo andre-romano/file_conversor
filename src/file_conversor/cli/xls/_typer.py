@@ -10,3 +10,9 @@ COMMAND_NAME = "xls"
 
 # SUBCOMMANDS
 CONVERT_NAME = "convert"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CONVERT_NAME",
+]

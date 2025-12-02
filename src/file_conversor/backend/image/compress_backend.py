@@ -104,3 +104,8 @@ class CompressBackend(AbstractBackend):
             output_file=output_file,
             **kwargs,
         )
+
+
+__all__ = [
+    "CompressBackend",
+]

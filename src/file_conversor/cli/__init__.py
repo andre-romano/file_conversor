@@ -115,3 +115,8 @@ def main_callback(
     logger.debug(f"Data folder: {Environment.get_data_folder()}")
     logger.debug(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
     logger.debug(f"Language (config / sys): ({CONFIG['language']} / {get_system_locale()})")
+
+
+__all__ = [
+    "app_cmd",
+]

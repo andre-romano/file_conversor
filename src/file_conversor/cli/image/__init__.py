@@ -47,3 +47,7 @@ image_cmd.add_typer(unsharp_cmd)
 
 # OTHERS_PANEL
 image_cmd.add_typer(info_cmd)
+
+__all__ = [
+    "image_cmd",
+]

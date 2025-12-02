@@ -292,3 +292,8 @@ class GhostscriptBackend(AbstractBackend):
 
         Environment.check_returncode(process, out_lines=out_lines)
         return process
+
+
+__all__ = [
+    "GhostscriptBackend",
+]

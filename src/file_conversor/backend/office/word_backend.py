@@ -79,3 +79,8 @@ class WordBackend(AbstractMSOfficeBackend):
 
                 if file_processed_callback:
                     file_processed_callback(input_path)
+
+
+__all__ = [
+    "WordBackend",
+]

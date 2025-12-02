@@ -1,3 +1,4 @@
+# src\file_conversor\utils\abstract_register_manager.py
 
 from typing import Any, Self
 
@@ -24,3 +25,8 @@ class AbstractRegisterManager:
             raise ValueError(f"'{name}' not registered. Registered options: {', '.join(cls.get_registered())}")
         args, kwargs = cls._REGISTERED[name]
         return cls(*args, **kwargs)
+
+
+__all__ = [
+    "AbstractRegisterManager",
+]

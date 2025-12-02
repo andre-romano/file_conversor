@@ -16,3 +16,7 @@ ppt_cmd = typer.Typer(
     help=f"{_('Presentation file manipulation')} {_('(requires LibreOffice)')})",
 )
 ppt_cmd.add_typer(convert_cmd)
+
+__all__ = [
+    "ppt_cmd",
+]

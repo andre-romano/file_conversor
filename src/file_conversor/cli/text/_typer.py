@@ -12,3 +12,11 @@ COMMAND_NAME = "text"
 CHECK_NAME = "check"
 COMPRESS_NAME = "compress"
 CONVERT_NAME = "convert"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CHECK_NAME",
+    "COMPRESS_NAME",
+    "CONVERT_NAME",
+]

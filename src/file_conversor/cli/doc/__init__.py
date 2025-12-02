@@ -17,3 +17,7 @@ doc_cmd = typer.Typer(
     help=f"{_('Document file manipulation')} {_('(requires LibreOffice)')})",
 )
 doc_cmd.add_typer(convert_cmd)
+
+__all__ = [
+    "doc_cmd",
+]

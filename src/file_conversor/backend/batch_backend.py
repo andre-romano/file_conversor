@@ -162,3 +162,8 @@ class BatchBackend(AbstractBackend):
                 cmd = os.path.normpath(cmd)
             cmd_list.append(cmd)
         return cmd_list
+
+
+__all__ = [
+    "BatchBackend",
+]

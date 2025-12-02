@@ -307,3 +307,24 @@ def format_in_out_files_tuple(
         if not STATE["overwrite-output"] and output_file.exists():
             raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
     return files
+
+
+__all__ = [
+    "escape_xml",
+    "parse_traceback_list",
+    "parse_js_to_py",
+    "parse_ffmpeg_filter",
+    "parse_image_resize_scale",
+    "parse_pdf_rotation",
+    "parse_pdf_pages",
+    "normalize_degree",
+    "parse_bytes",
+    "format_bytes",
+    "format_bitrate",
+    "format_alphanumeric",
+    "format_file_types_webview",
+    "format_py_to_js",
+    "format_traceback_str",
+    "format_traceback_html",
+    "format_in_out_files_tuple",
+]

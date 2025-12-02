@@ -1,6 +1,7 @@
 # tests\utils\test_validators.py
 
 import pytest
+import typer
 
 from file_conversor.utils.validators import *
 

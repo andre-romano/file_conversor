@@ -22,3 +22,18 @@ LIST_FORMATS_NAME = "list-formats"
 MIRROR_NAME = "mirror"
 RESIZE_NAME = "resize"
 ROTATE_NAME = "rotate"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CHECK_NAME",
+    "COMPRESS_NAME",
+    "CONVERT_NAME",
+    "ENHANCE_NAME",
+    "EXECUTE_NAME",
+    "INFO_NAME",
+    "LIST_FORMATS_NAME",
+    "MIRROR_NAME",
+    "RESIZE_NAME",
+    "ROTATE_NAME",
+]

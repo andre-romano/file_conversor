@@ -94,3 +94,10 @@ def merge(
         password=password,
         output_file=output_file,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_merge_cmd",
+]

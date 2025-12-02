@@ -27,3 +27,7 @@ pipeline_cmd = typer.Typer(
 )
 pipeline_cmd.add_typer(create_cmd)
 pipeline_cmd.add_typer(execute_cmd)
+
+__all__ = [
+    "pipeline_cmd",
+]

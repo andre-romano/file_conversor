@@ -89,3 +89,9 @@ def create():
 
     batch_backend.save_config()
     logger.info(f"{_('Pipeline creation')}: [bold green]{_('SUCCESS')}[/].")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

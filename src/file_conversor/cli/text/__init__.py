@@ -20,3 +20,7 @@ text_cmd = typer.Typer(
 text_cmd.add_typer(check_cmd)
 text_cmd.add_typer(compress_cmd)
 text_cmd.add_typer(convert_cmd)
+
+__all__ = [
+    "text_cmd",
+]

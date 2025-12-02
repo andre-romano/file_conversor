@@ -129,3 +129,10 @@ def compress(
     )
 
     logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_compress_cmd",
+]

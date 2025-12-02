@@ -106,3 +106,8 @@ class WinRegBackend(AbstractBackend):
             )
 
             logger.debug(f"'{key.path}' deleted")
+
+
+__all__ = [
+    "WinRegBackend",
+]

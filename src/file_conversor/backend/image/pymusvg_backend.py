@@ -65,3 +65,8 @@ class PyMuSVGBackend(AbstractBackend):
         for page in doc:
             pix = page.get_pixmap(dpi=dpi)  # type: ignore
             pix.save(str(output_file))  # type: ignore
+
+
+__all__ = [
+    "PyMuSVGBackend",
+]

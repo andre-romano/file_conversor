@@ -4,6 +4,7 @@
 This module provides functionalities for handling repositories using HTTP.
 """
 
+import threading
 import requests
 import requests_cache
 
@@ -23,6 +24,10 @@ CONFIG = Configuration.get_instance()
 logger = LOG.getLogger(__name__)
 
 
+class NetworkError(RuntimeError):
+    """Base exception for network-related errors in HttpBackend."""
+
+
 class HttpBackend(AbstractBackend):
     """
     HttpBackend is a class that provides an interface for handling HTTP requests.
@@ -35,6 +40,7 @@ class HttpBackend(AbstractBackend):
     EXTERNAL_DEPENDENCIES = set()
 
     __instance = None
+    __lock = threading.RLock()
 
     @classmethod
     def get_instance(
@@ -45,12 +51,12 @@ class HttpBackend(AbstractBackend):
         Initialize instance
 
         :param verbose: Verbose logging. Defaults to False.
-        :param cache: Enable caching. Defaults to True.
         """
-        if not cls.__instance:
-            cls.__instance = cls()
-        cls.__instance._verbose = verbose
-        return cls.__instance
+        with cls.__lock:
+            if not cls.__instance:
+                cls.__instance = cls()
+            cls.__instance._verbose = verbose
+            return cls.__instance
 
     def __init__(
         self,
@@ -69,7 +75,7 @@ class HttpBackend(AbstractBackend):
         self._cache_file = Environment.get_data_folder() / ".http_cache.sqlite"
 
         # Creates a persistent SQLite cache file: http_cache.sqlite
-        requests_cache.install_cache(
+        self._cached_session = requests_cache.CachedSession(
             cache_name=str(self._cache_file.with_suffix("").resolve()),
             backend="sqlite",
             expire_after=int(CONFIG["cache-expire-after"]),
@@ -78,6 +84,7 @@ class HttpBackend(AbstractBackend):
             old_data_on_error=True,  # Use old cache data if http 500 error occurs
             fast_save=True,          # Faster cache saving
         )
+        self._plain_session = requests.Session()
 
     def clear_cache(self):
         """Clear the HTTP cache."""
@@ -87,46 +94,73 @@ class HttpBackend(AbstractBackend):
     def get_json(
         self,
         url: str,
+        cache_enabled: bool = True,
+        timeout: tuple[int, int] | None = (5, 10),
         **kwargs,
     ) -> Any:
         """Get JSON data from a URL.
 
         :param url: The URL to fetch the JSON data from.        
+        :param cache_enabled: Whether to use the cache. Defaults to True.
+        :param timeout: A tuple specifying the connection and read timeout in seconds. Defaults to (5,30).
         :param kwargs: Additional arguments to pass to the requests.get() method.
         :return: The JSON data.
 
-        :raises RuntimeError: if the request fails or the response is not JSON.
+        :raises NetworkError: if the request fails or the response is not JSON.
         """
-        response = requests.get(url, **kwargs)
-        if not response.ok:
-            raise RuntimeError(f"{_('Failed to get JSON from url')} '{url}': {response.status_code} - {response.text}")
+        session = self._cached_session if cache_enabled else self._plain_session
         try:
+            response = session.get(url, timeout=timeout, **kwargs)
+            if not response.ok:
+                raise NetworkError(f"Response code: {response.status_code} - {response.text}")
             return response.json()
         except Exception as e:
-            raise RuntimeError(f"{_('Failed to parse JSON from url')} '{url}': {e}")
+            raise NetworkError(f"{_('Error during JSON fetch from url')} '{url}': {repr(e)}")
 
     def download(
         self,
         url: str,
         dest_file: str | Path,
+        cache_enabled: bool = False,
+        timeout: tuple[int, int] | None = (5, 600),
         progress_callback: Callable[[float], Any] | None = None,
+        **kwargs,
     ):
         """
         Download a file from a URL.
+
+        :param url: The URL to download the file from.
+        :param dest_file: The destination file path.
+        :param cache_enabled: Whether to use the cache. Defaults to False.
+        :param timeout: A tuple specifying the connection and read timeout in seconds. Defaults to (5,600).
+        :param progress_callback: A callback function to report download progress (0-100). Defaults to None.
+        :param kwargs: Additional arguments to pass to the requests.get() method.
+
+        :raises NetworkError: if the download fails.
         """
         dest_file = Path(dest_file).resolve()
         dest_file.parent.mkdir(parents=True, exist_ok=True)
         downloaded_bytes = 0.0
 
-        with requests.get(url, stream=True) as response:
-            if not response.ok:
-                raise RuntimeError(f"{_('Failed to download file')}: {response.status_code} - {response.text}")
-            total_size = float(response.headers.get("content-length", 0))
-            with dest_file.open("wb") as f:
-                for data in response.iter_content(chunk_size=1024):
-                    f.write(data)
-                    downloaded_bytes += len(data)
-                    if progress_callback:
-                        progress_callback(downloaded_bytes / total_size * 100)
-        if not dest_file.exists():
-            raise RuntimeError(f"{_('Failed to download file')}: '{dest_file}'")
+        session = self._cached_session if cache_enabled else self._plain_session
+        try:
+            with session.get(url, timeout=timeout, stream=True, **kwargs) as response:
+                if not response.ok:
+                    raise NetworkError(f"{_('Response code')}: {response.status_code} - {response.text}")
+                total_size = float(response.headers.get("content-length", 0))
+                with dest_file.open("wb") as f:
+                    for data in response.iter_content(chunk_size=1024):
+                        f.write(data)
+                        downloaded_bytes += len(data)
+                        if progress_callback:
+                            progress_callback(downloaded_bytes / total_size * 100)
+            if not dest_file.exists():
+                raise FileNotFoundError(f"'{dest_file}'")
+        except Exception as e:
+            raise NetworkError(f"{_('Network error during download')}: {repr(e)}")
+
+
+__all__ = [
+    "NetworkError",
+    "HttpBackend",
+]

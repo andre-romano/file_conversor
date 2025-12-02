@@ -44,3 +44,8 @@ class LibreofficeWriterBackend(AbstractLibreofficeBackend):
             install_deps=install_deps,
             verbose=verbose,
         )
+
+
+__all__ = [
+    "LibreofficeWriterBackend",
+]

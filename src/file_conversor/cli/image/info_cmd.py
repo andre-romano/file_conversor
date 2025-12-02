@@ -86,3 +86,9 @@ def info(
             *parser.get_exif_info().rich(),
         )
         print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

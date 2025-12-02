@@ -81,3 +81,9 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
     cmd_mgr.run(callback, out_suffix=f".{file_format}", out_stem=out_stem)
 
     logger.info(f"{_('FFMpeg result')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+__all__ = [
+    "EXTERNAL_DEPENDENCIES",
+    "ffmpeg_audio_run",
+]

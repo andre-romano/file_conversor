@@ -55,3 +55,9 @@ def execute(
 
     logger.info(f"{_('Pipeline execution')}: [bold green]{_('SUCCESS')}[/].")
     logger.info(f"--------------------------------")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

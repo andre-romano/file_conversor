@@ -94,3 +94,8 @@ class Configuration:
             "gui-zoom": 100,            # Default GUI zoom level
             "gui-output-dir": str(Environment.UserFolder.DOWNLOADS()),  # Default output directory
         })
+
+
+__all__ = [
+    "Configuration",
+]

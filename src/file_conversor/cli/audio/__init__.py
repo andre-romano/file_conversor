@@ -24,3 +24,7 @@ audio_cmd = typer.Typer(
 audio_cmd.add_typer(convert_cmd)
 audio_cmd.add_typer(info_cmd)
 audio_cmd.add_typer(check_cmd)
+
+__all__ = [
+    "audio_cmd",
+]

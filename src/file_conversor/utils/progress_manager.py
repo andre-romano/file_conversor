@@ -79,3 +79,8 @@ class ProgressManager:
         progress = self.update_progress(100.0)  # Ensure current step is 100%
         self.current_step += 1
         return progress
+
+
+__all__ = [
+    "ProgressManager",
+]

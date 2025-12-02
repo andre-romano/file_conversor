@@ -1,6 +1,7 @@
 # tests\utils\test_formatters.py
 
 import pytest
+from pathlib import Path
 
 from file_conversor.utils.formatters import *
 

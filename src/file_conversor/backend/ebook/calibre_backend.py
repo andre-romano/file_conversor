@@ -109,3 +109,8 @@ class CalibreBackend(AbstractBackend):
             str(output_path),
         )
         return process
+
+
+__all__ = [
+    'CalibreBackend',
+]

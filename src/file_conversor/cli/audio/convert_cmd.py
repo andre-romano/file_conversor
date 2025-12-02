@@ -86,3 +86,10 @@ def convert_audio(
         audio_bitrate=audio_bitrate,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "ffmpeg_audio_run",
+]

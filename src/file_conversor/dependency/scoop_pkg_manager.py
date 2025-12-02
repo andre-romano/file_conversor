@@ -80,3 +80,8 @@ class ScoopPackageManager(AbstractPackageManager):
                 f"{scoop_bin}", "bucket", "add", f"{bucket}",
             )
             logger.info(f"{_('Bucket')} '{bucket}' {_('added to scoop')}.")
+
+
+__all__ = [
+    "ScoopPackageManager",
+]

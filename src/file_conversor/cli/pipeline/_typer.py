@@ -11,3 +11,10 @@ COMMAND_NAME = "pipeline"
 # SUBCOMMANDS
 CREATE_NAME = "create"
 EXECUTE_NAME = "execute"
+
+__all__ = [
+    "COMMAND_NAME",
+
+    "CREATE_NAME",
+    "EXECUTE_NAME",
+]

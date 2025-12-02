@@ -311,3 +311,9 @@ VideoFormatContainer.register(
         "copy",
     },
 )
+
+__all__ = [
+    "FormatContainer",
+    "VideoFormatContainer",
+    "AudioFormatContainer",
+]

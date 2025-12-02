@@ -178,3 +178,8 @@ class Log:
     def _add_handler(self, handler: Handler):
         handler.setFormatter(self._log_formatter)
         logging.getLogger().addHandler(handler)
+
+
+__all__ = [
+    "Log",
+]

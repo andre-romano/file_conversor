@@ -40,3 +40,9 @@ EXTERNAL_DEPENDENCIES = set()
 )
 def show():
     print(f"{_('Configuration')}:", Pretty(CONFIG.to_dict(), expand_all=True))
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

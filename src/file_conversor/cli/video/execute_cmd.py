@@ -101,3 +101,9 @@ def execute(
     cmd_mgr.run(callback, out_suffix=f".{file_format}")
 
     logger.info(f"{_('FFMpeg execution')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

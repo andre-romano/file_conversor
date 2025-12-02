@@ -17,3 +17,7 @@ gui_cmd = typer.Typer(
 )
 
 gui_cmd.add_typer(start_cmd)
+
+__all__ = [
+    "gui_cmd",
+]

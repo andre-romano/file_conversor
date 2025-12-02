@@ -104,3 +104,8 @@ class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
             *command,
         )
         return process
+
+
+__all__ = [
+    "_OxiPNGBackend",
+]

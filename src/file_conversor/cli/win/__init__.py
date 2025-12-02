@@ -22,3 +22,7 @@ win_cmd.add_typer(restart_explorer_cmd)
 # CONTEXT_MENU_PANEL
 win_cmd.add_typer(install_menu_cmd)
 win_cmd.add_typer(uninstall_menu_cmd)
+
+__all__ = [
+    "win_cmd",
+]

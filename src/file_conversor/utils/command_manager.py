@@ -51,3 +51,8 @@ class CommandManager:
                     raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
 
                 callback(input_file, output_file, progress_mgr)
+
+
+__all__ = [
+    "CommandManager",
+]

@@ -15,9 +15,9 @@ from file_conversor.backend.office import *
 from file_conversor.backend.pdf import *
 
 # OTHER BACKENDS
-from file_conversor.backend.batch_backend import BatchBackend
-from file_conversor.backend.git_backend import GitBackend
-from file_conversor.backend.hash_backend import HashBackend
-from file_conversor.backend.http_backend import HttpBackend
-from file_conversor.backend.text_backend import TextBackend
-from file_conversor.backend.win_reg_backend import WinRegBackend
+from file_conversor.backend.batch_backend import *
+from file_conversor.backend.git_backend import *
+from file_conversor.backend.hash_backend import *
+from file_conversor.backend.http_backend import *
+from file_conversor.backend.text_backend import *
+from file_conversor.backend.win_reg_backend import *

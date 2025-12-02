@@ -90,3 +90,8 @@ class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
             f"-o", f"{output_file}",
         )
         return process
+
+
+__all__ = [
+    "_GifSicleBackend",
+]

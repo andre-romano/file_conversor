@@ -61,3 +61,9 @@ def list_formats(
         logger.info(f"  - {_('Audio codecs')}: {', '.join(kwargs['available_audio_codecs'])}")
         logger.info(f"  - {_('Video codecs')}: {', '.join(kwargs['available_video_codecs'])}")
     print()  # add a final newline
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+]

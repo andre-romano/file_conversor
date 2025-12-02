@@ -99,3 +99,10 @@ def extract_img(
         input_files=input_files,
         output_dir=output_dir,
     )
+
+
+__all__ = [
+    "typer_cmd",
+    "EXTERNAL_DEPENDENCIES",
+    "execute_pdf_extract_img_cmd",
+]

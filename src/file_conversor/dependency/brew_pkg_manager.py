@@ -55,3 +55,8 @@ class BrewPackageManager(AbstractPackageManager):
         pkg_mgr_bin = self._get_pkg_manager_installed()
         pkg_mgr_bin = pkg_mgr_bin if pkg_mgr_bin else "BREW_NOT_FOUND"
         return ["bash", "-c", f'export HOMEBREW_NO_INSTALL_CLEANUP=1 ; "{pkg_mgr_bin}" install "{dependency}"']
+
+
+__all__ = [
+    "BrewPackageManager",
+]

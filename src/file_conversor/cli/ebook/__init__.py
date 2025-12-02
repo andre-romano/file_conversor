@@ -20,3 +20,7 @@ ebook_cmd = typer.Typer(
 
 # CONVERSION_PANEL
 ebook_cmd.add_typer(convert_cmd)
+
+__all__ = [
+    "ebook_cmd",
+]

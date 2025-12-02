@@ -16,3 +16,7 @@ xls_cmd = typer.Typer(
     help=f"{_('Spreadsheet file manipulation')} {_('(requires LibreOffice)')})",
 )
 xls_cmd.add_typer(convert_cmd)
+
+__all__ = [
+    "xls_cmd",
+]
