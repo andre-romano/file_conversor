@@ -9,7 +9,7 @@ from rich import print
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
 from file_conversor.system.win.utils import is_admin
 
-from file_conversor.config import Environment, Log
+from file_conversor.config import Environment, Log, AbstractSingletonThreadSafe
 from file_conversor.config.locale import get_translation
 
 # get app config
@@ -43,14 +43,7 @@ class WinContextCommand:
         self.icon = icon
 
 
-class WinContextMenu:
-    _instance = None
-
-    @classmethod
-    def get_instance(cls):
-        if not cls._instance:
-            cls._instance = cls()
-        return cls._instance
+class WinContextMenu(AbstractSingletonThreadSafe):
 
     def __init__(self) -> None:
         """Set context menu for all users, or for current user ONLY"""

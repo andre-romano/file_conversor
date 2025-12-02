@@ -7,6 +7,8 @@ from typing import Any
 # user provided imports
 from file_conversor.config.log import Log
 
+from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
+
 # Get app config
 LOG = Log.get_instance()
 
@@ -55,15 +57,7 @@ def enable_overwrite_output_mode(value):
 
 
 # STATE controller dict class
-class State:
-    __instance = None
-
-    @classmethod
-    def get_instance(cls):
-        if not cls.__instance:
-            cls.__instance = cls()
-        return cls.__instance
-
+class State(AbstractSingletonThreadSafe):
     def __init__(self) -> None:
         super().__init__()
         self.__init_state()

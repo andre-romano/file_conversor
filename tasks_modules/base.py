@@ -23,6 +23,7 @@ def mkdirs(c: InvokeContext):
         "dist",
         f"{CACHE_DIR}",
         "docs",
+        "deps",
         "htmlcov",
     ]
     for dir in dirs:
@@ -63,6 +64,11 @@ def clean_docs(c: InvokeContext):
 
 
 @task(pre=[mkdirs])
+def clean_deps(c: InvokeContext):
+    remove_path_pattern(f"deps/*")
+
+
+@task(pre=[mkdirs])
 def clean_changelog(c: InvokeContext):
     remove_path_pattern(f"CHANGELOG.md")
     remove_path_pattern(f"RELEASE_NOTES.md")
@@ -79,6 +85,7 @@ def clean_requirements(c: InvokeContext):
            clean_cache,
            clean_htmlcov,
            clean_docs,
+           clean_deps,
            clean_changelog,
            ])
 def clean(c: InvokeContext):
@@ -93,7 +100,26 @@ def requirements(c: InvokeContext, prod: bool = True):
     print("[bold]Generating requirements.txt ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_htmlcov, locales.build,])
+@task(pre=[clean_deps,])
+def deps(c: InvokeContext):
+    print("[bold]Checking for circular dependencies ... [/]")
+    result = c.run(" ".join([
+        "pdm",
+        "run",
+        "pydeps",
+        "src/file_conversor/__main__.py",
+        "--only", "file_conversor",
+        "--show-cycles",
+        "--no-show",
+        # "--no-output",
+        "-o", "deps/dependencies.svg",
+        "-T", "svg",
+    ]))
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold]Checking for circular dependencies ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_htmlcov, locales.build])
 def tests(c: InvokeContext, args: str = ""):
     print("[bold] Running tests ... [/]")
     result = c.run(f"pdm run pytest {args.strip()}")

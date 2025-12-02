@@ -14,14 +14,14 @@ from enum import Enum
 
 # user provided imports
 from file_conversor.config.log import Log
+from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
 
 # Get app config
 logger = Log.get_instance().getLogger(__name__)
 
 
-class Environment:
+class Environment(AbstractSingletonThreadSafe):
 
-    __instance = None
     __APP_NAME = "file_conversor"
 
     class UserFolder(Enum):
@@ -233,12 +233,6 @@ class Environment:
     def get_app_name(cls) -> str:
         """Get the app name."""
         return cls.__APP_NAME
-
-    @classmethod
-    def get_instance(cls):
-        if not cls.__instance:
-            cls.__instance = cls()
-        return cls.__instance
 
     @classmethod
     def run_nowait(cls,

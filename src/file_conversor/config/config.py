@@ -7,17 +7,10 @@ from pathlib import Path
 from typing import Any
 
 from file_conversor.config.environment import Environment
+from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
 
 
-class Configuration:
-
-    __instance = None
-
-    @classmethod
-    def get_instance(cls):
-        if not cls.__instance:
-            cls.__instance = cls()
-        return cls.__instance
+class Configuration(AbstractSingletonThreadSafe):
 
     def __init__(self) -> None:
         super().__init__()

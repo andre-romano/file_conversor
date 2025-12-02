@@ -15,8 +15,11 @@ from typing import Mapping
 
 from pathlib import Path
 
+# user-provided imports
+from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
 
-class Log:
+
+class Log(AbstractSingletonThreadSafe):
     class CustomLogger:
         def __init__(self, name: str | None) -> None:
             super().__init__()
@@ -86,9 +89,6 @@ class Log:
                 record.msg = self.TAG_RE.sub('', record.msg)
             return super().format(record)
 
-    # singleton instance
-    __instance = None
-
     # most severe level, to least
     LEVEL_CRITICAL, LEVEL_FATAL = logging.CRITICAL, logging.FATAL  # 50
     LEVEL_ERROR = logging.ERROR  # 40
@@ -107,9 +107,7 @@ class Log:
         :param dest_folder: Destination folder to store log file. If None, do not log to file. Defaults to '.' (log to current working folder).
         :param level: Log level. Defaults to LEVEL_INFO.
         """
-        if not cls.__instance:
-            cls.__instance = cls(dest_folder=dest_folder, level=level)
-        return cls.__instance
+        return super().get_instance(dest_folder=dest_folder, level=level)
 
     def __init__(self, dest_folder: str | Path | None, level: int) -> None:
         """

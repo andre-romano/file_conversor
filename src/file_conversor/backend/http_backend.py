@@ -4,7 +4,6 @@
 This module provides functionalities for handling repositories using HTTP.
 """
 
-import threading
 import requests
 import requests_cache
 
@@ -13,7 +12,7 @@ from typing import Any, Callable, Iterable
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.config import Environment, Configuration, Log, get_translation
+from file_conversor.config import *
 
 from file_conversor.utils.validators import check_file_format
 
@@ -28,7 +27,7 @@ class NetworkError(RuntimeError):
     """Base exception for network-related errors in HttpBackend."""
 
 
-class HttpBackend(AbstractBackend):
+class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
     """
     HttpBackend is a class that provides an interface for handling HTTP requests.
     """
@@ -38,25 +37,6 @@ class HttpBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {}
 
     EXTERNAL_DEPENDENCIES = set()
-
-    __instance = None
-    __lock = threading.RLock()
-
-    @classmethod
-    def get_instance(
-        cls,
-        verbose: bool = False,
-    ):
-        """
-        Initialize instance
-
-        :param verbose: Verbose logging. Defaults to False.
-        """
-        with cls.__lock:
-            if not cls.__instance:
-                cls.__instance = cls()
-            cls.__instance._verbose = verbose
-            return cls.__instance
 
     def __init__(
         self,

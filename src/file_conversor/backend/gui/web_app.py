@@ -15,7 +15,7 @@ from file_conversor.backend.gui._webview_api import WebViewAPI
 
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
-from file_conversor.config import Configuration, Environment, Log, State
+from file_conversor.config import *
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
 
 # Get app config
@@ -28,7 +28,7 @@ logger = LOG.getLogger()
 
 
 # Create a web application
-class WebApp:
+class WebApp(AbstractSingletonThreadSafe):
     LOCALIZATION = {
         'global.quitConfirmation': _('Do you really want to quit?'),
         'global.ok': _('OK'),
@@ -54,14 +54,6 @@ class WebApp:
         'linux.openFiles': _('Open files'),
         'linux.openFolder': _('Open folder'),
     }
-
-    _instance: Self | None = None
-
-    @classmethod
-    def get_instance(cls) -> Self:
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     def __init__(self) -> None:
         super().__init__()
