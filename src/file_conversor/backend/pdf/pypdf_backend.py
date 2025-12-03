@@ -35,7 +35,67 @@ class PyPDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
+
+    class EncryptionPermission(Enum):
+        NONE = 'none'
+        """ No permissions granted to user (read-only) """
+
+        ANNOTATE = 'annotate'
+        """ User can add/modify annotations (comments, highlight text, etc) and interactive forms. """
+
+        FILL_FORMS = 'fill_forms'
+        """ User can fill interactive form fields. """
+
+        MODIFY = 'modify'
+        """ User can modify the document (except pages). """
+
+        MODIFY_PAGES = 'modify_pages'
+        """ User can modify the document's pages (insert, delete, rotate, etc). """
+
+        COPY = 'copy'
+        """ User can copy text and graphics from the document. """
+
+        ACCESSIBILITY = 'accessibility'
+        """ User can extract text and graphics for accessibility purposes. """
+
+        PRINT_LQ = 'print_lq'
+        """ User can print the document in low quality. """
+
+        PRINT_HQ = 'print_hq'
+        """ User can print the document in high quality. """
+
+        ALL = 'all'
+        """ All permissions granted to user. """
+
+        def get_value(self):
+            """Get permission value."""
+            return {
+                'none': UserAccessPermissions(0),
+                'annotate': UserAccessPermissions.ADD_OR_MODIFY,
+                'fill_forms': UserAccessPermissions.FILL_FORM_FIELDS,
+                'modify': UserAccessPermissions.MODIFY,
+                'modify_pages': UserAccessPermissions.ASSEMBLE_DOC,
+                'copy': UserAccessPermissions.EXTRACT,
+                'accessibility': UserAccessPermissions.EXTRACT_TEXT_AND_GRAPHICS,
+                'print_lq': UserAccessPermissions.PRINT,
+                'print_hq': UserAccessPermissions.PRINT_TO_REPRESENTATION,
+                'all': UserAccessPermissions.all(),
+            }[self.value]
+
+        @classmethod
+        def get_dict(cls) -> dict[str, 'PyPDFBackend.EncryptionPermission']:
+            """Get dictionary of encryption algorithms."""
+            return dict(cls.__members__)
+
+        @classmethod
+        def from_str(cls, name: str):
+            """Get encryption algorithm from string."""
+            name = name.upper()
+            alg_dict = cls.get_dict()
+            if name not in alg_dict:
+                raise ValueError(f"Encryption permission '{name}' is invalid. Valid options are: {', '.join(alg_dict.keys())}.")
+            return alg_dict[name]
 
     class EncryptionAlgorithm(Enum):
         """PDF encryption algorithms."""
@@ -264,31 +324,12 @@ class PyPDFBackend(AbstractBackend):
                 owner_password: str,
                 user_password: str | None = None,
                 decrypt_password: str | None = None,
-                permission_annotate: bool = False,
-                permission_fill_forms: bool = False,
-                permission_modify: bool = False,
-                permission_modify_pages: bool = False,
-                permission_copy: bool = False,
-                permission_accessibility: bool = True,
-                permission_print_low_quality: bool = True,
-                permission_print_high_quality: bool = True,
-                permission_all: bool = False,
+                permissions: Iterable[EncryptionPermission] | None = None,
                 encryption_algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256,
                 progress_callback: Callable[[float], Any] | None = None,
                 ):
         """
         Encrypt input file, generating a protected PDF output file.
-
-        **Available permissions:**
-        - ``permission_annotate``: User can add/modify annotations (comments, highlight text, etc) and interactive forms. Default to False (not set).
-        - ``permission_fill_forms``: User can fill form fields (subset permission of `permission_annotate`). Default to False (not set).
-        - ``permission_modify``: User can modify the document (e.g., add / edit text, add / edit images, etc). Default to False (not set).
-        - ``permission_modify_pages``: User can insert, delete, or rotate pages (subset of ``permission_modify``). Default to False (not set).
-        - ``permission_copy``: User can copy text/images. Default to False (not set).
-        - ``permission_accessibility``: User can use screen readers for accessibility. Default to True (not set).
-        - ``permission_print_low_quality``: User can PRINT pdf (low quality). Defaults to True (allow).
-        - ``permission_print_high_quality``: User can PRINT pdf (high quality). Requires `permission_print_low_quality=True`. Defaults to True (allow).
-        - ``permission_all``: User has ALL PERMISSIONS. If True, it overrides all other permissions. Defaults to False (not set).
 
         **Encryption algorithms:**
         - ``AES-256``    (high security, compatible with 2008+ PDF readers - **RECOMMENDED**)
@@ -304,15 +345,7 @@ class PyPDFBackend(AbstractBackend):
         :param user_password:  User password for encryption. User has ONLY THE PERMISSIONS specified in the arguments. Defaults to None (user and owner password are the same).
         :param decrypt_password: Password used to decrypt file, if needed. Defaults to None (do not decrypt).
 
-        :param permission_annotate: User can add/modify annotations (comments, highlight text, etc) and interactive forms. Default to False (not set).
-        :param permission_fill_forms: User can fill form fields (subset permission of `permission_annotate`). Default to False (not set).
-        :param permission_modify: User can modify the document (e.g., add / edit text, add / edit images, etc). Default to False (not set).
-        :param permission_modify_pages: User can insert, delete, or rotate pages (subset of ``permission_modify``). Default to False (not set).
-        :param permission_copy: User can copy text/images. Default to False (not set).
-        :param permission_accessibility: User can use screen readers for accessibility. Default to True (allow).
-        :param permission_print_low_quality: User can PRINT pdf (low quality). Defaults to True (allow).
-        :param permission_print_high_quality: User can PRINT pdf (high quality). Requires `permission_print_low_quality=True`. Defaults to True (allow).
-        :param permission_all: User has ALL PERMISSIONS. If True, it overrides all other permissions. Defaults to False (not set).
+        :param permissions: List of permissions to grant to the user. If None, no permissions are granted (user can only open the file). Format: [``EncryptionPermission.ANNOTATE``, ``EncryptionPermission.PRINT_LOW_QUALITY``, ...]. Defaults to None.
 
         :param encryption_algorithm: Encryption algorithm used. Defaults to "AES-256" (for enhanced security and compatibility).
         :param progress_callback: Progress callback (0-100). Defaults to None.
@@ -327,25 +360,9 @@ class PyPDFBackend(AbstractBackend):
                 reader.decrypt(decrypt_password)
 
             # set user permissions
-            permissions = UserAccessPermissions(0)
-            if permission_annotate:
-                permissions |= UserAccessPermissions.ADD_OR_MODIFY
-            if permission_fill_forms:
-                permissions |= UserAccessPermissions.FILL_FORM_FIELDS
-            if permission_modify:
-                permissions |= UserAccessPermissions.MODIFY
-            if permission_modify_pages:
-                permissions |= UserAccessPermissions.ASSEMBLE_DOC
-            if permission_copy:
-                permissions |= UserAccessPermissions.EXTRACT
-            if permission_accessibility:
-                permissions |= UserAccessPermissions.EXTRACT_TEXT_AND_GRAPHICS
-            if permission_print_low_quality:
-                permissions |= UserAccessPermissions.PRINT
-            if permission_print_high_quality:
-                permissions |= UserAccessPermissions.PRINT_TO_REPRESENTATION
-            if permission_all:
-                permissions |= UserAccessPermissions.all()
+            permissions_flag = PyPDFBackend.EncryptionPermission.NONE.get_value()
+            for perm in permissions or []:
+                permissions_flag |= perm.get_value()
 
             # add pages into writer
             pages_len = len(reader.pages)
@@ -359,7 +376,7 @@ class PyPDFBackend(AbstractBackend):
             writer.encrypt(
                 owner_password=owner_password,
                 user_password=user_password if user_password else owner_password,
-                permissions_flag=permissions,
+                permissions_flag=permissions_flag,
                 algorithm=encryption_algorithm.value,
                 use_128bit=True,
             )

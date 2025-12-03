@@ -77,31 +77,6 @@ jobs:
           pdm run invoke base.tests
         shell: bash
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Set up JDK 17 for ${{ runner.os }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: "temurin"
-
-      - if: matrix.os == 'ubuntu-latest'
-        name: SonarCloud Scan
-        id: sonar
-        uses: SonarSource/sonarcloud-github-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-
-      - if: matrix.os == 'ubuntu-latest'
-        name: SonarCloud Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1
-        timeout-minutes: 10
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   build:
     name: Build distribution on windows-latest
     runs-on: windows-latest

@@ -41,7 +41,7 @@ class Img2PDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,

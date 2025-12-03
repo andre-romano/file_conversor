@@ -32,7 +32,7 @@ class PikePDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -54,8 +54,6 @@ class PikePDFBackend(AbstractBackend):
                 return False  # opened without password → not encrypted
         except pikepdf.PasswordError:
             return True  # opening failed because it's encrypted
-        except Exception as e:
-            raise e  # other errors (corrupted file, etc.)
 
     def compress(
         self,

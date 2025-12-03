@@ -8,7 +8,7 @@ from typing import Any
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 
-from file_conversor.cli.pdf.encrypt_cmd import execute_pdf_encrypt_cmd
+from file_conversor.cli.pdf.encrypt_cmd import execute_pdf_encrypt_cmd, PyPDFBackend
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -21,6 +21,8 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger()
 
+EncryptionPermission = PyPDFBackend.EncryptionPermission
+
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle PDF encryption."""
@@ -32,29 +34,23 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     owner_password = str(params['owner-password'])
     user_password = params['user-password'] or None
 
-    allow_annotations = bool(params['allow-annotations'])
-    allow_fill_forms = bool(params['allow-fill-forms'])
-    allow_modify = bool(params['allow-modify'])
-    allow_modify_pages = bool(params['allow-modify-pages'])
-    allow_copy = bool(params['allow-copy'])
-    allow_accessibility = bool(params['allow-accessibility'])
-    allow_print_lq = bool(params['allow-print-lq'])
-    allow_print_hq = bool(params['allow-print-hq'])
+    permissions: list[EncryptionPermission] = [
+        EncryptionPermission.NONE if not bool(params['annotate']) else EncryptionPermission.ANNOTATE,
+        EncryptionPermission.NONE if not bool(params['fill_forms']) else EncryptionPermission.FILL_FORMS,
+        EncryptionPermission.NONE if not bool(params['modify']) else EncryptionPermission.MODIFY,
+        EncryptionPermission.NONE if not bool(params['modify_pages']) else EncryptionPermission.MODIFY_PAGES,
+        EncryptionPermission.NONE if not bool(params['copy']) else EncryptionPermission.COPY,
+        EncryptionPermission.NONE if not bool(params['accessibility']) else EncryptionPermission.ACCESSIBILITY,
+        EncryptionPermission.NONE if not bool(params['print_lq']) else EncryptionPermission.PRINT_LQ,
+        EncryptionPermission.NONE if not bool(params['print_hq']) else EncryptionPermission.PRINT_HQ,
+    ]
 
     execute_pdf_encrypt_cmd(
         input_files=input_files,
         decrypt_password=None,
         owner_password=owner_password,
         user_password=user_password,
-        allow_annotate=allow_annotations,
-        allow_fill_forms=allow_fill_forms,
-        allow_modify=allow_modify,
-        allow_modify_pages=allow_modify_pages,
-        allow_copy=allow_copy,
-        allow_accessibility=allow_accessibility,
-        allow_print_lq=allow_print_lq,
-        allow_print_hq=allow_print_hq,
-        allow_all=False,
+        permissions=permissions,
         encrypt_algo=encrypt_algo,
         output_dir=output_dir,
         progress_callback=status.set_progress,

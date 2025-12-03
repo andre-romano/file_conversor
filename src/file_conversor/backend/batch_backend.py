@@ -37,7 +37,7 @@ class BatchBackend(AbstractBackend):
 
     CONFIG_FILENAME = ".config_fc.json"
 
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -152,11 +152,11 @@ class BatchBackend(AbstractBackend):
         cmd_list = []
         for cmd in shlex.split(f"{Environment.get_executable()} {cmd_template}"):
             # replace placeholders
-            cmd = cmd.replace(f"{{in_file_path}}", f"{input_path.resolve()}")
-            cmd = cmd.replace(f"{{in_file_name}}", f"{input_path.with_suffix("").name}")
-            cmd = cmd.replace(f"{{in_file_ext}}", f"{input_path.suffix[1:].lower()}")
-            cmd = cmd.replace(f"{{in_dir}}", f"{in_path}")
-            cmd = cmd.replace(f"{{out_dir}}", f"{out_path}")
+            cmd = cmd.replace("{{in_file_path}}", f"{input_path.resolve()}")
+            cmd = cmd.replace("{{in_file_name}}", f"{input_path.with_suffix("").name}")
+            cmd = cmd.replace("{{in_file_ext}}", f"{input_path.suffix[1:].lower()}")
+            cmd = cmd.replace("{{in_dir}}", f"{in_path}")
+            cmd = cmd.replace("{{out_dir}}", f"{out_path}")
             # normalize paths
             if "/" in cmd or "\\" in cmd:
                 cmd = os.path.normpath(cmd)

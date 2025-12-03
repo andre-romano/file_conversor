@@ -5,11 +5,11 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.pdf import PyPDFBackend
 
-from file_conversor.backend.gui._dom_page import *
-from file_conversor.backend.gui.pdf._dom_page import *
+from file_conversor.backend.gui._dom_page import home_nav_item
+from file_conversor.backend.gui.pdf._dom_page import pdf_encrypt_nav_item, pdf_index_nav_item
 
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.bulma_utils import InputFilesField, OutputDirField, PDFEncryptionAlgorithmField, PDFPasswordField
+from file_conversor.utils.dominate_bulma import SmartGrid, Cell, FormFieldCheckbox, Tabs, PageForm
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -50,7 +50,7 @@ def TabAdvanced() -> list | tuple:
         SmartGrid(
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-annotations",
+                    _name="annotate",
                     current_value="off",
                     help=_("Allow annotations (comments, highlight text, etc) in the encrypted PDF files."),
                     label_text=_("Allow annotations"),
@@ -59,7 +59,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-fill-forms",
+                    _name="fill_forms",
                     current_value="off",
                     help=_("Allow fill forms in the encrypted PDF files."),
                     label_text=_("Allow fill forms"),
@@ -68,7 +68,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-modify",
+                    _name="modify",
                     current_value="off",
                     help=_("Allow encrypted PDF modifications."),
                     label_text=_("Allow modify"),
@@ -77,7 +77,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-modify-pages",
+                    _name="modify_pages",
                     current_value="off",
                     help=_("Allow modifying pages (add, delete, rotate, reorder) in the encrypted PDF files."),
                     label_text=_("Allow modify pages"),
@@ -86,7 +86,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-copy",
+                    _name="copy",
                     current_value="off",
                     help=_("Allow copying content from the encrypted PDF files."),
                     label_text=_("Allow copy"),
@@ -95,7 +95,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-accessibility",
+                    _name="accessibility",
                     current_value="on",
                     help=_("Allow accessibility features (screen readers, etc) in the encrypted PDF files."),
                     label_text=_("Allow accessibility features"),
@@ -104,7 +104,7 @@ def TabAdvanced() -> list | tuple:
             ),
             Cell(
                 FormFieldCheckbox(
-                    _name="allow-print-lq",
+                    _name="print_lq",
                     current_value="on",
                     help=_("Allow encrypted PDF printing (low quality)."),
                     label_text=_("Allow print low quality"),
@@ -112,7 +112,7 @@ def TabAdvanced() -> list | tuple:
                 ),
             ), Cell(
                 FormFieldCheckbox(
-                    _name="allow-print-hq",
+                    _name="print_hq",
                     current_value="on",
                     help=_("Allow encrypted PDF printing (high quality)."),
                     label_text=_("Allow print high quality"),

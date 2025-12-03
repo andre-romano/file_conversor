@@ -4,7 +4,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, Any, Callable, List
+from typing import Annotated, Any, Callable, Iterable, List
 
 from rich import print
 
@@ -62,15 +62,7 @@ def execute_pdf_encrypt_cmd(
     owner_password: str,
     user_password: str | None,
 
-    allow_annotate: bool,
-    allow_fill_forms: bool,
-    allow_modify: bool,
-    allow_modify_pages: bool,
-    allow_copy: bool,
-    allow_accessibility: bool,
-    allow_print_lq: bool,
-    allow_print_hq: bool,
-    allow_all: bool,
+    permissions: Iterable[PyPDFBackend.EncryptionPermission] | None,
 
     encrypt_algo: str,
     output_dir: Path,
@@ -90,15 +82,7 @@ def execute_pdf_encrypt_cmd(
             decrypt_password=decrypt_password,
 
             # permissions
-            permission_annotate=allow_annotate,
-            permission_fill_forms=allow_fill_forms,
-            permission_modify=allow_modify,
-            permission_modify_pages=allow_modify_pages,
-            permission_copy=allow_copy,
-            permission_accessibility=allow_accessibility,
-            permission_print_low_quality=allow_print_lq,
-            permission_print_high_quality=allow_print_hq,
-            permission_all=allow_all,
+            permissions=permissions,
 
             encryption_algorithm=PyPDFBackend.EncryptionAlgorithm.from_str(encrypt_algo),
             progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
@@ -133,53 +117,22 @@ def encrypt(
                                                 hide_input=True,
                                                 )],
 
+    permissions: Annotated[List[PyPDFBackend.EncryptionPermission], typer.Option("--permission", "-p",
+                                                                                 help=_("User permissions for the encrypted PDF file. Can be used multiple times to add multiple permissions. If no permissions are specified, the user will have no permissions (read-only)."),
+                                                                                 )] = [PyPDFBackend.EncryptionPermission.NONE],
+
     user_password: Annotated[str | None, typer.Option("--user-password", "-up",
                                                       help=_("User password for encryption. User has ONLY THE PERMISSIONS specified in the arguments. Defaults to None (user and owner password are the same)."),
                                                       )] = None,
+
     decrypt_password: Annotated[str | None, typer.Option("--decrypt-password", "-dp",
                                                          help=_("Decrypt password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 
-    allow_annotate: Annotated[bool, typer.Option("--annotate", "-an",
-                                                 help=_("User can add/modify annotations (comments, highlight text, etc) and interactive forms. Default to False (not set)."),
-                                                 is_flag=True,
-                                                 )] = False,
-    allow_fill_forms: Annotated[bool, typer.Option("--fill-forms", "-ff",
-                                                   help=_("User can fill form fields (subset permission of --annotate). Default to False (not set)."),
-                                                   is_flag=True,
-                                                   )] = False,
-    allow_modify: Annotated[bool, typer.Option("--modify", "-mo",
-                                               help=_("User can modify the document (e.g., add / edit text, add / edit images, etc). Default to False (not set)."),
-                                               is_flag=True,
-                                               )] = False,
-    allow_modify_pages: Annotated[bool, typer.Option("--modify-pages", "-mp",
-                                                     help=_("User can insert, delete, or rotate pages (subset of --modify). Default to False (not set)."),
-                                                     is_flag=True,
-                                                     )] = False,
-    allow_copy: Annotated[bool, typer.Option("--copy", "-co",
-                                             help=_("User can copy text/images. Default to False (not set)."),
-                                             is_flag=True,
-                                             )] = False,
-    allow_accessibility: Annotated[bool, typer.Option("--accessibility", "-ac",
-                                                      help=_("User can use screen readers for accessibility. Default to True (allow)."),
-                                                      is_flag=True,
-                                                      )] = True,
-    allow_print_lq: Annotated[bool, typer.Option("--print-lq", "-pl",
-                                                 help=_("User can print (low quality). Defaults to True (allow)."),
-                                                 is_flag=True,
-                                                 )] = True,
-    allow_print_hq: Annotated[bool, typer.Option("--print-hq", "-ph",
-                                                 help=_("User can print (high quality). Requires --allow-print. Defaults to True (allow)."),
-                                                 is_flag=True,
-                                                 )] = True,
-    allow_all: Annotated[bool, typer.Option("--all", "-all",
-                                            help=_("User has ALL PERMISSIONS. If set, it overrides all other permissions. Defaults to False (not set)."),
-                                            is_flag=True,
-                                            )] = False,
-    encrypt_algo: Annotated[str, typer.Option("--encryption", "-enc",
-                                              help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
-                                              callback=lambda x: check_valid_options(x, valid_options=PyPDFBackend.EncryptionAlgorithm.get_dict()),
-                                              )] = PyPDFBackend.EncryptionAlgorithm.AES_256.value,
+    algorithm: Annotated[str, typer.Option("--algorithm", "-a",
+                                           help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
+                                           callback=lambda x: check_valid_options(x, valid_options=PyPDFBackend.EncryptionAlgorithm.get_dict()),
+                                           )] = PyPDFBackend.EncryptionAlgorithm.AES_256.value,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
@@ -188,16 +141,8 @@ def encrypt(
         decrypt_password=decrypt_password,
         owner_password=owner_password,
         user_password=user_password,
-        allow_annotate=allow_annotate,
-        allow_fill_forms=allow_fill_forms,
-        allow_modify=allow_modify,
-        allow_modify_pages=allow_modify_pages,
-        allow_copy=allow_copy,
-        allow_accessibility=allow_accessibility,
-        allow_print_lq=allow_print_lq,
-        allow_print_hq=allow_print_hq,
-        allow_all=allow_all,
-        encrypt_algo=encrypt_algo,
+        permissions=permissions,
+        encrypt_algo=algorithm,
         output_dir=output_dir,
     )
 

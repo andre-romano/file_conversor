@@ -92,7 +92,7 @@ class PillowBackend(AbstractBackend):
         "tif": {"format": "TIFF"},
         "webp": {"format": "WEBP"},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(self, verbose: bool = False,):
         """

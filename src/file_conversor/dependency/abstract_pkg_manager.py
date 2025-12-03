@@ -24,6 +24,7 @@ logger = LOG.getLogger(__name__)
 
 
 class AbstractPackageManager:
+    NOT_IMPLEMENTED_ERROR_MSG = "Method not overloaded."
 
     def __init__(self,
                  dependencies: dict[str, str],
@@ -47,7 +48,7 @@ class AbstractPackageManager:
 
         :return: Missing dependencies list.
         """
-        missing_dependencies: set[str] = set([])
+        missing_dependencies: set[str] = set()
 
         # check if executable exists
         self._set_env_path()
@@ -129,7 +130,7 @@ class AbstractPackageManager:
 
     def _set_env_path(self):
         if not self._env:
-            logger.debug(f"No env PATH to set for pkg manager")
+            logger.debug("No env PATH to set for pkg manager")
             return
         # check if needs to add path
         env_paths = os.environ["PATH"].split(os.pathsep)
@@ -142,19 +143,19 @@ class AbstractPackageManager:
         os.environ["PATH"] = os.pathsep.join(env_paths)
 
     def _get_pkg_manager_installed(self) -> str | None:
-        raise NotImplementedError("Method not overloaded.")
+        raise NotImplementedError(self.NOT_IMPLEMENTED_ERROR_MSG)
 
     def _get_supported_oses(self) -> set[str]:
-        raise NotImplementedError("Method not overloaded.")
+        raise NotImplementedError(self.NOT_IMPLEMENTED_ERROR_MSG)
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
-        raise NotImplementedError("Method not overloaded.")
+        raise NotImplementedError(self.NOT_IMPLEMENTED_ERROR_MSG)
 
     def _post_install_pkg_manager(self) -> None:
-        raise NotImplementedError("Method not overloaded.")
+        raise NotImplementedError(self.NOT_IMPLEMENTED_ERROR_MSG)
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
-        raise NotImplementedError("Method not overloaded.")
+        raise NotImplementedError(self.NOT_IMPLEMENTED_ERROR_MSG)
 
 
 __all__ = [

@@ -35,7 +35,7 @@ class PyMuPDFBackend(AbstractBackend):
         "png": {},
         "jpg": {},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -101,10 +101,6 @@ class PyMuPDFBackend(AbstractBackend):
             page_len = len(doc)
             for page_index, page in enumerate(doc, start=1):  # type: ignore
                 images = page.get_images(full=True)  # list of image xrefs
-                img_len = len(images)
-
-                # if img_len > 0:
-                #     logger.debug(f"Page {page_index}: {img_len} image(s) found")
 
                 for img_index, img in enumerate(images, start=1):
                     xref = img[0]  # xref number of the image
@@ -112,7 +108,6 @@ class PyMuPDFBackend(AbstractBackend):
 
                     img_bytes = base_image["image"]
                     ext = base_image["ext"]  # format: png, jpg, jp2, etc.
-                    width, height = base_image["width"], base_image["height"]
 
                     output_file = output_dir / f"{input_name}_page{page_index}_img{img_index}.{ext}"
                     if not STATE["overwrite-output"] and Path(output_file).exists():

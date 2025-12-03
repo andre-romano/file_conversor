@@ -37,14 +37,14 @@ class TestAPIPdfDecryptEncrypt:
             'owner-password': password,
             'user-password': "null",
 
-            'allow-annotations': "off",
-            'allow-fill-forms': "off",
-            'allow-modify': "off",
-            'allow-modify-pages': "off",
-            'allow-copy': "off",
-            'allow-accessibility': "off",
-            'allow-print-lq': "off",
-            'allow-print-hq': "off",
+            'annotate': "off",
+            'fill_forms': "off",
+            'modify': "off",
+            'modify_pages': "off",
+            'copy': "off",
+            'accessibility': "off",
+            'print_lq': "off",
+            'print_hq': "off",
 
             "overwrite-output": "true",
         })

@@ -24,7 +24,7 @@ class PyMuSVGBackend(AbstractBackend):
         "png": {},
         "jpg": {},
     }
-    EXTERNAL_DEPENDENCIES: set[str] = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,

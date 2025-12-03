@@ -66,4 +66,8 @@
         "*.jinja": "jinja-html",
         "*.jinja2": "jinja-html"
     },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "andre-romano",
+        "projectKey": "andre-romano_file_conversor"
+    },
 }
