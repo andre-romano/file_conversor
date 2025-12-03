@@ -36,9 +36,9 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = set([
+EXTERNAL_DEPENDENCIES: set[str] = {
     *PyMuPDFBackend.EXTERNAL_DEPENDENCIES,
-])
+}
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):

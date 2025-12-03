@@ -50,47 +50,55 @@ class FFmpegFilter:
 
 
 # BRIGHTNESS, CONTRAST, SATURATION, GAMMA
-def FFmpegFilterEq(brightness: float = 1.0, contrast: float = 1.0, saturation: float = 1.0, gamma: float = 1.0) -> FFmpegFilter:
-    return FFmpegFilter("eq", brightness=str(brightness - 1), contrast=str(contrast), saturation=str(saturation), gamma=str(gamma),)
+class FFmpegFilterEq(FFmpegFilter):
+    def __init__(self, brightness: float = 1.0, contrast: float = 1.0, saturation: float = 1.0, gamma: float = 1.0) -> None:
+        super().__init__("eq", brightness=str(brightness - 1), contrast=str(contrast), saturation=str(saturation), gamma=str(gamma))
 
 
 # RESIZE
-def FFmpegFilterScale(width: int | str, height: int | str, force_original_aspect_ratio: str | None = None) -> FFmpegFilter:
-    options: dict[str, str] = {}
-    if force_original_aspect_ratio:
-        check_valid_options(force_original_aspect_ratio, {"increase", "decrease", "disable"})
-        options["force_original_aspect_ratio"] = force_original_aspect_ratio
-    return FFmpegFilter("scale", str(width), str(height), **options)
+class FFmpegFilterScale(FFmpegFilter):
+    def __init__(self, width: int | str, height: int | str, force_original_aspect_ratio: str | None = None) -> None:
+        options: dict[str, str] = {}
+        if force_original_aspect_ratio:
+            check_valid_options(force_original_aspect_ratio, {"increase", "decrease", "disable"})
+            options["force_original_aspect_ratio"] = force_original_aspect_ratio
+        super().__init__("scale", str(width), str(height), **options)
 
 
 # ROTATE
-def FFmpegFilterTranspose(direction: int) -> FFmpegFilter:
-    check_valid_options(direction, {0, 1, 2, 3})
-    return FFmpegFilter("transpose", str(direction))
+class FFmpegFilterTranspose(FFmpegFilter):
+    def __init__(self, direction: int) -> None:
+        check_valid_options(direction, {0, 1, 2, 3})
+        super().__init__("transpose", str(direction))
 
 
 # MIRROR
-def FFmpegFilterHflip() -> FFmpegFilter:
-    return FFmpegFilter("hflip")
+class FFmpegFilterHflip(FFmpegFilter):
+    def __init__(self) -> None:
+        super().__init__("hflip")
 
 
-def FFmpegFilterVflip() -> FFmpegFilter:
-    return FFmpegFilter("vflip")
+class FFmpegFilterVflip(FFmpegFilter):
+    def __init__(self) -> None:
+        super().__init__("vflip")
 
 
 # FPS
-def FFmpegFilterMInterpolate(fps: int, mi_mode: str = "mci", mc_mode: str = "aobmc", me_mode: str = "bidir", vsbmc: int = 1) -> FFmpegFilter:
-    return FFmpegFilter("minterpolate", fps=str(fps), mi_mode=mi_mode, mc_mode=mc_mode, me_mode=me_mode, vsbmc=str(vsbmc))
+class FFmpegFilterMInterpolate(FFmpegFilter):
+    def __init__(self, fps: int, mi_mode: str = "mci", mc_mode: str = "aobmc", me_mode: str = "bidir", vsbmc: int = 1) -> None:
+        super().__init__("minterpolate", fps=str(fps), mi_mode=mi_mode, mc_mode=mc_mode, me_mode=me_mode, vsbmc=str(vsbmc))
 
 
 # UNSHARP
-def FFmpegFilterUnsharp(luma_msize_x: int = 5, luma_msize_y: int = 5, luma_amount: float = 1.0) -> FFmpegFilter:
-    return FFmpegFilter("unsharp", luma_msize_x=str(luma_msize_x), luma_msize_y=str(luma_msize_y), luma_amount=str(luma_amount))
+class FFmpegFilterUnsharp(FFmpegFilter):
+    def __init__(self, luma_msize_x: int = 5, luma_msize_y: int = 5, luma_amount: float = 1.0) -> None:
+        super().__init__("unsharp", luma_msize_x=str(luma_msize_x), luma_msize_y=str(luma_msize_y), luma_amount=str(luma_amount))
 
 
 # DESHAKE
-def FFmpegFilterDeshake() -> FFmpegFilter:
-    return FFmpegFilter("deshake")
+class FFmpegFilterDeshake(FFmpegFilter):
+    def __init__(self) -> None:
+        super().__init__("deshake")
 
 
 __all__ = [

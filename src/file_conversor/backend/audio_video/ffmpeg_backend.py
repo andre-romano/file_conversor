@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+from cv2 import log
+
 # user-provided imports
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
@@ -36,12 +38,14 @@ class FFmpegBackend(AbstractFFmpegBackend):
     FFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
-    EXTERNAL_DEPENDENCIES = set([
+    EXTERNAL_DEPENDENCIES: set[str] = {
         "ffmpeg",
-    ])
+    }
 
     @staticmethod
-    def _clean_two_pass_log_file(logfile: Path):
+    def _clean_two_pass_log_file(logfile: Path | None):
+        if logfile is None:
+            return
         for filepath in logfile.parent.glob(logfile.name + "-0.log*"):
             try:
                 if not filepath.exists():
@@ -74,6 +78,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         self._input_file: Path | None = None
         self._output_file: Path | None = None
+        self._pass_logfile: Path | None = None
 
         self._audio_bitrate: int | None = None
         self._video_bitrate: int | None = None
@@ -186,6 +191,15 @@ class FFmpegBackend(AbstractFFmpegBackend):
             out_ext = self._output_file.suffix[1:]
         args, kwargs = self.SUPPORTED_OUT_FORMATS[out_ext]
         self._out_container = FormatContainer(*args, **kwargs)
+        self._set_pass_logfile()
+
+    def _set_pass_logfile(self):
+        if not self._output_file:
+            raise RuntimeError(f"{_('Output file not set')}")
+
+        logdir = self._output_file.parent
+        self._pass_logfile = logdir / CommandManager.get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
+        logger.debug(f"{_('Temporary 2-pass log file')}: {self._pass_logfile}")
 
     def set_files(self, input_file: str | Path, output_file: str | Path):
         """
@@ -274,6 +288,23 @@ class FFmpegBackend(AbstractFFmpegBackend):
         if (not bitrate or bitrate == 0) and quality_setting:
             self._out_container.video_codec.set_quality_setting(quality_setting)
 
+    def _get_two_pass_options(self, pass_num: int) -> list[str]:
+        if pass_num <= 0:
+            return []
+
+        if self._audio_bitrate and self._audio_bitrate <= 0:
+            raise ValueError(f"{_('Audio Bitrate cannot be 0 when using two-pass mode.')}")
+        if self._video_bitrate and self._video_bitrate <= 0:
+            raise ValueError(f"{_('Video Bitrate cannot be 0 when using two-pass mode.')}")
+        if not self._pass_logfile:
+            raise RuntimeError(f"{_('2-pass log file not set')}")
+
+        # add 2-pass encoding options
+        return [
+            "-pass", str(pass_num),
+            "-passlogfile", str(self._pass_logfile),
+        ]
+
     def _execute(self):
         # build ffmpeg command
         ffmpeg_command = []
@@ -326,41 +357,26 @@ class FFmpegBackend(AbstractFFmpegBackend):
         if not self._out_container:
             raise RuntimeError(f"{_('Output container not set')}")
 
-        self._out_opts = []
-
-        logdir = self._output_file.parent
-
-        logfile = logdir / CommandManager.get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
-
-        if pass_num > 0:
-            logger.debug(f"{_('Temporary 2-pass log file')}: {logfile}")
-            # add 2-pass encoding options
-            self._out_opts.extend([
-                "-pass", str(pass_num),
-                "-passlogfile", str(logfile),
-            ])
-            if self._audio_bitrate and self._audio_bitrate <= 0:
-                raise ValueError(f"{_('Audio bitrate cannot be 0 when using two-pass mode.')}")
-            if self._video_bitrate and self._video_bitrate <= 0:
-                raise ValueError(f"{_('Video bitrate cannot be 0 when using two-pass mode.')}")
-
-        self._out_opts.extend(self._out_container.get_options())
-        self._out_opts.extend(out_opts if out_opts else [])
+        self._out_opts = [
+            *self._get_two_pass_options(pass_num),
+            *self._out_container.get_options(),
+            *(out_opts or []),
+        ]
 
         original_output_file = self._output_file
         if pass_num == 1:
             self._output_file = Path("NUL" if is_windows() else "/dev/null")
 
         try:
-            process = self._execute()
+            self._execute()
         except:
-            self._clean_two_pass_log_file(logfile)
+            self._clean_two_pass_log_file(self._pass_logfile)
             raise
 
         self._output_file = original_output_file
 
         if pass_num in (0, 2):
-            self._clean_two_pass_log_file(logfile)
+            self._clean_two_pass_log_file(self._pass_logfile)
 
 
 __all__ = [

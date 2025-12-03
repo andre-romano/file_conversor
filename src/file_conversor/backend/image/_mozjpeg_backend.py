@@ -35,9 +35,9 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     SUPPORTED_OUT_FORMATS = {
         'jpg': {},
     }
-    EXTERNAL_DEPENDENCIES = set([
+    EXTERNAL_DEPENDENCIES: set[str] = {
         "cjpeg",
-    ])
+    }
 
     def __init__(
         self,

@@ -35,9 +35,9 @@ class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     SUPPORTED_OUT_FORMATS = {
         'png': {},
     }
-    EXTERNAL_DEPENDENCIES = set([
+    EXTERNAL_DEPENDENCIES: set[str] = {
         "oxipng",
-    ])
+    }
 
     def __init__(
         self,

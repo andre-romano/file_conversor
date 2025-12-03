@@ -14,7 +14,7 @@ from file_conversor.config.config import Configuration
 
 CONFIG = Configuration.get_instance()
 
-AVAILABLE_LANGUAGES = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
+AVAILABLE_LANGUAGES: set[str] = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
 
 _gettext_instance: Callable[[str], str] | None = None
 

@@ -14,7 +14,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.formatters import normalize_degree, parse_bytes
-from file_conversor.utils.validators import check_valid_options
+from file_conversor.utils.validators import check_valid_options, is_close
 
 # get app config
 CONFIG = Configuration.get_instance()
@@ -89,7 +89,7 @@ def ffmpeg_cli_cmd(
         elif fps > 0:
             video_filters.append(FFmpegFilterMInterpolate(fps=fps))
 
-    if brightness != 1.0 or contrast != 1.0 or color != 1.0 or gamma != 1.0:
+    if not (is_close(brightness, 1.0) and is_close(contrast, 1.0) and is_close(color, 1.0) and is_close(gamma, 1.0)):
         video_filters.append(FFmpegFilterEq(brightness=brightness, contrast=contrast, saturation=color, gamma=gamma))
 
     if rotation is not None:

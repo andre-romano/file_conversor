@@ -26,7 +26,7 @@ logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = set([])
+EXTERNAL_DEPENDENCIES: set[str] = set([])
 
 
 @typer_cmd.command(

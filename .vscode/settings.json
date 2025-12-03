@@ -23,11 +23,13 @@
     "files.exclude": {
         "**/.coverage/**": true,
         "**/.coverage*/**": true,
+        "**/.import_linter_cache/**": true,
         "**/.pytest_cache/**": true,
         "**/.pdm-python/**": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
+        "**/node_modules/**": true,
         "**/Thumbs.db": true,
     },
     "search.exclude": {

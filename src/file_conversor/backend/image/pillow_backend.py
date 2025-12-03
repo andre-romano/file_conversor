@@ -15,6 +15,7 @@ from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.formatters import normalize_degree
+from file_conversor.utils.validators import is_close
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
@@ -91,7 +92,7 @@ class PillowBackend(AbstractBackend):
         "tif": {"format": "TIFF"},
         "webp": {"format": "WEBP"},
     }
-    EXTERNAL_DEPENDENCIES = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set([])
 
     def __init__(self, verbose: bool = False,):
         """
@@ -200,7 +201,7 @@ class PillowBackend(AbstractBackend):
             format=format,
             quality=quality,
             optimize=optimize,
-            lossless=True if quality == 100 else False,  # valid only for WEBP
+            lossless=True if is_close(quality, 100) else False,  # valid only for WEBP
         )
 
     def rotate(

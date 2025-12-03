@@ -4,11 +4,11 @@ import os
 import platform
 
 # Import only on Darwin to avoid ImportError on other OSes
-if platform.system() == "Darwin":
-    # do nothing
-    pass
-else:
-    pass  # Placeholder so the name exists
+# if platform.system() == "Darwin":
+#     # do nothing
+#     pass
+# else:
+#     pass  # Placeholder so the name exists
 
 
 def is_admin() -> bool:

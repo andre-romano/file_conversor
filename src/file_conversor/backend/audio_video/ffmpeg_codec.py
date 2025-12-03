@@ -176,8 +176,8 @@ FFmpegAudioCodec.register("libvorbis", name="libvorbis")
 FFmpegAudioCodec.register("pcm_s16le", name="pcm_s16le")
 
 
-# register VIDEO codecs
-class QUALITY_OPTIONS:
+# register VIDEO codec quality options
+class QualityOptions:
     def __init__(
         self,
         high: str,
@@ -229,6 +229,7 @@ class QUALITY_OPTIONS:
         raise ValueError(f"Unknown implementation: {impl}")
 
 
+# register VIDEO codecs
 FFmpegVideoCodec.register("null", name="null")
 FFmpegVideoCodec.register("copy", name="copy")
 
@@ -237,21 +238,23 @@ for codec_name, impl in [("h264_nvenc", "nvenc"), ("hevc_nvenc", "nvenc"),
                          ("h264_qsv", "qsv"), ("hevc_qsv", "qsv"),
                          ("libx264", "lib"), ("libx265", "lib"),
                          ]:
+    preset = "-preset"
+    profile_v = "-profile:v"
     FFmpegVideoCodec.register(codec_name, name=codec_name,
-                              quality_setting_opts=QUALITY_OPTIONS(**{
+                              quality_setting_opts=QualityOptions(**{
                                   "high": "18",
                                   "medium": "23",
                                   "low": "28",
                               }).get_quality(impl),
                               encoding_speed_opts={
-                                  "fast": {"-preset": "fast"},
-                                  "medium": {"-preset": "medium"},
-                                  "slow": {"-preset": "slow"},
+                                  "fast": {preset: "fast"},
+                                  "medium": {preset: "medium"},
+                                  "slow": {preset: "slow"},
                               },
                               profile_opts={
-                                  "high": {"-profile:v": "high"},
-                                  "medium": {"-profile:v": "main"},
-                                  "low": {"-profile:v": "baseline"},
+                                  "high": {profile_v: "high"},
+                                  "medium": {profile_v: "main"},
+                                  "low": {profile_v: "baseline"},
                               },
                               )
 
@@ -261,7 +264,7 @@ for codec_name, impl in [("vp8_vaapi", "vaapi"), ("vp9_vaapi", "vaapi"),
                          ("libvpx", "lib"), ("libvpx-vp9", "lib"),
                          ]:
     FFmpegVideoCodec.register(codec_name, name=codec_name,
-                              quality_setting_opts=QUALITY_OPTIONS(**{
+                              quality_setting_opts=QualityOptions(**{
                                   "high": "13",
                                   "medium": "35",
                                   "low": "55",
@@ -274,7 +277,7 @@ for codec_name, impl in [("av1_nvenc", "nvenc"),
                          ("libaom-av1", "lib"),
                          ]:
     FFmpegVideoCodec.register(codec_name, name=codec_name,
-                              quality_setting_opts=QUALITY_OPTIONS(**{
+                              quality_setting_opts=QualityOptions(**{
                                   "high": "19",
                                   "medium": "29",
                                   "low": "42",

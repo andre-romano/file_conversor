@@ -1,5 +1,6 @@
 # src\file_conversor\utils\validators.py
 
+import math
 import sys
 import typer
 
@@ -10,6 +11,27 @@ from typing import Any, Callable, Iterable, List
 from file_conversor.config.locale import get_translation
 
 _ = get_translation()
+
+
+def is_close(num1: int | float, num2: int | float, rel_tol: float = 1e-9, abs_tol: float = 1e-9) -> bool:
+    """
+    Determines if two numbers are close to each other within a specified tolerance.
+
+    :param num1: First number.
+    :param num2: Second number.
+    :param rel_tol: Relative tolerance.
+    :param abs_tol: Absolute tolerance.
+    """
+    return math.isclose(num1, num2, rel_tol=rel_tol, abs_tol=abs_tol)
+
+
+def is_zero(num: int | float) -> bool:
+    """
+    Determines if a number is effectively zero within a small tolerance.
+
+    :param num: The number to check.
+    """
+    return is_close(num, 0.0, rel_tol=1e-9, abs_tol=1e-9)
 
 
 def prompt_retry_on_exception(
@@ -147,8 +169,8 @@ def check_positive_integer(num: int | float | None, allow_zero: bool = False):
     Checks if the provided number is a positive integer.
     """
     if num is None:
-        return num
-    if num < 0 or (not allow_zero and num == 0):
+        return None
+    if num < 0 or (not allow_zero and is_close(num, 0)):
         raise typer.BadParameter(_("Must be a positive integer."))
     return num
 

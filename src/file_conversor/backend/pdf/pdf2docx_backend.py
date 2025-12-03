@@ -32,7 +32,7 @@ class PDF2DOCXBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "docx": {},
     }
-    EXTERNAL_DEPENDENCIES = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set([])
 
     def __init__(
         self,

@@ -20,7 +20,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer_utils import AudioBitrateOption, BrightnessOption, ColorOption, ContrastOption, DeshakeOption, FPSOption, FormatOption, GammaOption, InputFilesArgument, OutputDirOption, ResolutionOption, UnsharpOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
-from file_conversor.utils.validators import check_positive_integer, check_video_resolution, prompt_retry_on_exception
+from file_conversor.utils.validators import check_positive_integer, check_video_resolution, is_close, prompt_retry_on_exception
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -95,9 +95,14 @@ def enhance(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    if (not resolution and not fps and
-            color == 1.0 and brightness == 1.0 and contrast == 1.0 and gamma == 1.0 and
-            not deshake and not unsharp):
+    if (not resolution
+            and not fps
+            and is_close(color, 1.0)
+            and is_close(brightness, 1.0)
+            and is_close(contrast, 1.0)
+            and is_close(gamma, 1.0)
+            and not deshake
+            and not unsharp):
         resolution = prompt_retry_on_exception(
             text=f"{_("Target Resolution (width:height) [0:0 = do not change video resolution]")}",
             default="0:0", type=str, check_callback=check_video_resolution,
@@ -108,7 +113,7 @@ def enhance(
             text=f"{_("Target FPS [0 = do not change FPS]")}",
             default=0, type=int, check_callback=check_positive_integer,
         )
-        fps = None if fps == 0 else fps
+        fps = None if fps is None or fps == 0 else fps
 
         color = prompt_retry_on_exception(
             text=f"{_("Color adjustment (> 1.0 increases color, < 1.0 decreases color)")}",

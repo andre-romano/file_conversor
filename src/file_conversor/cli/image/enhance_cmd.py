@@ -17,6 +17,7 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer_utils import BrightnessOption, ColorOption, ContrastOption, InputFilesArgument, OutputDirOption, SharpnessOption
+from file_conversor.utils.validators import is_close
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -109,7 +110,7 @@ def enhance(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    if brightness == 1.00 and contrast == 1.00 and color == 1.00 and sharpness == 1.00:
+    if is_close(brightness, 1.00) and is_close(contrast, 1.00) and is_close(color, 1.00) and is_close(sharpness, 1.00):
         brightness = typer.prompt("Brightness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
         contrast = typer.prompt("Contrast factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
         color = typer.prompt("Color factor (> 1.0 increases, < 1.0 decreases)", default=1.00)

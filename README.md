@@ -1,5 +1,12 @@
 <!-- [![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano) -->
 
+[![PyPI](https://img.shields.io/pypi/v/file_conversor.svg)](https://pypi.org/project/file_conversor/)
+[![Downloads](https://static.pepy.tech/badge/file-conversor)](https://pepy.tech/project/file-conversor)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+<a href="https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor">
+<img src="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" width="150px" >
+</a>
+
 # File Conversor
 A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
 

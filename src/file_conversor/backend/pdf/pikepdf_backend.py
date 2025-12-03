@@ -32,7 +32,7 @@ class PikePDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
-    EXTERNAL_DEPENDENCIES = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set([])
 
     def __init__(
         self,

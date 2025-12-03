@@ -28,9 +28,9 @@ class FFprobeBackend(AbstractFFmpegBackend):
     FFprobeBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
-    EXTERNAL_DEPENDENCIES = set([
+    EXTERNAL_DEPENDENCIES: set[str] = {
         "ffprobe",
-    ])
+    }
 
     def __init__(
         self,

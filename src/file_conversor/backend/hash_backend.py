@@ -73,7 +73,7 @@ class HashBackend(AbstractBackend):
             "gen_algo": hashlib.sha3_512
         },
     }
-    EXTERNAL_DEPENDENCIES = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set([])
 
     def __init__(
         self,

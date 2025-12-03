@@ -29,6 +29,7 @@ class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """Empty on purpose for testing."""
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
@@ -49,6 +50,7 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """Empty on purpose for testing."""
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
@@ -69,6 +71,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """Empty on purpose for testing."""
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
@@ -110,7 +113,7 @@ class TestAbstractBackend:
         assert backend_with_pkg_and_path is not None
 
         with pytest.raises(RuntimeError):
-            backend_with_pkg_and_path = AbstractBackend(
+            AbstractBackend(
                 pkg_managers={
                     _DummyPkgManagerNotInstalled({
                         "cmd.exe": "dummy_dependency_1",
@@ -119,14 +122,15 @@ class TestAbstractBackend:
                 }, install_answer=True,
             )
 
-        backend_with_pkg_and_path = AbstractBackend(
-            pkg_managers={
-                _DummyPkgManagerNotInstalled({
-                    "cmd.exe": "dummy_dependency_1",
-                    "another_non_existing_executable_67890.exe": "dummy_dependency_2",
-                })
-            }, install_answer=False,
-        )
+        with pytest.raises(RuntimeError):
+            AbstractBackend(
+                pkg_managers={
+                    _DummyPkgManagerNotInstalled({
+                        "cmd.exe": "dummy_dependency_1",
+                        "another_non_existing_executable_67890.exe": "dummy_dependency_2",
+                    })
+                }, install_answer=False,
+            )
 
         # unsupported OS
         backend_with_pkg_and_path = AbstractBackend(

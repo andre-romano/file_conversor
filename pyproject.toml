@@ -76,7 +76,7 @@ provider = "github"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cache-clear --ff --cov=src --cov-report=html"
+addopts = "--cache-clear --ff --cov=src --cov-report=html --cov-report=xml"
 filterwarnings = [
     "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer",
     # supress pymupdf warnings

@@ -35,7 +35,7 @@ class PyPDFBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {
         "pdf": {},
     }
-    EXTERNAL_DEPENDENCIES = set([])
+    EXTERNAL_DEPENDENCIES: set[str] = set([])
 
     class EncryptionAlgorithm(Enum):
         """PDF encryption algorithms."""

@@ -47,7 +47,7 @@ class AbstractPackageManager:
 
         :return: Missing dependencies list.
         """
-        missing_dependencies = set([])
+        missing_dependencies: set[str] = set([])
 
         # check if executable exists
         self._set_env_path()

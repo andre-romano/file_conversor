@@ -48,23 +48,22 @@ def get_python_version():
     MAX = ""
     with open("pyproject.toml", "rb") as f:
         pyproject = tomllib.load(f)
-    if "project" in pyproject:
-        if "requires-python" in pyproject["project"]:
-            requires_python = pyproject["project"]["requires-python"].split(",")
-            for req in requires_python:
-                req = req.strip()
-                if req.startswith(">="):
-                    MIN = req[2:].strip()
-                elif req.startswith(">"):
-                    MIN = req[1:].strip()
-                    major, minor, patch = add_version(MIN)
-                    MIN = f"{major}.{minor}.{patch}"
-                elif req.startswith("<="):
-                    MAX = req[2:].strip()
-                elif req.startswith("<"):
-                    MAX = req[1:].strip()
-                    major, minor, patch = sub_version(MAX)
-                    MAX = f"{major}.{minor}.{patch}"
+    if "project" in pyproject and "requires-python" in pyproject["project"]:
+        requires_python = pyproject["project"]["requires-python"].split(",")
+        for req in requires_python:
+            req = req.strip()
+            if req.startswith(">="):
+                MIN = req[2:].strip()
+            elif req.startswith(">"):
+                MIN = req[1:].strip()
+                major, minor, patch = add_version(MIN)
+                MIN = f"{major}.{minor}.{patch}"
+            elif req.startswith("<="):
+                MAX = req[2:].strip()
+            elif req.startswith("<"):
+                MAX = req[1:].strip()
+                major, minor, patch = sub_version(MAX)
+                MAX = f"{major}.{minor}.{patch}"
     return MIN, MAX
 
 

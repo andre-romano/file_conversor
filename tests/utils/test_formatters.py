@@ -1,9 +1,28 @@
 # tests\utils\test_formatters.py
 
+import math
 import pytest
 from pathlib import Path
 
-from file_conversor.utils.formatters import *
+from file_conversor.utils.formatters import (
+    escape_xml,
+    parse_traceback_list,
+    parse_js_to_py,
+    parse_ffmpeg_filter,
+    parse_image_resize_scale,
+    parse_pdf_rotation,
+    parse_pdf_pages,
+    normalize_degree,
+    parse_bytes,
+    format_bytes,
+    format_bitrate,
+    format_alphanumeric,
+    format_file_types_webview,
+    format_py_to_js,
+    format_traceback_str,
+    format_traceback_html,
+    format_in_out_files_tuple,
+)
 
 
 class TestUtilsFormatters:
@@ -74,16 +93,16 @@ class TestUtilsFormatters:
 
         monkeypatch.setattr("typer.prompt", lambda x: "2.0")
         scale = parse_image_resize_scale(None, None, quiet=False)
-        assert scale == 2.0
+        assert scale is not None and math.isclose(scale, 2.0)
 
         scale = parse_image_resize_scale(2.0, None, quiet=True)
-        assert scale == 2.0
+        assert scale is not None and math.isclose(scale, 2.0)
 
         scale = parse_image_resize_scale(None, 800, quiet=True)
         assert scale is None
 
         scale = parse_image_resize_scale(1.5, 600, quiet=True)
-        assert scale == 1.5
+        assert scale is not None and math.isclose(scale, 1.5)
 
     def test_parse_pdf_rotation(self):
         rotation_args = ["1:90", "2-4:-90", "5:180"]
