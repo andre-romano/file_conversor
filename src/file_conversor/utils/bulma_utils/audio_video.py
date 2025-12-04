@@ -5,10 +5,10 @@ from typing import Any
 # user-provided modules
 from file_conversor.backend.audio_video.ffmpeg_backend import FFmpegBackend
 
-from file_conversor.utils.dominate_utils import *
-from file_conversor.utils.dominate_bulma import *
-
-from file_conversor.utils.formatters import format_file_types_webview
+from file_conversor.utils.dominate_bulma.form_field import FormFieldHorizontal
+from file_conversor.utils.dominate_bulma.form_input import FormFieldInput
+from file_conversor.utils.dominate_bulma.form_select import FormFieldSelect
+from file_conversor.utils.dominate_bulma.form_checkbox import FormFieldCheckbox
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

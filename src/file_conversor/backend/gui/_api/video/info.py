@@ -11,9 +11,8 @@ from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
 from file_conversor.backend.audio_video import FFprobeBackend
 
 from file_conversor.utils.backend import FFprobeParser
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_utils import *
 
+from file_conversor.utils.dominate_utils import br, div
 from file_conversor.utils.formatters import format_bitrate, format_bytes
 
 from file_conversor.config import Configuration, Environment, Log, State

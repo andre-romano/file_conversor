@@ -1,6 +1,6 @@
 # src\file_conversor\backend\gui\_components\icon.py
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import i, span
 
 
 def FontAwesomeIcon(

@@ -3,8 +3,7 @@
 from typing import Any
 
 from file_conversor.utils.dominate_bulma.font_awesome_icon import FontAwesomeIcon
-
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import a, div, li, span, ul
 
 
 class TabsAlignment:

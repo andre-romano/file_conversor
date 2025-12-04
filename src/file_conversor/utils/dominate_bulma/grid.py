@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div
 
 
 def Cell(*content: Any, _class="", **kwargs):

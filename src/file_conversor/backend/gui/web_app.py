@@ -12,10 +12,9 @@ from typing import Any, Callable, Iterable, Self
 
 # user-provided modules
 from file_conversor.backend.gui._webview_api import WebViewAPI
-
 from file_conversor.backend.gui.flask_route import FlaskRoute
 
-from file_conversor.config import *
+from file_conversor.config import Configuration, Log, State, Environment, AbstractSingletonThreadSafe
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
 
 # Get app config

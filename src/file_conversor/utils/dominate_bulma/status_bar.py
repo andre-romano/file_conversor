@@ -1,8 +1,7 @@
 # src\file_conversor\backend\gui\_components\status_bar.py
 
 from file_conversor.utils.dominate_bulma.progress import Progress
-
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div, span
 
 
 def StatusBar(**kwargs):

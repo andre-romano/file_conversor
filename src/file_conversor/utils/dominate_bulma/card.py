@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import a, button, div, header, p, footer
 
 
 def Card(
@@ -38,7 +38,7 @@ def Card(
 
         # Card footer section (optional)
         if footer_data:
-            with footer(_class="card-footer") as card_footer:
+            with footer(_class="card-footer"):
                 for item in footer_data:
                     a(item["text"], _class="card-footer-item", _href=item["link"])
     return card

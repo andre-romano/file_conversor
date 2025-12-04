@@ -7,7 +7,7 @@ from file_conversor.utils.dominate_bulma.font_awesome_icon import FontAwesomeIco
 from file_conversor.utils.dominate_bulma.form_button import Button
 from file_conversor.utils.dominate_bulma.form_field import FormField
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import input_
 
 
 def Input(

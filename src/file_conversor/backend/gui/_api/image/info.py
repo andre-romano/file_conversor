@@ -14,8 +14,7 @@ from file_conversor.cli.pdf.ocr_cmd import EXTERNAL_DEPENDENCIES
 
 from file_conversor.utils.backend import PillowParser
 
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

@@ -1,6 +1,6 @@
 # src/file_conversor/utils/dominate_bulma/progress.py
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import progress
 
 
 def Progress(

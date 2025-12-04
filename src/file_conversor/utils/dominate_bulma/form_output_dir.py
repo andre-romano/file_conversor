@@ -4,8 +4,6 @@ from typing import Any
 
 from file_conversor.utils.dominate_bulma.form_input import FormFieldInput
 
-from file_conversor.utils.dominate_utils import *
-
 
 def FormFieldOutputDirectory(
     help: str,

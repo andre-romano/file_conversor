@@ -2,7 +2,7 @@
 
 from typing import Any, Sequence
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import button, div, i, input_, label, option, select, template, p
 from file_conversor.utils.formatters import format_py_to_js
 
 

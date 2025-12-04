@@ -7,8 +7,6 @@ from typing import Any, Sequence
 
 from file_conversor.utils.dominate_bulma.form_input import FormFieldInput
 
-from file_conversor.utils.dominate_utils import *
-
 from file_conversor.utils.formatters import format_py_to_js
 
 

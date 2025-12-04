@@ -1,6 +1,6 @@
 # src/file_conversor/backend/gui/_components/text.py
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div, p
 
 
 def Title(text: str, **kwargs):

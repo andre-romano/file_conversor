@@ -1,9 +1,5 @@
 # src/file_conversor/backend/gui/_components/margin.py
 
-from re import M
-from file_conversor.utils.dominate_utils import *
-
-
 class MarginAll:
     M_AUTO = "m-auto"
     M_0 = "m-0"

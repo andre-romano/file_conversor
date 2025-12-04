@@ -1,8 +1,5 @@
 # src/file_conversor/backend/gui/_components/typography.py
 
-from file_conversor.utils.dominate_utils import *
-
-
 class TextSize:
     SIZE_1 = "is-size-1"
     SIZE_2 = "is-size-2"

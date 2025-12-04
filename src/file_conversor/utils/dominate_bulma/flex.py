@@ -1,9 +1,6 @@
 # src/file_conversor/backend/gui/_components/_class.py
 
 
-from file_conversor.utils.dominate_utils import *
-
-
 class FlexWrap:
     NO_WRAP = "is-flex-wrap-nowrap"
     WRAP = "is-flex-wrap-wrap"

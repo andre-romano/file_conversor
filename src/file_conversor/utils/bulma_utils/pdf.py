@@ -5,10 +5,9 @@ from typing import Any
 # user-provided modules
 from file_conversor.backend.pdf import GhostscriptBackend, PikePDFBackend, PyPDFBackend, OcrMyPDFBackend
 
-from file_conversor.utils.dominate_utils import *
-from file_conversor.utils.dominate_bulma import *
-
-from file_conversor.utils.formatters import format_file_types_webview
+from file_conversor.utils.dominate_bulma.form_field import FormFieldHorizontal
+from file_conversor.utils.dominate_bulma.form_input import FormFieldInput
+from file_conversor.utils.dominate_bulma.form_select import FormFieldSelect
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_language_name, get_translation

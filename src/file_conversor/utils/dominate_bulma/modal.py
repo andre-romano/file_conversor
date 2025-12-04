@@ -1,8 +1,9 @@
 # src\file_conversor\backend\gui\_components\modal.py
 
-from file_conversor.utils.dominate_utils import *
-
 from typing import Any
+
+# user-defined imports
+from file_conversor.utils.dominate_utils import button, div, header, p, section, footer
 
 
 def _Modal(**kwargs):

@@ -5,8 +5,8 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.audio_video import FFmpegBackend
 
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.bulma_utils.audio_video import AudioBitrateField, VideoBitrateField, VideoEncodingSpeedField, VideoQualityField
+from file_conversor.utils.dominate_bulma import FormFieldHorizontal, FormFieldSelect
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES

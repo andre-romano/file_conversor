@@ -3,7 +3,7 @@
 from typing import Any
 
 from file_conversor.utils.dominate_bulma.form_field import FormField
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div, option, select
 
 
 def Select(

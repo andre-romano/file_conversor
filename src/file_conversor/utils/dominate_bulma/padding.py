@@ -1,9 +1,5 @@
 # src/file_conversor/backend/gui/_components/padding.py
 
-from re import M
-from file_conversor.utils.dominate_utils import *
-
-
 class PaddingAll:
     P_AUTO = "p-auto"
     P_0 = "p-0"

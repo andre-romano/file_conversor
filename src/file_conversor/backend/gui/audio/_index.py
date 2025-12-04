@@ -6,7 +6,7 @@ from flask import render_template, render_template_string, url_for
 from file_conversor.backend.gui._dom_page import home_nav_item
 from file_conversor.backend.gui.audio._dom_page import audio_index_nav_item
 
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.dominate_bulma import PageCardGrid
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

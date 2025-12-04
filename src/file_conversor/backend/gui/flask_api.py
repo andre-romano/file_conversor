@@ -9,7 +9,7 @@ from typing import Any, Callable, Iterable, Self
 from flask import Flask, Response, request, jsonify
 
 # user-provided modules
-from file_conversor.backend.gui.flask_api_status import *
+from file_conversor.backend.gui.flask_api_status import FlaskApiStatus, FlaskApiStatusCompleted, FlaskApiStatusUnknown, FlaskApiStatusError, FlaskApiStatusProcessing, FlaskApiStatusReady
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

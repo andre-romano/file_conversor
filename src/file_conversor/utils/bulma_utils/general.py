@@ -11,8 +11,6 @@ from file_conversor.utils.dominate_bulma.form_file_list import FormFileList
 from file_conversor.utils.dominate_bulma.form_output_dir import FormFieldOutputDirectory
 from file_conversor.utils.dominate_bulma.form_output_file import FormFieldOutputFile
 
-from file_conversor.utils.dominate_utils import *
-
 from file_conversor.utils.formatters import format_file_types_webview
 
 from file_conversor.config import Configuration, Environment, Log, State

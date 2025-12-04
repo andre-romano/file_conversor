@@ -3,8 +3,8 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.backend.gui._dom_page import *
-from file_conversor.backend.gui.config._dom_page import *
+from file_conversor.backend.gui._dom_page import home_nav_item
+from file_conversor.backend.gui.config._dom_page import config_index_nav_item
 
 from file_conversor.backend.gui.config._tab_audio_video import TabConfigAudioVideo
 from file_conversor.backend.gui.config._tab_general import TabConfigGeneral
@@ -15,7 +15,7 @@ from file_conversor.backend.gui.config._tab_pdf import TabConfigPDF
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.dominate_bulma import PageForm, Tabs, Button
 
 # Get app config
 CONFIG = Configuration.get_instance()

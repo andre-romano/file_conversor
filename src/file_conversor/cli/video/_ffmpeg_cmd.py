@@ -77,8 +77,8 @@ def ffmpeg_cli_cmd(
         target_size_bytes = parse_bytes(target_size)
 
     # set filters
-    audio_filters: list[FFmpegFilter] = list()
-    video_filters: list[FFmpegFilter] = list()
+    audio_filters: list[FFmpegFilter] = []
+    video_filters: list[FFmpegFilter] = []
 
     if resolution:
         video_filters.append(FFmpegFilterScale(*resolution.split(":")))
@@ -95,6 +95,7 @@ def ffmpeg_cli_cmd(
     if rotation is not None:
         rotation = normalize_degree(rotation)
         if rotation == 0:
+            # no need to rotate
             pass
         elif rotation in (90, 270):
             direction = {
@@ -110,6 +111,7 @@ def ffmpeg_cli_cmd(
 
     if mirror_axis is not None:
         if mirror_axis == "":
+            # no need to mirror
             pass
         elif mirror_axis == "x":
             video_filters.append(FFmpegFilterHflip())
@@ -178,7 +180,7 @@ def ffmpeg_cli_cmd(
             def progress_complete_cb(): return progress_callback(progress_mgr.complete_step(), progress_mgr)  # pyright: ignore[reportOptionalCall]
 
         # display current progress
-        process = ffmpeg_backend.execute(
+        ffmpeg_backend.execute(
             progress_callback=progress_update_cb,
             pass_num=1 if two_pass else 0,
         )
@@ -186,7 +188,7 @@ def ffmpeg_cli_cmd(
 
         if two_pass:
             # display current progress
-            process = ffmpeg_backend.execute(
+            ffmpeg_backend.execute(
                 progress_callback=progress_update_cb,
                 pass_num=2,
             )

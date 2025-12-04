@@ -46,7 +46,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
     )
 
     # set filters
-    audio_filters: list[FFmpegFilter] = list()
+    audio_filters: list[FFmpegFilter] = []
 
     two_pass = (audio_bitrate > 0)
 
@@ -63,7 +63,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
             def progress_complete_cb(): return progress_callback(progress_mgr.complete_step(), progress_mgr)  # pyright: ignore[reportOptionalCall]
 
         # display current progress
-        process = ffmpeg_backend.execute(
+        ffmpeg_backend.execute(
             progress_callback=progress_update_cb,
             pass_num=1 if two_pass else 0,
         )
@@ -71,7 +71,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
 
         if two_pass:
             # display current progress
-            process = ffmpeg_backend.execute(
+            ffmpeg_backend.execute(
                 progress_callback=progress_update_cb,
                 pass_num=2,
             )

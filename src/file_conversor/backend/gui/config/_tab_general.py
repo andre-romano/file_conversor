@@ -3,11 +3,11 @@
 from flask import render_template, render_template_string, url_for
 
 # user-provided modules
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.dominate_bulma import FormFieldCheckbox, FormFieldHorizontal, FormFieldInput, FormFieldSelect
+from file_conversor.utils.bulma_utils import OutputDirField
 
 from file_conversor.config import Configuration, Environment, Log, State
-from file_conversor.config.locale import *
+from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_translation, get_language_name
 
 # Get app config
 CONFIG = Configuration.get_instance()

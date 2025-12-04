@@ -1,6 +1,6 @@
 # src\file_conversor\backend\gui\_components\footer.py
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import a, div, span, strong
 
 
 def Footer(**kwargs):

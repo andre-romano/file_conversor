@@ -5,11 +5,11 @@ from flask import render_template, render_template_string, url_for
 # user-provided modules
 from file_conversor.backend.audio_video import FFmpegBackend
 
-from file_conversor.backend.gui._dom_page import *
-from file_conversor.backend.gui.audio._dom_page import *
+from file_conversor.backend.gui._dom_page import home_nav_item
+from file_conversor.backend.gui.audio._dom_page import audio_convert_nav_item, audio_index_nav_item
 
-from file_conversor.utils.bulma_utils import *
-from file_conversor.utils.dominate_bulma import *
+from file_conversor.utils.bulma_utils import AudioBitrateField, FileFormatField, InputFilesField, OutputDirField
+from file_conversor.utils.dominate_bulma import PageForm
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation

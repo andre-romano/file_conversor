@@ -10,8 +10,6 @@ from file_conversor.utils.dominate_bulma.form import Form
 from file_conversor.utils.dominate_bulma.breadcrumb import Breadcrumb
 from file_conversor.utils.dominate_bulma.page_base import PageBase
 
-from file_conversor.utils.dominate_utils import *
-
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 

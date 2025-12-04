@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import a, div, hr, img, nav, span
 
 
 def NavbarDivider(_class: str = "", **kwargs):

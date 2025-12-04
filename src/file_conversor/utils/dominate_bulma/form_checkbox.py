@@ -2,11 +2,8 @@
 
 from typing import Any
 
-from file_conversor.utils.dominate_bulma.font_awesome_icon import FontAwesomeIcon
-
 from file_conversor.utils.dominate_bulma.form_field import FormField
-
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import input_, label, span
 
 
 def Checkbox(

@@ -1,9 +1,5 @@
 # src/file_conversor/backend/gui/_components/visibility.py
 
-
-from file_conversor.utils.dominate_utils import *
-
-
 class Visibility:
     IS_BLOCK = "is-block"
     IS_INLINE = "is-inline"

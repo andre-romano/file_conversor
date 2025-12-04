@@ -1,8 +1,5 @@
 # src/file_conversor/backend/gui/_components/_class.py
 
-from file_conversor.utils.dominate_utils import *
-
-
 def class_is_pulled_left():
     return "is-pulled-left"
 

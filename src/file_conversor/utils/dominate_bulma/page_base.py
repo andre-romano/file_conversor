@@ -11,7 +11,7 @@ from file_conversor.utils.dominate_bulma.navbar import Navbar
 from file_conversor.utils.dominate_bulma.footer import Footer
 from file_conversor.utils.dominate_bulma.status_bar import StatusBar
 
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import div, document, meta, script, link
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES
@@ -44,7 +44,7 @@ def PageBase(
         _class="has-navbar-fixed-top has-status-bar-fixed-bottom",
         **kwargs,
     ) as component:
-        with cast(dominate.tags.head, component.head) as head:
+        with cast(dominate.tags.head, component.head):
             meta(_charset="UTF-8")
             meta(_name="viewport", _content="width=device-width, initial-scale=1.0")
             # title(_title)

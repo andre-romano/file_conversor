@@ -3,8 +3,7 @@
 from typing import Any
 
 from file_conversor.utils.dominate_bulma.font_awesome_icon import FontAwesomeIcon
-
-from file_conversor.utils.dominate_utils import *
+from file_conversor.utils.dominate_utils import a, li, nav, ul
 
 
 def Breadcrumb(*items: dict[str, Any], _class: str = "", **kwargs):
@@ -27,7 +26,7 @@ def Breadcrumb(*items: dict[str, Any], _class: str = "", **kwargs):
     with nav(_class=f"breadcrumb {_class}", _aria_label="breadcrumbs", **kwargs) as component:
         with ul():
             for item in items:
-                with li(_class="is-active" if item.get("active") else "") as li_item:
+                with li(_class="is-active" if item.get("active") else ""):
                     if item.get("icon"):
                         FontAwesomeIcon(item["icon"])
                     a(item["label"], _href=item["url"])
