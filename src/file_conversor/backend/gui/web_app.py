@@ -167,7 +167,7 @@ class WebApp(AbstractSingletonThreadSafe):
             logger.info(f"[bold]{_('Access the app at')} {url}[/]")
             logger.info(f"[bold]{_('Press Ctrl+C to exit.')}[/]")
             self._run_webview()
-        except (typer.Abort, typer.Exit, KeyboardInterrupt, SystemExit) as e:
+        except (typer.Abort, typer.Exit, KeyboardInterrupt, SystemExit):
             logger.info(f"{_('Shutting down main thread...')}")
 
         logger.info(f"{_('[bold] Shutting down the application ... [/]')}")

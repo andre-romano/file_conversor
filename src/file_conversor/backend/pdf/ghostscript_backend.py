@@ -155,6 +155,34 @@ class GhostscriptBackend(AbstractBackend):
                 f"-dGrayImageFilter=/{self.value}",
             ]
 
+    class JPEGCompression(Enum):
+        NONE = 99
+        """no compression / highest quality"""
+        LOW = 90
+        """low compression / high quality"""
+        MEDIUM = 80
+        """medium compression / medium quality"""
+        HIGH = 70
+        """high compression / low quality"""
+
+        @classmethod
+        def get_dict(cls):
+            return {
+                "none": cls.NONE,
+                "low": cls.LOW,
+                "medium": cls.MEDIUM,
+                "high": cls.HIGH,
+            }
+
+        @classmethod
+        def from_str(cls, name: str):
+            return cls.get_dict()[name]
+
+        def get_options(self) -> list[str]:
+            return [
+                f"-dJPEGQ={self.value}",
+            ]
+
     SUPPORTED_IN_FORMATS = {
         "pdf": {},
     }
@@ -166,9 +194,6 @@ class GhostscriptBackend(AbstractBackend):
     EXTERNAL_DEPENDENCIES = {
         "gs",
     }
-
-    PROGRESS_RE = re.compile(r'Page\s*(\d+)')
-    NUM_PAGES_RE = re.compile(r'Processing pages (\d+) through (\d+)')
 
     def __init__(
         self,
@@ -197,6 +222,62 @@ class GhostscriptBackend(AbstractBackend):
 
         # find ghostscript bin
         self._ghostscript_bin = self.find_in_path("gs")
+
+    def _get_gs_command(self) -> list[str]:
+        """
+        Get the base Ghostscript command.
+
+        :return: List of Ghostscript command and basic options.
+        """
+        return [
+            f"{self._ghostscript_bin}",
+            # set non-interactive mode
+            f"-dNOPAUSE",
+            f"-dBATCH",
+        ]
+
+    def _get_inout_options(self, in_path: Path, out_path: Path) -> list[str]:
+        """
+        Get input/output options for Ghostscript command.
+
+        :param in_path: Input file path.
+        :param out_path: Output file path.
+        :return: List of input/output options.
+        """
+        return [
+            f"-sOutputFile={out_path}",
+            f"{in_path}",
+        ]
+
+    def _get_num_pages(self, line: str) -> int | None:
+        """
+        Get number of pages from Ghostscript output line.
+
+        :param line: Ghostscript output line.
+        :return: Number of pages or None if not found.
+        """
+        match = re.search(r'Processing pages (\d+) through (\d+)', line)
+        if not match:
+            return None
+        begin = int(match.group(1))
+        end = int(match.group(2))
+        num_pages = end - begin + 1
+        return num_pages
+
+    def _get_progress(self, num_pages: int, line: str) -> float | None:
+        """
+        Get progress percentage from Ghostscript output line.
+
+        :param num_pages: Total number of pages.
+        :param line: Ghostscript output line.
+        :return: Progress percentage or None if not found.
+        """
+        match = re.search(r'Page\s*(\d+)', line)
+        if not match:
+            return None
+        pages = int(match.group(1))
+        progress = 100.0 * (float(pages) / num_pages)
+        return progress
 
     def compress(self,
                  output_file: str | Path,
@@ -234,59 +315,42 @@ class GhostscriptBackend(AbstractBackend):
         out_file_format: GhostscriptBackend.OutputFileFormat = self.SUPPORTED_OUT_FORMATS[out_ext]["out_file_format"]
 
         # build command
-        command = [
-            f"{self._ghostscript_bin}",
+        command = self._get_gs_command()
 
-            # set non-interactive mode
-            f"-dNOPAUSE",
-            f"-dBATCH",
-        ]
-
+        # add options
         command.extend(out_file_format.get_options())  # file_device options
         command.extend(compression_level.get_options())  # compression options
         command.extend(compatibility_preset.get_options())  # compatibility options
         command.extend(downsampling_type.get_options())  # downsampling options
         command.extend(image_compression.get_options())  # set image compression
+
+        # adjust JPEG compression if needed
         if image_compression == GhostscriptBackend.ImageCompression.JPG:
-            if compression_level == GhostscriptBackend.Compression.HIGH:
-                command.append(f"-dJPEGQ=70")  # Set JPEG quality
-            elif compression_level == GhostscriptBackend.Compression.MEDIUM:
-                command.append(f"-dJPEGQ=80")  # Set JPEG quality
-            elif compression_level == GhostscriptBackend.Compression.LOW:
-                command.append(f"-dJPEGQ=90")  # Set JPEG quality
-            else:
-                command.append(f"-dJPEGQ=99")  # Set JPEG quality
+            compression_level_name = compression_level.name.lower()
+            jpeg_compression = GhostscriptBackend.JPEGCompression.from_str(compression_level_name)
+            command.extend(jpeg_compression.get_options())  # set JPEG compression
 
         # set input/output files
-        command.extend([
-            f"-sOutputFile={out_path}",
-            f"{in_path}",
-        ])
+        command.extend(self._get_inout_options(in_path, out_path))
 
         # Execute the FFmpeg command
         process = Environment.run_nowait(
             *command,
         )
 
+        # process output
         out_lines: list[str] = []
-        num_pages = 0
+        num_pages: int = 0
+        progress: float = 0.0
         while process.poll() is None:
             if not process.stdout:
                 continue
             line = process.stdout.readline()
+            out_lines.append(line)  # collect output lines for error checking
 
-            match = GhostscriptBackend.NUM_PAGES_RE.search(line)
-            if match:
-                begin = int(match.group(1))
-                end = int(match.group(2))
-                num_pages = end - begin + 1
+            num_pages = self._get_num_pages(line) or num_pages
+            progress = self._get_progress(num_pages, line) or progress
 
-            match = GhostscriptBackend.PROGRESS_RE.search(line)
-            if not match:
-                out_lines.append(line)
-                continue
-            pages = int(match.group(1))
-            progress = 100.0 * (float(pages) / num_pages)
             if progress_callback:
                 progress_callback(progress)
 

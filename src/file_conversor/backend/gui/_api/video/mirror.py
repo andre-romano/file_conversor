@@ -1,16 +1,13 @@
 # src/file_conversor/backend/gui/_api/video/mirror.py
 
-from flask import json, render_template, request, url_for
 from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd, EXTERNAL_DEPENDENCIES
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
 
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
-
-from file_conversor.utils import CommandManager, ProgressManager
 
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
@@ -42,19 +39,23 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     mirror_axis = params['mirror-axis']
 
     logger.info(f"[bold]{_('Mirroring video files')}[/]...")
-    ffmpeg_cli_cmd(
-        input_files=input_files,
-        file_format=file_format,
 
-        audio_bitrate=audio_bitrate,
-        video_bitrate=video_bitrate,
-        video_encoding_speed=video_encoding_speed,
-        video_quality=video_quality,
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
+    )
 
-        mirror_axis=mirror_axis,
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_mirrored", output_dir=output_dir)
 
-        output_dir=output_dir,
-        out_stem="_mirrored",
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+
+    ffmpeg_cmd_helper.set_mirror_filter(mirror_axis)
+
+    ffmpeg_cmd_helper.execute(
         progress_callback=lambda p, pm: status.set_progress(pm.update_progress(p)),
     )
 

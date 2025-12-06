@@ -23,7 +23,6 @@ from file_conversor.cli.video._typer import COMMAND_NAME, INFO_NAME
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils.backend import FFprobeParser
-from file_conversor.utils.formatters import format_bytes, format_bitrate
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu

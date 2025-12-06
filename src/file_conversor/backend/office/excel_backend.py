@@ -82,7 +82,7 @@ class ExcelBackend(AbstractMSOfficeBackend):
                 if output_path.suffix.lower() == ".pdf":
                     workbook.ExportAsFixedFormat(
                         Filename=str(output_path),
-                        Type=0,  # 0 = pdf
+                        Type=0,  # = pdf
                         Quality=0,
                         IncludeDocProperties=True,
                         IgnorePrintAreas=False,

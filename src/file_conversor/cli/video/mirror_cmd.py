@@ -11,7 +11,7 @@ from pathlib import Path
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
 
 from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.video._typer import COMMAND_NAME, MIRROR_NAME
@@ -20,7 +20,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 
 from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.validators import check_positive_integer
-from file_conversor.utils.typer_utils import AxisOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
+from file_conversor.utils.typer_utils import AudioBitrateOption, AxisOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -33,8 +33,6 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
-
-EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
@@ -84,6 +82,7 @@ def mirror(
 
     file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG["video-format"],
 
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
     video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
 
     video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
@@ -91,16 +90,22 @@ def mirror(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    ffmpeg_cli_cmd(
-        input_files,
-        file_format=file_format,
-        out_stem="_mirrored",
-        mirror_axis=mirror_axis,
-        video_bitrate=video_bitrate,
-        video_encoding_speed=video_encoding_speed,
-        video_quality=video_quality,
-        output_dir=output_dir,
+
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
     )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_mirrored", output_dir=output_dir)
+
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+    ffmpeg_cmd_helper.set_mirror_filter(mirror_axis)
+
+    ffmpeg_cmd_helper.execute()
 
 
 __all__ = [

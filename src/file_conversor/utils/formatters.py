@@ -56,7 +56,7 @@ def parse_js_to_py(value: str) -> Any:
     elif value.lower() in ('false', 'off'):
         return False
     # Handle numeric values
-    elif re.match(r'^-?\d+((\.|,)\d+)?$', value):
+    elif re.match(r'^-?\d+([\.,]\d+)?$', value):
         if '.' in value or ',' in value:
             return float(value.replace(',', '.'))
         else:
@@ -68,7 +68,12 @@ def parse_js_to_py(value: str) -> Any:
 
 
 def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
-    """return (name, args, kwargs)"""
+    """
+    Parse FFmpeg filter string to name, args, kwargs.
+
+    :param filter: FFmpeg filter string.
+    :returns: (name, args, kwargs)
+    """
     if not filter:
         return "", [], {}
     splitted = filter.split("=", maxsplit=1)
@@ -100,7 +105,7 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
     # get rotation dict in format {page: rotation}
     rotation_dict = {}
     for arg in rotation:
-        match = re.search(r'(\d+)(-(\d*)){0,1}:([-]{0,1}\d+)', arg)
+        match = re.search(r'(\d+)(-(\d*))?:(-?\d+)', arg)
         if not match:
             raise RuntimeError(f"{_('Invalid rotation instruction')} '{arg}'. {_("Valid format is 'begin-end:degree' or 'page:degree'")}.")
 
@@ -133,7 +138,7 @@ def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
     # parse user input
     pages_list: list[int] = []
     for arg in pages:
-        match = re.compile(r'(\d+)(-(\d*)){0,1}').search(arg)
+        match = re.compile(r'(\d+)(-(\d*))?').search(arg)
         if not match:
             raise RuntimeError(f"{_('Invalid page instruction')} '{arg}'. {_("Valid format is 'page' or 'begin-end'")}.")
 
@@ -181,9 +186,10 @@ def parse_bytes(target_size: str | None) -> int:
     raise ValueError(f"{_('Invalid size format')} '{target_size}'.")
 
 
-def format_bytes(size: float) -> str:
+def format_bytes(size: float | int) -> str:
     """Format size in bytes, KB, MB, GB, or TB"""
     # Size in bytes to a human-readable string
+    size = float(size)
     for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
         if size < 1024.0:
             return f"{size:.1f} {unit}"
@@ -212,9 +218,9 @@ def format_alphanumeric(text: str) -> str:
     formatted = re.sub(r'[íïìî]', 'i', formatted)
     formatted = re.sub(r'[óòöôõ]', 'o', formatted)
     formatted = re.sub(r'[úüùû]', 'u', formatted)
-    formatted = re.sub(r'[ç]', 'c', formatted)
-    formatted = re.sub(r'[ñ]', 'n', formatted)
-    formatted = re.sub(r'[\s ]+', ' ', formatted)
+    formatted = re.sub(r'[çc]', 'c', formatted)
+    formatted = re.sub(r'[ñn]', 'n', formatted)
+    formatted = re.sub(r'[\s]+', ' ', formatted)
     formatted = re.sub(r'[^a-zA-Z0-9_ ]', '', formatted)
     return formatted.strip()
 

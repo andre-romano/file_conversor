@@ -73,8 +73,16 @@ class FFmpegBackend(AbstractFFmpegBackend):
             install_deps=install_deps,
             verbose=verbose,
         )
-        self._stats = stats
-        self._overwrite_output = overwrite_output
+
+        self._global_options: list[str] = [
+            "" if not verbose else "-v",
+            "" if not stats else "-stats",
+            "-n" if not overwrite_output else "-y",
+        ]
+        self._in_opts: list[str] = []
+        self._out_opts: list[str] = []
+
+        self._out_container: FormatContainer | None = None
 
         self._input_file: Path | None = None
         self._output_file: Path | None = None
@@ -82,12 +90,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         self._audio_bitrate: int | None = None
         self._video_bitrate: int | None = None
-
-        self._global_options: list[str] = []
-        self._in_opts: list[str] = []
-        self._out_opts: list[str] = []
-
-        self._out_container: FormatContainer | None = None
 
         self._progress_callback: Callable[[float], Any] | None = None
 
@@ -122,20 +124,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
             if self._progress_callback:
                 self._progress_callback(progress)
         return lines
-
-    def _set_global_options(self):
-        """Set default global options"""
-        global_options = {}
-        global_options["-y" if self._overwrite_output else "-n"] = ""
-        if self._verbose:
-            global_options["-v"] = ""  # verbose output
-        if self._stats:
-            global_options["-stats"] = ""  # print progress stats
-
-        # create global options list
-        self._global_options = []
-        for k, v in global_options.items():
-            self._global_options.extend([str(k), str(v)])
 
     def _set_input_file(self, input_file: str | Path):
         """
@@ -208,7 +196,6 @@ class FFmpegBackend(AbstractFFmpegBackend):
         :param input_file: Input file path.
         :param output_file: Output file path.      
         """
-        self._set_global_options()
         self._set_input_file(input_file)
         self._set_output_file(output_file)
 

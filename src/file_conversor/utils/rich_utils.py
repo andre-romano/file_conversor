@@ -31,9 +31,11 @@ class DummyProgress(Progress):
         return TaskID(0)
 
     def update(self, task_id: TaskID, *, total: float | None = None, completed: float | None = None, advance: float | None = None, description: str | None = None, visible: bool | None = None, refresh: bool = False, **fields: Any):
+        # empty method (does nothing / dummy progress bar)
         pass
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
+        # empty method (does nothing / dummy progress bar)
         pass
 
 

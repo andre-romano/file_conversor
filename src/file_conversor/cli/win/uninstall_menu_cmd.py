@@ -50,8 +50,6 @@ def uninstall_menu():
 
     # Define registry path
     ctx_menu = WinContextMenu.get_instance()
-    # logger.debug("---- .REG file contents ----")
-    # logger.debug(repr(ctx_menu.get_reg_file()))
 
     winreg_backend.delete_keys(ctx_menu.get_reg_file())
 

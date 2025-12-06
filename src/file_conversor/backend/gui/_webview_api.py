@@ -85,6 +85,7 @@ class WebViewAPI:
         )  # pyright: ignore[reportOperatorIssue]
 
     def _on_drag(self, event) -> None:
+        # empty handler to allow drop event
         pass
 
     def _on_drop(self, event) -> None:

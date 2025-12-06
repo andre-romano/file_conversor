@@ -10,7 +10,7 @@ from rich import print
 # user-provided modules
 from file_conversor.backend import FFmpegBackend
 
-from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
 
 from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.video._typer import COMMAND_NAME, ENHANCE_NAME
@@ -33,8 +33,6 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
-
-EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
@@ -141,24 +139,31 @@ def enhance(
             default=False, type=bool,
         )
 
-    ffmpeg_cli_cmd(
-        input_files,
-        file_format=file_format,
-        out_stem="_enhanced",
-        audio_bitrate=audio_bitrate,
-        video_bitrate=video_bitrate,
-        video_encoding_speed=video_encoding_speed,
-        video_quality=video_quality,
-        resolution=resolution,
-        fps=fps,
-        color=color,
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
+    )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_enhanced", output_dir=output_dir)
+
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+
+    ffmpeg_cmd_helper.set_resolution_filter(resolution)
+    ffmpeg_cmd_helper.set_fps_filter(fps)
+    ffmpeg_cmd_helper.set_enhancement_filters(
         brightness=brightness,
         contrast=contrast,
+        color=color,
         gamma=gamma,
-        deshake=deshake,
-        unsharp=unsharp,
-        output_dir=output_dir,
     )
+    ffmpeg_cmd_helper.set_deshake_filter(deshake)
+    ffmpeg_cmd_helper.set_unsharp_filter(unsharp)
+
+    ffmpeg_cmd_helper.execute()
 
 
 __all__ = [

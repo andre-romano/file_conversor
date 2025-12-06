@@ -91,7 +91,7 @@ def execute(
         ffmpeg_backend.set_video_codec(codec=video_codec, bitrate=video_bitrate, filters=video_filters_obj)
 
         # display current progress
-        process = ffmpeg_backend.execute(
+        ffmpeg_backend.execute(
             progress_callback=progress_mgr.update_progress,
             out_opts=shlex.split(ffmpeg_args),
         )

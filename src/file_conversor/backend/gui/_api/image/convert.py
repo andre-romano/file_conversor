@@ -29,12 +29,12 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     input_files = [Path(i) for i in params['input-files']]
     output_dir = Path(params['output-dir'])
 
-    format = str(params['file-format'])
+    file_format = str(params['file-format'])
     quality = int(params['image-quality'])
 
     execute_image_convert_cmd(
         input_files=input_files,
-        format=format,
+        format=file_format,
         quality=quality,
         output_dir=output_dir,
         progress_callback=status.set_progress,

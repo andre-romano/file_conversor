@@ -88,7 +88,7 @@ class AbstractLibreofficeBackend(AbstractBackend):
                 str(output_dir),
                 str(input_path)
             )
-            if any([p.startswith("Error:") for p in (process.stdout or "", process.stderr or "")]):
+            if any(p.startswith("Error:") for p in (process.stdout or "", process.stderr or "")):
                 raise RuntimeError(f"LibreOffice conversion failed: {process.stdout or ''} {process.stderr or ''}")
             if file_processed_callback:
                 file_processed_callback(input_path)

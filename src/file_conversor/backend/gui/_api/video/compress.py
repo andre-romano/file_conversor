@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 # user-provided modules
-from file_conversor.cli.video._ffmpeg_cmd import ffmpeg_cli_cmd, EXTERNAL_DEPENDENCIES
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
 
 from file_conversor.backend.gui.flask_api import FlaskApi
 from file_conversor.backend.gui.flask_api_status import FlaskApiStatus
@@ -39,14 +39,19 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     video_encoding_speed = params['video-encoding-speed']
     video_quality = params['video-quality']
 
-    ffmpeg_cli_cmd(
-        input_files=input_files,
-        file_format=file_format,
-        target_size=target_size,
-        video_encoding_speed=video_encoding_speed,
-        video_quality=video_quality,
-        output_dir=output_dir,
-        out_stem="_compressed",
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG['install-deps'],
+        verbose=STATE["verbose"],
+        overwrite_output=STATE["overwrite-output"],
+    )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_compressed", output_dir=output_dir)
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_target_size(target_size)
+
+    ffmpeg_cmd_helper.execute(
         progress_callback=lambda p, pm: status.set_progress(pm.update_progress(p)),
     )
 

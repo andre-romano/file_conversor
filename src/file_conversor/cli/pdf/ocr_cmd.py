@@ -66,7 +66,7 @@ def execute_pdf_ocr_cmd(
         verbose=STATE['verbose'],
     )
     local_langs: set[str] = ocrmypdf_backend.get_available_languages()
-    remote_langs: set[str] = set()
+    remote_langs: set[str]
 
     if 'all' in languages:
         remote_langs = ocrmypdf_backend.get_available_remote_languages()
@@ -87,7 +87,7 @@ def execute_pdf_ocr_cmd(
                 task = progress.add_task(f"{_('Installing language')} '{lang}' ...", total=100)
                 ocrmypdf_backend.install_language(
                     lang=lang,
-                    progress_callback=lambda p: progress.update(task, completed=p),
+                    progress_callback=lambda p, t=task: progress.update(t, completed=p),
                 )
                 progress.update(task, completed=100)
 

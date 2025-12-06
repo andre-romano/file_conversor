@@ -140,7 +140,7 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         with self._open(input_file) as img:
             if scale:
@@ -160,7 +160,7 @@ class PillowBackend(AbstractBackend):
             self._save(
                 img,
                 output_file,
-                format=format,
+                file_format=file_format,
                 quality=90,
                 optimize=True,
             )
@@ -192,13 +192,13 @@ class PillowBackend(AbstractBackend):
 
         out_ext = output_file.suffix[1:]
 
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=quality,
             optimize=optimize,
             lossless=True if is_close(quality, 100) else False,  # valid only for WEBP
@@ -231,14 +231,14 @@ class PillowBackend(AbstractBackend):
 
         out_ext = output_file.suffix[1:]
 
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         img = img.rotate(-rotate, resample=resampling, expand=True)  # clockwise rotation
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -259,7 +259,7 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         if x_y:
@@ -269,7 +269,7 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -296,7 +296,7 @@ class PillowBackend(AbstractBackend):
 
         out_ext = output_file.suffix[1:]
 
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         img = img.filter(
@@ -305,7 +305,7 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -336,7 +336,7 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         img = img.filter(ImageFilter.UnsharpMask(
@@ -347,7 +347,7 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -376,14 +376,14 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         img = img.filter(algorithm.value(radius))
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -416,7 +416,7 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         img = ImageEnhance.Color(img).enhance(color_factor)
@@ -426,7 +426,7 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -474,17 +474,17 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
 
         img = self._open(input_file)
         for filter in filters:
             if isinstance(filter, str):
-                filter = self.PILLOW_FILTERS[filter]
-            img = img.filter(filter)
+                img_filter = self.PILLOW_FILTERS[filter]
+            img = img.filter(img_filter)
         self._save(
             img,
             output_file,
-            format=format,
+            file_format=file_format,
             quality=90,
             optimize=True,
         )
@@ -496,7 +496,7 @@ class PillowBackend(AbstractBackend):
             img = img.convert("RGBA")
         return img
 
-    def _save(self, img: Image.Image, output_file: str | Path, format: str, **params):
+    def _save(self, img: Image.Image, output_file: str | Path, file_format: str, **params):
         """
         Corrects common errors in images and saves them.
 
@@ -508,7 +508,7 @@ class PillowBackend(AbstractBackend):
         :raises Exception: if image correction fails.
         """
         try:
-            format = format.upper()  # ensure uppercase format
+            file_format = file_format.upper()  # ensure uppercase format
 
             # 0. Preserve EXIF and ICC if they exist
             if "exif" in img.info and img.info["exif"]:
@@ -517,20 +517,20 @@ class PillowBackend(AbstractBackend):
                 params.setdefault("icc_profile", img.info["icc_profile"])
 
             # 2. Convert incompatible modes to the target format
-            if format in ("JPEG",) and img.mode not in ("RGB", "L"):
+            if file_format in ("JPEG",) and img.mode not in ("RGB", "L"):
                 img = img.convert("RGB")
-            elif format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):
+            elif file_format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):
                 img = img.convert("RGBA")
-            elif format == "TIFF" and img.mode not in ("RGB", "RGBA", "L"):
+            elif file_format == "TIFF" and img.mode not in ("RGB", "RGBA", "L"):
                 img = img.convert("RGB")
-            elif format == "BMP" and img.mode not in ("RGB",):
+            elif file_format == "BMP" and img.mode not in ("RGB",):
                 img = img.convert("RGB")
         except Exception as e:
             logger.error(f"{_('Image correction failed')}: {e}")
             raise
 
         # save image
-        img.save(output_file, format=format, **params)
+        img.save(output_file, format=file_format, **params)
 
 
 __all__ = [

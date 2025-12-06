@@ -68,7 +68,7 @@ class PowerPointBackend(AbstractMSOfficeBackend):
                 out_ext = output_path.suffix[1:]
                 out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[out_ext]
 
-                # powerpoint.Visible = True  # needed for powerpoint
+                # powerpoint.Visible -> True  # needed for powerpoint
                 presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)
                 presentation.SaveAs(
                     str(output_path),

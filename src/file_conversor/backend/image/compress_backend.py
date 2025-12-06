@@ -60,7 +60,7 @@ class CompressBackend(AbstractBackend):
         """
         super().__init__()
         # get required dependencies
-        for _, opts in CompressBackend.SUPPORTED_IN_FORMATS.items():
+        for opts in CompressBackend.SUPPORTED_IN_FORMATS.values():
             cls = opts["cls"]
             cls(
                 install_deps=install_deps,

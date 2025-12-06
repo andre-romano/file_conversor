@@ -60,8 +60,6 @@ def install_menu(
 
     # Define registry path
     ctx_menu = WinContextMenu.get_instance()
-    # logger.debug("---- .REG file contents ----")
-    # logger.debug(repr(ctx_menu.get_reg_file()))
 
     winreg_backend.import_file(ctx_menu.get_reg_file())
 

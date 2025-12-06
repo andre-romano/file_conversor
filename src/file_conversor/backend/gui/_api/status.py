@@ -20,5 +20,5 @@ logger = LOG.getLogger()
 def api_status():
     """API endpoint to get the application status."""
     params = FlaskApi.get_args()
-    id = str(params.get('id', '-1'))
-    return FlaskApi.status_response(id)
+    status_id = str(params.get('id', '-1'))
+    return FlaskApi.status_response(status_id)
