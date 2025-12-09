@@ -78,6 +78,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", f"Installing dependency {dependency}..."]
 
 
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
 class TestAbstractBackend:
     def test_find_in_path_not_exists(self):
         assert AbstractBackend.find_in_path("cmd.exe").exists()

@@ -74,6 +74,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", f"Installing dependency {dependency}..."]
 
 
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
 class TestAbstractPkgManager:
     def test_check_dependencies(self):
         pkg_manager = _DummyPkgManager({
