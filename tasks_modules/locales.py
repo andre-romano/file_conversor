@@ -63,7 +63,41 @@ def create(c, locale: str):
     print(f"[bold] Creating new locale '{locale}' ... [/][bold green]OK[/]")
 
 
-@task(pre=[template])
+@task(post=[template])
+def backup_i18n(c: InvokeContext):
+    """ Backup locales' .PO files"""
+    print(f"[bold] Backing up locales .po files ... [/]")
+    for path in I18N_PATH.rglob("*.po"):
+        po_bak = path.with_suffix(".po.bak")
+        shutil.copy2(path, po_bak)
+    print(f"[bold] Backing up locales .po files ... [/][bold green]OK[/]")
+
+
+@task
+def recover_i18n(c: InvokeContext):
+    """ Recover locales' .PO files from backup"""
+    print(f"[bold] Recovering individual locale translations from backup ... [/]")
+    for po_bak_path in I18N_PATH.rglob("*.po.bak"):
+        po_path = po_bak_path.with_suffix("")
+
+        po = polib.pofile(po_path)
+        po_bak = polib.pofile(po_bak_path)
+
+        if not po.untranslated_entries():
+            print(f"[bold yellow]WARN:[/] No untranslated entries for '{po_path.parent.parent.name}'. Skipping ... ")
+            continue
+
+        print(f"\tRecovering translations for '{po_path.parent.parent}' ... ", end="")
+        for entry in po.untranslated_entries():
+            bak_entry = po_bak.find(entry.msgid)
+            entry.msgstr = bak_entry.msgstr if bak_entry else entry.msgstr
+        po.save()
+        po_bak_path.unlink()
+        print(f"[bold green]OK[/]")
+    print(f"[bold] Recovering individual locale translations from backup ... [/][bold green]OK[/]")
+
+
+@task(pre=[backup_i18n], post=[recover_i18n])
 def update(c: InvokeContext):
     """ Update locales' .PO files based on current template (.pot)"""
     print(f"[bold] Updating locales based on template .pot file ... [/]")
