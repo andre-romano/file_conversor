@@ -6,21 +6,16 @@ import typer
 from rich import print
 
 from typing import Annotated, List
-from datetime import timedelta
 from pathlib import Path
-
-from rich import print
-from rich.text import Text
-from rich.panel import Panel
-from rich.console import Group
 
 # user-provided modules
 from file_conversor.backend import FFprobeBackend
 from file_conversor.cli.audio._typer import COMMAND_NAME, INFO_NAME
 
+from file_conversor.cli.video.info_cmd import info as info_video_cmd, EXTERNAL_DEPENDENCIES
+
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
-from file_conversor.utils.backend import FFprobeParser
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
@@ -34,8 +29,6 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 typer_cmd = typer.Typer()
-
-EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
 
 
 def register_ctx_menu(ctx_menu: WinContextMenu):
@@ -80,26 +73,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def info(
     input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend.SUPPORTED_IN_AUDIO_FORMATS)],
 ):
-
-    ffprobe_backend = FFprobeBackend(
-        install_deps=CONFIG['install-deps'],
-        verbose=STATE["verbose"],
-    )
-    for filename in input_files:
-        logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")
-        try:
-            parser = FFprobeParser(ffprobe_backend, filename)
-            parser.run()
-            # Agrupar e exibir tudo com Rich
-            group = Group(*[
-                *parser.get_format().rich(),
-                *parser.get_streams().rich(),
-                *parser.get_chapters().rich(),
-            ])
-            print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
-        except Exception as e:
-            logger.error(f"{_('Error parsing file')} '{filename}': {e}")
-            continue
+    info_video_cmd(input_files)
 
 
 __all__ = [

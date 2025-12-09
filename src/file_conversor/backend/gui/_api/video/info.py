@@ -30,7 +30,7 @@ EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
 
 def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     """Thread to handle audio information retrieval."""
-    logger.debug(f"Audio info thread received: {params}")
+    logger.debug(f"Audio/video info thread received: {params}")
     input_files: list[Path] = [Path(i) for i in params['input-files']]
 
     backend = FFprobeBackend(

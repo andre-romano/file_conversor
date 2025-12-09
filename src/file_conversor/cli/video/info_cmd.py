@@ -63,11 +63,11 @@ ctx_menu.register_callback(register_ctx_menu)
     name=INFO_NAME,
     rich_help_panel=RICH_HELP_PANEL,
     help=f"""
-        {_('Get information about a audio/video file.')}
+        {_('Get information about a video file.')}
 
-        {_('This command retrieves metadata and other information about the audio / video file')}:
+        {_('This command retrieves metadata and other information about the video file')}:
 
-        - {_('Format')} (mp3, mp4, mov, etc)
+        - {_('Format')} (avi, mp4, mov, etc)
 
         - {_('Duration')} (HH:MM:SS)
 
@@ -78,7 +78,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
         - `file_conversor {COMMAND_NAME} {INFO_NAME} filename.webm`
 
-        - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp3`
+        - `file_conversor {COMMAND_NAME} {INFO_NAME} other_filename.mp4`
     """)
 def info(
     input_files: Annotated[List[Path], InputFilesArgument(FFprobeBackend)],
