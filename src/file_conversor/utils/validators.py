@@ -63,7 +63,7 @@ def prompt_retry_on_exception(
     :raises typer.Abort: If the user aborts the input or retries are exhausted.
     :return: The user input, validated by the callback if provided.
     """
-    for _ in range(retries if retries and retries > 0 else int(sys.maxsize)):
+    for _ in range(retries or int(sys.maxsize)):
         try:
             if type == bool:
                 res = typer.confirm(
@@ -71,20 +71,18 @@ def prompt_retry_on_exception(
                     default=default if isinstance(default, bool) else False,
                     show_default=show_default,
                 )
-                return check_callback(res) if check_callback else res
-            res = typer.prompt(
-                text=text,
-                default=default,
-                hide_input=hide_input,
-                confirmation_prompt=confirmation_prompt,
-                type=type,
-                show_choices=show_choices,
-                show_default=show_default,
-                **prompt_kwargs,
-            )
+            else:
+                res = typer.prompt(
+                    text=text,
+                    default=default,
+                    hide_input=hide_input,
+                    confirmation_prompt=confirmation_prompt,
+                    type=type,
+                    show_choices=show_choices,
+                    show_default=show_default,
+                    **prompt_kwargs,
+                )
             return check_callback(res) if check_callback else res
-        except (typer.Abort, KeyboardInterrupt):
-            raise
         except:
             pass
     raise typer.Abort()

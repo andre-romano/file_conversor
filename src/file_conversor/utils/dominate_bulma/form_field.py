@@ -8,6 +8,85 @@ from file_conversor.utils.dominate_utils import div, label, p
 from file_conversor.utils.formatters import format_py_to_js
 
 
+def _validate_func_js(validation_expr: str, value: str, is_valid_var: str) -> str:
+    return f"""
+        console.log('Validating field with value:', {value});
+        {is_valid_var} = {validation_expr} ;
+        const parentForm = this.$el.closest('form[x-data]');
+        if(parentForm){{
+            const parentData = Alpine.$data(parentForm);
+            parentData.updateValidity();
+        }} else {{
+            console.log('No parent form found');
+        }}
+        return {is_valid_var} ;
+    """
+
+
+def _grouped_field(*input_el: Any, _class_control: str) -> list[Any]:
+    controls = []
+    for el in input_el:
+        if not el:
+            continue
+        with div(_class=f"control {_class_control}") as control_group:
+            control_group.add(el)
+        controls.append(control_group)
+    return controls
+
+
+def _addons_field(*input_el: Any) -> list[Any]:
+    with div(_class=f"field has-addons") as control_group:
+        for el in input_el:
+            if not el:
+                continue
+            control_group.add(el)
+    return [control_group]
+
+
+def _icon_component(icons: dict[str, Any], position: str) -> list[Any]:
+    icon_fields = []
+    if icons and icons.get(position):
+        icon_fields.append(FontAwesomeIcon(icons[position], _class=f"is-{position} is-small"))
+    return icon_fields
+
+
+def _icons_field(*input_el: Any, icons: dict[str, Any], _class_control: str) -> list[Any]:
+    _icons_class = ''
+    _icons_class += 'has-icons-left' if icons.get('left') else ''
+    _icons_class += 'has-icons-right' if icons.get('right') else ''
+    with div(_class=f"control {_class_control}") as control:
+        for el in input_el:
+            if not el:
+                continue
+            control.add(el)
+        control.add(*_icon_component(icons, 'left'))
+        control.add(*_icon_component(icons, 'right'))
+    return [control]
+
+
+def _label_component(label_text: str) -> list[Any]:
+    components = []
+    if label_text:
+        components.append(
+            label(label_text, _class="label")
+        )
+    return components
+
+
+def _help_component(help_var: str, is_hidden: str) -> list[Any]:
+    return [
+        p(
+            _class=f"help is-danger",
+            **{
+                'x-text': f'{help_var}',
+                ':class': f"""{{
+                    'is-hidden': {is_hidden},
+                }}""",
+            },
+        )  # Placeholder for error messages
+    ]
+
+
 def FormField(
     *input_el,
     label_text: str = "",
@@ -42,16 +121,7 @@ def FormField(
                 value: {format_py_to_js(current_value)},
                 isValid: false,
                 validate(value){{
-                    console.log('Validating field with value:', value);
-                    this.isValid = {validation_expr} ;
-                    const parentForm = this.$el.closest('form[x-data]');
-                    if(parentForm){{
-                        const parentData = Alpine.$data(parentForm);
-                        parentData.updateValidity();
-                    }} else {{
-                        console.log('No parent form found');
-                    }}
-                    return this.isValid ;
+                    {_validate_func_js(validation_expr, value="value", is_valid_var="this.isValid")}
                 }},
                 init() {{
                     this.$watch('value', this.validate.bind(this));
@@ -63,39 +133,14 @@ def FormField(
         },
         **kwargs,
     ) as field:
-        if label_text:
-            label(label_text, _class="label")
+        field.add(*_label_component(label_text))
         if "is-grouped" in _class:
-            for el in input_el:
-                if not el:
-                    continue
-                with div(_class=f"control {_class_control}") as control_group:
-                    control_group.add(el)
+            field.add(*_grouped_field(*input_el, _class_control=_class_control))
         elif has_addons:
-            with div(_class=f"field has-addons") as control_group:
-                for el in input_el:
-                    if not el:
-                        continue
-                    control_group.add(el)
+            field.add(*_addons_field(*input_el))
         else:
-            with div(_class=f"control {'has-icons-left' if icons and icons.get('left') else ''} {'has-icons-right' if icons and icons.get('right') else ''} {_class_control}") as control:
-                for el in input_el:
-                    if not el:
-                        continue
-                    control.add(el)
-                if icons and icons.get('left'):
-                    FontAwesomeIcon(icons['left'], _class="is-left is-small")
-                if icons and icons.get('right'):
-                    FontAwesomeIcon(icons['right'], _class="is-right is-small")
-        p(
-            _class=f"help is-danger",
-            **{
-                'x-text': 'help',
-                ':class': """{
-                    'is-hidden': isValid,
-                }""",
-            },
-        )  # Placeholder for error messages
+            field.add(*_icons_field(*input_el, icons=icons or {}, _class_control=_class_control))
+        field.add(*_help_component("help", is_hidden="isValid"))
     return field
 
 
@@ -119,10 +164,9 @@ def FormFieldHorizontal(
     """
     with div(_class=f"field is-horizontal is-full-width {_class}", **kwargs) as field:
         with div(_class=f"field-label {_class_label}") as field_label:
-            label(label_text, _class="label")
+            field_label.add(*_label_component(label_text))
         with div(_class=f"field-body {_class_body}") as field_body:
-            for form_field in form_fields:
-                field_body.add(form_field)
+            field_body.add(*form_fields)
     return field
 
 
