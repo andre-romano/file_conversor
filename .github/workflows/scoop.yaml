@@ -13,6 +13,8 @@ permissions:
 
 jobs:
   read-python-version:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    name: Read Python MIN / MAX version
     runs-on: ubuntu-latest
 
     outputs:
@@ -35,7 +37,6 @@ jobs:
         shell: bash
 
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     name: Scoop package CD
     runs-on: windows-latest
     needs: [read-python-version]

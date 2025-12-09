@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   read-python-version:
+    name: Read Python MIN / MAX version
     runs-on: ubuntu-latest
 
     outputs:
