@@ -1,0 +1,36 @@
+# .github/workflows/docker.yml
+name: Docker CI / CD
+
+on:
+  workflow_run:
+    workflows: [Git Release CI / CD]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  docker:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    name: Build and publish Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Login to Docker Hub registry
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build docker image
+        run: |
+          bash ./scripts/docker_build.sh
+        shell: bash
+
+      - name: Publish docker image
+        run: |
+          bash ./scripts/docker_push.sh
+        shell: bash
