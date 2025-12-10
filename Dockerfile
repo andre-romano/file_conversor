@@ -22,29 +22,32 @@ FROM andreromano/oxipng:latest AS oxipng
 # --------------------
 FROM python:${PYTHON_VERSION} AS build
 
-WORKDIR /app
+COPY --from=gifsicle /usr/local/bin /root/.local/bin
+COPY --from=mozjpeg /usr/local/bin /root/.local/bin
+COPY --from=oxipng /usr/local/bin /root/.local/bin
+
 COPY . /app
+WORKDIR /app
 
 # INSTALL BUILD DEPENDENCIES AND BUILD APP:
-RUN echo "Building Python app using pdm ..." \
-    && echo "Current directory: $(pwd) - Pyproject.toml found in $(ls pyproject.toml)" \
+RUN echo "Installing Python dependencies ..." \
     && python -m pip install --upgrade pip \
     && python -m pip install --upgrade setuptools wheel pdm \
     && python -m pdm install --dev --no-lock \
+    && echo "Installing Python dependencies ... OK" \
+    && echo "Building .whl ..." \
     && python -m pdm run invoke pypi.build \
-    && echo "Building Python app using pdm ... OK" 
+    && echo "Building .whl ... OK" 
 
 # --------------------
 # STAGE 2 - release
 # --------------------
 FROM python:${PYTHON_VERSION} AS release
 
-WORKDIR /app
+COPY --from=build /root/.local/bin /root/.local/bin
 COPY --from=build /app/dist /app/dist
 
-COPY --from=gifsicle /usr/local/bin /root/.local/bin
-COPY --from=mozjpeg /usr/local/bin /root/.local/bin
-COPY --from=oxipng /usr/local/bin /root/.local/bin
+WORKDIR /app
 
 ENV PATH="/root/.local/bin:${PATH}"
 RUN apt-get update \
