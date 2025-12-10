@@ -14,6 +14,7 @@ tests
 *.log
 *.log.*
 *.pyc
+*.pyo
 *.swp
 .DS_Store
 Thumbs.db
