@@ -83,11 +83,16 @@ class FFmpegCmdHelper:
         target_size_kbps = int(target_size_kbit / duration)
 
         # audio size
-        self._audio_bitrate = 128 if self._audio_bitrate <= 0 else self._audio_bitrate
+        self.set_bitrate(
+            audio_bitrate=128 if self._audio_bitrate <= 0 else self._audio_bitrate,
+        )
+        self.set_bitrate(
+            video_bitrate=target_size_kbps - self._audio_bitrate,
+        )
+
         audio_kbps = self._audio_bitrate / 8.0
         audio_mb = audio_kbps * duration / 1024.0
 
-        self._video_bitrate = target_size_kbps - self._audio_bitrate
         if self._video_bitrate < 1:
             target_size = format_bytes(self._target_size_bytes)
             raise RuntimeError(f"{_('Target size too small')}: {target_size}. {_(f'Increase target size to at least')} '{audio_mb + 0.100:.2f}M' {_('(might not be enougth to achieve good video quality)')}.")
@@ -141,15 +146,17 @@ class FFmpegCmdHelper:
         self._video_quality = quality
         return self
 
-    def set_bitrate(self, audio_bitrate: int = 0, video_bitrate: int = 0) -> Self:
+    def set_bitrate(self, audio_bitrate: int = -1, video_bitrate: int = -1) -> Self:
         """
         Set audio and video bitrate.
 
         :param audio_bitrate: Audio bitrate value.
         :param video_bitrate: Video bitrate value.
         """
-        self._audio_bitrate = audio_bitrate
-        self._video_bitrate = video_bitrate
+        if audio_bitrate >= 0:
+            self._audio_bitrate = audio_bitrate
+        if video_bitrate >= 0:
+            self._video_bitrate = video_bitrate
         self._two_pass = (self._video_bitrate > 0) or (self._audio_bitrate > 0)
         return self
 
@@ -282,6 +289,7 @@ class FFmpegCmdHelper:
         def _callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
             logger.debug(f"Input file: {input_file}")
 
+            self._set_video_bitrate_for_target_size(input_file)
             logger.debug(f"{_('Audio bitrate')}: [green][bold]{self._audio_bitrate} kbps[/bold][/green]")
             logger.debug(f"{_('Video bitrate')}: [green][bold]{self._video_bitrate} kbps[/bold][/green]")
 
@@ -320,7 +328,6 @@ class FFmpegCmdHelper:
                     progress_callback=progress_update_cb,
                     pass_num=2,
                 )
-                progress_complete_cb()
 
         cmd_mgr = CommandManager(self._input_files, output_dir=self._output_dir, steps=2 if self._two_pass else 1, overwrite=self._overwrite_output)
         cmd_mgr.run(_callback, out_suffix=f".{self._file_format}", out_stem=self._out_stem)

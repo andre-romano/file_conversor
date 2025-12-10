@@ -3,7 +3,6 @@
 [![PyPI](https://img.shields.io/pypi/v/file_conversor.svg)](https://pypi.org/project/file_conversor/)
 [![Downloads](https://static.pepy.tech/badge/file-conversor)](https://pepy.tech/project/file-conversor)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
