@@ -19,7 +19,7 @@ from file_conversor.utils.validators import check_file_format
 
 _ = get_translation()
 LOG = Log.get_instance()
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 
 logger = LOG.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
         self._cached_session = requests_cache.CachedSession(
             cache_name=str(self._cache_file.with_suffix("").resolve()),
             backend="sqlite",
-            expire_after=int(CONFIG["cache-expire-after"]),
+            expire_after=CONFIG.cache_expire_after,
             allowable_codes=(200,),  # ONLY cache successful HTTP 200 responses
             stale_if_error=True,     # Use stale cache if network error occurs
             old_data_on_error=True,  # Use old cache data if http 500 error occurs

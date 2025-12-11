@@ -22,7 +22,7 @@ from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, O
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -70,7 +70,7 @@ def execute_xls_convert_cmd(
     )
 
     backend = LibreofficeCalcBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
     )
     with ProgressManager(len(input_files)) as progress_mgr:

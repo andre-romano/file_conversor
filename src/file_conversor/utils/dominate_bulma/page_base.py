@@ -17,7 +17,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -60,7 +60,7 @@ def PageBase(
             # Custom CSS
             link(_rel="stylesheet", _href="/static/css/base.css")
         with cast(dominate.tags.body, component.body) as body:
-            body.set_attribute("style", f"zoom: {CONFIG['gui-zoom']}%;")
+            body.set_attribute("style", f"zoom: {CONFIG.gui_zoom}%;")
 
             body.set_attribute("x-data", f"""{{ }}""")
             body.set_attribute(":class", f"""{{

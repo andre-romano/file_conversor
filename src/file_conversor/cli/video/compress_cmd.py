@@ -24,7 +24,7 @@ from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, O
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -73,15 +73,15 @@ def compress(
 
     target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (size[K|M|G]) [0 = do not limit output file size]")}")],
 
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
-    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG["video-quality"],
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
+    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG.video_quality,
 
-    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG["video-format"],
+    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

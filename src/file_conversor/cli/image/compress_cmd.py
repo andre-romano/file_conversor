@@ -23,7 +23,7 @@ from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -61,7 +61,7 @@ def execute_image_compress_cmd(
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
     compress_backend = CompressBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
     )
 
@@ -97,7 +97,7 @@ def execute_image_compress_cmd(
     """)
 def compress(
     input_files: Annotated[List[Path], InputFilesArgument(CompressBackend)],
-    quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
+    quality: Annotated[int, QualityOption()] = CONFIG.image_quality,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_image_compress_cmd(

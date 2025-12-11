@@ -32,7 +32,7 @@ from file_conversor.utils.typer_utils import (InputFilesArgument, FormatOption, 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -93,14 +93,14 @@ def convert(
 
     file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)],
 
-    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
-    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG.video_bitrate,
 
     audio_codec: Annotated[str | None, AudioCodecOption(FFmpegBackend.get_supported_audio_codecs())] = None,
     video_codec: Annotated[str | None, VideoCodecOption(FFmpegBackend.get_supported_video_codecs())] = None,
 
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
-    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG["video-quality"],
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
+    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG.video_quality,
 
     resolution: Annotated[str | None, ResolutionOption()] = None,
     fps: Annotated[int | None, FPSOption()] = None,
@@ -119,7 +119,7 @@ def convert(
 ):
 
     ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

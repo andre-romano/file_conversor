@@ -13,7 +13,7 @@ from file_conversor.cli.config._typer import COMMAND_NAME, SHOW_NAME
 from file_conversor.config import Configuration, State, Log, get_translation
 
 # app configuration
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

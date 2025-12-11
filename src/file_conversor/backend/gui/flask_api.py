@@ -17,7 +17,7 @@ from file_conversor.config.locale import get_translation
 from file_conversor.utils.formatters import escape_xml, format_traceback_html, format_traceback_str, parse_js_to_py
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

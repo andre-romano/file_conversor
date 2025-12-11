@@ -13,7 +13,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_language_name, get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -29,7 +29,7 @@ def PDFCompressionField():
                 (k, k.upper())
                 for k in GhostscriptBackend.Compression.get_dict()
             ],
-            current_value=str(CONFIG["pdf-compression"]),
+            current_value=str(CONFIG.pdf_compression),
             _name="pdf-compression",
             help=_("Select the PDF compression level to apply. Higher compression may reduce quality."),
         ),
@@ -98,7 +98,7 @@ def PDFPagesField(
 def PDFLanguageField():
     """Create a form field for specifying OCR languages."""
     backend = OcrMyPDFBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE['verbose'],
     )
     languages = [

@@ -19,7 +19,7 @@ from file_conversor.utils.rich_utils import get_progress_bar
 from file_conversor.utils.validators import check_dir_exists
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

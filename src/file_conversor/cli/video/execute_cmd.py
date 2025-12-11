@@ -22,7 +22,7 @@ from file_conversor.utils.validators import check_valid_options
 from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoCodecOption
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -52,9 +52,9 @@ def execute(
 
     file_format: Annotated[str, FormatOption(FFmpegBackend)],
 
-    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
 
-    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG.video_bitrate,
 
     audio_codec: Annotated[str | None, AudioCodecOption(FFmpegBackend.get_supported_audio_codecs())] = None,
 
@@ -76,7 +76,7 @@ def execute(
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

@@ -22,7 +22,7 @@ from file_conversor.utils.typer_utils import DPIOption, FormatOption, InputFiles
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -99,7 +99,7 @@ def execute_image_render_cmd(
 def render(
     input_files: Annotated[List[Path], InputFilesArgument(PyMuSVGBackend)],
     format: Annotated[str, FormatOption(PyMuSVGBackend)],
-    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
+    dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_image_render_cmd(

@@ -25,7 +25,7 @@ from file_conversor.utils.validators import check_valid_options
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -67,7 +67,7 @@ def execute_pdf_compress_cmd(
 ):
     pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
     gs_backend = GhostscriptBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE['verbose'],
     )
 
@@ -117,9 +117,9 @@ def execute_pdf_compress_cmd(
 def compress(
     input_files: Annotated[List[Path], InputFilesArgument(GhostscriptBackend)],
     compression: Annotated[str, typer.Option("--compression", "-c",
-                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG["pdf-compression"]}.",
+                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG.pdf_compression}.",
                                              callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
-                                             )] = CONFIG["pdf-compression"],
+                                             )] = CONFIG.pdf_compression,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_pdf_compress_cmd(

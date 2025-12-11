@@ -13,7 +13,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -41,7 +41,7 @@ def _api_thread(params: dict[str, Any], status: FlaskApiStatus) -> None:
     logger.info(f"[bold]{_('Resizing video files')}[/]...")
 
     ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

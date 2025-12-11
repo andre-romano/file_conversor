@@ -18,7 +18,7 @@ from file_conversor.config import Configuration, Log, State, Environment, Abstra
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -61,7 +61,7 @@ class WebApp(AbstractSingletonThreadSafe):
         self.webview_api = WebViewAPI()
         window = webview.create_window(
             title="File Conversor",
-            url=f"http://127.0.0.1:{CONFIG['port']}",
+            url=f"http://127.0.0.1:{CONFIG.port}",
             localization=self.LOCALIZATION,
             maximized=True,
             js_api=self.webview_api,
@@ -101,7 +101,7 @@ class WebApp(AbstractSingletonThreadSafe):
                 self._flask_ready.set()
                 self.app.run(
                     host="127.0.0.1",
-                    port=CONFIG["port"],
+                    port=CONFIG.port,
                     debug=STATE["debug"],
                     threaded=True,  # Allow handling multiple requests
                     use_reloader=False,   # Disable the reloader to avoid issues with threading
@@ -162,7 +162,7 @@ class WebApp(AbstractSingletonThreadSafe):
         logger.debug(f"{_('Waiting for Flask to be ready ...')}")
         self._flask_ready.wait()
 
-        url = f"http://127.0.0.1:{CONFIG['port']}"
+        url = f"http://127.0.0.1:{CONFIG.port}"
         try:
             logger.info(f"[bold]{_('Access the app at')} {url}[/]")
             logger.info(f"[bold]{_('Press Ctrl+C to exit.')}[/]")

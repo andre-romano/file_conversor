@@ -26,7 +26,7 @@ from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -135,7 +135,7 @@ def convert(
         **PyMuPDFBackend.SUPPORTED_OUT_FORMATS,
         **PDF2DOCXBackend.SUPPORTED_OUT_FORMATS,
     })],
-    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
+    dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
     password: Annotated[str | None, PasswordOption()] = None,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

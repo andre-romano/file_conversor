@@ -24,7 +24,7 @@ from file_conversor.utils.validators import check_is_bool_or_none, check_path_ex
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -114,17 +114,15 @@ def execute_image_to_pdf_cmd(
     """)
 def to_pdf(
     input_files: Annotated[List[Path], InputFilesArgument(Img2PDFBackend)],
-    dpi: Annotated[int, DPIOption()] = CONFIG["image-dpi"],
+    dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
     fit: Annotated[str, typer.Option("--fit", "-f",
-                                     help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG["image-fit"]}",
+                                     help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG.image_fit}",
                                      callback=lambda x: check_valid_options(x.lower(), Img2PDFBackend.FIT_MODES),
-                                     )] = CONFIG["image-fit"],
-
+                                     )] = CONFIG.image_fit,
     page_size: Annotated[str | None, typer.Option("--page-size", "-ps",
                                                   help=f"{_("Page size. Format '(width, height)'. Other valid values are:")} {", ".join(Img2PDFBackend.PAGE_LAYOUT)}. {_("Defaults to None (PDF size = image size).")}",
                                                   callback=lambda x: check_valid_options(x.lower() if x else None, Img2PDFBackend.PAGE_LAYOUT),
-                                                  )] = CONFIG["image-page-size"],
-
+                                                  )] = CONFIG.image_page_size,
     set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
                                                help=_("Set PDF metadata. Defaults to False (do not set creator, producer, modification date, etc)."),
                                                callback=check_is_bool_or_none,

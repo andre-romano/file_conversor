@@ -28,7 +28,7 @@ from file_conversor.utils.typer_utils import InputFilesArgument
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -85,7 +85,7 @@ def info(
 ):
 
     ffprobe_backend = FFprobeBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
     )
     for filename in input_files:

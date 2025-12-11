@@ -9,7 +9,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -22,7 +22,7 @@ def TabConfigNetwork() -> tuple | list:
         FormFieldHorizontal(
             FormFieldInput(
                 validation_expr="Number.parseInt(value) >= 1 && Number.parseInt(value) <= 65535",
-                current_value=CONFIG['port'],
+                current_value=str(CONFIG.port),
                 _name="port",
                 _type="number",
                 help=_("Set the port number for the application to listen on (1-65535)."),

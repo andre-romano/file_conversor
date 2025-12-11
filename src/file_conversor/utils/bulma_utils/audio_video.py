@@ -14,7 +14,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -41,7 +41,7 @@ def AudioBitrateField():
     return FormFieldHorizontal(
         FormFieldInput(
             validation_expr="Number.parseInt(value) >= 0",
-            current_value=CONFIG['audio-bitrate'],
+            current_value=str(CONFIG.audio_bitrate),
             _name="audio-bitrate",
             _type="number",
             help=_("Set audio bitrate (in kbps). Type 0 to keep original audio bitrate."),
@@ -55,7 +55,7 @@ def VideoBitrateField():
     return FormFieldHorizontal(
         FormFieldInput(
             validation_expr="Number.parseInt(value) >= 0",
-            current_value=CONFIG['video-bitrate'],
+            current_value=str(CONFIG.video_bitrate),
             _name="video-bitrate",
             _type="number",
             help=_("Set video bitrate (in kbps). Type 0 to keep original video bitrate."),
@@ -106,7 +106,7 @@ def VideoEncodingSpeedField():
                 (speed, speed.upper())
                 for speed in FFmpegBackend.ENCODING_SPEEDS
             ],
-            current_value=CONFIG['video-encoding-speed'],
+            current_value=str(CONFIG.video_encoding_speed),
             _name="video-encoding-speed",
             help=_("Select the video encoding speed. Faster speeds result in lower quality and larger file sizes."),
         ),
@@ -122,7 +122,7 @@ def VideoQualityField():
                 (quality, quality.upper())
                 for quality in FFmpegBackend.QUALITY_PRESETS
             ],
-            current_value=CONFIG['video-quality'],
+            current_value=str(CONFIG.video_quality),
             _name="video-quality",
             help=_("Select the video quality preset. Higher quality results in larger file sizes."),
         ),

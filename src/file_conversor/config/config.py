@@ -5,90 +5,139 @@ import locale
 
 from pathlib import Path
 from typing import Any
+from dataclasses import dataclass
 
 from file_conversor.config.environment import Environment
-from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
+from file_conversor.config.dataclass_enforce_types import dataclass_enforce_types
 
 
-class Configuration(AbstractSingletonThreadSafe):
+@dataclass
+@dataclass_enforce_types  # order matters here
+class ConfigurationData:
+    """Configuration data structure"""
 
-    def __init__(self) -> None:
-        super().__init__()
+    cache_enabled: bool
+    """http cache enabled"""
+    cache_expire_after: int
+    """http cache expiration time in seconds"""
+    port: int
+    """Default port (flask app)"""
+    language: str
+    """Default: system language or "en_US" """
+    install_deps: bool | None
+    """Default: ask user to confirm dependency installation"""
+    audio_bitrate: int
+    """Default audio bitrate in kbps"""
+    video_bitrate: int
+    """Default video bitrate in kbps"""
+    video_format: str
+    """Default video format"""
+    video_encoding_speed: str
+    """Default video encoding speed"""
+    video_quality: str
+    """Default video quality"""
+    image_quality: int
+    """Default image quality 90%"""
+    image_dpi: int
+    """Default image => PDF dpi"""
+    image_fit: str
+    """Default image => PDF fit mode"""
+    image_page_size: str | None
+    """Default image => PDF page size"""
+    image_resampling: str
+    """Default image resampling algorithm"""
+    pdf_compression: str
+    """Default PDF compression level"""
+    gui_zoom: int
+    """Default GUI zoom level"""
+    gui_output_dir: str
+    """Default output directory"""
 
-        self.__config_path = Environment.get_data_folder() / ".config.json"
+    def to_dict(self) -> dict[str, Any]:
+        """Convert configuration to dictionary."""
+        return {**self.__dict__}
 
-        # Load configuration dictionary
-        self.__data = {}
-        self.load()
+    def copy(self) -> 'ConfigurationData':
+        """Create a copy of the configuration data."""
+        return ConfigurationData(**self.__dict__)
 
-    def __repr__(self) -> str:
-        return repr(self.__data)
 
-    def __str__(self) -> str:
-        return str(self.__data)
+class Configuration:
+    """Application configuration manager."""
+    __config_path = Environment.get_data_folder() / ".config.json"
+    __data: ConfigurationData | None = None
 
-    def __getitem__(self, key) -> Any:
-        return self.__data[key]
+    @classmethod
+    def __load(cls) -> ConfigurationData:
+        if cls.__config_path.exists():
+            return ConfigurationData(**json.loads(cls.__config_path.read_text()))
+        return cls.__reset()
 
-    def __setitem__(self, key, value):
-        self.__data[key] = value
-
-    def __delitem__(self, key):
-        del self.__data[key]
-
-    def __contains__(self, key):
-        return key in self.__data
-
-    def __len__(self):
-        return len(self.__data)
-
-    def get_path(self) -> Path:
-        return self.__config_path
-
-    def to_dict(self):
-        return self.__data.copy()
-
-    def update(self, new: dict):
-        self.__data.update(new)
-
-    def save(self):
-        """Save app configuration file"""
-        self.__config_path.write_text(json.dumps(self.__data, indent=2))
-
-    def load(self):
-        """Load app configuration file"""
-        self.reset_factory_default()
-        if self.__config_path.exists():
-            self.__data.update(json.loads(self.__config_path.read_text()))
-
-    def reset_factory_default(self):
+    @classmethod
+    def __reset(cls) -> ConfigurationData:
         language = "en_US"
         if locale.getlocale() and locale.getlocale()[0]:
-            language = locale.getlocale()[0]
+            language = locale.getlocale()[0] or language
 
-        self.__data.clear()
-        self.__data.update({
-            "cache-enabled": True,     # Enable HTTP cache
-            "cache-expire-after": int(30 * 24 * 60 * 60),  # HTTP cache expiration time in seconds (30 days)
-            "port": 5000,              # Default port (flask app)
-            "language": language,      # Default: system language or "en_US"
-            "install-deps": True,      # Default: ask user to confirm dependency installation
-            "audio-bitrate": 0,        # Default audio bitrate in kbps
-            "video-bitrate": 0,        # Default video bitrate in kbps
-            "video-format": "mp4",     # Default video format
-            "video-encoding-speed": "medium",  # Default video encoding speed
-            "video-quality": "medium",  # Default video quality
-            "image-quality": 90,        # Default image quality 90%
-            "image-dpi": 200,           # Default image => PDF dpi
-            "image-fit": 'into',        # Default image => PDF fit mode
-            "image-page-size": None,    # Default image => PDF page size
-            "image-resampling": "bicubic",  # Default image resampling algorithm
-            "pdf-compression": "medium",  # Default PDF compression level
-            "gui-zoom": 100,            # Default GUI zoom level
-            "gui-output-dir": str(Environment.UserFolder.DOWNLOADS()),  # Default output directory
-        })
+        return ConfigurationData(
+            cache_enabled=True,     # Enable HTTP cache
+            cache_expire_after=int(30 * 24 * 60 * 60),  # HTTP cache expiration time in seconds (30 days)
+            port=5000,              # Default port (flask app)
+            language=language,      # Default: system language or "en_US"
+            install_deps=True,      # Default: ask user to confirm dependency installation
+            audio_bitrate=0,        # Default audio bitrate in kbps
+            video_bitrate=0,        # Default video bitrate in kbps
+            video_format="mp4",     # Default video format
+            video_encoding_speed="medium",  # Default video encoding speed
+            video_quality="medium",  # Default video quality
+            image_quality=90,        # Default image quality 90%
+            image_dpi=200,           # Default image => PDF dpi
+            image_fit='into',        # Default image => PDF fit mode
+            image_page_size=None,    # Default image => PDF page size
+            image_resampling="bicubic",  # Default image resampling algorithm
+            pdf_compression="medium",  # Default PDF compression level
+            gui_zoom=100,            # Default GUI zoom level
+            gui_output_dir=str(Environment.UserFolder.DOWNLOADS()),  # Default output directory
+        )
+
+    @classmethod
+    def set(cls, new_config: ConfigurationData) -> None:
+        """Set application configuration data."""
+        cls.__data = new_config
+
+    @classmethod
+    def get(cls) -> ConfigurationData:
+        """Get application configuration data."""
+        if cls.__data is None:
+            cls.__data = cls.__load()
+        return cls.__data
+
+    @classmethod
+    def get_path(cls) -> Path:
+        """Get configuration file path."""
+        return cls.__config_path
+
+    @classmethod
+    def save(cls) -> None:
+        """Save app configuration file"""
+        if cls.__data is None:
+            raise RuntimeError("Configuration data is not set.")
+        data_dict = cls.__data.to_dict()
+        json_str = json.dumps(data_dict, indent=2)
+        cls.__config_path.write_text(json_str)
+
+    @classmethod
+    def load(cls) -> None:
+        """Load app configuration file"""
+        cls.__data = cls.__load()
+
+    @classmethod
+    def reset(cls) -> None:
+        """Reset app configuration to factory defaults"""
+        cls.__data = cls.__reset()
 
 
 __all__ = [
     "Configuration",
+    "ConfigurationData",
 ]

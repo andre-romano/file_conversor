@@ -17,7 +17,7 @@ from file_conversor.config import Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

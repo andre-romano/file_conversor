@@ -25,7 +25,7 @@ from file_conversor.utils.validators import check_positive_integer, check_video_
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -72,14 +72,13 @@ ctx_menu.register_callback(register_ctx_menu)
 def enhance(
     input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
 
-    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG["video-format"],
+    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
 
-    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
-    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG["video-bitrate"],
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
+    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG["video-encoding-speed"],
-    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG["video-quality"],
-
+    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
+    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG.video_quality,
     resolution: Annotated[str | None, ResolutionOption()] = None,
     fps: Annotated[int | None, FPSOption()] = None,
 
@@ -140,7 +139,7 @@ def enhance(
         )
 
     ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

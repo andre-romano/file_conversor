@@ -18,7 +18,7 @@ from file_conversor.utils.formatters import format_file_types_webview, format_py
 from file_conversor.system import set_window_icon
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -30,7 +30,7 @@ class WebViewState:
     """State shared between the webview and the main application."""
 
     # Global last open directory
-    _lastOpenDir: Path = Path(CONFIG['gui-output-dir']).resolve()
+    _lastOpenDir: Path = Path(CONFIG.gui_output_dir).resolve()
     _icon_configured: bool = False
 
     @classmethod
@@ -117,8 +117,11 @@ class WebViewAPI:
 
     def reset_config(self):
         """Reset the application configuration to factory defaults."""
-        CONFIG.reset_factory_default()
-        CONFIG.save()
+        global CONFIG
+
+        Configuration.reset()
+        Configuration.save()
+        CONFIG = Configuration.get()
         logger.info("Configuration reset to factory defaults.")
 
     def get_config(self) -> dict[str, Any]:

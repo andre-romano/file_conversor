@@ -12,7 +12,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation, AVAILABLE_LANGUAGES
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -28,7 +28,7 @@ def TabConfigAudioVideo() -> tuple | list:
                     (f, f.upper())
                     for f in filter(lambda x: x != 'null', FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)
                 ],
-                current_value=CONFIG['video-format'],
+                current_value=CONFIG.video_format,
                 _name="video-format",
                 help=_("Select the desired video format for video conversions."),
             ),

@@ -98,7 +98,7 @@ class Test:
     def flask_api(
         url: str,
         method: str = "POST",
-        data: dict[str, str] | None = None,
+        data: dict[str, Any] | None = None,
         status_code: int = 200,
     ):
         """
@@ -110,7 +110,10 @@ class Test:
 
         :return: JSON response as a dictionary.
         """
-        data = data or {}
+        data = {
+            k: str(v)
+            for k, v in (data or {}).items()
+        }
 
         if method.upper() == "GET":
             response = Test.FCLIENT.get(url, query_string=data)

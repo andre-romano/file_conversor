@@ -15,7 +15,7 @@ from file_conversor.config import Environment, Configuration, State, Log, get_tr
 from file_conversor.utils import ProgressManager, CommandManager
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -40,7 +40,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
-        install_deps=CONFIG['install-deps'],
+        install_deps=CONFIG.install_deps,
         verbose=STATE["verbose"],
         overwrite_output=STATE["overwrite-output"],
     )

@@ -22,7 +22,7 @@ from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, O
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -99,7 +99,7 @@ def execute_image_convert_cmd(
 def convert(
     input_files: Annotated[List[Path], InputFilesArgument(PillowBackend)],
     format: Annotated[str, FormatOption(PillowBackend)],
-    quality: Annotated[int, QualityOption()] = CONFIG["image-quality"],
+    quality: Annotated[int, QualityOption()] = CONFIG.image_quality,
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_image_convert_cmd(

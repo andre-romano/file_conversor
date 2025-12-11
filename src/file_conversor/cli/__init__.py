@@ -15,7 +15,7 @@ from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale,
 from file_conversor.cli._typer import COMMANDS_LIST, PYTHON_VERSION
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -114,7 +114,7 @@ def main_callback(
     logger.debug(f"Resources folder: {Environment.get_resources_folder()}")
     logger.debug(f"Data folder: {Environment.get_data_folder()}")
     logger.debug(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
-    logger.debug(f"Language (config / sys): ({CONFIG['language']} / {get_system_locale()})")
+    logger.debug(f"Language (config / sys): ({CONFIG.language} / {get_system_locale()})")
 
 
 __all__ = [

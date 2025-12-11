@@ -17,7 +17,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -116,7 +116,7 @@ def FileFormatField(
 def OverwriteFilesField():
     """Create a form field for overwrite option."""
     return FormFieldCheckbox(
-        current_value=STATE["overwrite-output"],
+        current_value=str(STATE["overwrite-output"]),
         _name="overwrite-output",
         label_text=_("Overwrite Existing Files"),
         help=_("Allow overwriting of existing files."),

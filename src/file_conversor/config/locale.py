@@ -12,7 +12,7 @@ from typing import Callable
 from file_conversor.config.environment import Environment
 from file_conversor.config.config import Configuration
 
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 
 AVAILABLE_LANGUAGES: set[str] = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
 
@@ -30,7 +30,7 @@ def _get_lang_name_babel(lang_code: str) -> str:
     """
     locale = Locale.parse(lang_code)
     try:
-        display_lang = normalize_lang_code(CONFIG["language"])[:2].lower()
+        display_lang = normalize_lang_code(CONFIG.language)[:2].lower()
         lang = locale.get_display_name(display_lang)
         if not lang:
             raise ValueError(f"No language name found for display language '{display_lang}'.")
@@ -73,7 +73,7 @@ def _get_lang_name_pycountry(lang_code: str) -> str:
 def _print_debug():
     print(f"Locales folder: {Environment.get_locales_folder()}")
     print(f"Available languages: {sorted(AVAILABLE_LANGUAGES)} ({len(AVAILABLE_LANGUAGES)} entries)")
-    print(f"Config / sys lang: ({CONFIG['language']} / {get_system_locale()})")
+    print(f"Config / sys lang: ({CONFIG.language} / {get_system_locale()})")
 
 
 def get_default_language():
@@ -104,7 +104,7 @@ def get_translation():
     languages: list[str] = []
     try:
         languages = [
-            normalize_lang_code(CONFIG["language"]),
+            normalize_lang_code(CONFIG.language),
             normalize_lang_code(get_system_locale()),
             normalize_lang_code(get_default_language()),  # fallback
         ]

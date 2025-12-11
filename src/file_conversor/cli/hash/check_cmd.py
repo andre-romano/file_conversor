@@ -22,7 +22,7 @@ from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

@@ -14,7 +14,7 @@ from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
 # Get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -27,7 +27,7 @@ def ImageQualityField():
     return FormFieldHorizontal(
         FormFieldInput(
             validation_expr="Number.parseInt(value) >= 0 && Number.parseInt(value) <= 100",
-            current_value=CONFIG["image-quality"],
+            current_value=str(CONFIG.image_quality),
             _name="image-quality",
             _type="number",
             step="10",
@@ -88,7 +88,7 @@ def ImageDPIField():
     return FormFieldHorizontal(
         FormFieldInput(
             validation_expr="Number.parseInt(value) > 0",
-            current_value=str(CONFIG["image-dpi"]),
+            current_value=str(CONFIG.image_dpi),
             _name="image-dpi",
             _type="number",
             step="100",
@@ -136,7 +136,7 @@ def ImageResampleAlgorithmField():
                 (k, k.upper())
                 for k in PillowBackend.RESAMPLING_OPTIONS
             ],
-            current_value=CONFIG["image-resampling"],
+            current_value=str(CONFIG.image_resampling),
             _name="image-resampling",
             help=_("Select the resampling algorithm to use when resizing images."),
         ),
@@ -152,7 +152,7 @@ def ImageFitField():
                 (k, k.upper())
                 for k in Img2PDFBackend().FIT_MODES
             ],
-            current_value=CONFIG["image-fit"],
+            current_value=str(CONFIG.image_fit),
             _name="image-fit",
             help=_("Select how to fit the image into the page when converting to PDF. Valid only if page size is defined."),
         ),
@@ -169,7 +169,7 @@ def ImagePageSizeField():
                 (k, k.upper())
                 for k in Img2PDFBackend().PAGE_LAYOUT
             ],
-            current_value=CONFIG["image-page-size"],
+            current_value=str(CONFIG.image_page_size),
             _name="image-page-size",
             help=_("Select the page size for the output PDF. If not defined, PDF size will match image size."),
         ),

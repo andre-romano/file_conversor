@@ -25,7 +25,7 @@ from file_conversor.utils.validators import check_valid_options
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -110,9 +110,9 @@ def rotate(
                                           )],
 
     resampling: Annotated[str, typer.Option("--resampling", "-re",
-                                            help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG["image-resampling"]}.',
+                                            help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG.image_resampling}.',
                                             callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
-                                            )] = CONFIG["image-resampling"],
+                                            )] = CONFIG.image_resampling,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

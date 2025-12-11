@@ -23,7 +23,7 @@ from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOptio
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get_instance()
+CONFIG = Configuration.get()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 
@@ -76,7 +76,7 @@ def convert_audio(
 
     file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_AUDIO_FORMATS)],
 
-    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG["audio-bitrate"],
+    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

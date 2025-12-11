@@ -18,7 +18,6 @@ from file_conversor.config.locale import get_translation
 from file_conversor.utils.dominate_bulma import PageForm, Tabs, Button
 
 # Get app config
-CONFIG = Configuration.get_instance()
 STATE = State.get_instance()
 LOG = Log.get_instance()
 

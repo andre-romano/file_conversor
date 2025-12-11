@@ -23,7 +23,6 @@ from file_conversor.config.locale import get_translation
 from file_conversor.utils.rich_utils import DummyProgress
 
 # get app config
-CONFIG = Configuration.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()
