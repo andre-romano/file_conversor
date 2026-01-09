@@ -2,7 +2,7 @@
 
 [project]
 name = "file_conversor"
-version = "0.7.4"
+version = "0.8.0"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
@@ -15,6 +15,7 @@ dependencies = [
     "img2pdf>=0.6.1",
     "pywin32>=311; sys_platform == 'win32'",
     "pymupdf>=1.26.3",
+    "pdf2docx>=0.5.8",
     "pyyaml>=6.0.2",
     "xmltodict>=0.14.2",
     "toml>=0.10.2",
@@ -22,16 +23,13 @@ dependencies = [
     "portalocker>=3.2.0",
     "ocrmypdf>=16.11.0",
     "requests>=2.32.5",
-    "flask>=3.1.2",
-    "dominate>=2.9.1",
-    "pywebview>=6.1",
+    "requests-cache>=1.2.1",
     "pycountry>=24.6.1",
     "platformdirs>=4.5.0",
     "natsort>=8.4.0",
-    "pdf2docx>=0.5.8",
-    "requests-cache>=1.2.1",
+    "pydantic>=2.12.5",
 ]
-requires-python = ">=3.12,<=3.13.7"
+requires-python = ">=3.12,<=3.14"
 readme = "README.md"
 license-files = ["LICEN[CS]E*", "AUTHORS.md","README.md"]
 classifiers = [
@@ -83,8 +81,6 @@ filterwarnings = [
     "ignore:builtin type SwigPyPacked has no __module__ attribute:DeprecationWarning",
     "ignore:builtin type swigvarlink has no __module__ attribute",
     "ignore:builtin type SwigPyObject has no __module__ attribute",
-    # supress dominate warnings
-    "ignore:There is no current event loop:DeprecationWarning",
 ]
 
 [tool.pyright]
@@ -123,7 +119,6 @@ ignore = [
     "**/build/**",
     "**/dist/**",
     "**/docs/**",
-    "**/node_modules/**",
     "**/venv/**",
     "**/.venv/**",    
     "**/.tox/**",
@@ -136,12 +131,12 @@ ignore = [
     "**/*.egg",
     "**/*.pyc",
 ]
+
 exclude = [
     "**/__pycache__/**",
     "**/build/**",
     "**/dist/**",
     "**/docs/**",
-    "**/node_modules/**",
     "**/venv/**",
     "**/.venv/**",    
     "**/.tox/**",

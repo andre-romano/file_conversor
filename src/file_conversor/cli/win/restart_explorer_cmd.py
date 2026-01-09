@@ -12,14 +12,13 @@ from rich import print
 from file_conversor.cli.win._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.win._typer import COMMAND_NAME, RESTART_EXPLORER_NAME
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Configuration, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.system import win
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()

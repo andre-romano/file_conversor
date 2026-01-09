@@ -10,8 +10,9 @@ from rich import print
 from logging import Handler
 from concurrent_log_handler import ConcurrentTimedRotatingFileHandler
 
+from enum import Enum
 from types import TracebackType
-from typing import Mapping
+from typing import Mapping, Self
 
 from pathlib import Path
 
@@ -90,17 +91,48 @@ class Log(AbstractSingletonThreadSafe):
             return super().format(record)
 
     # most severe level, to least
-    LEVEL_CRITICAL, LEVEL_FATAL = logging.CRITICAL, logging.FATAL  # 50
-    LEVEL_ERROR = logging.ERROR  # 40
-    LEVEL_WARNING = logging.WARNING  # 30
-    LEVEL_INFO = logging.INFO  # 20
-    LEVEL_DEBUG = logging.DEBUG  # 10
+    class Level(Enum):
+        """ Log levels enum """
+        CRITICAL = logging.CRITICAL
+        """ 50 = Critical logging level """
+        FATAL = logging.FATAL
+        """ 50 = Fatal logging level """
+        ERROR = logging.ERROR
+        """ 40 = Error logging level """
+        WARNING = logging.WARNING
+        """ 30 = Warning logging level """
+        INFO = logging.INFO
+        """ 20 = Verbose logging level """
+        DEBUG = logging.DEBUG
+        """ 10 = Debug logging level """
+
+        @classmethod
+        def get(cls) -> Self:
+            return cls(logging.getLogger().level)
+
+        def set(self) -> Self:
+            logging.getLogger().setLevel(self.value)
+            if self.value != self.get().value:
+                raise RuntimeError(f"Unable to set log level to {self.name} ({self.value}). Current level is {self.get()}.")
+            return self
+
+        def is_critical(self) -> bool:
+            return self.value <= Log.Level.CRITICAL.value
+
+        def is_quiet(self) -> bool:
+            return self.value <= Log.Level.ERROR.value
+
+        def is_verbose(self) -> bool:
+            return self.value <= Log.Level.INFO.value
+
+        def is_debug(self) -> bool:
+            return self.value <= Log.Level.DEBUG.value
 
     # logfile name
     FILENAME = f".file_conversor.log"
 
     @classmethod
-    def get_instance(cls, dest_folder: str | Path | None = ".", level: int = LEVEL_INFO):
+    def get_instance(cls, dest_folder: str | Path | None = ".", level: Level = Level.INFO):
         """
         Initialize logfile instance
 
@@ -109,7 +141,7 @@ class Log(AbstractSingletonThreadSafe):
         """
         return super().get_instance(dest_folder=dest_folder, level=level)
 
-    def __init__(self, dest_folder: str | Path | None, level: int) -> None:
+    def __init__(self, dest_folder: str | Path | None, level: Level) -> None:
         """
         Initialize logfile, inside a dest_folder with a log_level
         """
@@ -125,7 +157,7 @@ class Log(AbstractSingletonThreadSafe):
         )
 
         # set level
-        self.set_level(level)
+        self._level = level.set()
         self.set_dest_folder(dest_folder)
 
     def shutdown(self):
@@ -138,12 +170,6 @@ class Log(AbstractSingletonThreadSafe):
 
     def getLogger(self, name: str | None = None) -> CustomLogger:
         return Log.CustomLogger(name)
-
-    def get_level(self) -> int:
-        return logging.getLogger().level
-
-    def set_level(self, level: int):
-        logging.getLogger().setLevel(level)
 
     def get_dest_folder(self) -> Path | None:
         return self._dest_path

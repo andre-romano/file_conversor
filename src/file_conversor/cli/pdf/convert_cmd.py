@@ -27,7 +27,7 @@ from file_conversor.config.locale import get_translation
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -91,7 +91,7 @@ def execute_pdf_convert_cmd(
         logger.info(f"[bold]{_('Converting files')}[/] ...")
         # Perform conversion
         if format in PyMuPDFBackend.SUPPORTED_OUT_FORMATS:
-            backend = PyMuPDFBackend(verbose=STATE['verbose'])
+            backend = PyMuPDFBackend(verbose=STATE.loglevel.get().is_verbose())
             for input_file, output_file in files:
                 backend.convert(
                     input_file=input_file,
@@ -100,7 +100,7 @@ def execute_pdf_convert_cmd(
                     password=password,
                 )
         else:
-            backend = PDF2DOCXBackend(verbose=STATE['verbose'])
+            backend = PDF2DOCXBackend(verbose=STATE.loglevel.get().is_verbose())
             for input_file, output_file in files:
                 backend.convert(
                     input_file=input_file,

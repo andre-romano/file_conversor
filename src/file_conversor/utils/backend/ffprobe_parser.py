@@ -13,7 +13,6 @@ from rich.console import Group
 # user-provided imports
 from file_conversor.backend.audio_video import FFprobeBackend
 
-from file_conversor.utils.dominate_utils import br, div
 from file_conversor.utils.formatters import format_bitrate, format_bytes
 
 from file_conversor.config import Configuration, Environment, Log, State
@@ -21,7 +20,7 @@ from file_conversor.config.locale import get_translation
 
 # Get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -63,18 +62,6 @@ class _FFprobeFormatInfo:
             f"  - {_('Bitrate')}: {bitrate}",
         ]
 
-    def div(self):
-        duration, size, bitrate, format_name = self._parse()
-        with div() as result:
-            div(f"{_('File Information')}:")
-            div(f"  - {_('Name')}: {self.input_file.name}")
-            div(f"  - {_('Format')}: {format_name}")
-            div(f"  - {_('Duration')}: {duration}")
-            div(f"  - {_('Size')}: {size}")
-            div(f"  - {_('Bitrate')}: {bitrate}")
-            br()
-        return result
-
 
 class _FFprobeStreamsInfo:
     def __init__(self, input_file: Path, metadata: dict) -> None:
@@ -112,25 +99,6 @@ class _FFprobeStreamsInfo:
                 formatted.append(f"    - {_('Channels')}: {channels}")
         return formatted
 
-    def div(self):
-        with div() as result:
-            if self.streams_info:
-                div(f"{_("Media Streams")}:")
-            for i, stream in enumerate(self.streams_info):
-                stream_type, codec, resolution, bitrate, sample_rate, channels = self._parse(stream)
-
-                div(f"    {_('Stream')} #{i} ({stream_type.upper()}):")
-                div(f"    - {_('Codec')}: {codec}")
-                if resolution:
-                    div(f"    - {_('Resolution')}: {resolution}")
-                div(f"    - {_('Bitrate')}: {bitrate}")
-                if stream_type == "audio":
-                    div(f"    - {_('Sampling rate')}: {sample_rate}")
-                    div(f"    - {_('Channels')}: {channels}")
-                br()
-            br()
-        return result
-
 
 class _FFprobeChaptersInfo:
     def __init__(self, input_file: Path, metadata: dict) -> None:
@@ -151,15 +119,6 @@ class _FFprobeChaptersInfo:
             title, start = self._parse(chapter)
             formatted.append(f"  - {title} ({_('Time')}: {start})")
         return formatted
-
-    def div(self):
-        with div() as result:
-            if self.chapters_info:
-                div(f"{_('Chapters')}:")
-            for chapter in self.chapters_info:
-                title, start = self._parse(chapter)
-                div(f"  - {title} ({_('Time')}: {start})")
-        return result
 
 
 class FFprobeParser:

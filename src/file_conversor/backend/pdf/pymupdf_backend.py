@@ -11,13 +11,13 @@ from pathlib import Path
 from typing import Any, Callable
 
 # user-provided imports
-from file_conversor.config import Environment, Log, State
+from file_conversor.config import State, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-STATE = State.get_instance()
 LOG = Log.get_instance()
+STATE = State.get()
 
 logger = LOG.getLogger(__name__)
 _ = get_translation()
@@ -110,7 +110,7 @@ class PyMuPDFBackend(AbstractBackend):
                     ext = base_image["ext"]  # format: png, jpg, jp2, etc.
 
                     output_file = output_dir / f"{input_name}_page{page_index}_img{img_index}.{ext}"
-                    if not STATE["overwrite-output"] and Path(output_file).exists():
+                    if not STATE.overwrite_output.enabled and Path(output_file).exists():
                         raise FileExistsError(f"{_('File')} '{output_file}' {_('exists')}")
 
                     with open(output_file, "wb") as f:

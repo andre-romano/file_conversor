@@ -22,7 +22,7 @@ from file_conversor.utils.validators import check_path_exists
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -38,11 +38,11 @@ def execute_hash_create_cmd(
     output_file: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    if not STATE["overwrite-output"]:
+    if not STATE.overwrite_output.enabled:
         check_path_exists(output_file, exists=False)
 
     hash_backend = HashBackend(
-        verbose=STATE["verbose"],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
     with ProgressManager() as progress_mgr:
         hash_backend.generate(

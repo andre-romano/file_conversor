@@ -23,7 +23,7 @@ from file_conversor.utils.typer_utils import InputFilesArgument
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -56,7 +56,7 @@ def execute_text_check_cmd(
     input_files: List[Path],
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    text_backend = TextBackend(verbose=STATE["verbose"])
+    text_backend = TextBackend(verbose=STATE.loglevel.get().is_verbose())
     logger.info(f"{_('Checking files')} ...")
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):

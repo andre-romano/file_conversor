@@ -23,7 +23,7 @@ from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOptio
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -77,8 +77,8 @@ def execute(
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
     )
 
     # set filters
@@ -97,7 +97,7 @@ def execute(
         )
         progress_mgr.complete_step()
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{file_format}")
 
     logger.info(f"{_('FFMpeg execution')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

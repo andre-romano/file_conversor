@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -43,10 +43,10 @@ def execute_pdf_merge_cmd(
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], stem="_merged")
-    if not STATE["overwrite-output"]:
+    if not STATE.overwrite_output.enabled:
         check_path_exists(output_file, exists=False)
 
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    pypdf_backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
     with ProgressManager() as progress_mgr:
         print(f"Processing '{output_file}' ...")
         pypdf_backend.merge(

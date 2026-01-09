@@ -16,7 +16,7 @@ from file_conversor.cli._typer import COMMANDS_LIST, PYTHON_VERSION
 
 # Get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -99,14 +99,16 @@ def main_callback(
             is_flag=True,
         )] = False,
 ):
-    STATE.update({
-        "no-log": no_log,
-        "no-progress": no_progress,
-        "quiet": quiet,
-        "verbose": verbose,
-        "debug": debug,
-        "overwrite-output": overwrite_output,
-    })
+    STATE.overwrite_output.enabled = overwrite_output
+    STATE.logfile.enabled = not no_log
+    STATE.progress.enabled = not no_progress
+    if quiet:
+        STATE.loglevel.level = Log.Level.ERROR
+    elif verbose:
+        STATE.loglevel.level = Log.Level.INFO
+    elif debug:
+        STATE.loglevel.level = Log.Level.DEBUG
+
     logger.debug(f"Python {PYTHON_VERSION} ({sys.executable})")
     logger.debug(f"Command: {sys.argv}")
     # Environment.get_executable()

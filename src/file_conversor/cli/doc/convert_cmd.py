@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -71,7 +71,7 @@ def execute_doc_convert_cmd(
 
     backend = LibreofficeWriterBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
 
     with ProgressManager(len(input_files)) as progress_mgr:

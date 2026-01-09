@@ -14,7 +14,6 @@ from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)

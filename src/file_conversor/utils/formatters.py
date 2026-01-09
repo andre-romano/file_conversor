@@ -14,7 +14,7 @@ from file_conversor.config import State, get_translation
 
 from file_conversor.utils.command_manager import CommandManager
 
-STATE = State.get_instance()
+STATE = State.get()
 _ = get_translation()
 
 
@@ -310,7 +310,7 @@ def format_in_out_files_tuple(
         for input_file in input_files
     ]
     for input_file, output_file in files:
-        if not STATE["overwrite-output"] and output_file.exists():
+        if not STATE.overwrite_output.enabled and output_file.exists():
             raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
     return files
 

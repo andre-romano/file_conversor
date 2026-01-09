@@ -14,15 +14,13 @@ from file_conversor.cli.audio._typer import COMMAND_NAME, INFO_NAME
 
 from file_conversor.cli.video.info_cmd import info as info_video_cmd, EXTERNAL_DEPENDENCIES
 
-from file_conversor.config import Environment, Configuration, State, Log, get_translation
+from file_conversor.config import Environment, Log, get_translation
 
 from file_conversor.utils.typer_utils import InputFilesArgument
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
-CONFIG = Configuration.get()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()

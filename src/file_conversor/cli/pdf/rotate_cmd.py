@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -68,7 +68,7 @@ def execute_pdf_rotate_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    pypdf_backend = PyPDFBackend(verbose=STATE["verbose"])
+    pypdf_backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         pypdf_backend.rotate(
@@ -80,7 +80,7 @@ def execute_pdf_rotate_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_stem="_rotated")
     logger.info(f"{_('Rotate pages')}: [bold green]{_('SUCCESS')}[/].")
 

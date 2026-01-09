@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 # user-provided imports
-from file_conversor.config import Environment, Log, State
+from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -18,7 +18,6 @@ from file_conversor.backend.http_backend import HttpBackend
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)

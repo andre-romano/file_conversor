@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -15,6 +15,7 @@ from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNA
 from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.video._typer import COMMAND_NAME, ENHANCE_NAME
 
+from file_conversor.cli.video.execute_cmd import execute
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
 
@@ -26,7 +27,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -52,6 +53,59 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 # register commands in windows context menu
 ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
+
+
+def execute_video_enhance_cmd(
+    input_files: List[Path],
+
+    file_format: str,
+
+    audio_bitrate: int,
+    video_bitrate: int,
+
+    video_encoding_speed: str | None,
+    video_quality: str | None,
+    resolution: str | None,
+    fps: int | None,
+
+    color: float,
+    brightness: float,
+    contrast: float,
+    gamma: float,
+
+    deshake: bool,
+    unsharp: bool,
+
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG.install_deps,
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
+    )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_enhanced", output_dir=output_dir)
+
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+
+    ffmpeg_cmd_helper.set_resolution_filter(resolution)
+    ffmpeg_cmd_helper.set_fps_filter(fps)
+    ffmpeg_cmd_helper.set_enhancement_filters(
+        brightness=brightness,
+        contrast=contrast,
+        color=color,
+        gamma=gamma,
+    )
+    ffmpeg_cmd_helper.set_deshake_filter(deshake)
+    ffmpeg_cmd_helper.set_unsharp_filter(unsharp)
+
+    ffmpeg_cmd_helper.execute(
+        progress_callback=lambda p, pm: progress_callback(pm.update_progress(p)),
+    )
 
 
 @typer_cmd.command(
@@ -138,31 +192,23 @@ def enhance(
             default=False, type=bool,
         )
 
-    ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
-    )
-
-    # Set arguments for FFmpeg command helper
-    ffmpeg_cmd_helper.set_input(input_files)
-    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_enhanced", output_dir=output_dir)
-
-    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
-    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
-
-    ffmpeg_cmd_helper.set_resolution_filter(resolution)
-    ffmpeg_cmd_helper.set_fps_filter(fps)
-    ffmpeg_cmd_helper.set_enhancement_filters(
+    execute_video_enhance_cmd(
+        input_files=input_files,
+        file_format=file_format,
+        audio_bitrate=audio_bitrate,
+        video_bitrate=video_bitrate,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
+        resolution=resolution,
+        fps=fps,
         brightness=brightness,
         contrast=contrast,
         color=color,
         gamma=gamma,
+        deshake=deshake,
+        unsharp=unsharp,
+        output_dir=output_dir,
     )
-    ffmpeg_cmd_helper.set_deshake_filter(deshake)
-    ffmpeg_cmd_helper.set_unsharp_filter(unsharp)
-
-    ffmpeg_cmd_helper.execute()
 
 
 __all__ = [

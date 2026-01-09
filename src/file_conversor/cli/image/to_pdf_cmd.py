@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -65,10 +65,10 @@ def execute_image_to_pdf_cmd(
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
     output_file = output_file if output_file else Path() / CommandManager.get_output_file(input_files[0], suffix=".pdf")
-    if not STATE["overwrite-output"]:
+    if not STATE.overwrite_output.enabled:
         check_path_exists(output_file, exists=False)
 
-    img2pdf_backend = Img2PDFBackend(verbose=STATE['verbose'])
+    img2pdf_backend = Img2PDFBackend(verbose=STATE.loglevel.get().is_verbose())
     # display current progress
     with ProgressManager() as progress_mgr:
         page_sz: tuple | None = None

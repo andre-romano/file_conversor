@@ -23,7 +23,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -65,7 +65,7 @@ def execute_image_mirror_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+    pillow_backend = PillowBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         logger.info(f"Processing '{output_file}' ... ")
@@ -76,7 +76,7 @@ def execute_image_mirror_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_stem="_mirrored")
     logger.info(f"{_('Image mirroring')}: [green bold]{_('SUCCESS')}[/]")
 

@@ -14,14 +14,13 @@ import file_conversor.cli.config.show_cmd as show_cmd
 from file_conversor.cli.config._typer import COMMAND_NAME, SET_NAME
 
 from file_conversor.backend import Img2PDFBackend, PillowBackend, FFmpegBackend, GhostscriptBackend
-from file_conversor.config import Configuration, State, Log, locale, get_translation, AVAILABLE_LANGUAGES
+from file_conversor.config import Configuration, Log, locale, get_translation, AVAILABLE_LANGUAGES
 
 from file_conversor.utils.typer_utils import VideoEncodingSpeedOption, VideoQualityOption
-from file_conversor.utils.validators import check_dir_exists, check_is_bool_or_none, check_positive_integer, check_valid_options, check_ip_format
+from file_conversor.utils.validators import check_dir_exists, check_is_bool_or_none, check_positive_integer, check_valid_options
 
 # app configuration
 CONFIG = Configuration.get()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()

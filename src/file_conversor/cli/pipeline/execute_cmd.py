@@ -12,7 +12,7 @@ from file_conversor.backend import BatchBackend
 
 from file_conversor.cli.pipeline._typer import COMMAND_NAME, EXECUTE_NAME
 
-from file_conversor.config import Configuration, State, Log
+from file_conversor.config import Configuration, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.rich_utils import get_progress_bar
@@ -20,7 +20,6 @@ from file_conversor.utils.validators import check_dir_exists
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()

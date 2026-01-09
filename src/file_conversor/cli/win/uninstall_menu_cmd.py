@@ -21,7 +21,7 @@ from file_conversor.system.win.ctx_menu import WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -44,7 +44,7 @@ EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {UNINSTALL_MENU_NAME}` 
 """)
 def uninstall_menu():
-    winreg_backend = WinRegBackend(verbose=STATE["verbose"])
+    winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
 
     logger.info(f"{_('Removing app context menu from Windows Explorer')} ...")
 

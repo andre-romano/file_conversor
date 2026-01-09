@@ -3,7 +3,7 @@
 import typer
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 
 from rich import print
 
@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -51,6 +51,33 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 # register commands in windows context menu
 ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
+
+
+def execute_video_compress_cmd(
+    input_files: List[Path],
+    target_size: str,
+    video_encoding_speed: str | None,
+    video_quality: str | None,
+    file_format: str,
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG.install_deps,
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
+    )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_compressed", output_dir=output_dir)
+
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_target_size(target_size)
+
+    ffmpeg_cmd_helper.execute(
+        progress_callback=lambda p, pm: progress_callback(pm.update_progress(p)),
+    )
 
 
 @typer_cmd.command(
@@ -80,20 +107,14 @@ def compress(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-    ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
+    execute_video_compress_cmd(
+        input_files=input_files,
+        target_size=target_size,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
+        file_format=file_format,
+        output_dir=output_dir,
     )
-
-    # Set arguments for FFmpeg command helper
-    ffmpeg_cmd_helper.set_input(input_files)
-    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_compressed", output_dir=output_dir)
-
-    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
-    ffmpeg_cmd_helper.set_target_size(target_size)
-
-    ffmpeg_cmd_helper.execute()
 
 
 __all__ = [

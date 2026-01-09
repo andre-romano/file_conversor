@@ -26,7 +26,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -65,10 +65,12 @@ def execute_pdf_compress_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    pikepdf_backend = PikePDFBackend(verbose=STATE["verbose"])
+    pikepdf_backend = PikePDFBackend(
+        verbose=STATE.loglevel.get().is_verbose(),
+    )
     gs_backend = GhostscriptBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE['verbose'],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
@@ -91,7 +93,7 @@ def execute_pdf_compress_cmd(
             progress_callback(progress_mgr.complete_step())
             print(f"Processing '{output_file}' ... OK")
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_stem="_compressed")
 
     logger.info(f"{_('File compression')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

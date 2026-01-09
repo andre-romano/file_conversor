@@ -25,7 +25,7 @@ from file_conversor.utils.typer_utils import InputFilesArgument, OutputDirOption
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -59,7 +59,7 @@ def execute_text_compress_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    text_backend = TextBackend(verbose=STATE["verbose"])
+    text_backend = TextBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         text_backend.minify(
@@ -68,7 +68,7 @@ def execute_text_compress_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_stem=f"_compressed")
     logger.info(f"{_('Compression')}: [bold green]{_('SUCCESS')}[/].")
 

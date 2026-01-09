@@ -29,7 +29,7 @@ from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -86,7 +86,7 @@ def info(
 
     ffprobe_backend = FFprobeBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
     for filename in input_files:
         logger.info(f"{_('Parsing file metadata for')} '{filename}' ...")

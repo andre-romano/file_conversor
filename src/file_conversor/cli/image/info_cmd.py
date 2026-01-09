@@ -26,7 +26,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -74,7 +74,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def info(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
 ):
-    pillow_backend = PillowBackend(verbose=STATE['verbose'])
+    pillow_backend = PillowBackend(verbose=STATE.loglevel.get().is_verbose())
     for input_file in input_files:
 
         # 📁 Informações gerais do arquivo

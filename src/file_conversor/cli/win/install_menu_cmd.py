@@ -24,7 +24,7 @@ from file_conversor.system.win.ctx_menu import WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -52,7 +52,7 @@ def install_menu(
                                                   is_flag=True,
                                                   )] = False,
 ):
-    winreg_backend = WinRegBackend(verbose=STATE["verbose"])
+    winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
 
     uninstall_menu_cmd.uninstall_menu()
 

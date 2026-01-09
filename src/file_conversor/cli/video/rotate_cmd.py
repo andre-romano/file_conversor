@@ -26,7 +26,7 @@ from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -92,8 +92,8 @@ def rotate(
 
     ffmpeg_cmd_helper = FFmpegCmdHelper(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
     )
 
     # Set arguments for FFmpeg command helper

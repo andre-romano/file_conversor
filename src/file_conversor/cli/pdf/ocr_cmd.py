@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -63,7 +63,7 @@ def execute_pdf_ocr_cmd(
 ):
     ocrmypdf_backend = OcrMyPDFBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE['verbose'],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
     local_langs: set[str] = ocrmypdf_backend.get_available_languages()
     remote_langs: set[str]
@@ -94,7 +94,7 @@ def execute_pdf_ocr_cmd(
     for idx, input_file in enumerate(input_files):
         input_file = Path(input_file).resolve()
         output_file = output_dir / CommandManager.get_output_file(input_file, stem="_ocr")
-        if not STATE["overwrite-output"] and output_file.exists():
+        if not STATE.overwrite_output.enabled and output_file.exists():
             raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
 
         print(f"Processing '{output_file}' ...")

@@ -23,7 +23,7 @@ from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -63,7 +63,7 @@ def execute_ebook_convert_cmd(
     """Execute ebook conversion command."""
     calibre_backend = CalibreBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
@@ -73,7 +73,7 @@ def execute_ebook_convert_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{format}")
 
     logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

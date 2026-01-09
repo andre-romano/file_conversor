@@ -75,9 +75,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
         )
 
         self._global_options: list[str] = [
-            "" if not verbose else "-v",
-            "" if not stats else "-stats",
             "-n" if not overwrite_output else "-y",
+            "" if not stats else "-stats",
         ]
         self._in_opts: list[str] = []
         self._out_opts: list[str] = []

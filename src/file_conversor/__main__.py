@@ -27,14 +27,15 @@ def main() -> None:
         app_cmd(prog_name=Environment.get_app_name())
         sys.exit(0)
     except Exception as e:
+        debug_mode = STATE.loglevel.level.is_debug()
         error_type = str(type(e))
         error_type = error_type.split("'")[1]
-        logger.error(f"{error_type} ({e})", exc_info=True if STATE["debug"] else None)
+        logger.error(f"{error_type} ({e})", exc_info=True if debug_mode else None)
         if isinstance(e, subprocess.CalledProcessError):
             logger.error(f"CMD: {e.cmd} ({e.returncode})")
             logger.error(f"STDERR: {e.stderr}")
             logger.error(f"STDOUT: {e.stdout}")
-        if STATE["debug"]:
+        if debug_mode:
             raise
         sys.exit(1)
 

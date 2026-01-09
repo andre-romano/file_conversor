@@ -25,7 +25,7 @@ from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -60,7 +60,7 @@ def execute_pdf_extract_img_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    pymupdf_backend = PyMuPDFBackend(verbose=STATE["verbose"])
+    pymupdf_backend = PyMuPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         pymupdf_backend.extract_images(

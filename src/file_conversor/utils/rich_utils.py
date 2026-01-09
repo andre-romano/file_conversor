@@ -1,6 +1,5 @@
 # src\file_conversor\utils\rich.py
 
-
 from types import TracebackType
 from typing import Any, Optional, Self, Type
 
@@ -9,7 +8,7 @@ from rich.progress import Progress, TaskID, TextColumn, BarColumn, TimeRemaining
 # user-provided
 from file_conversor.config.state import State
 
-STATE = State.get_instance()
+STATE = State.get()
 
 
 class DummyProgress(Progress):
@@ -42,7 +41,7 @@ class DummyProgress(Progress):
 def get_progress_bar() -> Progress | DummyProgress:
     """Gets rich Progress() instance, properly formatted"""
 
-    if STATE['no-progress']:
+    if not STATE.progress.enabled:
         return DummyProgress()
     return Progress(
         TextColumn("[bold blue]{task.description}"),

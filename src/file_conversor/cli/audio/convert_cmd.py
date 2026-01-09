@@ -14,17 +14,15 @@ from file_conversor.backend import FFmpegBackend
 from file_conversor.cli.audio._ffmpeg_cmd import ffmpeg_audio_run
 from file_conversor.cli.audio._typer import COMMAND_NAME, CONVERT_NAME
 
-from file_conversor.config import Environment, Configuration, State, Log, get_translation
+from file_conversor.config import Environment, Configuration, Log
+from file_conversor.config.locale import get_translation
 
-from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.validators import check_valid_options
-from file_conversor.utils.typer_utils import AudioBitrateOption, AudioCodecOption, FormatOption, InputFilesArgument, OutputDirOption
+from file_conversor.utils.typer_utils import AudioBitrateOption, FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
 LOG = Log.get_instance()
 
 _ = get_translation()

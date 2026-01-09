@@ -10,13 +10,13 @@ from pathlib import Path
 from file_conversor.backend import FFmpegBackend
 from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 
-from file_conversor.config import Environment, Configuration, State, Log, get_translation
+from file_conversor.config import Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -41,8 +41,8 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
     )
 
     # set filters
@@ -77,7 +77,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
             )
             progress_complete_cb()
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{file_format}", out_stem=out_stem)
 
     logger.info(f"{_('FFMpeg result')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

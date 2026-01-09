@@ -1,4 +1,3 @@
-<!-- [![Patreon](https://img.shields.io/badge/Patreon-Support-orange?logo=patreon)](https://www.patreon.com/andre-romano) -->
 
 [![PyPI](https://img.shields.io/pypi/v/file_conversor.svg)](https://pypi.org/project/file_conversor/)
 [![Downloads](https://static.pepy.tech/badge/file-conversor)](https://pepy.tech/project/file-conversor)
@@ -10,7 +9,7 @@
 
 
 # File Conversor
-A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
+A powerful Python-based CLI and GUI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
 
 **Summary**:
 - [File Conversor](#file-conversor)
@@ -39,7 +38,7 @@ Run ``file_conversor -h`` to explore all available commands and options.
 
 <img src="./assets/gui.jpg" >
 
-Run ``file_conversor gui start`` to launch the GUI application or double click the Windows Shortcut.
+Run ``file_conversor_gui`` to launch the GUI application or double click the Windows Shortcut.
 
 ### Windows Context Menu (Windows OS only)
 
@@ -87,11 +86,9 @@ Run ``file_conversor gui start`` to launch the GUI application or double click t
 
 ## External dependencies
 
-This project has external dependencies. 
+This project has external dependencies. By installing and using this software, you agree to comply with the licenses of these third-party tools. 
 
-In ``Windows`` and ``MacOS`` prompts will assist you in downloading missing dependencies when required. 
-
-In `Linux` you may need to install them manually using your package manager.
+In prompts will assist you in downloading missing dependencies when required, using package managers installed in your system (e.g., `apt`, `brew`, `scoop`). 
 
 ## Installing
 
@@ -121,7 +118,13 @@ pip install file_conversor
 
 ### For Linux / MacOS
 
-- **Option 1. PyPi**
+- **Option 1. Docker (recommended)**
+
+```bash
+docker run --rm -it -v $(pwd):/app andreromano/file_conversor:latest 
+```
+
+- **Option 2. PyPi**
 
 ```bash
 pip install file_conversor
@@ -136,5 +139,9 @@ pip install file_conversor
 
 ## License and Copyright
 
-Distributed under the **Apache License 2.0**. See [`LICENSE`](./LICENSE) for details.
+Distributed under the **Apache License 2.0**.
+
+By using this software, you agree to comply with the terms of the Apache License 2.0. Further, you agree to respect the licenses of any third-party tools integrated or utilized by this software. 
+
+Licenses are provided in the [`LICENSES`](./LICENSES) folder.
 

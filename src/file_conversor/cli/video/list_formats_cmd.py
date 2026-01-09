@@ -22,7 +22,7 @@ from file_conversor.utils.typer_utils import FormatOption
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()

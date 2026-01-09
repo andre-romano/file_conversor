@@ -11,14 +11,12 @@ from rich.console import Group
 # user-provided imports
 from file_conversor.backend.image import PillowBackend
 
-from file_conversor.utils.dominate_utils import br, div
-
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import get_translation
 
 # Get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -47,18 +45,6 @@ class _PillowExifInfo:
             tag_name = PillowBackend.Exif_TAGS.get(tag, f"{tag}")
             formatted.append(f"  - {tag_name}: {value}")
         return formatted
-
-    def div(self):
-        input_name, in_ext = self._parse()
-        with div() as result:
-            div(f"{_('File Information')}:")
-            div(f"  - {_('Name')}: {input_name}")
-            div(f"  - {_('Format')}: {in_ext}")
-            for tag, value in self.metadata.items():
-                tag_name = PillowBackend.Exif_TAGS.get(tag, f"{tag}")
-                div(f"  - {tag_name}: {value}")
-            br()
-        return result
 
 
 class PillowParser:

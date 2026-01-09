@@ -13,6 +13,7 @@ from file_conversor.backend import FFprobeBackend
 
 from file_conversor.cli.video._typer import OTHERS_PANEL as RICH_HELP_PANEL
 from file_conversor.cli.video._typer import COMMAND_NAME, CHECK_NAME
+
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.utils import ProgressManager, CommandManager
@@ -23,7 +24,7 @@ from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -60,7 +61,7 @@ def execute_video_check_cmd(
     # init ffmpeg
     backend = FFprobeBackend(
         install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
+        verbose=STATE.loglevel.get().is_verbose(),
     )
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
@@ -69,7 +70,7 @@ def execute_video_check_cmd(
         parser.run()
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{format}")
 
     logger.info(f"{_('FFMpeg check')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

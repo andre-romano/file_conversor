@@ -25,7 +25,7 @@ from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, O
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -84,7 +84,7 @@ def execute_text_convert_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    text_backend = TextBackend(verbose=STATE["verbose"])
+    text_backend = TextBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         text_backend.convert(
@@ -93,7 +93,7 @@ def execute_text_convert_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=output_dir, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{format}")
     logger.info(f"{_('File conversion')}: [bold green]{_('SUCCESS')}[/].")
 

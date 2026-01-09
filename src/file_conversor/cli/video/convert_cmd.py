@@ -5,7 +5,7 @@ import typer
 
 from rich import print
 
-from typing import Annotated, List
+from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
 # user-provided modules
@@ -33,7 +33,7 @@ from file_conversor.system.win import WinContextCommand, WinContextMenu
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -71,6 +71,68 @@ def register_ctx_menu(ctx_menu: WinContextMenu):
 # register commands in windows context menu
 ctx_menu = WinContextMenu.get_instance()
 ctx_menu.register_callback(register_ctx_menu)
+
+
+def execute_video_convert_cmd(
+    input_files: List[Path],
+
+    file_format: str,
+
+    audio_bitrate: int,
+    video_bitrate: int,
+
+    audio_codec: str | None,
+    video_codec: str | None,
+
+    video_encoding_speed: str | None,
+    video_quality: str | None,
+
+    resolution: str | None,
+    fps: int | None,
+
+    brightness: float,
+    contrast: float,
+    color: float,
+    gamma: float,
+
+    rotation: int | None,
+    mirror_axis: str | None,
+    deshake: bool,
+    unsharp: bool,
+
+    output_dir: Path,
+    progress_callback: Callable[[float], Any] = lambda p: p,
+):
+    ffmpeg_cmd_helper = FFmpegCmdHelper(
+        install_deps=CONFIG.install_deps,
+        verbose=STATE.loglevel.get().is_verbose(),
+        overwrite_output=STATE.overwrite_output.enabled,
+    )
+
+    # Set arguments for FFmpeg command helper
+    ffmpeg_cmd_helper.set_input(input_files)
+    ffmpeg_cmd_helper.set_output(file_format=file_format, output_dir=output_dir)
+
+    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+    ffmpeg_cmd_helper.set_codecs(audio_codec=audio_codec, video_codec=video_codec)
+
+    ffmpeg_cmd_helper.set_resolution_filter(resolution)
+    ffmpeg_cmd_helper.set_fps_filter(fps)
+    ffmpeg_cmd_helper.set_enhancement_filters(
+        brightness=brightness,
+        contrast=contrast,
+        color=color,
+        gamma=gamma,
+    )
+    ffmpeg_cmd_helper.set_rotation_filter(rotation)
+    ffmpeg_cmd_helper.set_mirror_filter(mirror_axis)
+    ffmpeg_cmd_helper.set_deshake_filter(deshake)
+    ffmpeg_cmd_helper.set_unsharp_filter(unsharp)
+
+    ffmpeg_cmd_helper.execute(
+        progress_callback=lambda p, pm: progress_callback(pm.update_progress(p)),
+    )
 
 
 @typer_cmd.command(
@@ -117,35 +179,27 @@ def convert(
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
-
-    ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE["verbose"],
-        overwrite_output=STATE["overwrite-output"],
-    )
-
-    # Set arguments for FFmpeg command helper
-    ffmpeg_cmd_helper.set_input(input_files)
-    ffmpeg_cmd_helper.set_output(file_format=file_format, output_dir=output_dir)
-
-    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
-    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
-    ffmpeg_cmd_helper.set_codecs(audio_codec=audio_codec, video_codec=video_codec)
-
-    ffmpeg_cmd_helper.set_resolution_filter(resolution)
-    ffmpeg_cmd_helper.set_fps_filter(fps)
-    ffmpeg_cmd_helper.set_enhancement_filters(
+    execute_video_convert_cmd(
+        input_files=input_files,
+        file_format=file_format,
+        audio_bitrate=audio_bitrate,
+        video_bitrate=video_bitrate,
+        audio_codec=audio_codec,
+        video_codec=video_codec,
+        video_encoding_speed=video_encoding_speed,
+        video_quality=video_quality,
+        resolution=resolution,
+        fps=fps,
         brightness=brightness,
         contrast=contrast,
         color=color,
         gamma=gamma,
+        rotation=rotation,
+        mirror_axis=mirror_axis,
+        deshake=deshake,
+        unsharp=unsharp,
+        output_dir=output_dir,
     )
-    ffmpeg_cmd_helper.set_rotation_filter(rotation)
-    ffmpeg_cmd_helper.set_mirror_filter(mirror_axis)
-    ffmpeg_cmd_helper.set_deshake_filter(deshake)
-    ffmpeg_cmd_helper.set_unsharp_filter(unsharp)
-
-    ffmpeg_cmd_helper.execute()
 
 
 __all__ = [

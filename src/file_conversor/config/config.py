@@ -5,15 +5,12 @@ import locale
 
 from pathlib import Path
 from typing import Any
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 from file_conversor.config.environment import Environment
-from file_conversor.config.dataclass_enforce_types import dataclass_enforce_types
 
 
-@dataclass
-@dataclass_enforce_types  # order matters here
-class ConfigurationData:
+class ConfigurationData(BaseModel):
     """Configuration data structure"""
 
     cache_enabled: bool
@@ -56,10 +53,6 @@ class ConfigurationData:
     def to_dict(self) -> dict[str, Any]:
         """Convert configuration to dictionary."""
         return {**self.__dict__}
-
-    def copy(self) -> 'ConfigurationData':
-        """Create a copy of the configuration data."""
-        return ConfigurationData(**self.__dict__)
 
 
 class Configuration:

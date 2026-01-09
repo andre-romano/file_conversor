@@ -13,7 +13,7 @@ from file_conversor.backend import HashBackend
 
 from file_conversor.cli.hash._typer import COMMAND_NAME, CHECK_NAME
 
-from file_conversor.config import Environment, Configuration, State, Log
+from file_conversor.config import Environment, State, Configuration, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
@@ -23,7 +23,7 @@ from file_conversor.utils.typer_utils import InputFilesArgument
 
 # get app config
 CONFIG = Configuration.get()
-STATE = State.get_instance()
+STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -56,7 +56,7 @@ def execute_hash_check_cmd(
     input_files: List[Path],
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
-    hash_backend = HashBackend(verbose=STATE["verbose"])
+    hash_backend = HashBackend(verbose=STATE.loglevel.get().is_verbose())
 
     def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
         logger.info(f"{_('Checking file')} '{input_file}' ...")
@@ -66,7 +66,7 @@ def execute_hash_check_cmd(
         )
         progress_callback(progress_mgr.complete_step())
 
-    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE["overwrite-output"])
+    cmd_mgr = CommandManager(input_files, output_dir=Path(), overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback)
 
     logger.info(f"{_('Hash check')}: [bold green]{_('SUCCESS')}[/].")
