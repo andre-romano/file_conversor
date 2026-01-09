@@ -11,8 +11,8 @@ from tasks_modules import base, embedpy
 
 BUILD_DIR = embedpy.BUILD_DIR
 
-APP_EXE = embedpy.PORTABLE_SHIM_BAT
-APP_GUI_EXE = embedpy.PORTABLE_SHIM_VBS
+APP_EXE = embedpy.PORTABLE_SHIM_CLI_BAT
+APP_GUI_EXE = embedpy.PORTABLE_SHIM_GUI_VBS
 
 if base.WINDOWS:
     INSTALL_APP_CURR = INSTALL_APP_WIN

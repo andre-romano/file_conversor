@@ -3,8 +3,6 @@
         "ms-python.autopep8",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "dbaeumer.vscode-eslint",
-        "samuelcolvin.jinjahtml",
         "redhat.vscode-yaml",
         "tamasfe.even-better-toml",
         "GitHub.copilot",

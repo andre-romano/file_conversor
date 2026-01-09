@@ -31,6 +31,8 @@
         "**/.DS_Store": true,
         "**/node_modules/**": true,
         "**/Thumbs.db": true,
+        "**/coverage.xml": true,
+        "**/*.spec": true,
     },
     "search.exclude": {
         "**/node_modules": true,
@@ -45,26 +47,8 @@
         "**/dist": true,
         "**/htmlcov": true,
         "**/pdm.lock": true,
-    },
-    "eslint.options": {
-        "overrideConfigFile": "eslint.config.mjs"
-    },
-    "eslint.validate": [
-        "javascript",
-        "html",
-        "jinja",
-        "jinja2",
-        "jinja-html",
-    ],
-    "emmet.includeLanguages": {
-        "jinja": "html",
-        "jinja2": "html",
-        "jinja-html": "html"
-    },
-    "files.associations": {
-        "*.j2": "jinja-html",
-        "*.jinja": "jinja-html",
-        "*.jinja2": "jinja-html"
+        "**/coverage.xml": true,
+        "**/*.spec": true,
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "andre-romano",

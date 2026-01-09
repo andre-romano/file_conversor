@@ -1,0 +1,95 @@
+File Conversor
+Copyright (c) [2024–] Andre Luiz Romano Madureira
+
+This product includes software developed by Andre Luiz Romano Madureira
+and contributors.
+
+-----------------------------------------------------------------------
+THIRD-PARTY SOFTWARE NOTICES
+-----------------------------------------------------------------------
+
+This distribution includes third-party software components.
+
+The complete list of third-party packages, their authors, and their
+respective licenses is provided in the file:
+
+    THIRD_PARTY_LICENSES.md
+
+This file forms an integral part of the legal documentation of this 
+distribution.
+
+All third-party components are used in compliance with their respective
+licenses. Where required, copyright notices, license texts, and
+redistribution conditions are reproduced in THIRD_PARTY_LICENSES.md.
+
+
+-----------------------------------------------------------------------
+EXTERNAL SOFTWARE DISCLAIMER
+-----------------------------------------------------------------------
+
+This software may interoperate with, invoke, detect, or assist in the
+installation or use of external programs and system-level tools that are
+NOT distributed as part of this product, including but not limited to:
+
+    • PDF manipulation tools
+    • Image processing tools
+    • Media encoders/decoders
+    • Operating system utilities
+
+Such external software is NOT covered by this product’s license, is NOT
+part of this distribution, and is NOT included in THIRD_PARTY_LICENSES.md
+unless explicitly bundled.
+
+All trademarks, copyrights, and license rights for such external software
+remain the property of their respective owners.
+
+Users are solely responsible for:
+
+    • obtaining these external programs from their official sources
+    • complying with their license terms
+    • ensuring lawful installation, distribution, and usage
+
+References to external software are provided solely for interoperability
+and functional integration and do not imply endorsement, affiliation, or
+licensing coverage.
+
+-----------------------------------------------------------------------
+LICENSE SUMMARY
+-----------------------------------------------------------------------
+
+The core File Conversor source code is distributed under the terms of the
+Apache License, Version 2.0, unless otherwise stated.
+
+Some third-party dependencies included in this distribution are licensed
+under different terms, including but not limited to:
+
+    • Apache License 2.0
+    • MIT License
+    • BSD Licenses (2-Clause and 3-Clause)
+    • MPL 2.0
+    • LGPL v2/v3
+    • GPL v3
+    • AGPL v3
+
+The inclusion of any third-party code does not imply that such components
+are covered by the Apache License 2.0.
+
+-----------------------------------------------------------------------
+NO MODIFICATION OF THIRD-PARTY RIGHTS
+-----------------------------------------------------------------------
+
+Nothing in this NOTICE file modifies or supersedes the terms of any
+third-party license. In the event of a conflict between this NOTICE and
+any third-party license, the third-party license shall prevail for the
+relevant components.
+
+-----------------------------------------------------------------------
+SOURCE AVAILABILITY
+-----------------------------------------------------------------------
+
+Where required by applicable licenses (e.g., GPL, LGPL, AGPL), the
+corresponding source code and license texts are made available through
+the project repository or accompanying distribution materials.
+
+Project homepage:
+https://github.com/andre-romano/file_conversor

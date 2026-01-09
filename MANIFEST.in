@@ -1,4 +1,4 @@
-include LICENSE AUTHORS.md README.md pyproject.toml
+include LICENSE NOTICE THIRD_PARTY_LICENSES.md AUTHORS.md README.md pyproject.toml
 
 recursive-include src/file_conversor/.locales *
 recursive-include src/file_conversor/.icons *

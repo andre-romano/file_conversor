@@ -92,6 +92,33 @@ def clean(c: InvokeContext):
     pass
 
 
+@task
+def licenses(c: InvokeContext):
+    print("[bold]Generating THIRD_PARTY_LICENSES.md licenses report ... [/]")
+    THIRD_PARTY_LICENSES_FILE = Path("THIRD_PARTY_LICENSES.md")
+    THIRD_PARTY_LICENSES_FILE.unlink(missing_ok=True)
+    result = c.run(" ".join([
+        "pdm",
+        "run",
+        "pip-licenses",
+        "--format=markdown",
+        "--with-authors",
+        "--with-urls",
+        # "--with-license-file",
+        f"--output-file={THIRD_PARTY_LICENSES_FILE}",
+    ]))
+    assert (result is not None) and (result.return_code == 0)
+    assert THIRD_PARTY_LICENSES_FILE.exists()
+
+    THIRD_PARTY_LICENSES_FILE.write_text(rf"""
+# Third Party Licenses
+                                         
+{THIRD_PARTY_LICENSES_FILE.read_text()}
+""", encoding="utf-8")
+    # git_commit_push(c, THIRD_PARTY_LICENSES_FILE, message=f"ci: scoop bucket {GIT_RELEASE}")
+    print("[bold]Generating THIRD_PARTY_LICENSES.md licenses report ... [/][bold green]OK[/]")
+
+
 @task(pre=[clean_requirements,])
 def requirements(c: InvokeContext, prod: bool = True):
     print("[bold]Generating requirements.txt ... [/]")
@@ -108,7 +135,6 @@ def deps(c: InvokeContext):
         "run",
         "pydeps",
         "src/file_conversor/__main__.py",
-        "--only", "file_conversor",
         "--show-cycles",
         "--no-show",
         # "--no-output",

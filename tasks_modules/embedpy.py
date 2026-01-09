@@ -1,7 +1,5 @@
 # tasks_modules\embedpy.py
 
-import tempfile
-
 from pathlib import Path
 from invoke.tasks import task
 
@@ -18,8 +16,10 @@ PORTABLE_PYTHON_EXE = PORTABLE_PYTHON_DIR / "python.exe"
 PORTABLE_PIP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / "pip.exe"
 PORTABLE_APP_EXE = PORTABLE_PYTHON_DIR / "Scripts" / f"{PROJECT_NAME}.exe"
 
-PORTABLE_SHIM_BAT = BUILD_DIR / f"{PROJECT_NAME}.bat"
-PORTABLE_SHIM_VBS = BUILD_DIR / f"{PROJECT_NAME}-gui.vbs"
+PORTABLE_SHIM_CLI_BAT = BUILD_DIR / f"{PROJECT_NAME}.bat"
+
+PORTABLE_SHIM_GUI_BAT = BUILD_DIR / f"{PROJECT_NAME}_gui.bat"
+PORTABLE_SHIM_GUI_VBS = BUILD_DIR / f"{PROJECT_NAME}_gui.vbs"
 
 
 def get_pip_install_cmd(*modules: str):
@@ -186,33 +186,45 @@ def install_app(c: InvokeContext):
 @task(pre=[install_app],)
 def create_shim(c: InvokeContext):
     print(f"[bold] Creating shim ... [/]")
-    PORTABLE_SHIM_BAT.write_text(rf"""@echo off
+
+    def get_shim_bat_contents(py_module_name: str, *args: str):
+        return rf"""@echo off
     setlocal
     set SCRIPT_DIR=%~dp0
     set PYTHONHOME=%SCRIPT_DIR%\\{PORTABLE_PYTHON_DIR.relative_to(BUILD_DIR)}    
     set PATH=%PYTHONHOME%\\Scripts;%PYTHONHOME%;%PATH%
     set PYTHON_EXE=%PYTHONHOME%\\{PORTABLE_PYTHON_EXE.relative_to(PORTABLE_PYTHON_DIR)}
-    "%PYTHON_EXE%" -m {PROJECT_NAME} %*
+    "%PYTHON_EXE%" -m {py_module_name} {' '.join(args)} %*
     endlocal
-""", encoding="utf-8")
-
-    result = c.run(f'"{PORTABLE_SHIM_BAT.resolve()}" --version')
+"""
+    PORTABLE_SHIM_CLI_BAT.write_text(
+        get_shim_bat_contents(PROJECT_NAME),
+        encoding="utf-8",
+    )
+    result = c.run(f'"{PORTABLE_SHIM_CLI_BAT.resolve()}" --version')
     if (result is None) or (result.return_code != 0):
-        raise RuntimeError(f"Failed to run shim for '{PROJECT_NAME}': {result}")
+        raise RuntimeError(f"Failed to run CLI shim for '{PROJECT_NAME}': {result}")
 
-    PORTABLE_SHIM_VBS.write_text(rf'''
+    PORTABLE_SHIM_GUI_BAT.write_text(
+        get_shim_bat_contents(f"{PROJECT_NAME}_gui"),
+        encoding="utf-8",
+    )
+    if not PORTABLE_SHIM_GUI_BAT.exists():
+        raise RuntimeError(f"Failed to create GUI shim for '{PROJECT_NAME}'")
+
+    PORTABLE_SHIM_GUI_VBS.write_text(rf'''
     Set WshShell = CreateObject("WScript.Shell")
 
     ' Folder where the VBS script is located
     scriptFolder = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
 
     ' Full path to the .bat file
-    batPath = scriptFolder & "\{PORTABLE_SHIM_BAT.name}"
+    batPath = scriptFolder & "\{PORTABLE_SHIM_GUI_BAT.name}"
 
     ' Run hidden (0), don't wait (False)
     WshShell.Run """" & batPath & """ gui start", 0, False
     ''', encoding="utf-8")
-    if not PORTABLE_SHIM_VBS.exists():
+    if not PORTABLE_SHIM_GUI_VBS.exists():
         raise RuntimeError(f"Failed to create VBS shim for '{PROJECT_NAME}'")
 
     print(f"[bold] Creating shim ... [/][bold green]OK[/]")
@@ -226,7 +238,7 @@ def build(c: InvokeContext):
 @task(pre=[build,])
 def check(c: InvokeContext):
     print("[bold] Checking shim ... [/]")
-    result = c.run(f'"{PORTABLE_SHIM_BAT.resolve()}" --version')
+    result = c.run(f'"{PORTABLE_SHIM_CLI_BAT.resolve()}" --version')
     if (result is None) or (result.return_code != 0):
         raise RuntimeError(f"Failed to run shim for '{PROJECT_NAME}': {result}")
     print("[bold] Checking shim ... [/][bold green]OK[/]")

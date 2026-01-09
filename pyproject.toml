@@ -29,12 +29,12 @@ dependencies = [
     "natsort>=8.4.0",
     "pydantic>=2.12.5",
 ]
-requires-python = ">=3.12,<=3.14"
+requires-python = ">=3.12,<=3.13.7"
 readme = "README.md"
-license-files = ["LICEN[CS]E*", "AUTHORS.md","README.md"]
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*", "NOTICE*", "THIRD_PARTY*", "AUTHORS.md", "README.md"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent", 
 ] 
 keywords = ["file", "conversion", "multimedia", "docs", "video", "audio", "image", "converter"]
@@ -62,15 +62,6 @@ title = "File Conversor"
 data_path = "src/file_conversor/.data"
 icons_path = "src/file_conversor/.icons"
 locales_path = "src/file_conversor/.locales"
-
-[tool.git-changelog]
-# bump = "auto"
-convention = "angular"
-template = "keepachangelog"
-versioning = "semver"
-zerover = true
-output = "CHANGELOG.md"
-provider = "github"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -155,11 +146,10 @@ dev = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "pydeps>=3.0.1",
-    "pylint>=3.3.7",
     "invoke>=2.2.0",
-    "git-changelog>=2.5.3",
     "twine>=6.1.0",
     "polib>=1.2.0",
     "deep-translator>=1.11.4",
     "requests>=2.32.5",
+    "pip-licenses>=5.5.0",
 ]

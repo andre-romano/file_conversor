@@ -7,12 +7,14 @@ from invoke.tasks import task
 # user provided
 from tasks_modules import _config, base, zip
 from tasks_modules._config import *
-from tasks_modules._deps import *
 
 SCOOP_PATH = Path("bucket")
 SCOOP_JSON = SCOOP_PATH / f"{PROJECT_NAME}.json"
 
 SCOOP_APP_EXE = zip.APP_EXE.relative_to(zip.BUILD_DIR)
+
+SCOOP_DEPS = {
+}
 
 
 @task
