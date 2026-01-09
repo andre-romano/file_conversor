@@ -109,13 +109,7 @@ def licenses(c: InvokeContext):
     ]))
     assert (result is not None) and (result.return_code == 0)
     assert THIRD_PARTY_LICENSES_FILE.exists()
-
-    THIRD_PARTY_LICENSES_FILE.write_text(rf"""
-# Third Party Licenses
-                                         
-{THIRD_PARTY_LICENSES_FILE.read_text()}
-""", encoding="utf-8")
-    # git_commit_push(c, THIRD_PARTY_LICENSES_FILE, message=f"ci: scoop bucket {GIT_RELEASE}")
+    git_commit_push(c, THIRD_PARTY_LICENSES_FILE, message=f"ci: third party licenses file for {GIT_RELEASE}")
     print("[bold]Generating THIRD_PARTY_LICENSES.md licenses report ... [/][bold green]OK[/]")
 
 
