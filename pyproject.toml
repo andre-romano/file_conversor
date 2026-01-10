@@ -59,9 +59,9 @@ file_conversor = [
 
 [tool.myproject]
 title = "File Conversor"
-data_path = "src/file_conversor/.data"
-icons_path = "src/file_conversor/.icons"
-locales_path = "src/file_conversor/.locales"
+data_path = "src/file_conversor_core/.data"
+icons_path = "src/file_conversor_core/.icons"
+locales_path = "src/file_conversor_core/.locales"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

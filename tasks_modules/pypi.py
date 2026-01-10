@@ -39,7 +39,7 @@ def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ...[/]")
     for include in _config.parse_manifest_includes():
         include_path = Path(include)
-        dest_path = Path("./src") / PROJECT_NAME / include_path.name
+        dest_path = Path("./src") / f"{PROJECT_NAME}.egg-info" / include_path.name
         if include_path.resolve() == dest_path.resolve():
             continue
         to_remove.add(dest_path)

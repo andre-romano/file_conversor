@@ -47,7 +47,9 @@ def create_manifest(c: InvokeContext):
     if not zip.BUILD_DIR.exists():
         raise RuntimeError(f"Path {zip.BUILD_DIR} does not exist")
 
-    APP_INSTALL_DIR = rf"{{app}}\python\Lib\site-packages\{PROJECT_NAME}"
+    LIB_INSTALL_DIR = rf"{{app}}\python\Lib\site-packages"
+
+    APP_ICON_RELATIVE_DIR = rf"{LIB_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
 
     # setup.iss
     setup_iss_path = Path(f"{INNO_ISS}")
@@ -66,7 +68,7 @@ ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile={ICON_APP.resolve()}
-UninstallDisplayIcon={APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}
+UninstallDisplayIcon={APP_ICON_RELATIVE_DIR}
 SourceDir={Path(".").resolve()}
 OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
@@ -83,8 +85,8 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Icons]
-Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
-Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
+Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"
+Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"
 
 [Run]
 StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated
@@ -114,7 +116,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_exe, create_manifest, install,], post=[zip.clean_build])
+@task(pre=[clean_exe, create_manifest, install,])
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")

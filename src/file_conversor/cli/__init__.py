@@ -20,7 +20,7 @@ STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
-logger = LOG.getLogger()
+logger = LOG.getLogger(__name__)
 
 # Create a Typer CLI application
 app_cmd = typer.Typer(

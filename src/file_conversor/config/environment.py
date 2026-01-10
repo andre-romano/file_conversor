@@ -22,7 +22,8 @@ logger = Log.get_instance().getLogger(__name__)
 
 class Environment(AbstractSingletonThreadSafe):
 
-    __APP_NAME = "file_conversor"
+    __APP_NAME = f"file_conversor"
+    __APP_CORE = f"{__APP_NAME}_core"
 
     class UserFolder(Enum):
         @classmethod
@@ -188,7 +189,7 @@ class Environment(AbstractSingletonThreadSafe):
     @classmethod
     def get_resources_folder(cls) -> Path:
         """Get the absolute path of the included folders in pip."""
-        files_obj = files(cls.get_app_name())
+        files_obj = files(cls.__APP_CORE)
         res_path = Path(str(files_obj)).resolve()
         return res_path
 

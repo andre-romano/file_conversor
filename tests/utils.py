@@ -54,7 +54,7 @@ class Test:
 
     @staticmethod
     def run(*cmd_list: str):
-        exe_cmd_list = shlex.split(f'"{sys.executable}" "{Environment.get_resources_folder() / "__main__.py"}"')
+        exe_cmd_list = shlex.split(f'"{sys.executable}" -m "{Environment.get_app_name()}"')
 
         cmd = exe_cmd_list.copy()
         cmd.extend(cmd_list)

@@ -1,14 +1,2 @@
+
 include LICENSE NOTICE THIRD_PARTY_LICENSES.md AUTHORS.md README.md pyproject.toml
-
-recursive-include src/file_conversor/.locales *
-recursive-include src/file_conversor/.icons *
-
-recursive-exclude assets *
-recursive-exclude bucket *
-recursive-exclude choco *
-recursive-exclude dist *
-recursive-exclude docs *
-recursive-exclude scripts *
-recursive-exclude tasks_modules *
-recursive-exclude tests *
-recursive-exclude uml *
