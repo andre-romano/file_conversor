@@ -5,7 +5,7 @@
 from typing import Any, Iterable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
-from file_conversor.backend.audio_video.format_container import AudioFormatContainer, VideoFormatContainer
+from file_conversor.backend.audio_video.format_container import AbstractRegisterManager, AudioFormatContainer, VideoFormatContainer
 
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
@@ -60,13 +60,12 @@ class AbstractFFmpegBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
 
     @classmethod
-    def __get_supported_codecs(cls, supported_format: dict[str, tuple[tuple, dict[str, Any]]], is_audio: bool, ext: str | None = None) -> Iterable[str]:
+    def __get_supported_codecs(cls, supported_format: dict[str, AbstractRegisterManager.ConstructorDataModel], is_audio: bool, ext: str | None = None) -> Iterable[str]:
         res: set[str] = set()
         codecs_kwarg = "available_audio_codecs" if is_audio else "available_video_codecs"
-        for cont_ext, data in supported_format.items():
+        for cont_ext, constructor in supported_format.items():
             if not ext or (ext == cont_ext):
-                _, kwargs = data
-                res.update(kwargs[codecs_kwarg])
+                res.update(constructor.kwargs[codecs_kwarg])
         return sorted(res)
 
     @classmethod

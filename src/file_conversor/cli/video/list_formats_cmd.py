@@ -56,10 +56,9 @@ def list_formats(
         format_dict = {file_format: format_dict[file_format]}
 
     for fmt, fmt_info in format_dict.items():
-        args, kwargs = fmt_info
         logger.info(f"[bold]{fmt}[/bold]")
-        logger.info(f"  - {_('Audio codecs')}: {', '.join(kwargs['available_audio_codecs'])}")
-        logger.info(f"  - {_('Video codecs')}: {', '.join(kwargs['available_video_codecs'])}")
+        logger.info(f"  - {_('Audio codecs')}: {', '.join(fmt_info.kwargs['available_audio_codecs'])}")
+        logger.info(f"  - {_('Video codecs')}: {', '.join(fmt_info.kwargs['available_video_codecs'])}")
     print()  # add a final newline
 
 

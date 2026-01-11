@@ -10,8 +10,6 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from cv2 import log
-
 # user-provided imports
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
@@ -176,8 +174,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
             # set the output format options based on the file extension
             out_ext = self._output_file.suffix[1:]
-        args, kwargs = self.SUPPORTED_OUT_FORMATS[out_ext]
-        self._out_container = FormatContainer(*args, **kwargs)
+        constructor = self.SUPPORTED_OUT_FORMATS[out_ext]
+        self._out_container = FormatContainer(*constructor.args, **constructor.kwargs)
         self._set_pass_logfile()
 
     def _set_pass_logfile(self):
