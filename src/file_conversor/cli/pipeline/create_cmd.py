@@ -8,7 +8,7 @@ from typing import Annotated
 from rich import print
 
 # user-provided modules
-from file_conversor.backend import BatchBackend
+from file_conversor.backend.batch_backend import BatchBackend, StageConfigDataModel
 
 from file_conversor.cli.pipeline._typer import COMMAND_NAME, CREATE_NAME
 
@@ -75,8 +75,9 @@ def create():
         try:
             stage: str = typer.prompt(f"{_('Name of the processing stage (e.g., image_convert)')}")
 
-            cmd_str: str = typer.prompt(f"{_('Type command here')} ({_('e.g.')}, image convert {{in_file_path}} {{out_dir}}/{{in_file_name}}_converted.png )")
-            batch_backend.add_stage(stage, command=cmd_str)
+            print(StageConfigDataModel.help_template())
+            cmd_str: str = typer.prompt(f"{_('Type command here')} ({_('e.g.')}, image convert {{in_file_path}} -od {{out_dir}} -f png )")
+            batch_backend.pipeline.add_stage(stage, command=cmd_str)
 
             terminate = not typer.confirm(f"{_('Need another pipeline stage')}", default=False)
             print(f"-------------------------------------")

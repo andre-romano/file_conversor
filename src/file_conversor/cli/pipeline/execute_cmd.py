@@ -3,6 +3,7 @@
 
 import typer
 
+from pathlib import Path
 from typing import Annotated
 
 from rich import print
@@ -41,16 +42,23 @@ EXTERNAL_DEPENDENCIES = BatchBackend.EXTERNAL_DEPENDENCIES
 - `file_conversor {COMMAND_NAME} {EXECUTE_NAME} c:/Users/Alice/Desktop/pipeline_name` 
 """)
 def execute(
-    pipeline_folder: Annotated[str, typer.Argument(
+    pipeline_folder: Annotated[Path, typer.Argument(
         help=f"{_('Pipeline folder')}",
-        callback=check_dir_exists
+        callback=lambda x: check_dir_exists(x),
     )],
 ):
     logger.info("Executing pipeline ...")
+    batch_backend = BatchBackend(pipeline_folder)
+    batch_backend.load_config()
+
     with get_progress_bar() as progress:
-        batch_backend = BatchBackend(pipeline_folder)
-        batch_backend.load_config()
-        batch_backend.execute(progress)
+        total_stages = len(batch_backend.pipeline.stages)
+
+        task_all_stages = progress.add_task(f"{_('Processing stage')}", total=total_stages)
+        for i, stage in enumerate(batch_backend.pipeline.stages):
+            task_stage = progress.add_task(description=f"{_('Processing stage')} {i + 1}/{total_stages}")
+            stage.execute(lambda p, task_stage=task_stage: progress.update(task_stage, completed=p))
+            progress.update(task_all_stages, completed=i + 1)
 
     logger.info(f"{_('Pipeline execution')}: [bold green]{_('SUCCESS')}[/].")
     logger.info(f"--------------------------------")

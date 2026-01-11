@@ -15,8 +15,6 @@ from file_conversor.backend.abstract_backend import AbstractBackend
 
 from file_conversor.config import Configuration, State, Environment, Log, AbstractSingletonThreadSafe, get_translation
 
-from file_conversor.utils.validators import check_file_format
-
 _ = get_translation()
 LOG = Log.get_instance()
 CONFIG = Configuration.get()

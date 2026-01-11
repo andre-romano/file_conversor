@@ -1,6 +1,7 @@
 # src\file_conversor\utils\validators.py
 
 import math
+import os
 import sys
 import typer
 
@@ -119,29 +120,32 @@ def check_video_resolution(data: str | None) -> str | None:
     return data
 
 
-def check_path_exists(data: str | Path | None, exists: bool = True):
+def check_path_exists(data: str | Path | None, exists: bool = True) -> Path | None:
     if not data:
-        return data
-    path = Path(data)
-    if exists and not path.exists():
-        raise typer.BadParameter(f"{_("File")} '{path}' {_("not found")}")
-    if not exists and path.exists():
-        raise typer.BadParameter(f"{_("File")} '{path}' {_("exists")}")
+        return None
+    data = Path(os.path.expandvars(data))
+    if exists and not data.exists():
+        raise typer.BadParameter(f"{_("File")} '{data}' {_("not found")}")
+    if not exists and data.exists():
+        raise typer.BadParameter(f"{_("File")} '{data}' {_("exists")}")
     return data
 
 
-def check_file_exists(data: str | Path | None):
-    check_path_exists(data)
-    if data and not Path(data).is_file():
+def check_file_exists(data: str | Path | None) -> Path | None:
+    data = check_path_exists(data)
+    if data and not data.is_file():
         raise typer.BadParameter(f"{_("Path")} '{data}' {_("is not a file")}")
     return data
 
 
-def check_dir_exists(data: str | Path | None, mkdir: bool = False):
-    if data and mkdir:
-        Path(data).mkdir(parents=True, exist_ok=True)
+def check_dir_exists(data: str | Path | None, mkdir: bool = False) -> Path | None:
+    if not data:
+        return None
+    data = Path(os.path.expandvars(data))
+    if mkdir:
+        data.mkdir(parents=True, exist_ok=True)
     check_path_exists(data)
-    if data and not Path(data).is_dir():
+    if not data.is_dir():
         raise typer.BadParameter(f"{_("Path")} '{data}' {_("is not a directory")}")
     return data
 

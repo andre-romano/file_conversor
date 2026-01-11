@@ -15,8 +15,6 @@ from file_conversor.config import Environment, Log, get_translation
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
-from file_conversor.utils.validators import check_file_format
-
 _ = get_translation()
 LOG = Log.get_instance()
 
