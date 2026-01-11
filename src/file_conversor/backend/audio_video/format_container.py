@@ -98,11 +98,11 @@ class FormatContainer(AbstractRegisterManager):
 
 
 class VideoFormatContainer(FormatContainer):
-    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
+    _REGISTERED: dict[str, AbstractRegisterManager.ConstructorDataModel] = {}
 
 
 class AudioFormatContainer(FormatContainer):
-    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
+    _REGISTERED: dict[str, AbstractRegisterManager.ConstructorDataModel] = {}
 
 
 # AUDIO CONTAINERS

@@ -2,7 +2,7 @@
 
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Iterable, Self
+from typing import Any, Callable, Iterable, Protocol, Self
 
 # user-provided imports
 from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
@@ -18,9 +18,22 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class _FFmpegCodec(AbstractRegisterManager):
+class SetBitrateProtocol(Protocol):
+    def set_bitrate(self, bitrate: int):
+        """Set bitrate for the codec."""
+        ...
+
+
+class SetFiltersProtocol(Protocol):
+
+    def set_filters(self, *filters: FFmpegFilter):
+        """Set filters for the codec."""
+        ...
+
+
+class _FFmpegCodec(AbstractRegisterManager, SetBitrateProtocol, SetFiltersProtocol):
     @classmethod
-    def get_available_codecs(cls) -> dict[str, Any]:
+    def get_available_codecs(cls):
         return cls.get_registered()
 
     def __init__(
@@ -76,12 +89,6 @@ class _FFmpegCodec(AbstractRegisterManager):
         if option in self._options:
             del self._options[option]
 
-    def set_bitrate(self, bitrate: int):
-        raise NotImplementedError("not implemented")
-
-    def set_filters(self, *filters: FFmpegFilter):
-        raise NotImplementedError("not implemented")
-
     def get_options(self) -> list[str]:
         res = [self._prefix, self._name]
         if not self._name or self._name.lower() == "null":
@@ -97,7 +104,7 @@ class _FFmpegCodec(AbstractRegisterManager):
 
 
 class FFmpegAudioCodec(_FFmpegCodec):
-    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
+    _REGISTERED: dict[str, AbstractRegisterManager.ConstructorDataModel] = {}
 
     def __init__(
         self,
@@ -118,7 +125,7 @@ class FFmpegAudioCodec(_FFmpegCodec):
 
 
 class FFmpegVideoCodec(_FFmpegCodec):
-    _REGISTERED: dict[str, tuple[tuple, dict[str, Any]]] = {}
+    _REGISTERED: dict[str, AbstractRegisterManager.ConstructorDataModel] = {}
 
     def __init__(
         self,

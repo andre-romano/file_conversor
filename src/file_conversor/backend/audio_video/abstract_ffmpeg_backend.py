@@ -1,8 +1,8 @@
 # src\file_conversor\backend\audio_video\abstract_ffmpeg_backend.py
 
+from typing import Any, Iterable
 
 # user-provided imports
-from typing import Any, Iterable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 from file_conversor.backend.audio_video.format_container import AbstractRegisterManager, AudioFormatContainer, VideoFormatContainer
