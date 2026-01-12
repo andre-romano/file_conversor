@@ -1,43 +1,18 @@
 
 # src\file_conversor\__main__.py
 
-import subprocess
-import sys
-
 # user provided imports
-from file_conversor.cli import Environment, app_cmd, STATE, CONFIG, LOG, logger, _
-from file_conversor.config import add_cleanup_task
-from file_conversor.system import reload_user_path
+from file_conversor.cli import Environment, app_cmd
+from file_conversor_core.main import start_app
 
 
-def cleanup():
-    """Cleanup function to be called on exit."""
-    logger.debug(f"{_('Shutting down log system')} ...")
-    LOG.shutdown()
+def _start_app() -> None:
+    app_cmd(prog_name=Environment.get_app_name())
 
 
 # Entry point of the app
 def main() -> None:
-    try:
-        # Register cleanup for normal exits
-        add_cleanup_task(cleanup)
-
-        # begin app
-        reload_user_path()
-        app_cmd(prog_name=Environment.get_app_name())
-        sys.exit(0)
-    except Exception as e:
-        debug_mode = STATE.loglevel.level.is_debug()
-        error_type = str(type(e))
-        error_type = error_type.split("'")[1]
-        logger.error(f"{error_type} ({e})", exc_info=True if debug_mode else None)
-        if isinstance(e, subprocess.CalledProcessError):
-            logger.error(f"CMD: {e.cmd} ({e.returncode})")
-            logger.error(f"STDERR: {e.stderr}")
-            logger.error(f"STDOUT: {e.stdout}")
-        if debug_mode:
-            raise
-        sys.exit(1)
+    start_app(_start_app)
 
 
 # Start the application
