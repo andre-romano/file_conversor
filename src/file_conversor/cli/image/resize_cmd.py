@@ -61,7 +61,7 @@ def execute_image_resize_cmd(
     input_files: List[Path],
     scale: float | None,
     width: int | None,
-    resampling: str,
+    resampling: PillowBackend.ResamplingOption,
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -76,7 +76,7 @@ def execute_image_resize_cmd(
             output_file=output_file,
             scale=scale,
             width=width,
-            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+            resampling=resampling,
         )
         progress_callback(progress_mgr.complete_step())
 
@@ -121,10 +121,9 @@ def resize(
                                               callback=lambda x: check_positive_integer(x),
                                               )] = None,
 
-    resampling: Annotated[str, typer.Option("--resampling", "-r",
-                                            help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG.image_resampling}.',
-                                            callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
-                                            )] = CONFIG.image_resampling,
+    resampling: Annotated[PillowBackend.ResamplingOption, typer.Option("--resampling", "-r",
+                                                                       help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in PillowBackend.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}.',
+                                                                       )] = PillowBackend.ResamplingOption(CONFIG.image_resampling),
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_image_resize_cmd(

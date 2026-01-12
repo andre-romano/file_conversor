@@ -4,18 +4,18 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-from enum import Enum
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from PIL.ExifTags import TAGS
 
 from pathlib import Path
+from enum import Enum
+from typing import Any, Iterable
 
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.formatters import normalize_degree
-from file_conversor.utils.validators import is_close
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 
@@ -30,42 +30,79 @@ class PillowBackend(AbstractBackend):
     A class that provides an interface for handling image files using ``pillow``.
     """
     class AntialiasAlgorithm(Enum):
-        MEDIAN = ImageFilter.MedianFilter
-        MODE = ImageFilter.ModeFilter
+        MEDIAN = "median"
+        MODE = "mode"
 
-        @classmethod
-        def from_str(cls, name: str):
-            name = name.lower()
-            return cls.get_dict()[name]
+        def get(self):
+            if self == PillowBackend.AntialiasAlgorithm.MEDIAN:
+                return ImageFilter.MedianFilter
+            elif self == PillowBackend.AntialiasAlgorithm.MODE:
+                return ImageFilter.ModeFilter
+            else:
+                raise ValueError(f"Invalid AntialiasAlgorithm: {self}")
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "median": cls.MEDIAN,
-                "mode": cls.MODE,
-            }
+    class PillowFilter(Enum):
+        BLUR = "blur"
+        SMOOTH = "smooth"
+        SMOOTH_MORE = "smooth_more"
+        SHARPEN = "sharpen"
+        SHARPEN_MORE = "sharpen_more"
+        EDGE_ENHANCE = "edge_enhance"
+        EDGE_ENHANCE_MORE = "edge_enhance_more"
+        EMBOSS = "emboss"
+        EMBOSS_EDGE = "emboss_edge"
 
-    PILLOW_FILTERS: dict[str, type[ImageFilter.BuiltinFilter]] = {
-        "blur": ImageFilter.BLUR,
-        "smooth": ImageFilter.SMOOTH,
-        "smooth_more": ImageFilter.SMOOTH_MORE,
-        "sharpen": ImageFilter.DETAIL,
-        "sharpen_more": ImageFilter.SHARPEN,
-        "edge_enhance": ImageFilter.EDGE_ENHANCE,
-        "edge_enhance_more": ImageFilter.EDGE_ENHANCE_MORE,
-        "emboss": ImageFilter.EMBOSS,
-        "emboss_edge": ImageFilter.CONTOUR,
-    }
+        def get(self):
+            if self == PillowBackend.PillowFilter.BLUR:
+                return ImageFilter.BLUR
+
+            elif self == PillowBackend.PillowFilter.SMOOTH:
+                return ImageFilter.SMOOTH
+
+            elif self == PillowBackend.PillowFilter.SMOOTH_MORE:
+                return ImageFilter.SMOOTH_MORE
+
+            elif self == PillowBackend.PillowFilter.SHARPEN:
+                return ImageFilter.DETAIL
+
+            elif self == PillowBackend.PillowFilter.SHARPEN_MORE:
+                return ImageFilter.SHARPEN
+
+            elif self == PillowBackend.PillowFilter.EDGE_ENHANCE:
+                return ImageFilter.EDGE_ENHANCE
+
+            elif self == PillowBackend.PillowFilter.EDGE_ENHANCE_MORE:
+                return ImageFilter.EDGE_ENHANCE_MORE
+
+            elif self == PillowBackend.PillowFilter.EMBOSS:
+                return ImageFilter.EMBOSS
+
+            elif self == PillowBackend.PillowFilter.EMBOSS_EDGE:
+                return ImageFilter.CONTOUR
+
+            else:
+                raise ValueError(f"Invalid PillowFilter: {self}")
 
     Exif = Image.Exif
     Exif_TAGS = TAGS
 
-    RESAMPLING_OPTIONS = {
-        "bicubic": Image.Resampling.BICUBIC,
-        "bilinear": Image.Resampling.BILINEAR,
-        "lanczos": Image.Resampling.LANCZOS,
-        "nearest": Image.Resampling.NEAREST,
-    }
+    class ResamplingOption(Enum):
+        BICUBIC = "bicubic"
+        BILINEAR = "bilinear"
+        LANCZOS = "lanczos"
+        NEAREST = "nearest"
+
+        def get(self):
+            if self == PillowBackend.ResamplingOption.BICUBIC:
+                return Image.Resampling.BICUBIC
+            elif self == PillowBackend.ResamplingOption.BILINEAR:
+                return Image.Resampling.BILINEAR
+            elif self == PillowBackend.ResamplingOption.LANCZOS:
+                return Image.Resampling.LANCZOS
+            elif self == PillowBackend.ResamplingOption.NEAREST:
+                return Image.Resampling.NEAREST
+            else:
+                raise ValueError(f"Invalid ResamplingOption: {self}")
 
     SUPPORTED_IN_FORMATS = {
         "bmp": {},
@@ -121,7 +158,7 @@ class PillowBackend(AbstractBackend):
                input_file: str | Path,
                width: int | None,
                scale: float | None = None,
-               resampling: Image.Resampling = Image.Resampling.BICUBIC,
+               resampling: ResamplingOption = ResamplingOption.BICUBIC,
                ):
         """
         Resize input file.
@@ -136,12 +173,6 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         with self._open(input_file) as img:
             if scale:
                 if scale <= 0:
@@ -155,14 +186,11 @@ class PillowBackend(AbstractBackend):
 
             img = img.resize(
                 size=(width, height),
-                resample=resampling
+                resample=resampling.get()
             )
             self._save(
                 img,
                 output_file,
-                file_format=file_format,
-                quality=90,
-                optimize=True,
             )
 
     def convert(
@@ -187,21 +215,12 @@ class PillowBackend(AbstractBackend):
         if quality < 1 or quality > 100:
             raise ValueError(f"{_('Invalid quality level. Valid values are')} 1-100.")
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         self._save(
             img,
             output_file,
-            file_format=file_format,
             quality=quality,
             optimize=optimize,
-            lossless=True if is_close(quality, 100) else False,  # valid only for WEBP
         )
 
     def rotate(
@@ -209,7 +228,7 @@ class PillowBackend(AbstractBackend):
         output_file: str | Path,
         input_file: str | Path,
         rotate: int,
-        resampling: Image.Resampling = Image.Resampling.BICUBIC,
+        resampling: ResamplingOption = ResamplingOption.BICUBIC,
     ):
         """
         Rotate input file by X degrees (clockwise).
@@ -226,21 +245,11 @@ class PillowBackend(AbstractBackend):
         # parse rotation argument
         rotate = normalize_degree(rotate)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
-        img = img.rotate(-rotate, resample=resampling, expand=True)  # clockwise rotation
+        img = img.rotate(-rotate, resample=resampling.get(), expand=True)  # clockwise rotation
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def mirror(self, output_file: str | Path, input_file: str | Path, x_y: bool):
@@ -255,12 +264,6 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         if x_y:
             img = ImageOps.mirror(img)
@@ -269,9 +272,6 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def blur(
@@ -291,13 +291,6 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         img = img.filter(
             ImageFilter.GaussianBlur(radius=blur_pixels)
@@ -305,9 +298,6 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def unsharp_mask(
@@ -332,12 +322,6 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         img = img.filter(ImageFilter.UnsharpMask(
             radius=radius,
@@ -347,9 +331,6 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def antialias(
@@ -372,20 +353,14 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
-        img = img.filter(algorithm.value(radius))
+
+        filter_algo = algorithm.get()
+        img = img.filter(filter_algo(radius))
+
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def enhance(
@@ -412,12 +387,6 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         img = ImageEnhance.Color(img).enhance(color_factor)
         img = ImageEnhance.Contrast(img).enhance(contrast_factor)
@@ -426,16 +395,13 @@ class PillowBackend(AbstractBackend):
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def filter(
         self,
         output_file: str | Path,
         input_file: str | Path,
-        filters: list[ImageFilter.BuiltinFilter] | list[str],
+        filters: Iterable[PillowFilter],
     ):
         """
         Enhances an input image file.
@@ -470,23 +436,12 @@ class PillowBackend(AbstractBackend):
         """
         self.check_file_exists(input_file)
 
-        output_file = Path(output_file).resolve()
-        output_file = output_file.with_suffix(output_file.suffix.lower())
-
-        out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-
         img = self._open(input_file)
         for filter in filters:
-            if isinstance(filter, str):
-                img_filter = self.PILLOW_FILTERS[filter]
-            img = img.filter(img_filter)
+            img = img.filter(filter.get())
         self._save(
             img,
             output_file,
-            file_format=file_format,
-            quality=90,
-            optimize=True,
         )
 
     def _open(self, input_file: Path | str):
@@ -496,20 +451,38 @@ class PillowBackend(AbstractBackend):
             img = img.convert("RGBA")
         return img
 
-    def _save(self, img: Image.Image, output_file: str | Path, file_format: str, **params):
+    def _save(
+        self,
+        img: Image.Image,
+        output_file: str | Path,
+        quality: int = 90,
+        optimize: bool = True,
+    ):
         """
         Corrects common errors in images and saves them.
 
         :param img: Image to be corrected.
-        :param output_file: File to save img.
-        :param format: Target format to save img.
-        :param params: Additional parameters for saving the image, such as quality and optimize.
+        :param output_file: File to save img.        
+        :param quality: Quality of the saved image (if applicable).
+        :param optimize: Whether to optimize the saved image (if applicable).
 
         :raises Exception: if image correction fails.
         """
-        try:
-            file_format = file_format.upper()  # ensure uppercase format
+        output_file = Path(output_file).resolve()
+        output_file = output_file.with_suffix(output_file.suffix.lower())
 
+        out_ext = output_file.suffix[1:]
+        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
+        file_format = file_format.upper()  # ensure uppercase format
+
+        # save parameters
+        params: dict[str, Any] = {
+            "quality": quality,
+            "optimize": optimize,
+            "lossless": True if quality == 100 else False,  # valid only for WEBP
+        }
+
+        try:
             # 0. Preserve EXIF and ICC if they exist
             if "exif" in img.info and img.info["exif"]:
                 params.setdefault("exif", img.info["exif"])
@@ -519,10 +492,13 @@ class PillowBackend(AbstractBackend):
             # 2. Convert incompatible modes to the target format
             if file_format in ("JPEG",) and img.mode not in ("RGB", "L"):
                 img = img.convert("RGB")
+
             elif file_format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):
                 img = img.convert("RGBA")
+
             elif file_format == "TIFF" and img.mode not in ("RGB", "RGBA", "L"):
                 img = img.convert("RGB")
+
             elif file_format == "BMP" and img.mode not in ("RGB",):
                 img = img.convert("RGB")
         except Exception as e:
@@ -530,7 +506,11 @@ class PillowBackend(AbstractBackend):
             raise
 
         # save image
-        img.save(output_file, format=file_format, **params)
+        img.save(
+            output_file,
+            format=file_format,
+            **params,
+        )
 
 
 __all__ = [

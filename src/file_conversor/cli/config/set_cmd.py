@@ -99,20 +99,17 @@ def set(
                                            help=_("Image quality in dots per inch (DPI) (for ``image to_pdf`` command). Valid values are between 40-3600."),
                                            min=40, max=3600,
                                            )] = CONFIG.image_dpi,
-    image_fit: Annotated[str, typer.Option("--image-fit", "-if",
-                                           help=f'{_("Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}',
-                                           callback=lambda x: check_valid_options(x.lower(), ['into', 'fill']),
-                                           )] = CONFIG.image_fit,
+    image_fit: Annotated[Img2PDFBackend.FitMode, typer.Option("--image-fit", "-if",
+                                                              help=f'{_("Image fit (for ``image to_pdf`` command). Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(mode.value for mode in Img2PDFBackend.FitMode)}.',
+                                                              )] = Img2PDFBackend.FitMode(CONFIG.image_fit),
 
-    image_page_size: Annotated[str | None, typer.Option("--image-page-size", "-ip",
-                                                        help=f'{_("Page size (for ``image to_pdf`` command). Format (width, height). Other valid values are:")} {", ".join(Img2PDFBackend.PAGE_LAYOUT)}',
-                                                        callback=lambda x: check_valid_options(x.lower() if x else None, Img2PDFBackend.PAGE_LAYOUT),
-                                                        )] = CONFIG.image_page_size,
+    image_page_size: Annotated[Img2PDFBackend.PageLayout | None, typer.Option("--image-page-size", "-ip",
+                                                                              help=f'{_("Page size (for ``image to_pdf`` command). Valid values are: ")} {", ".join(mode.value for mode in Img2PDFBackend.PageLayout)}',
+                                                                              )] = Img2PDFBackend.PageLayout(CONFIG.image_page_size) if CONFIG.image_page_size else None,
 
-    image_resampling: Annotated[str, typer.Option("--image-resampling", "-ir",
-                                                  help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG.image_resampling}',
-                                                  callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
-                                                  )] = CONFIG.image_resampling,
+    image_resampling: Annotated[PillowBackend.ResamplingOption, typer.Option("--image-resampling", "-ir",
+                                                                             help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in PillowBackend.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}',
+                                                                             )] = PillowBackend.ResamplingOption(CONFIG.image_resampling),
 
     pdf_compression: Annotated[str, typer.Option("--pdf-compression", "-pc",
                                                  help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG.pdf_compression}.",
@@ -142,9 +139,9 @@ def set(
     CONFIG.video_quality = video_quality
     CONFIG.image_quality = image_quality
     CONFIG.image_dpi = image_dpi
-    CONFIG.image_fit = image_fit
-    CONFIG.image_page_size = image_page_size
-    CONFIG.image_resampling = image_resampling
+    CONFIG.image_fit = image_fit.value
+    CONFIG.image_page_size = image_page_size.value if image_page_size else None
+    CONFIG.image_resampling = image_resampling.value
     CONFIG.pdf_compression = pdf_compression
     CONFIG.gui_zoom = gui_zoom
     CONFIG.gui_output_dir = str(gui_output_dir.resolve())

@@ -1,7 +1,9 @@
 # src\file_conversor\backend\compress_backend.py
 
 from pathlib import Path
+
 from typing import Any
+from pydantic import BaseModel
 
 # user-provided imports
 from file_conversor.config import Log
@@ -21,22 +23,20 @@ logger = LOG.getLogger(__name__)
 
 class CompressBackend(AbstractBackend):
     """
-    Provides an interface for handling files using mozjpeg.
+    Provides an interface for handling image file compression using multiple backends.
     """
 
-    SUPPORTED_IN_FORMATS: dict[str, dict[str, type]] = {
-        "gif": {
-            "cls": _GifSicleBackend
-        },
-        "jpg": {
-            "cls": _MozJPEGBackend
-        },
-        "jpeg": {
-            "cls": _MozJPEGBackend
-        },
-        "png": {
-            "cls": _OxiPNGBackend
-        },
+    class CompressBackendDataModel(BaseModel):
+        """ Data model to select CompressBackends. """
+        cls: type[_GifSicleBackend | _MozJPEGBackend | _OxiPNGBackend]
+
+    SUPPORTED_IN_FORMATS: dict[str, CompressBackendDataModel] = {
+        "gif": CompressBackendDataModel(cls=_GifSicleBackend),
+
+        "jpg": CompressBackendDataModel(cls=_MozJPEGBackend),
+        "jpeg": CompressBackendDataModel(cls=_MozJPEGBackend),
+
+        "png": CompressBackendDataModel(cls=_OxiPNGBackend),
     }
     SUPPORTED_OUT_FORMATS = SUPPORTED_IN_FORMATS
     EXTERNAL_DEPENDENCIES = {
@@ -60,9 +60,8 @@ class CompressBackend(AbstractBackend):
         """
         super().__init__()
         # get required dependencies
-        for opts in CompressBackend.SUPPORTED_IN_FORMATS.values():
-            cls = opts["cls"]
-            cls(
+        for backend in CompressBackend.SUPPORTED_IN_FORMATS.values():
+            backend.cls(
                 install_deps=install_deps,
                 verbose=verbose,
             )
@@ -71,9 +70,9 @@ class CompressBackend(AbstractBackend):
 
     def compress(
         self,
-            input_file: str | Path,
-            output_file: str | Path,
-            **kwargs,
+        input_file: str | Path,
+        output_file: str | Path,
+        **kwargs,
     ):
         """
         Execute the command to compress the input file.
@@ -92,10 +91,9 @@ class CompressBackend(AbstractBackend):
 
         out_ext = output_file.suffix[1:]
 
-        out_opts = CompressBackend.SUPPORTED_OUT_FORMATS[out_ext]
-        BACKEND_CLASS = out_opts["cls"]
+        backend_datamodel = CompressBackend.SUPPORTED_OUT_FORMATS[out_ext]
 
-        backend = BACKEND_CLASS(
+        backend = backend_datamodel.cls(
             install_deps=self._install_deps,
             verbose=self._verbose,
         )

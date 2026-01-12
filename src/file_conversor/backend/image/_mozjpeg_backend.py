@@ -9,13 +9,14 @@ import subprocess
 from pathlib import Path
 
 # user-provided imports
+from file_conversor.backend.abstract_backend import AbstractBackend
+
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.utils.validators import check_file_format
 
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
-from file_conversor.backend.abstract_backend import AbstractBackend
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -70,10 +71,10 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
 
     def compress(
         self,
-            input_file: str | Path,
-            output_file: str | Path,
-            quality: int,
-            **kwargs,
+        input_file: str | Path,
+        output_file: str | Path,
+        quality: int,
+        **kwargs,
     ):
         """
         Execute the command to compress the input file.

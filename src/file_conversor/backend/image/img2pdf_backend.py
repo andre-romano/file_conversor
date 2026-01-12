@@ -8,7 +8,9 @@ import img2pdf
 
 from pathlib import Path
 from datetime import datetime
+
 from typing import Any, Iterable
+from enum import Enum
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -19,15 +21,64 @@ class Img2PDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``img2pdf``.
     """
 
-    FIT_MODES = {
-        'into': img2pdf.FitMode.into,
-        'fill': img2pdf.FitMode.fill,
-    }
+    class FitMode(Enum):
+        INTO = "into"
+        FILL = "fill"
 
-    PAGE_LAYOUT = {
-        'a4': (21.00, 29.70),  # A4 in cm
-        'a4_landscape': (29.70, 21.00),
-    }
+        def get(self) -> img2pdf.FitMode:
+            if self == Img2PDFBackend.FitMode.INTO:
+                return img2pdf.FitMode.into
+            elif self == Img2PDFBackend.FitMode.FILL:
+                return img2pdf.FitMode.fill
+            else:
+                raise ValueError(f"Invalid FitMode: {self}")
+
+    class PageLayout(Enum):
+        A0 = "a0"
+        A0_LANDSCAPE = "a0-landscape"
+
+        A1 = "a1"
+        A1_LANDSCAPE = "a1-landscape"
+
+        A2 = "a2"
+        A2_LANDSCAPE = "a2-landscape"
+
+        A3 = "a3"
+        A3_LANDSCAPE = "a3-landscape"
+
+        A4 = "a4"
+        A4_LANDSCAPE = "a4-landscape"
+
+        LETTER = "letter"
+        LETTER_LANDSCAPE = "letter-landscape"
+
+        def get(self) -> tuple[float, float]:
+            if self == Img2PDFBackend.PageLayout.A0:
+                return (84.10, 118.90)  # A0 in cm
+            elif self == Img2PDFBackend.PageLayout.A0_LANDSCAPE:
+                return (118.90, 84.10)  # A0 Landscape in cm
+            elif self == Img2PDFBackend.PageLayout.A1:
+                return (59.40, 84.10)  # A1 in cm
+            elif self == Img2PDFBackend.PageLayout.A1_LANDSCAPE:
+                return (84.10, 59.40)  # A1 Landscape in cm
+            elif self == Img2PDFBackend.PageLayout.A2:
+                return (42.00, 59.40)  # A2 in cm
+            elif self == Img2PDFBackend.PageLayout.A2_LANDSCAPE:
+                return (59.40, 42.00)  # A2 Landscape in cm
+            elif self == Img2PDFBackend.PageLayout.A3:
+                return (29.70, 42.00)  # A3 in cm
+            elif self == Img2PDFBackend.PageLayout.A3_LANDSCAPE:
+                return (42.00, 29.70)  # A3 Landscape in cm
+            elif self == Img2PDFBackend.PageLayout.A4:
+                return (21.00, 29.70)  # A4 in cm
+            elif self == Img2PDFBackend.PageLayout.A4_LANDSCAPE:
+                return (29.70, 21.00)  # A4 Landscape in cm
+            elif self == Img2PDFBackend.PageLayout.LETTER:
+                return (21.59, 27.94)  # Letter in cm
+            elif self == Img2PDFBackend.PageLayout.LETTER_LANDSCAPE:
+                return (27.94, 21.59)  # Letter Landscape in cm
+            else:
+                raise ValueError(f"Invalid PageLayout: {self}")
 
     SUPPORTED_IN_FORMATS = {
         "jpeg": {},
@@ -58,8 +109,8 @@ class Img2PDFBackend(AbstractBackend):
     def to_pdf(self,
                output_file: str | Path,
                input_files: Iterable[str | Path],
-               image_fit: img2pdf.FitMode = FIT_MODES['into'],
-               page_size: tuple[float, float] | None = None,
+               image_fit: FitMode = FitMode.INTO,
+               page_size: tuple[float, float] | PageLayout | None = None,
                dpi: int = 200,
                include_metadata: bool = True
                ):
@@ -67,8 +118,8 @@ class Img2PDFBackend(AbstractBackend):
         Convert input image files into one PDF output file.
 
         image_fit = 
-        - FIT_INTO: resize image to fit in page (keep proportions, DO NOT cut image)
-        - FIT_FILL: resize image to page - no borders allowed (keep proportions, CUT image if necessary)
+        - into: resize image to fit in page (keep proportions, DO NOT cut image)
+        - fill: resize image to page - no borders allowed (keep proportions, CUT image if necessary)
 
         dpi = 
         -  96 = low quality, for screen.
@@ -106,9 +157,14 @@ class Img2PDFBackend(AbstractBackend):
 
         # page layout
         if page_size:
+            page_sz: tuple[float, float]
+            if isinstance(page_size, tuple):
+                page_sz = page_size
+            else:
+                page_sz = page_size.get()
             opts['layout_fun'] = img2pdf.get_layout_fun(
-                pagesize=tuple(img2pdf.cm_to_pt(x) for x in page_size),
-                fit=image_fit,
+                pagesize=tuple(img2pdf.cm_to_pt(x) for x in page_sz),
+                fit=image_fit.get(),
             )
 
         buffer = img2pdf.convert(*input_files, **opts)

@@ -14,7 +14,7 @@ _ = get_translation()
 
 
 def InputFilesArgument(backend_or_iterable: type | dict | list | None = None):
-    list_formats: list[str] | dict[str, Any]
+    list_formats: Iterable[str]
     if not backend_or_iterable:
         list_formats = ["*"]
     elif isinstance(backend_or_iterable, (dict, list)):

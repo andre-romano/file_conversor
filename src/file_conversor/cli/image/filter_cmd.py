@@ -55,7 +55,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 def execute_image_filter_cmd(
     input_files: List[Path],
-    filters: List[str],
+    filters: List[PillowBackend.PillowFilter],
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -94,10 +94,9 @@ def execute_image_filter_cmd(
 def filter(
     input_files: Annotated[List[str], InputFilesArgument(PillowBackend)],
 
-    filters: Annotated[List[str], typer.Option("--filter", "-f",
-                                               help=f'{_("Filter to apply. Available filters:")} {", ".join(PillowBackend.PILLOW_FILTERS)}',
-                                               callback=lambda x: [check_valid_options(opt, PillowBackend.PILLOW_FILTERS) for opt in x],
-                                               )],
+    filters: Annotated[List[PillowBackend.PillowFilter], typer.Option("--filter", "-f",
+                                                                      help=f'{_("Filter to apply. Available filters:")} {", ".join(mode.value for mode in PillowBackend.PillowFilter)}',
+                                                                      )],
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

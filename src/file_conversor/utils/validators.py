@@ -177,7 +177,7 @@ def check_positive_integer(num: int | float | None, allow_zero: bool = False):
     return num
 
 
-def check_file_format(filename_or_iter: list | dict | set | str | Path | None, format_dict: dict | list, exists: bool = False):
+def check_file_format(filename_or_iter: list | dict | set | str | Path | None, format_dict: Iterable[str], exists: bool = False):
     """
     Checks if the provided format is supported.
 

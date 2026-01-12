@@ -56,7 +56,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def execute_image_antialias_cmd(
     input_files: List[Path],
     radius: int,
-    algorithm: str,
+    algorithm: PillowBackend.AntialiasAlgorithm,
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -68,7 +68,7 @@ def execute_image_antialias_cmd(
             input_file=input_file,
             output_file=output_file,
             radius=radius,
-            algorithm=PillowBackend.AntialiasAlgorithm.from_str(algorithm),
+            algorithm=algorithm,
         )
         progress_callback(progress_mgr.complete_step())
 
@@ -96,10 +96,9 @@ def antialias(
 
     radius: Annotated[int, RadiusOption()] = 3,
 
-    algorithm: Annotated[str, typer.Option("--algorithm", "-a",
-                                           help=f'{_("Algorithm to use. Available algorihtms:")} {", ".join(PillowBackend.AntialiasAlgorithm.get_dict())}.',
-                                           callback=lambda x: check_valid_options(x, PillowBackend.AntialiasAlgorithm.get_dict()),
-                                           )] = "median",
+    algorithm: Annotated[PillowBackend.AntialiasAlgorithm, typer.Option("--algorithm", "-a",
+                                                                        help=f'{_("Algorithm to use. Available algorihtms:")} {", ".join(mode.value for mode in PillowBackend.AntialiasAlgorithm)}.',
+                                                                        )] = PillowBackend.AntialiasAlgorithm.MEDIAN,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

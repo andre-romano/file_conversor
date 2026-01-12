@@ -65,7 +65,7 @@ ctx_menu.register_callback(register_ctx_menu)
 def execute_image_rotate_cmd(
     input_files: List[Path],
     rotation: int,
-    resampling: str,
+    resampling: PillowBackend.ResamplingOption,
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -77,7 +77,7 @@ def execute_image_rotate_cmd(
             input_file=input_file,
             output_file=output_file,
             rotate=rotation,
-            resampling=PillowBackend.RESAMPLING_OPTIONS[resampling],
+            resampling=resampling,
         )
         progress_callback(progress_mgr.complete_step())
 
@@ -109,10 +109,9 @@ def rotate(
                                           min=-360, max=360,
                                           )],
 
-    resampling: Annotated[str, typer.Option("--resampling", "-re",
-                                            help=f'{_("Resampling algorithm. Valid values are")} {", ".join(PillowBackend.RESAMPLING_OPTIONS)}. {_("Defaults to")} {CONFIG.image_resampling}.',
-                                            callback=lambda x: check_valid_options(x, PillowBackend.RESAMPLING_OPTIONS),
-                                            )] = CONFIG.image_resampling,
+    resampling: Annotated[PillowBackend.ResamplingOption, typer.Option("--resampling", "-re",
+                                                                       help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in PillowBackend.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}.',
+                                                                       )] = PillowBackend.ResamplingOption(CONFIG.image_resampling),
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

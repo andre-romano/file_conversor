@@ -58,8 +58,8 @@ ctx_menu.register_callback(register_ctx_menu)
 def execute_image_to_pdf_cmd(
     input_files: List[Path],
     dpi: int,
-    fit: str,
-    page_size: str | None,
+    fit: Img2PDFBackend.FitMode,
+    page_size: Img2PDFBackend.PageLayout | None,
     set_metadata: bool,
     output_file: Path | None,
     progress_callback: Callable[[float], Any] = lambda p: p,
@@ -71,17 +71,13 @@ def execute_image_to_pdf_cmd(
     img2pdf_backend = Img2PDFBackend(verbose=STATE.loglevel.get().is_verbose())
     # display current progress
     with ProgressManager() as progress_mgr:
-        page_sz: tuple | None = None
-        if page_size in Img2PDFBackend.PAGE_LAYOUT:
-            page_sz = Img2PDFBackend.PAGE_LAYOUT[page_size]
-        elif page_size:
-            page_sz = tuple(page_size)
+        page_sz = page_size.get() if page_size else None
 
         img2pdf_backend.to_pdf(
             input_files=input_files,
             output_file=output_file,
             dpi=dpi,
-            image_fit=Img2PDFBackend.FIT_MODES[fit],
+            image_fit=fit,
             page_size=page_sz,
             include_metadata=set_metadata,
         )
@@ -109,20 +105,16 @@ def execute_image_to_pdf_cmd(
         - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf`
 
         - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file.jpg -of output_file.pdf -ps a4_landscape`
-
-        - `file_conversor {COMMAND_NAME} {TO_PDF_NAME} input_file1.bmp input_file2.png -of output_file.pdf --page-size (21.00,29.70)`
     """)
 def to_pdf(
     input_files: Annotated[List[Path], InputFilesArgument(Img2PDFBackend)],
     dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
-    fit: Annotated[str, typer.Option("--fit", "-f",
-                                     help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(Img2PDFBackend.FIT_MODES)}. {_("Defaults to")} {CONFIG.image_fit}",
-                                     callback=lambda x: check_valid_options(x.lower(), Img2PDFBackend.FIT_MODES),
-                                     )] = CONFIG.image_fit,
-    page_size: Annotated[str | None, typer.Option("--page-size", "-ps",
-                                                  help=f"{_("Page size. Format '(width, height)'. Other valid values are:")} {", ".join(Img2PDFBackend.PAGE_LAYOUT)}. {_("Defaults to None (PDF size = image size).")}",
-                                                  callback=lambda x: check_valid_options(x.lower() if x else None, Img2PDFBackend.PAGE_LAYOUT),
-                                                  )] = CONFIG.image_page_size,
+    fit: Annotated[Img2PDFBackend.FitMode, typer.Option("--fit", "-f",
+                                                        help=f"{_("Image fit. Valid only if ``--page-size`` is defined. Valid values are")} {", ".join(mode.value for mode in Img2PDFBackend.FitMode)}. {_("Defaults to")} {CONFIG.image_fit}",
+                                                        )] = Img2PDFBackend.FitMode(CONFIG.image_fit),
+    page_size: Annotated[Img2PDFBackend.PageLayout | None, typer.Option("--page-size", "-ps",
+                                                                        help=f"{_("Page size. Valid values are:")} {", ".join(mode.value for mode in Img2PDFBackend.PageLayout)}. {_("Defaults to None (PDF size = image size).")}",
+                                                                        )] = Img2PDFBackend.PageLayout(CONFIG.image_page_size) if CONFIG.image_page_size else None,
     set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
                                                help=_("Set PDF metadata. Defaults to False (do not set creator, producer, modification date, etc)."),
                                                callback=check_is_bool_or_none,
