@@ -8,6 +8,7 @@ from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.office.convert_protocol import ConvertProtocol
 
 from file_conversor.system import is_windows
 
@@ -63,7 +64,7 @@ class Win32Com:
         return False
 
 
-class AbstractMSOfficeBackend(AbstractBackend):
+class AbstractMSOfficeBackend(AbstractBackend, ConvertProtocol):
     """
     A class that provides an interface for handling files using ``msoffice``.
     """
@@ -84,21 +85,6 @@ class AbstractMSOfficeBackend(AbstractBackend):
         super().__init__()
         self._verbose = verbose
         self.PROG_ID = prog_id
-
-    def convert(
-        self,
-        files: list[tuple[Path, Path]],
-        file_processed_callback: Callable[[Path], Any] | None = None,
-    ):
-        """
-        Convert input file into an output file.
-
-        :param files: List of tuples containing input and output file paths.    
-
-        :raises FileNotFoundError: if input file not found.
-        :raises OSError: if os is not Windows, or MS Office App not available.
-        """
-        raise NotImplementedError("Must be implemented within a subclass")
 
     def is_available(self) -> bool:
         """Returns True if MS Office App is available, False otherwise"""

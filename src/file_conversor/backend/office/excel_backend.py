@@ -6,6 +6,7 @@ from typing import Any, Callable
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
+
 from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
@@ -55,22 +56,22 @@ class ExcelBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        files: list[tuple[Path, Path]],
+        files: list[AbstractMSOfficeBackend.FilesDataModel],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         """
         Convert input file into an output file.
 
-        :param files: List of tuples containing input and output file paths.
+        :param files: List of FilesDataModel containing input and output file paths.    
 
         :raises FileNotFoundError: if input file not found.
         :raises RuntimeError: if os != Windows.
         """
         with Win32Com(self.PROG_ID, visible=False) as excel:
-            for input_file, output_file in files:
-                input_path = Path(input_file).resolve()
+            for file_data_model in files:
+                input_path = Path(file_data_model.input_file).resolve()
 
-                output_path = Path(output_file).resolve()
+                output_path = Path(file_data_model.output_file).resolve()
                 output_path = output_path.with_suffix(output_path.suffix.lower())
 
                 self.check_file_exists(str(input_path))

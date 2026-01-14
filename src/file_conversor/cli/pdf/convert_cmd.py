@@ -86,7 +86,7 @@ def execute_pdf_convert_cmd(
         files = format_in_out_files_tuple(
             input_files=input_files,
             output_dir=output_dir,
-            format=format,
+            file_format=format,
         )
         logger.info(f"[bold]{_('Converting files')}[/] ...")
         # Perform conversion

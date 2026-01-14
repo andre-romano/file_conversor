@@ -8,6 +8,7 @@ from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.office.convert_protocol import ConvertProtocol
 
 from file_conversor.dependency.brew_pkg_manager import BrewPackageManager
 from file_conversor.dependency.scoop_pkg_manager import ScoopPackageManager
@@ -18,7 +19,7 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class AbstractLibreofficeBackend(AbstractBackend):
+class AbstractLibreofficeBackend(AbstractBackend, ConvertProtocol):
     """
     A class that provides an interface for handling files using ``libreoffice``.
     """
@@ -59,21 +60,21 @@ class AbstractLibreofficeBackend(AbstractBackend):
 
     def convert(
         self,
-        files: list[tuple[Path, Path]],
+        files: list[ConvertProtocol.FilesDataModel],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         """
         Convert input file into an output file.
 
-        :param files: List of tuples containing input and output file paths.
+        :param files: List of FilesDataModel containing input and output file paths.    
 
         :raises FileNotFoundError: if input file not found.
         """
-        for input_file, output_file in files:
-            self.check_file_exists(input_file)
+        for file_data_model in files:
+            self.check_file_exists(file_data_model.input_file)
 
-            input_path = input_file.resolve()
-            output_path = output_file.resolve()
+            input_path = file_data_model.input_file.resolve()
+            output_path = file_data_model.output_file.resolve()
 
             output_dir = output_path.parent
             output_format = output_path.suffix.lstrip(".").lower()

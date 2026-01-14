@@ -63,11 +63,18 @@ def execute_doc_convert_cmd(
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ) -> None:
-    files = format_in_out_files_tuple(
-        input_files=input_files,
-        output_dir=output_dir,
-        format=format,
-    )
+
+    files = [
+        LibreofficeWriterBackend.FilesDataModel(
+            input_file=input,
+            output_file=output,
+        )
+        for input, output in format_in_out_files_tuple(
+            input_files=input_files,
+            output_dir=output_dir,
+            file_format=format,
+        )
+    ]
 
     backend = LibreofficeWriterBackend(
         install_deps=CONFIG.install_deps,

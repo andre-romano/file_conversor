@@ -6,6 +6,7 @@ from typing import Any, Callable
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
+
 from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
@@ -53,14 +54,14 @@ class PowerPointBackend(AbstractMSOfficeBackend):
 
     def convert(
         self,
-        files: list[tuple[Path, Path]],
+        files: list[AbstractMSOfficeBackend.FilesDataModel],
         file_processed_callback: Callable[[Path], Any] | None = None,
     ):
         with Win32Com(self.PROG_ID, visible=None) as powerpoint:
-            for input_file, output_file in files:
-                input_path = input_file.resolve()
+            for file_data_model in files:
+                input_path = Path(file_data_model.input_file).resolve()
 
-                output_path = output_file.resolve()
+                output_path = Path(file_data_model.output_file).resolve()
                 output_path = output_path.with_suffix(output_path.suffix.lower())
 
                 self.check_file_exists(str(input_path))

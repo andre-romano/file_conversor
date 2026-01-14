@@ -222,12 +222,12 @@ class TestUtilsFormatters:
             assert "&lt;traceback&gt;" not in tb_html  # Ensure HTML is properly formatted
 
     def test_format_in_out_files_tuple(self):
-        files = format_in_out_files_tuple(input_files=[Path("input.txt")], format="png", output_dir=Path("/output"))
+        files = format_in_out_files_tuple(input_files=[Path("input.txt")], file_format="png", output_dir=Path("/output"))
         for in_file, out_file in files:
             assert in_file == Path("input.txt")
             assert out_file == Path("/output/input.png")
 
-        files = format_in_out_files_tuple(input_files=[Path("input.jpg"), Path("input2.jpg")], format=".png", output_dir=Path("/output"))
+        files = format_in_out_files_tuple(input_files=[Path("input.jpg"), Path("input2.jpg")], file_format=".png", output_dir=Path("/output"))
         for in_file, out_file in files:
             if in_file == Path("input.jpg"):
                 assert out_file == Path("/output/input.png")

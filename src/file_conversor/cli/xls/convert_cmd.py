@@ -63,11 +63,17 @@ def execute_xls_convert_cmd(
 ) -> None:
     """Execute the convert command."""
 
-    files = format_in_out_files_tuple(
-        input_files=input_files,
-        output_dir=output_dir,
-        format=format,
-    )
+    files = [
+        LibreofficeCalcBackend.FilesDataModel(
+            input_file=input,
+            output_file=output,
+        )
+        for input, output in format_in_out_files_tuple(
+            input_files=input_files,
+            output_dir=output_dir,
+            file_format=format,
+        )
+    ]
 
     backend = LibreofficeCalcBackend(
         install_deps=CONFIG.install_deps,

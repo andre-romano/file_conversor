@@ -293,7 +293,7 @@ def format_traceback_html(exc: Exception, debug: bool = True) -> str:
 
 def format_in_out_files_tuple(
     input_files: list[Path],
-    format: str,
+    file_format: str,
     output_dir: Path,
 ):
     """
@@ -305,14 +305,11 @@ def format_in_out_files_tuple(
 
     :raises FileExistsError: if output file exists and overwrite is disabled.
     """
-    files = [
-        (input_file, output_dir / CommandManager.get_output_file(input_file, suffix=f".{format.lstrip('.')}"))
-        for input_file in input_files
-    ]
-    for input_file, output_file in files:
+    for input_file in input_files:
+        output_file = output_dir / CommandManager.get_output_file(input_file, suffix=f".{file_format.lstrip('.')}")
         if not STATE.overwrite_output.enabled and output_file.exists():
             raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
-    return files
+        yield input_file, output_file
 
 
 __all__ = [
