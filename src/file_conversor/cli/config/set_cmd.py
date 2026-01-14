@@ -111,10 +111,9 @@ def set(
                                                                              help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in PillowBackend.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}',
                                                                              )] = PillowBackend.ResamplingOption(CONFIG.image_resampling),
 
-    pdf_compression: Annotated[str, typer.Option("--pdf-compression", "-pc",
-                                                 help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG.pdf_compression}.",
-                                                 callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
-                                                 )] = CONFIG.pdf_compression,
+    pdf_compression: Annotated[GhostscriptBackend.Compression, typer.Option("--pdf-compression", "-pc",
+                                                                            help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(mode.value for mode in GhostscriptBackend.Compression)}. {_('Defaults to')} {CONFIG.pdf_compression}.",
+                                                                            )] = GhostscriptBackend.Compression(CONFIG.pdf_compression),
 
     gui_zoom: Annotated[int, typer.Option("--gui-zoom", "-gz",
                                           help=_("GUI zoom level. Valid values are >= 1 (100 = normal size, 150 = 1.5x size, etc)."),
@@ -142,7 +141,7 @@ def set(
     CONFIG.image_fit = image_fit.value
     CONFIG.image_page_size = image_page_size.value if image_page_size else None
     CONFIG.image_resampling = image_resampling.value
-    CONFIG.pdf_compression = pdf_compression
+    CONFIG.pdf_compression = pdf_compression.value
     CONFIG.gui_zoom = gui_zoom
     CONFIG.gui_output_dir = str(gui_output_dir.resolve())
 

@@ -61,7 +61,7 @@ ctx_menu.register_callback(register_ctx_menu)
 
 def execute_pdf_compress_cmd(
     input_files: List[Path],
-    compression: str,
+    compression: GhostscriptBackend.Compression,
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -79,7 +79,7 @@ def execute_pdf_compress_cmd(
             gs_backend.compress(
                 input_file=input_file,
                 output_file=gs_out,
-                compression_level=GhostscriptBackend.Compression.from_str(compression),
+                compression_level=compression,
                 progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
             )
             progress_callback(progress_mgr.complete_step())
@@ -118,10 +118,9 @@ def execute_pdf_compress_cmd(
     """)
 def compress(
     input_files: Annotated[List[Path], InputFilesArgument(GhostscriptBackend)],
-    compression: Annotated[str, typer.Option("--compression", "-c",
-                                             help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(GhostscriptBackend.Compression.get_dict())}. {_('Defaults to')} {CONFIG.pdf_compression}.",
-                                             callback=lambda x: check_valid_options(x, GhostscriptBackend.Compression.get_dict()),
-                                             )] = CONFIG.pdf_compression,
+    compression: Annotated[GhostscriptBackend.Compression, typer.Option("--compression", "-c",
+                                                                        help=f"{_('Compression level (high compression = low quality). Valid values are')} {', '.join(mode.value for mode in GhostscriptBackend.Compression)}. {_('Defaults to')} {CONFIG.pdf_compression}.",
+                                                                        )] = GhostscriptBackend.Compression(CONFIG.pdf_compression),
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):
     execute_pdf_compress_cmd(

@@ -8,7 +8,7 @@ from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.backend.office.convert_protocol import ConvertProtocol
+from file_conversor.backend.office._convert_protocol import ConvertProtocol
 
 from file_conversor.system import is_windows
 

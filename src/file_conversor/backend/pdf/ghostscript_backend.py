@@ -29,46 +29,39 @@ class GhostscriptBackend(AbstractBackend):
     A class that provides an interface for handling files using ``ghostscript``.
     """
     class OutputFileFormat(Enum):
-        PDF = "pdfwrite"
+        PDF = "pdf"
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "pdf": cls.PDF,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "pdf":
+                return "pdfwrite"
+            raise ValueError(f"Unsupported output file format: {self.value}")
 
         def get_options(self) -> list[str]:
-            return [f"-sDEVICE={self.value}"]
+            return [f"-sDEVICE={self.get()}"]
 
     class Compression(Enum):
-        HIGH = "screen"
+        HIGH = "high"
         """72 dpi quality - high compression / low quality"""
-        MEDIUM = "ebook"
+        MEDIUM = "medium"
         """150 dpi quality - medium compression / medium quality"""
-        LOW = "printer"
+        LOW = "low"
         """300 dpi quality - low compression / high quality"""
-        NONE = "preprint"
+        NONE = "none"
         """600 dpi quality - no compression / highest quality"""
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "high": cls.HIGH,
-                "medium": cls.MEDIUM,
-                "low": cls.LOW,
-                "none": cls.NONE,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "high":
+                return "screen"
+            if self.value == "medium":
+                return "ebook"
+            if self.value == "low":
+                return "printer"
+            if self.value == "none":
+                return "prepress"
+            raise ValueError(f"Unsupported compression level: {self.value}")
 
         def get_options(self) -> list[str]:
-            return [f"-dPDFSETTINGS=/{self.value}"]
+            return [f"-dPDFSETTINGS=/{self.get()}"]
 
     class CompatibilityPreset(Enum):
         PRESET_1_3 = "1.3"
@@ -82,105 +75,98 @@ class GhostscriptBackend(AbstractBackend):
         PRESET_1_7 = "1.7"
         """low campatibility / support for 3D and transparency"""
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "1.3": cls.PRESET_1_3,
-                "1.4": cls.PRESET_1_4,
-                "1.5": cls.PRESET_1_5,
-                "1.6": cls.PRESET_1_6,
-                "1.7": cls.PRESET_1_7,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "1.3":
+                return "1.3"
+            if self.value == "1.4":
+                return "1.4"
+            if self.value == "1.5":
+                return "1.5"
+            if self.value == "1.6":
+                return "1.6"
+            if self.value == "1.7":
+                return "1.7"
+            raise ValueError(f"Unsupported compatibility preset: {self.value}")
 
         def get_options(self) -> list[str]:
-            return [f"-dCompatibilityLevel={self.value}"]  # PDF preset
+            return [f"-dCompatibilityLevel={self.get()}"]  # PDF preset
 
     class Downsampling(Enum):
-        HIGH = "Bicubic"
+        HIGH = "high"
         """slowest processing / highest quality"""
-        MEDIUM = "Average"
+        MEDIUM = "medium"
         """medium processing / medium quality"""
-        LOW = "Subsample"
+        LOW = "low"
         """fast processing / low quality"""
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "high": cls.HIGH,
-                "medium": cls.MEDIUM,
-                "low": cls.LOW,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "high":
+                return "Bicubic"
+            if self.value == "medium":
+                return "Average"
+            if self.value == "low":
+                return "Subsample"
+            raise ValueError(f"Unsupported downsampling type: {self.value}")
 
         def get_options(self) -> list[str]:
+            value = self.get()
             return [
                 f"-dDownsampleColorImages=true",
                 f"-dDownsampleGrayImages=true",
-                f"-dColorImageDownsampleType=/{self.value}",
-                f"-dGrayImageDownsampleType=/{self.value}",
+                f"-dColorImageDownsampleType=/{value}",
+                f"-dGrayImageDownsampleType=/{value}",
             ]
 
     class ImageCompression(Enum):
-        JPX = "JPXEncode"
+        JPX = "jpx"
         """JPEG2000 format (poor support by browsers / open source viewers)"""
-        JPG = "DCTEncode"
+        JPG = "jpg"
         """JPEG format (great support by browsers / open source viewers)"""
-        PNG = "FlateEncode"
+        PNG = "png"
         """PNG format (great support / high file size)"""
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "jpx": cls.JPX,
-                "jpg": cls.JPG,
-                "png": cls.PNG,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "jpx":
+                return "JPXEncode"
+            if self.value == "jpg":
+                return "DCTEncode"
+            if self.value == "png":
+                return "FlateEncode"
+            raise ValueError(f"Unsupported image compression format: {self.value}")
 
         def get_options(self) -> list[str]:
+            value = self.get()
             return [
                 f"-dAutoFilterColorImages=false",
                 f"-dAutoFilterGrayImages=false",
-                f"-dColorImageFilter=/{self.value}",
-                f"-dGrayImageFilter=/{self.value}",
+                f"-dColorImageFilter=/{value}",
+                f"-dGrayImageFilter=/{value}",
             ]
 
     class JPEGCompression(Enum):
-        NONE = 99
+        NONE = "none"
         """no compression / highest quality"""
-        LOW = 90
+        LOW = "low"
         """low compression / high quality"""
-        MEDIUM = 80
+        MEDIUM = "medium"
         """medium compression / medium quality"""
-        HIGH = 70
+        HIGH = "high"
         """high compression / low quality"""
 
-        @classmethod
-        def get_dict(cls):
-            return {
-                "none": cls.NONE,
-                "low": cls.LOW,
-                "medium": cls.MEDIUM,
-                "high": cls.HIGH,
-            }
-
-        @classmethod
-        def from_str(cls, name: str):
-            return cls.get_dict()[name]
+        def get(self):
+            if self.value == "none":
+                return 99
+            if self.value == "low":
+                return 90
+            if self.value == "medium":
+                return 80
+            if self.value == "high":
+                return 70
+            raise ValueError(f"Unsupported JPEG compression level: {self.value}")
 
         def get_options(self) -> list[str]:
             return [
-                f"-dJPEGQ={self.value}",
+                f"-dJPEGQ={self.get()}",
             ]
 
     SUPPORTED_IN_FORMATS = {
@@ -326,8 +312,8 @@ class GhostscriptBackend(AbstractBackend):
 
         # adjust JPEG compression if needed
         if image_compression == GhostscriptBackend.ImageCompression.JPG:
-            compression_level_name = compression_level.name.lower()
-            jpeg_compression = GhostscriptBackend.JPEGCompression.from_str(compression_level_name)
+            compression_level_name = compression_level.name.upper()
+            jpeg_compression = GhostscriptBackend.JPEGCompression[compression_level_name]
             command.extend(jpeg_compression.get_options())  # set JPEG compression
 
         # set input/output files

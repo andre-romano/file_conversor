@@ -8,7 +8,7 @@ from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.backend.office.convert_protocol import ConvertProtocol
+from file_conversor.backend.office._convert_protocol import ConvertProtocol
 
 from file_conversor.dependency.brew_pkg_manager import BrewPackageManager
 from file_conversor.dependency.scoop_pkg_manager import ScoopPackageManager
