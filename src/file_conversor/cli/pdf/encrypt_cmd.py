@@ -64,7 +64,7 @@ def execute_pdf_encrypt_cmd(
 
     permissions: Iterable[PyPDFBackend.EncryptionPermission] | None,
 
-    encrypt_algo: str,
+    encrypt_algo: PyPDFBackend.EncryptionAlgorithm,
     output_dir: Path,
     progress_callback: Callable[[float], Any] = lambda p: p,
 ):
@@ -84,7 +84,7 @@ def execute_pdf_encrypt_cmd(
             # permissions
             permissions=permissions,
 
-            encryption_algorithm=PyPDFBackend.EncryptionAlgorithm.from_str(encrypt_algo),
+            encryption_algorithm=encrypt_algo,
             progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p))
         )
         progress_callback(progress_mgr.complete_step())
@@ -129,10 +129,9 @@ def encrypt(
                                                          help=_("Decrypt password used to open protected file. Defaults to None (do not decrypt)."),
                                                          )] = None,
 
-    algorithm: Annotated[str, typer.Option("--algorithm", "-a",
-                                           help=_("Encryption algorithm used. Valid options are RC4-40, RC4-128, AES-128, AES-256-R5, or AES-256. Defaults to AES-256 (for enhanced security and compatibility)."),
-                                           callback=lambda x: check_valid_options(x, valid_options=PyPDFBackend.EncryptionAlgorithm.get_dict()),
-                                           )] = PyPDFBackend.EncryptionAlgorithm.AES_256.value,
+    algorithm: Annotated[PyPDFBackend.EncryptionAlgorithm, typer.Option("--algorithm", "-a",
+                                                                        help=f'{_("Encryption algorithm used. Valid options are ")} {' '.join(mode.value for mode in PyPDFBackend.EncryptionAlgorithm)}. {_(f"Defaults to")} {PyPDFBackend.EncryptionAlgorithm.AES_256.value}.',
+                                                                        )] = PyPDFBackend.EncryptionAlgorithm.AES_256,
 
     output_dir: Annotated[Path, OutputDirOption()] = Path(),
 ):

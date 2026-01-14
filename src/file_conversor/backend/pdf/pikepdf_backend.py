@@ -59,18 +59,18 @@ class PikePDFBackend(AbstractBackend):
         self,
         input_file: str | Path,
         output_file: str | Path,
-        progress_callback: Callable[[int], Any] | None = None,
-        decrypt_password: str | None = None,
         linearize: bool = True,
+        decrypt_password: str | None = None,
+        progress_callback: Callable[[int], Any] | None = None,
     ):
         """
         Compress input PDF file.
 
         :param input_files: Input PDF file. 
         :param output_files: Output PDF file.
-        :param progress_callback: Progress callback executed as PDF is processed. Format callback(0-100). Defaults to None (no progress callback).
-        :param decryption_password: Decryption password for input PDF file. Defaults to None (do not decrypt).
         :param linearize: Linearize PDF file structures (speed up web render). Defaults to True.
+        :param decryption_password: Decryption password for input PDF file. Defaults to "" (do not decrypt).
+        :param progress_callback: Progress callback executed as PDF is processed. Format callback(0-100). Defaults to None (no progress callback).
 
         :raises FileNotFoundError: if input file not found.
         :raises PDFError, ForeignObjectError: if qpdf errors.
@@ -78,15 +78,15 @@ class PikePDFBackend(AbstractBackend):
         self.check_file_exists(input_file)
 
         # Open PDF (with password if provided)
-        preserve_encryption = True if decrypt_password and self.is_encrypted(input_file) else None
-        with pikepdf.open(input_file, password=decrypt_password if decrypt_password else "") as pdf:
+        preserve_encryption: bool = (decrypt_password != "" and self.is_encrypted(input_file))
+        with pikepdf.open(input_file, password=decrypt_password or "") as pdf:
             # Save optimized PDF
             pdf.save(output_file,
-                     progress=progress_callback,  # callback(0-100)
                      encryption=preserve_encryption,  # preserve encryption
+                     linearize=linearize,  # linearize for web
                      compress_streams=True,  # compress streams
                      object_stream_mode=ObjectStreamMode(ObjectStreamMode.generate),  # generate streams as needed (max compression)
-                     linearize=linearize,
+                     progress=progress_callback,  # callback(0-100)
                      )
 
 

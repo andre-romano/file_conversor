@@ -61,7 +61,7 @@ class PyMuPDFBackend(AbstractBackend):
         :param output_file: Output file
         :param input_file: Input file. 
         :param dpi: DPI for rendering images. Defaults to 200.
-        :param password: Password for encrypted PDF files. Defaults to None.
+        :param password: Password for encrypted PDF files. Defaults to "" (do not decrypt).
 
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
@@ -76,7 +76,7 @@ class PyMuPDFBackend(AbstractBackend):
             if doc.is_encrypted:
                 if not password:
                     raise ValueError(_("Password is required for encrypted PDF files"))
-                doc.authenticate(password or "")
+                doc.authenticate(password)
             # => .png, .jpg, .svg OUTPUT
             for page in doc:
                 pix = page.get_pixmap(dpi=dpi)  # type: ignore
@@ -86,7 +86,7 @@ class PyMuPDFBackend(AbstractBackend):
             self,
             input_file: str | Path,
             output_dir: str | Path,
-            progress_callback: Callable[[float], Any] | None = None,
+            progress_callback: Callable[[float], Any] = lambda p: p,
     ):
         """
         Extract all images from a PDF using PyMuPDF (fitz).
@@ -119,10 +119,8 @@ class PyMuPDFBackend(AbstractBackend):
                     # logger.debug(f"Extracted {output_file} ({width}x{height})")
 
                 progress = 100.0 * (float(page_index) / page_len)
-                if progress_callback:
-                    progress_callback(progress)
-        if progress_callback:
-            progress_callback(100.0)
+                progress_callback(progress)
+        progress_callback(100.0)
 
 
 __all__ = [

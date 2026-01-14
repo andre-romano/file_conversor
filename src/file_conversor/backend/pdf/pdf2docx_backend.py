@@ -3,9 +3,10 @@
 """
 This module provides functionalities for handling files using ``pdf2docx`` backend.
 """
-import pdf2docx
-from pathlib import Path
 
+import pdf2docx
+
+from pathlib import Path
 from typing import Any, Callable
 
 # user-provided imports

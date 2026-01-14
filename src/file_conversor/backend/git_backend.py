@@ -6,6 +6,7 @@ This module provides functionalities for handling repositories using Git.
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
+from pydantic import BaseModel
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -26,6 +27,11 @@ class GitBackend(AbstractBackend):
     GitBackend is a class that provides an interface for handling repositories using Git.
     """
 
+    class RepositoryDataModel(BaseModel):
+        user_name: str
+        repo_name: str
+        branch: str = ""
+
     SUPPORTED_IN_FORMATS = {}
 
     SUPPORTED_OUT_FORMATS = {}
@@ -36,28 +42,22 @@ class GitBackend(AbstractBackend):
 
     @staticmethod
     def get_download_url(
-        user_name: str,
-        repo_name: str,
+        repository: RepositoryDataModel,
         file_path: str | Path,
-        branch: str = "",
     ):
         """Get the download URL for a file in a GitHub repository.
 
-        :param user_name: The GitHub username or organization name.
-        :param repo_name: The name of the repository.
-        :param file_path: The path to the file in the repository.        
+        :param repository: The repository data model containing user_name, repo_name, and branch.
         :param branch: The branch name. If not provided, the default branch will be used.
         """
         file_path = Path(file_path)
-        request_url = f"https://raw.githubusercontent.com/{user_name}/{repo_name}/{branch}/{file_path.as_posix()}"
+        request_url = f"https://raw.githubusercontent.com/{repository.user_name}/{repository.repo_name}/{repository.branch}/{file_path.as_posix()}"
         return request_url
 
     @staticmethod
     def get_info_api(
-        user_name: str,
-        repo_name: str,
+        repository: RepositoryDataModel,
         path: str | Path = "",
-        branch: str = "",
     ) -> list[dict[str, Any]]:
         """
         Get information about a file or directory in a GitHub repository using the GitHub API.
@@ -73,10 +73,8 @@ class GitBackend(AbstractBackend):
             "type": "file"|"dir",
         }]
 
-        :param user_name: The GitHub username or organization name.
-        :param repo_name: The name of the repository.
+        :param repository: The repository data model containing user_name, repo_name, and branch.
         :param path: The path to the file or directory in the repository. Defaults to the root directory.
-        :param branch: The branch name. If not provided, the default branch will be used.
 
         :return: A dictionary containing information about the file or directory.
 
@@ -84,8 +82,8 @@ class GitBackend(AbstractBackend):
         """
         http_backend = HttpBackend.get_instance(verbose=False)
         res = http_backend.get_json(
-            url=f"https://api.github.com/repos/{user_name}/{repo_name}/contents/{path}",
-            params={"ref": branch} if branch else None,
+            url=f"https://api.github.com/repos/{repository.user_name}/{repository.repo_name}/contents/{path}",
+            params={"ref": repository.branch} if repository.branch else None,
         )
         if isinstance(res, dict) and res.get("status", "200") != "200":
             raise NetworkError(f"{_('Failed to retrieve info from GitHub API')}: {res.get('status', '200')} - {res.get('message', '')}")

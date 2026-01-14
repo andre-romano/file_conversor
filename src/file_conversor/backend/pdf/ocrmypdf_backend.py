@@ -5,7 +5,6 @@ import re
 import ocrmypdf
 
 from pathlib import Path
-
 from typing import Any, Callable
 
 # user-provided imports
@@ -27,11 +26,11 @@ _ = get_translation()
 class OcrMyPDFBackend(AbstractBackend):
     TESSDATA_DIR: Path | None = None
 
-    TESSDATA_REPOSITORY = {
-        "user_name": "tesseract-ocr",
-        "repo_name": "tessdata",
-        "branch": "main",
-    }
+    TESSDATA_REPOSITORY = GitBackend.RepositoryDataModel(
+        user_name="tesseract-ocr",
+        repo_name="tessdata",
+        branch="main",
+    )
 
     SUPPORTED_IN_FORMATS = {
         "pdf": {},
@@ -88,7 +87,7 @@ class OcrMyPDFBackend(AbstractBackend):
             return
 
         lang_url = GitBackend.get_download_url(
-            **self.TESSDATA_REPOSITORY,
+            repository=self.TESSDATA_REPOSITORY,
             file_path=f"{lang}.traineddata",
         )
         http_backend = HttpBackend.get_instance(verbose=self._verbose)
@@ -134,7 +133,7 @@ class OcrMyPDFBackend(AbstractBackend):
         """
         remote_langs = set()
         for file_info in GitBackend.get_info_api(
-            **self.TESSDATA_REPOSITORY,
+            repository=self.TESSDATA_REPOSITORY,
         ):
             if not file_info.get("name", "").endswith(".traineddata"):
                 continue
