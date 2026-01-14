@@ -6,7 +6,7 @@ import yaml
 import xmltodict
 import configparser
 
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any, Callable, Iterable, Protocol, Sequence
 
 from pathlib import Path
 
@@ -26,19 +26,24 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class AbstractTextFile:
+class TextFileProtocol(Protocol):
+    def read(self) -> Any:
+        """ Read the data from file. """
+        ...
+
+    def write(self, data: Any):
+        """ Write the data to file. """
+        ...
+
+    def minify(self, data: Any):
+        """ Minify the data and write to file. """
+        ...
+
+
+class AbstractTextFile(TextFileProtocol):
     def __init__(self, filename: str | Path) -> None:
         super().__init__()
         self._filepath = Path(filename)
-
-    def read(self) -> Any:
-        raise NotImplementedError("not implemented")
-
-    def write(self, data: Any):
-        raise NotImplementedError("not implemented")
-
-    def minify(self, data: Any):
-        self.write(data)
 
 
 class XMLTextFile(AbstractTextFile):
@@ -95,6 +100,9 @@ class TOMLTextFile(AbstractTextFile):
         with open(self._filepath, mode="w") as fp:
             toml.dump(data, fp)
 
+    def minify(self, data: Any):
+        self.write(data)  # toml.dump already writes in compact form
+
 
 class INITextFile(AbstractTextFile):
     def read(self):
@@ -112,6 +120,9 @@ class INITextFile(AbstractTextFile):
             config[section] = {str(k): str(v) for k, v in values.items()}
         with open(self._filepath, "w") as f:
             config.write(f)
+
+    def minify(self, data: Any):
+        return self.write(data)  # configparser writes in compact form by default
 
 
 class TextBackend(AbstractBackend):
@@ -167,12 +178,14 @@ class TextBackend(AbstractBackend):
             formats: dict[str, dict[str, type]],
     ) -> tuple[str, AbstractTextFile]:
         """"Checks file format and returns (ext, textfile)"""
-        ext = filepath.suffix[1:]
+        ext = filepath.suffix[1:].lower()
         if ext not in formats:
             raise ValueError(f"Unsupported input format '{ext}'. Supported formats: {', '.join(formats)}")
+
         if "cls" not in formats[ext]:
             raise ValueError(f"Cannot find class for format '{ext}'.")
         cls = formats[ext]["cls"]
+
         text_file = cls(filepath)
         # logger.debug(f"Filepath: {filepath} - Class: {type(text_file)}")
         return (ext, text_file)
