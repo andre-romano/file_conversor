@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
+from dataclasses import dataclass
 from typing import Any
-from pydantic import BaseModel
 
 # user-provided imports
 from file_conversor.config import Log
@@ -26,7 +26,8 @@ class CompressBackend(AbstractBackend):
     Provides an interface for handling image file compression using multiple backends.
     """
 
-    class CompressBackendDataModel(BaseModel):
+    @dataclass
+    class CompressBackendDataModel:
         """ Data model to select CompressBackends. """
         cls: type[_GifSicleBackend | _MozJPEGBackend | _OxiPNGBackend]
 

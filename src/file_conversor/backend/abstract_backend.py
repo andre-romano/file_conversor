@@ -11,7 +11,6 @@ import typer
 
 from typing import Iterable
 from pathlib import Path
-from rich import print
 
 # user-provided imports
 from file_conversor.dependency import AbstractPackageManager
@@ -106,7 +105,7 @@ class AbstractBackend:
         :param pkg_mgr: Package manager to use for checking dependencies.
         :return: Set of missing dependencies.
         """
-        missing_deps = pkg_mgr.check_dependencies()
+        missing_deps = pkg_mgr.get_missing_dependencies()
         if missing_deps:
             logger.warning(f"[bold]{_("Missing dependencies detected")}[/]: {", ".join(missing_deps)}")
         return missing_deps

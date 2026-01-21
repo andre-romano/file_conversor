@@ -1,53 +1,142 @@
 # src\file_conversor\cli\image\__init__.py
 
-import typer
+from enum import Enum
 
 # user-provided modules
+from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
 from file_conversor.config.locale import get_translation
 
-from file_conversor.cli.image._typer import COMMAND_NAME
-
-from file_conversor.cli.image.antialias_cmd import typer_cmd as antialias_cmd
-from file_conversor.cli.image.blur_cmd import typer_cmd as blur_cmd
-from file_conversor.cli.image.compress_cmd import typer_cmd as compress_cmd
-from file_conversor.cli.image.convert_cmd import typer_cmd as convert_cmd
-from file_conversor.cli.image.enhance_cmd import typer_cmd as enhance_cmd
-from file_conversor.cli.image.filter_cmd import typer_cmd as filter_cmd
-from file_conversor.cli.image.info_cmd import typer_cmd as info_cmd
-from file_conversor.cli.image.mirror_cmd import typer_cmd as mirror_cmd
-from file_conversor.cli.image.render_cmd import typer_cmd as render_cmd
-from file_conversor.cli.image.resize_cmd import typer_cmd as resize_cmd
-from file_conversor.cli.image.rotate_cmd import typer_cmd as rotate_cmd
-from file_conversor.cli.image.to_pdf_cmd import typer_cmd as to_pdf_cmd
-from file_conversor.cli.image.unsharp_cmd import typer_cmd as unsharp_cmd
+from file_conversor.cli.image.antialias_cmd import ImageAntialiasTyperCommand
+from file_conversor.cli.image.blur_cmd import ImageBlurTyperCommand
+from file_conversor.cli.image.compress_cmd import ImageCompressTyperCommand
+from file_conversor.cli.image.convert_cmd import ImageConvertTyperCommand
+from file_conversor.cli.image.filter_cmd import ImageFilterTyperCommand
+from file_conversor.cli.image.enhance_cmd import ImageEnhanceTyperCommand
+from file_conversor.cli.image.info_cmd import ImageInfoTyperCommand
+from file_conversor.cli.image.mirror_cmd import ImageMirrorTyperCommand
+from file_conversor.cli.image.render_cmd import ImageRenderTyperCommand
+from file_conversor.cli.image.resize_cmd import ImageResizeTyperCommand
+from file_conversor.cli.image.rotate_cmd import ImageRotateTyperCommand
+from file_conversor.cli.image.to_pdf_cmd import ImageToPdfTyperCommand
+from file_conversor.cli.image.unsharp_cmd import ImageUnsharpTyperCommand
 
 _ = get_translation()
 
-image_cmd = typer.Typer(
-    name=COMMAND_NAME,
-    help=_("Image file manipulation"),
-)
-# CONVERSION_PANEL
-image_cmd.add_typer(convert_cmd)
-image_cmd.add_typer(render_cmd)
-image_cmd.add_typer(to_pdf_cmd)
 
-# TRANSFORMATION_PANEL
-image_cmd.add_typer(compress_cmd)
-image_cmd.add_typer(mirror_cmd)
-image_cmd.add_typer(rotate_cmd)
-image_cmd.add_typer(resize_cmd)
+class ImageTyperGroup(AbstractTyperGroup):
 
-# FILTER_PANEL
-image_cmd.add_typer(antialias_cmd)
-image_cmd.add_typer(blur_cmd)
-image_cmd.add_typer(enhance_cmd)
-image_cmd.add_typer(filter_cmd)
-image_cmd.add_typer(unsharp_cmd)
+    class Panels(Enum):
+        CONVERSION = _("Conversions")
+        TRANSFORMATION = _("Transformations")
+        FILTER = _("Filters")
+        OTHERS = _("Other commands")
 
-# OTHERS_PANEL
-image_cmd.add_typer(info_cmd)
+    class Commands(Enum):
+        # CONVERSION
+        CONVERT = "convert"
+        RENDER = "render"
+        TO_PDF = "to-pdf"
+
+        # TRANSFORMATION
+        COMPRESS = "compress"
+        MIRROR = "mirror"
+        ROTATE = "rotate"
+        RESIZE = "resize"
+
+        # FILTER
+        ANTIALIAS = "antialias"
+        BLUR = "blur"
+        ENHANCE = "enhance"
+        FILTER = "filter"
+        UNSHARP = "unsharp"
+
+        # OTHERS
+        INFO = "info"
+
+    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+        super().__init__(
+            group_name=group_name,
+            help=_("Image file manipulation"),
+            rich_help_panel=rich_help_panel,
+        )
+
+        # add subcommands
+        self.add(
+            # CONVERSION
+            ImageConvertTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.CONVERT.value,
+                rich_help_panel=self.Panels.CONVERSION.value,
+            ),
+            ImageRenderTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.RENDER.value,
+                rich_help_panel=self.Panels.CONVERSION.value,
+            ),
+            ImageToPdfTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.TO_PDF.value,
+                rich_help_panel=self.Panels.CONVERSION.value,
+            ),
+
+            # TRANSFORMATION
+            ImageCompressTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.COMPRESS.value,
+                rich_help_panel=self.Panels.TRANSFORMATION.value,
+            ),
+            ImageMirrorTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.MIRROR.value,
+                rich_help_panel=self.Panels.TRANSFORMATION.value,
+            ),
+            ImageRotateTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.ROTATE.value,
+                rich_help_panel=self.Panels.TRANSFORMATION.value,
+            ),
+            ImageResizeTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.RESIZE.value,
+                rich_help_panel=self.Panels.TRANSFORMATION.value,
+            ),
+
+            # FILTER
+            ImageAntialiasTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.ANTIALIAS.value,
+                rich_help_panel=self.Panels.FILTER.value,
+            ),
+            ImageBlurTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.BLUR.value,
+                rich_help_panel=self.Panels.FILTER.value,
+            ),
+            ImageEnhanceTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.ENHANCE.value,
+                rich_help_panel=self.Panels.FILTER.value,
+            ),
+            ImageFilterTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.FILTER.value,
+                rich_help_panel=self.Panels.FILTER.value,
+            ),
+            ImageUnsharpTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.UNSHARP.value,
+                rich_help_panel=self.Panels.FILTER.value,
+            ),
+
+            # OTHERS
+            ImageInfoTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.INFO.value,
+                rich_help_panel=self.Panels.OTHERS.value,
+            ),
+        )
+
 
 __all__ = [
-    "image_cmd",
+    "ImageTyperGroup",
 ]

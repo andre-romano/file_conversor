@@ -1,21 +1,14 @@
 
 # src\file_conversor\cli\win\unins_cmd.py
 
-import typer
-
-from typing import Annotated
-
-from rich import print
-
+from typing import Annotated, Iterable
 
 # user-provided modules
+from file_conversor.cli._utils.abstract_typer_command import AbstractTyperCommand
+
 from file_conversor.backend import WinRegBackend
 
-from file_conversor.cli.win._typer import CONTEXT_MENU_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.win._typer import COMMAND_NAME, UNINSTALL_MENU_NAME
-
-from file_conversor.config import Configuration, State, Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
 from file_conversor.system.win.ctx_menu import WinContextMenu
 
@@ -27,36 +20,38 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
+class WinUninstallMenuTyperCommand(AbstractTyperCommand):
+    EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
 
+    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
+        return  # No context menu to register
 
-@typer_cmd.command(
-    name=UNINSTALL_MENU_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
-    help=f"""
-        {_('Uninstalls app context menu (right click in Windows Explorer).')}        
-    """,
-    epilog=f"""
-**{_('Examples')}:** 
+    def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            command_name=command_name,
+            function=self.uninstall_menu,
+            help=f"""
+    {_('Uninstalls app context menu (right click in Windows Explorer).')}        
+""",
+            epilog=f"""
+    **{_('Examples')}:** 
 
-- `file_conversor {COMMAND_NAME} {UNINSTALL_MENU_NAME}` 
+    - `file_conversor {group_name} {command_name}` 
 """)
-def uninstall_menu():
-    winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
 
-    logger.info(f"{_('Removing app context menu from Windows Explorer')} ...")
+    def uninstall_menu(self):
+        winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
+        ctx_menu = WinContextMenu.get_instance(icons_folder=Environment.get_icons_folder())
 
-    # Define registry path
-    ctx_menu = WinContextMenu.get_instance()
+        logger.info(f"{_('Removing app context menu from Windows Explorer')} ...")
+        winreg_backend.delete_keys(ctx_menu.get_reg_file())
 
-    winreg_backend.delete_keys(ctx_menu.get_reg_file())
-
-    logger.info(f"{_('Context Menu Uninstall')}: [bold green]{_('SUCCESS')}[/].")
+        logger.info(f"{_('Context Menu Uninstall')}: [bold green]{_('SUCCESS')}[/].")
 
 
 __all__ = [
-    "typer_cmd",
-    "EXTERNAL_DEPENDENCIES",
+    "WinUninstallMenuTyperCommand",
 ]

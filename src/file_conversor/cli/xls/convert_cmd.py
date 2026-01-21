@@ -1,23 +1,18 @@
 
 # src\file_conversor\cli\xls\convert_cmd.py
 
-import typer
-
 from pathlib import Path
-from typing import Annotated, Any, Callable, List
-
-from rich import print
+from typing import Annotated, Any, Callable, Iterable, List
 
 # user-provided modules
-from file_conversor.backend import LibreofficeCalcBackend
+from file_conversor.cli._utils import AbstractTyperCommand, CommandManagerRich, ProgressManagerRich
+from file_conversor.cli._utils.typer import FormatOption, InputFilesArgument, OutputDirOption
 
-from file_conversor.cli.xls._typer import COMMAND_NAME, CONVERT_NAME
+from file_conversor.backend import LibreofficeCalcBackend
 
 from file_conversor.config import Configuration, Environment, Log, State, get_translation
 
-from file_conversor.utils import CommandManager, ProgressManager
 from file_conversor.utils.formatters import format_in_out_files_tuple
-from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -29,93 +24,75 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-# typer PANELS
-typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = LibreofficeCalcBackend.EXTERNAL_DEPENDENCIES
+class XlsConvertTyperCommand(AbstractTyperCommand):
+    EXTERNAL_DEPENDENCIES = LibreofficeCalcBackend.EXTERNAL_DEPENDENCIES
 
+    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+        icons_folder_path = Environment.get_icons_folder()
+        # WordBackend commands
+        for ext in LibreofficeCalcBackend.SUPPORTED_IN_FORMATS:
+            ctx_menu.add_extension(f".{ext}", [
+                WinContextCommand(
+                    name=f"to_{ext}",
+                    description=f"To {ext.upper()}",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f "{ext}" "%1""',
+                    icon=str(icons_folder_path / f"{ext}.ico"),
+                )
+                for ext in LibreofficeCalcBackend.SUPPORTED_OUT_FORMATS
+            ])
 
-def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = Environment.get_icons_folder()
-    # WordBackend commands
-    for ext in LibreofficeCalcBackend.SUPPORTED_IN_FORMATS:
-        ctx_menu.add_extension(f".{ext}", [
-            WinContextCommand(
-                name=f"to_{ext}",
-                description=f"To {ext.upper()}",
-                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{CONVERT_NAME}" "%1" -f "{ext}""',
-                icon=str(icons_folder_path / f"{ext}.ico"),
+    def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            command_name=command_name,
+            function=self.convert,
+            help=f"""
+    {_('Convert spreadsheet files into other formats (requires LibreOffice).')}
+""",
+            epilog=f"""
+    **{_('Examples')}:**
+
+    - `file_conversor {group_name} {command_name} input_file.ods -o output_file.xls`
+
+    - `file_conversor {group_name} {command_name} input_file.xlsx -o output_file.pdf`
+""")
+
+    def convert(
+        self,
+        input_files: Annotated[List[Path], InputFilesArgument(LibreofficeCalcBackend)],
+        format: Annotated[str, FormatOption(LibreofficeCalcBackend)],
+        output_dir: Annotated[Path, OutputDirOption()] = Path(),
+    ):
+        files = [
+            LibreofficeCalcBackend.FilesDataModel(
+                input_file=input,
+                output_file=output,
             )
-            for ext in LibreofficeCalcBackend.SUPPORTED_OUT_FORMATS
-        ])
+            for input, output in format_in_out_files_tuple(
+                input_files=input_files,
+                output_dir=output_dir,
+                file_format=format,
+                overwrite_output=STATE.overwrite_output.enabled,
+            )
+        ]
 
-
-# register commands in windows context menu
-ctx_menu = WinContextMenu.get_instance()
-ctx_menu.register_callback(register_ctx_menu)
-
-
-def execute_xls_convert_cmd(
-    input_files: List[Path],
-    format: str,
-    output_dir: Path,
-    progress_callback: Callable[[float], Any] = lambda p: p,
-) -> None:
-    """Execute the convert command."""
-
-    files = [
-        LibreofficeCalcBackend.FilesDataModel(
-            input_file=input,
-            output_file=output,
+        backend = LibreofficeCalcBackend(
+            install_deps=CONFIG.install_deps,
+            verbose=STATE.loglevel.get().is_verbose(),
         )
-        for input, output in format_in_out_files_tuple(
-            input_files=input_files,
-            output_dir=output_dir,
-            file_format=format,
-        )
-    ]
+        with ProgressManagerRich(len(input_files)) as progress_mgr:
+            logger.info(f"[bold]{_('Converting files')}[/] ...")
+            # Perform conversion
+            backend.convert(
+                files=files,
+                file_processed_callback=lambda _: progress_mgr.complete_step()
+            )
 
-    backend = LibreofficeCalcBackend(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE.loglevel.get().is_verbose(),
-    )
-    with ProgressManager(len(input_files)) as progress_mgr:
-        logger.info(f"[bold]{_('Converting files')}[/] ...")
-        # Perform conversion
-        backend.convert(
-            files=files,
-            file_processed_callback=lambda _: progress_callback(progress_mgr.complete_step())
-        )
-
-    logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
-
-
-@typer_cmd.command(
-    name=CONVERT_NAME,
-    help=f"""
-        {_('Convert spreadsheet files into other formats (requires LibreOffice).')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:**
-
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.ods -o output_file.xls`
-
-        - `file_conversor {COMMAND_NAME} {CONVERT_NAME} input_file.xlsx -o output_file.pdf`
-    """)
-def convert(
-    input_files: Annotated[List[Path], InputFilesArgument(LibreofficeCalcBackend)],
-    format: Annotated[str, FormatOption(LibreofficeCalcBackend)],
-    output_dir: Annotated[Path, OutputDirOption()] = Path(),
-):
-    execute_xls_convert_cmd(
-        input_files=input_files,
-        format=format,
-        output_dir=output_dir,
-    )
+        logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 __all__ = [
-    "typer_cmd",
-    "EXTERNAL_DEPENDENCIES",
-    "execute_xls_convert_cmd",
+    "XlsConvertTyperCommand",
 ]

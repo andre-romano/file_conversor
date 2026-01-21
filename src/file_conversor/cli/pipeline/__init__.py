@@ -1,33 +1,58 @@
 # src\file_conversor\cli\pipeline\__init__.py
 
-import typer
+from enum import Enum
 
 # user-provided modules
-from file_conversor.config import get_translation
+from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
 
-from file_conversor.cli.pipeline._typer import COMMAND_NAME
+from file_conversor.cli.pipeline.create_cmd import PipelineCreateTyperCommand
+from file_conversor.cli.pipeline.execute_cmd import PipelineExecuteTyperCommand
 
-from file_conversor.cli.pipeline.create_cmd import typer_cmd as create_cmd
-from file_conversor.cli.pipeline.execute_cmd import typer_cmd as execute_cmd
+from file_conversor.config.locale import get_translation
 
 _ = get_translation()
 
-pipeline_cmd = typer.Typer(
-    name=COMMAND_NAME,
-    help=f"""{_('Pipeline file processing (task automation)')}
 
-                {_('The pipeline processsing by processing an input folder, passing those files to the next pipeline stage, and processing them inside that stage. This process continues (output of the current stage is the input of the next stage), until those files reach the end of the pipeline.')}
+class PipelineTyperGroup(AbstractTyperGroup):
+    class Panels(Enum):
+        NONE = None
+
+    class Commands(Enum):
+        CREATE = "create"
+        EXECUTE = "execute"
+
+    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            help=f"""
+    {_('Pipeline file processing (task automation)')}
+
+    {_('The pipeline processsing by processing an input folder, passing those files to the next pipeline stage, and processing them inside that stage. This process continues (output of the current stage is the input of the next stage), until those files reach the end of the pipeline.')}
 
 
 
-                {_('Example')}:
+    {_('Example')}:
 
-                - {_('Input folder')} => {_('Stage 1')} => {_('Stage 2')} => ... => {_('Output Folder')}
-        """,
-)
-pipeline_cmd.add_typer(create_cmd)
-pipeline_cmd.add_typer(execute_cmd)
+    - {_('Input folder')} => {_('Stage 1')} => {_('Stage 2')} => ... => {_('Output Folder')}
+""",
+        )
+
+        # add subcommands
+        self.add(
+            PipelineCreateTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.CREATE.value,
+                rich_help_panel=self.Panels.NONE.value,
+            ),
+            PipelineExecuteTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.EXECUTE.value,
+                rich_help_panel=self.Panels.NONE.value,
+            ),
+        )
+
 
 __all__ = [
-    "pipeline_cmd",
+    "PipelineTyperGroup",
 ]

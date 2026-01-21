@@ -16,7 +16,7 @@
         "**/*",
     ],
     "python.testing.pytestArgs": [
-        "tests"
+        "src/file_conversor/tests"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

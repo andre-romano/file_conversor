@@ -20,11 +20,11 @@ class BrewPackageManager(AbstractPackageManager):
                  dependencies: dict[str, str],
                  env: list[str | Path] | None = None,
                  ) -> None:
-        self._fix_path()
         super().__init__(
             dependencies=dependencies,
             env=env,
         )
+        self._fix_path()
 
     def _fix_path(self):
         possible_paths = [

@@ -6,6 +6,7 @@ version = "0.8.0"
 description = "Universal file conversor for multimedia files (audio, video, pdf, docs, etc)"
 authors = [{ name = "Andre Luiz Romano Madureira", email = "andre@domain.com" }]
 dependencies = [
+    "pytest>=8.4.1",
     "typer>=0.16.0",
     "rich>=14.0.0",
     "Babel>=2.17.0",
@@ -29,7 +30,7 @@ dependencies = [
     "natsort>=8.4.0",
     "pydantic>=2.12.5",
 ]
-requires-python = ">=3.12,<=3.13.7"
+requires-python = ">=3.12,<=3.14.2"
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICEN[CS]E*", "NOTICE*", "THIRD_PARTY*", "AUTHORS.md", "README.md"]
@@ -44,7 +45,7 @@ Homepage = "https://github.com/andre-romano/file_conversor"
 
 [project.scripts]
 # CLI command =  module:entry_point
-file_conversor = "file_conversor.__main__:main"  
+file_conversor = "file_conversor.__main__:main" 
 
 [tool.pdm] 
 distribution = true
@@ -59,12 +60,12 @@ file_conversor = [
 
 [tool.myproject]
 title = "File Conversor"
-data_path = "src/file_conversor_core/.data"
-icons_path = "src/file_conversor_core/.icons"
-locales_path = "src/file_conversor_core/.locales"
+data_path = "src/file_conversor/.data"
+icons_path = "src/file_conversor/.icons"
+locales_path = "src/file_conversor/.locales"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["src/file_conversor/tests"]
 addopts = "--cache-clear --ff --cov=src --cov-report=html --cov-report=xml"
 filterwarnings = [
     "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer",

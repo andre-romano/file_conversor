@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, Callable, Self
 
 from pydantic import BaseModel
-from rich import print
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -170,6 +169,9 @@ class BatchBackend(AbstractBackend):
     SUPPORTED_OUT_FORMATS = {}
 
     EXTERNAL_DEPENDENCIES: set[str] = set()
+
+    StageConfigDataModel = StageConfigDataModel
+    PipelineConfigDataModel = PipelineConfigDataModel
 
     def __init__(
         self,

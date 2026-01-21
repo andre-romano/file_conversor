@@ -7,11 +7,6 @@ from pathlib import Path
 from typing import Iterable, Self
 
 # user-provided imports
-from file_conversor.config.log import Log
-
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
 
 
 class WinRegKey:
@@ -173,7 +168,7 @@ class WinRegFile:
         with open(out_file, "wb") as f:
             f.write(b'\xff\xfe')     # BOM
             f.write(repr(self).encode("utf-16le"))
-        logger.info(f"Dumped reg file into '{output_file}'")
+        # logger.info(f"Dumped reg file into '{output_file}'")
 
     def dumps(self) -> str:
         """
@@ -219,7 +214,7 @@ class WinRegFile:
                     raise RuntimeError(f"Invalid reg file. Value '{name}' not associated with a key.")
                 reg_key.add_value(name, content)
 
-        logger.info(f"Input file '{input_path}' loaded")
+        # logger.info(f"Input file '{input_path}' loaded")
 
 
 __all__ = [

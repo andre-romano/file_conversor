@@ -127,7 +127,7 @@ jobs:
 
       - name: Check installed scoop app
         run: |
-          file_conversor --version
+          file_conversor --self-test
         shell: bash
 
       - name: Publish Scoop bucket

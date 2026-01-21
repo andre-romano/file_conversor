@@ -3,16 +3,14 @@
 import sys
 import typer
 
-from rich import print
-
 from pathlib import Path
 from typing import Annotated, Any
 
 # user-provided imports
+from file_conversor.cli._typer import PYTHON_VERSION, get_commands
+
 from file_conversor.config import Configuration, Environment, Log, State
 from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
-
-from file_conversor.cli._typer import COMMANDS_LIST, PYTHON_VERSION
 
 # Get app config
 CONFIG = Configuration.get()
@@ -36,8 +34,8 @@ app_cmd = typer.Typer(
 # REGISTER COMMANDS #
 #####################
 
-for cmd_obj in COMMANDS_LIST:
-    app_cmd.add_typer(**cmd_obj)
+for cmd_obj in get_commands():
+    app_cmd.add_typer(cmd_obj)
 
 
 #####################
@@ -46,11 +44,28 @@ for cmd_obj in COMMANDS_LIST:
 
 
 def version_callback(value: bool):
-    if value:
-        VERSION = Environment.get_version()
-        print(f"File Conversor {VERSION}")
-        print(f"Python {PYTHON_VERSION} ({sys.executable})")
-        raise typer.Exit()
+    if not value:
+        return
+    VERSION = Environment.get_version()
+    logger.info(f"File Conversor {VERSION}")
+    logger.info(f"Python {PYTHON_VERSION} ({sys.executable})")
+    raise typer.Exit()
+
+
+def self_test_callback(value: bool):
+    if not value:
+        return
+
+    try:
+        # show version info
+        version_callback(True)
+    except typer.Exit:
+        pass
+
+    from file_conversor.config.self_tests import SelfTests
+    SelfTests().run_self_tests()
+
+    raise typer.Exit()
 
 
 # Main callback, to process global options
@@ -91,6 +106,12 @@ def main_callback(
             "--version", "-V",
             help=_("Display version"),
             callback=version_callback,
+            is_flag=True,
+        )] = False,
+        self_test: Annotated[bool, typer.Option(
+            "--self-test", "-st",
+            help=_("Run self tests"),
+            callback=self_test_callback,
             is_flag=True,
         )] = False,
         overwrite_output: Annotated[bool, typer.Option(

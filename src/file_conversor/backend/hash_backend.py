@@ -6,8 +6,6 @@ from typing import Any, Callable, Sequence
 
 from pathlib import Path
 
-from rich import print
-
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 

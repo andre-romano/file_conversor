@@ -2,13 +2,13 @@
 # src/file_conversor/backend/office/convert_protocol.py
 
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Any, Callable, Protocol
-
-from pydantic import BaseModel
 
 
 class ConvertProtocol(Protocol):
-    class FilesDataModel(BaseModel):
+    @dataclass
+    class FilesDataModel:
         input_file: Path
         output_file: Path
 

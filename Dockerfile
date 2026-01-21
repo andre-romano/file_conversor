@@ -78,8 +78,8 @@ RUN apt-get update \
         /app/dist/* \
     && echo "Cleaning up ... OK" \
     && echo "Testing installation ..." \
-    && python -m file_conversor --help \
     && python -m file_conversor --version \
+    && python -m file_conversor --self-test \
     && echo "Testing installation ... OK" \
     && echo "All done."
 

@@ -1,19 +1,12 @@
 
 # src\file_conversor\cli\win\restart_exp_cmd.py
 
-import typer
-
-from typing import Annotated
-
-from rich import print
-
+from typing import Annotated, Iterable
 
 # user-provided modules
-from file_conversor.cli.win._typer import OTHERS_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.win._typer import COMMAND_NAME, RESTART_EXPLORER_NAME
+from file_conversor.cli._utils import AbstractTyperCommand
 
-from file_conversor.config import Configuration, Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Configuration, Log, get_translation
 
 from file_conversor.system import win
 
@@ -24,28 +17,33 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-typer_cmd = typer.Typer()
 
-EXTERNAL_DEPENDENCIES = set()
+class WinRestartExplorerTyperCommand(AbstractTyperCommand):
+    EXTERNAL_DEPENDENCIES = set()
 
+    def register_ctx_menu(self, ctx_menu: win.WinContextMenu) -> None:
+        return  # No context menu to register
 
-@typer_cmd.command(
-    name=RESTART_EXPLORER_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
-    help=f"""
-        {_('Restarts explorer.exe (to refresh ctx menus).')}        
-    """,
-    epilog=f"""
-**{_('Examples')}:** 
+    def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            command_name=command_name,
+            function=self.restart_explorer,
+            help=f"""
+    {_('Restarts explorer.exe (to refresh ctx menus).')}        
+""",
+            epilog=f"""
+    **{_('Examples')}:** 
 
-- `file_conversor {COMMAND_NAME} {RESTART_EXPLORER_NAME}` 
+    - `file_conversor {group_name} {command_name}` 
 """)
-def restart_explorer():
-    logger.info(f"{_('Restarting explorer.exe')} ...")
-    win.restart_explorer()
+
+    def restart_explorer(self):
+        logger.info(f"{_('Restarting explorer.exe')} ...")
+        win.restart_explorer()
 
 
 __all__ = [
-    "typer_cmd",
-    "EXTERNAL_DEPENDENCIES",
+    "WinRestartExplorerTyperCommand",
 ]

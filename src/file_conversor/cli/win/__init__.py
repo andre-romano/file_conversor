@@ -1,28 +1,59 @@
 # src\file_conversor\cli\win\__init__.py
 
-import typer
+from enum import Enum
 
 # user-provided modules
+from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
+
+from file_conversor.cli.win.install_menu_cmd import WinInstallMenuTyperCommand
+from file_conversor.cli.win.restart_explorer_cmd import WinRestartExplorerTyperCommand
+from file_conversor.cli.win.uninstall_menu_cmd import WinUninstallMenuTyperCommand
+
 from file_conversor.config.locale import get_translation
-
-from file_conversor.cli.win._typer import COMMAND_NAME
-
-from file_conversor.cli.win.install_menu_cmd import typer_cmd as install_menu_cmd
-from file_conversor.cli.win.restart_explorer_cmd import typer_cmd as restart_explorer_cmd
-from file_conversor.cli.win.uninstall_menu_cmd import typer_cmd as uninstall_menu_cmd
 
 _ = get_translation()
 
-win_cmd = typer.Typer(
-    name=COMMAND_NAME,
-    help=_("Windows OS commands (for Windows ONLY)"),
-)
-win_cmd.add_typer(restart_explorer_cmd)
 
-# CONTEXT_MENU_PANEL
-win_cmd.add_typer(install_menu_cmd)
-win_cmd.add_typer(uninstall_menu_cmd)
+class WinTyperGroup(AbstractTyperGroup):
+    class Panels(Enum):
+        CONTEXT_MENU = _("Context menu")
+        OTHERS = _("Other commands")
+
+    class Commands(Enum):
+        INSTALL_MENU = "install-menu"
+        UNINSTALL_MENU = "uninstall-menu"
+        RESTART_EXPLORER = "restart-explorer"
+
+    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            help=_("Windows OS commands (for Windows ONLY)"),
+        )
+
+        # add subcommands
+        self.add(
+            # OTHERS_PANEL
+            WinRestartExplorerTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.RESTART_EXPLORER.value,
+                rich_help_panel=self.Panels.OTHERS.value,
+            ),
+
+            # CONTEXT_MENU_PANEL
+            WinInstallMenuTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.INSTALL_MENU.value,
+                rich_help_panel=self.Panels.CONTEXT_MENU.value,
+            ),
+            WinUninstallMenuTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.UNINSTALL_MENU.value,
+                rich_help_panel=self.Panels.CONTEXT_MENU.value,
+            ),
+        )
+
 
 __all__ = [
-    "win_cmd",
+    "WinTyperGroup",
 ]

@@ -1,8 +1,6 @@
 
 # src\file_conversor\cli\video\_ffmpeg_cmd.py
 
-from rich import print
-
 from typing import Annotated, Any, Callable, List
 from pathlib import Path
 
@@ -12,7 +10,7 @@ from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
 
 from file_conversor.config import Configuration, State, Log, get_translation
 
-from file_conversor.utils import ProgressManager, CommandManager
+from file_conversor.cli._utils import ProgressManagerRich, CommandManagerRich
 
 # get app config
 CONFIG = Configuration.get()
@@ -36,7 +34,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
     audio_codec: str | None = None,
 
     output_dir: Path = Path(),
-    progress_callback: Callable[[float, ProgressManager], Any] | None = None,
+    progress_callback: Callable[[float, ProgressManagerRich], Any] | None = None,
 ):
     # init ffmpeg
     ffmpeg_backend = FFmpegBackend(
@@ -50,7 +48,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
 
     two_pass = (audio_bitrate > 0)
 
-    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+    def callback(input_file: Path, output_file: Path, progress_mgr: ProgressManagerRich):
         ffmpeg_backend.set_files(input_file=input_file, output_file=output_file)
         ffmpeg_backend.set_audio_codec(codec=audio_codec, bitrate=audio_bitrate, filters=audio_filters)
 
@@ -77,7 +75,7 @@ def ffmpeg_audio_run(  # pyright: ignore[reportUnusedFunction]
             )
             progress_complete_cb()
 
-    cmd_mgr = CommandManager(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE.overwrite_output.enabled)
+    cmd_mgr = CommandManagerRich(input_files, output_dir=output_dir, steps=2 if two_pass else 1, overwrite=STATE.overwrite_output.enabled)
     cmd_mgr.run(callback, out_suffix=f".{file_format}", out_stem=out_stem)
 
     logger.info(f"{_('FFMpeg result')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

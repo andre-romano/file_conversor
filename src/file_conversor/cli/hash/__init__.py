@@ -1,24 +1,49 @@
 # src\file_conversor\cli\hash\__init__.py
 
-import typer
+from enum import Enum
 
 # user-provided modules
+from file_conversor.cli._utils import AbstractTyperGroup
 from file_conversor.config.locale import get_translation
 
-from file_conversor.cli.hash._typer import COMMAND_NAME
-
-from file_conversor.cli.hash.check_cmd import typer_cmd as check_cmd
-from file_conversor.cli.hash.create_cmd import typer_cmd as create_cmd
+from file_conversor.cli.hash.check_cmd import HashCheckCommand
+from file_conversor.cli.hash.create_cmd import HashCreateCommand
 
 _ = get_translation()
 
-hash_cmd = typer.Typer(
-    name=COMMAND_NAME,
-    help=_("Hashing manipulation (check, gen, etc)"),
-)
-hash_cmd.add_typer(create_cmd)
-hash_cmd.add_typer(check_cmd)
+
+class HashTyperGroup(AbstractTyperGroup):
+    """Config group command class."""
+
+    class Panels(Enum):
+        NONE = None
+
+    class Commands(Enum):
+        CHECK = "check"
+        CREATE = "create"
+
+    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+        super().__init__(
+            group_name=group_name,
+            help=_("Hashing manipulation (check, gen, etc)"),
+            rich_help_panel=rich_help_panel,
+        )
+
+        # add subcommands
+        self.add(
+            HashCheckCommand(
+                group_name=group_name,
+                command_name=self.Commands.CHECK.value,
+                rich_help_panel=self.Panels.NONE.value,
+            ),
+            HashCreateCommand(
+                group_name=group_name,
+                command_name=self.Commands.CREATE.value,
+                rich_help_panel=self.Panels.NONE.value,
+            ),
+        )
+
 
 __all__ = [
-    "hash_cmd",
+    "HashTyperGroup",
 ]

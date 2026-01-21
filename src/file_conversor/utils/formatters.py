@@ -4,18 +4,29 @@ import json
 import math
 import re
 import traceback
-import typer
 
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 # user-provided modules
-from file_conversor.config import State, get_translation
+from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.command_manager import CommandManager
-
-STATE = State.get()
 _ = get_translation()
+
+
+@staticmethod
+def get_output_file(
+        output_file: str | Path,
+        stem: str | None = None,
+        suffix: str | None = None,
+):
+    """
+    Get output file based on input
+    """
+    output_file = Path(output_file)
+    output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem or ""}")
+    output_name = output_name.with_suffix(suffix if suffix is not None else output_file.suffix)
+    return Path(output_name.name)
 
 
 def escape_xml(text: Any | str | None) -> str:
@@ -32,6 +43,15 @@ def escape_xml(text: Any | str | None) -> str:
             .replace('"', "&quot;")
             .replace("'", "&apos;")
     )
+
+
+def normalize_degree(deg: float | int) -> int:
+    """Normalize clockwise degree to 0-360"""
+    # parse rotation argument
+    degree = int(math.fmod(deg, 360))
+    if degree < 0:
+        degree += 360  # fix rotation signal
+    return degree
 
 
 def parse_traceback_list(exc: Exception) -> list[str]:
@@ -95,7 +115,7 @@ def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool
     if not scale and not width:
         if quiet:
             raise RuntimeError(f"{_('Scale and width not provided')}")
-        userinput = str(typer.prompt(f"{_('Output image scale (e.g., 1.5)')}"))
+        userinput = str(input(f"{_('Output image scale (e.g., 1.5)')}"))
         scale = float(userinput)
     return scale
 
@@ -129,7 +149,7 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
 def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
     """Parse PDF pages argument to list of page numbers (0-based)."""
     if not pages:
-        pages_str = typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
+        pages_str = input(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
         pages = str(pages_str)
 
     if isinstance(pages, str):
@@ -152,15 +172,6 @@ def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
         # create pages list
         pages_list.extend(range(begin, end + 1))
     return pages_list
-
-
-def normalize_degree(deg: float | int) -> int:
-    """Normalize clockwise degree to 0-360"""
-    # parse rotation argument
-    degree = int(math.fmod(deg, 360))
-    if degree < 0:
-        degree += 360  # fix rotation signal
-    return degree
 
 
 def parse_bytes(target_size: str | None) -> int:
@@ -295,6 +306,7 @@ def format_in_out_files_tuple(
     input_files: list[Path],
     file_format: str,
     output_dir: Path,
+    overwrite_output: bool,
 ):
     """
     Get input and output files for conversion.
@@ -302,25 +314,27 @@ def format_in_out_files_tuple(
     :param input_files: List of input file paths.
     :param format: Output file format.
     :param output_dir: Output directory path.
+    :param overwrite_output: Whether to overwrite existing output files.
 
     :raises FileExistsError: if output file exists and overwrite is disabled.
     """
     for input_file in input_files:
-        output_file = output_dir / CommandManager.get_output_file(input_file, suffix=f".{file_format.lstrip('.')}")
-        if not STATE.overwrite_output.enabled and output_file.exists():
+        output_file = output_dir / get_output_file(input_file, suffix=f".{file_format.lstrip('.')}")
+        if not overwrite_output and output_file.exists():
             raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
         yield input_file, output_file
 
 
 __all__ = [
+    "get_output_file",
     "escape_xml",
+    "normalize_degree",
     "parse_traceback_list",
     "parse_js_to_py",
     "parse_ffmpeg_filter",
     "parse_image_resize_scale",
     "parse_pdf_rotation",
     "parse_pdf_pages",
-    "normalize_degree",
     "parse_bytes",
     "format_bytes",
     "format_bitrate",

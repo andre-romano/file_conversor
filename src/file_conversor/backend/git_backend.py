@@ -4,9 +4,9 @@
 This module provides functionalities for handling repositories using Git.
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable
-from pydantic import BaseModel
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -27,7 +27,8 @@ class GitBackend(AbstractBackend):
     GitBackend is a class that provides an interface for handling repositories using Git.
     """
 
-    class RepositoryDataModel(BaseModel):
+    @dataclass
+    class RepositoryDataModel:
         user_name: str
         repo_name: str
         branch: str = ""

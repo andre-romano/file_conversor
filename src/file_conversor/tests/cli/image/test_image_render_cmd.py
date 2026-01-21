@@ -1,0 +1,32 @@
+# tests\cli\image\test_image_render_cmd.py
+
+import pytest
+from pathlib import Path
+
+# user-provided imports
+from file_conversor.cli._typer import AppCommands, ImageTyperGroup
+from file_conversor.cli.image import ImageRenderTyperCommand
+
+from file_conversor.tests.utils import TestTyper, DATA_PATH
+
+
+@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageRenderTyperCommand.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+class TestImageRender:
+    def test_image_render_cases(self, tmp_path):
+        test_cases: list[tuple[Path, Path]] = [
+            (DATA_PATH / "test.svg", tmp_path / "test.jpg"),
+            (DATA_PATH / "test.svg", tmp_path / "test.png"),
+        ]
+
+        for in_path, out_path in test_cases:
+            result = TestTyper.invoke(
+                AppCommands.IMAGE.value, ImageTyperGroup.Commands.RENDER.value,
+                str(in_path),
+                *TestTyper.get_format_params(out_path),
+                *TestTyper.get_out_dir_params(out_path),
+            )
+            assert result.exit_code == 0
+            assert out_path.exists()
+
+    def test_image_render_help(self,):
+        TestTyper.invoke_test_help(AppCommands.IMAGE.value, ImageTyperGroup.Commands.RENDER.value)

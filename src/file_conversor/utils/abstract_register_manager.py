@@ -1,12 +1,13 @@
 # src\file_conversor\utils\abstract_register_manager.py
 
+from dataclasses import dataclass
 from typing import Any, Self
-from pydantic import BaseModel
 
 
 class AbstractRegisterManager:
 
-    class ConstructorDataModel(BaseModel):
+    @dataclass
+    class ConstructorDataModel:
         """ Data model to store constructor data for registered classes. """
         name: str
         args: tuple

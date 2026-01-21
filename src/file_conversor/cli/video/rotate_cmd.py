@@ -1,26 +1,16 @@
 
 # src\file_conversor\cli\video\rotate_cmd.py
 
-import typer
-
-from rich import print
-
-from typing import Annotated, List
+from typing import Annotated, List, Iterable
 from pathlib import Path
 
 # user-provided modules
-from file_conversor.backend import FFmpegBackend
+from file_conversor.cli._utils import AbstractTyperCommand
+from file_conversor.cli._utils.typer import AudioBitrateOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption, VideoRotationOption
 
-from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
-
-from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.video._typer import COMMAND_NAME, ROTATE_NAME
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
-
-from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.validators import check_positive_integer, check_valid_options
-from file_conversor.utils.typer_utils import AudioBitrateOption, FormatOption, InputFilesArgument, OutputDirOption, VideoBitrateOption, VideoEncodingSpeedOption, VideoQualityOption, VideoRotationOption
 
 from file_conversor.system.win import WinContextCommand, WinContextMenu
 
@@ -32,82 +22,81 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-typer_cmd = typer.Typer()
 
+class VideoRotateTyperCommand(AbstractTyperCommand):
+    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
 
-def register_ctx_menu(ctx_menu: WinContextMenu):
-    # FFMPEG commands
-    icons_folder_path = Environment.get_icons_folder()
-    for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
-        ctx_menu.add_extension(f".{ext}", [
-            WinContextCommand(
-                name="rotate_anticlock_90",
-                description="Rotate Left",
-                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r -90"',
-                icon=str(icons_folder_path / "rotate_left.ico"),
-            ),
-            WinContextCommand(
-                name="rotate_clock_90",
-                description="Rotate Right",
-                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{ROTATE_NAME}" "%1" -r 90"',
-                icon=str(icons_folder_path / "rotate_right.ico"),
-            ),
-        ])
+    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+        # FFMPEG commands
+        icons_folder_path = Environment.get_icons_folder()
+        for ext in FFmpegCmdHelper.BACKEND.SUPPORTED_IN_VIDEO_FORMATS:
+            ctx_menu.add_extension(f".{ext}", [
+                WinContextCommand(
+                    name="rotate_anticlock_90",
+                    description="Rotate Left",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r -90"',
+                    icon=str(icons_folder_path / "rotate_left.ico"),
+                ),
+                WinContextCommand(
+                    name="rotate_clock_90",
+                    description="Rotate Right",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r 90"',
+                    icon=str(icons_folder_path / "rotate_right.ico"),
+                ),
+            ])
 
+    def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            command_name=command_name,
+            function=self.rotate,
+            help=f"""
+    {_('Rotate a video file (clockwise or anti-clockwise).')}
 
-# register commands in windows context menu
-ctx_menu = WinContextMenu.get_instance()
-ctx_menu.register_callback(register_ctx_menu)
+    {_('Outputs an video file with _rotated at the end.')}
+""",
+            epilog=f"""
+    **{_('Examples')}:** 
 
+    - `file_conversor {group_name} {command_name} input_file.webm -r 90 -od output_dir/ --audio-bitrate 192`
 
-@typer_cmd.command(
-    name=ROTATE_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
-    help=f"""
-        {_('Rotate a video file (clockwise or anti-clockwise).')}
+    - `file_conversor {group_name} {command_name} input_file.mp4 -r 180`
+""")
 
-        {_('Outputs an video file with _rotated at the end.')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:** 
+    def rotate(
+        self,
+        input_files: Annotated[List[Path], InputFilesArgument(FFmpegCmdHelper.BACKEND.SUPPORTED_IN_VIDEO_FORMATS)],
 
-        - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.webm -r 90 -od output_dir/ --audio-bitrate 192`
+        rotation: Annotated[int, VideoRotationOption()],
 
-        - `file_conversor {COMMAND_NAME} {ROTATE_NAME} input_file.mp4 -r 180`
-    """)
-def rotate(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
+        file_format: Annotated[str, FormatOption(FFmpegCmdHelper.BACKEND.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
 
-    rotation: Annotated[int, VideoRotationOption()],
+        audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
+        video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
+        video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegCmdHelper.BACKEND.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
+        video_quality: Annotated[str | None, VideoQualityOption(FFmpegCmdHelper.BACKEND.QUALITY_PRESETS)] = CONFIG.video_quality,
+        output_dir: Annotated[Path, OutputDirOption()] = Path(),
+    ):
 
-    audio_bitrate: Annotated[int, AudioBitrateOption()] = CONFIG.audio_bitrate,
-    video_bitrate: Annotated[int, VideoBitrateOption()] = CONFIG.video_bitrate,
+        ffmpeg_cmd_helper = FFmpegCmdHelper(
+            install_deps=CONFIG.install_deps,
+            verbose=STATE.loglevel.get().is_verbose(),
+            overwrite_output=STATE.overwrite_output.enabled,
+        )
 
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
-    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG.video_quality,
-    output_dir: Annotated[Path, OutputDirOption()] = Path(),
-):
+        # Set arguments for FFmpeg command helper
+        ffmpeg_cmd_helper.set_input(input_files)
+        ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_rotated", output_dir=output_dir)
 
-    ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE.loglevel.get().is_verbose(),
-        overwrite_output=STATE.overwrite_output.enabled,
-    )
+        ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+        ffmpeg_cmd_helper.set_rotation_filter(rotation)
 
-    # Set arguments for FFmpeg command helper
-    ffmpeg_cmd_helper.set_input(input_files)
-    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_rotated", output_dir=output_dir)
-
-    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
-    ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
-    ffmpeg_cmd_helper.set_rotation_filter(rotation)
-
-    ffmpeg_cmd_helper.execute()
+        ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
-    "typer_cmd",
-    "EXTERNAL_DEPENDENCIES",
+    "VideoRotateTyperCommand",
 ]

@@ -1,20 +1,19 @@
 
 # src\file_conversor\cli\video\_ffmpeg_cmd_helper.py
 
-from rich import print
-
-from typing import Annotated, Any, Callable, List, Self
+from typing import Any, Callable, Iterable, Self
 from pathlib import Path
 
 # user-provided modules
+from file_conversor.cli._utils import ProgressManagerRich, CommandManagerRich
+
 from file_conversor.backend import FFmpegBackend, FFprobeBackend
 from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter, FFmpegFilterDeshake, FFmpegFilterEq, FFmpegFilterHflip, FFmpegFilterMInterpolate, FFmpegFilterScale, FFmpegFilterTranspose, FFmpegFilterUnsharp, FFmpegFilterVflip
 
 from file_conversor.config import Log, get_translation
 
-from file_conversor.utils import ProgressManager, CommandManager
 from file_conversor.utils.formatters import format_bytes, normalize_degree, parse_bytes
-from file_conversor.utils.validators import check_valid_options, is_close
+from file_conversor.utils.validators import is_close
 
 # get app config
 LOG = Log.get_instance()
@@ -23,10 +22,9 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-EXTERNAL_DEPENDENCIES = FFmpegBackend.EXTERNAL_DEPENDENCIES
-
-
 class FFmpegCmdHelper:
+    BACKEND = FFmpegBackend
+
     def __init__(
             self,
             install_deps: bool | None,
@@ -284,9 +282,9 @@ class FFmpegCmdHelper:
 
     def execute(
         self,
-        progress_callback: Callable[[float, ProgressManager], Any] | None = None,
+        progress_callback: Callable[[float], Any] = lambda p: p,
     ) -> Self:
-        def _callback(input_file: Path, output_file: Path, progress_mgr: ProgressManager):
+        def _callback(input_file: Path, output_file: Path, progress_mgr: ProgressManagerRich):
             logger.debug(f"Input file: {input_file}")
 
             self._set_video_bitrate_for_target_size(input_file)
@@ -307,29 +305,21 @@ class FFmpegCmdHelper:
                 quality_setting=self._video_quality,
             )
 
-            progress_update_cb = progress_mgr.update_progress
-            if progress_callback is not None:
-                def progress_update_cb(step_progress: float): return progress_callback(step_progress, progress_mgr)  # pyright: ignore[reportOptionalCall]
-
-            progress_complete_cb = progress_mgr.complete_step
-            if progress_callback is not None:
-                def progress_complete_cb(): return progress_callback(progress_mgr.complete_step(), progress_mgr)  # pyright: ignore[reportOptionalCall]
-
             # display current progress
             self._ffmpeg_backend.execute(
-                progress_callback=progress_update_cb,
+                progress_callback=lambda p: progress_callback(progress_mgr.update_progress(p)),
                 pass_num=1 if self._two_pass else 0,
             )
-            progress_complete_cb()
+            progress_callback(progress_mgr.complete_step())
 
             if self._two_pass:
                 # display current progress
                 self._ffmpeg_backend.execute(
-                    progress_callback=progress_update_cb,
+                    progress_callback=progress_mgr.update_progress,
                     pass_num=2,
                 )
 
-        cmd_mgr = CommandManager(self._input_files, output_dir=self._output_dir, steps=2 if self._two_pass else 1, overwrite=self._overwrite_output)
+        cmd_mgr = CommandManagerRich(self._input_files, output_dir=self._output_dir, steps=2 if self._two_pass else 1, overwrite=self._overwrite_output)
         cmd_mgr.run(_callback, out_suffix=f".{self._file_format}", out_stem=self._out_stem)
 
         logger.info(f"{_('FFMpeg result')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
@@ -338,5 +328,4 @@ class FFmpegCmdHelper:
 
 __all__ = [
     "FFmpegCmdHelper",
-    "EXTERNAL_DEPENDENCIES",
 ]

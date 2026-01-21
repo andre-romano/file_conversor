@@ -1,56 +1,41 @@
 # src\file_conversor\system\win\context_menu.py
 
-from typing import Self, Callable
+from dataclasses import dataclass
+from typing import Iterable, Self, Callable
 from pathlib import Path
-
-from rich import print
 
 # user-provided modules
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
 from file_conversor.system.win.utils import is_admin
 
-from file_conversor.config import Environment, Log, AbstractSingletonThreadSafe
-from file_conversor.config.locale import get_translation
 
-# get app config
-LOG = Log.get_instance()
-
-_ = get_translation()
-logger = LOG.getLogger(__name__)
-
-
+@dataclass
 class WinContextCommand:
-    def __init__(self, name: str, description: str, command: str, icon: str | None = None) -> None:
-        """
-        Creates a windows context menu
-
-        multi_select =
-        ```python
-        True  # command accepts multi file selection
-        False # command available for single files (only)
-        ```
-
-        :param name: Name used to create command keys
-        :param description: Description of the command (as the user sees it)
-        :param command: Command to execute (accepts "%1" for single path input, %* for many inputs - no DOUBLE QUOTES)
-        :param multi_select_model: If command valid for multiple files.
-        :param icon: Icon to display with command.
-        """
-        super().__init__()
-        self.name = name
-        self.description = description
-        self.command = command
-        self.icon = icon
+    name: str
+    """ Name used to create command keys """
+    description: str
+    """ Description of the command (as the user sees it) """
+    command: str
+    """ Command to execute (accepts "%1" for single path input, %* for many inputs - no DOUBLE QUOTES) """
+    icon: str | None = None
+    """ Icon to display with command. """
 
 
-class WinContextMenu(AbstractSingletonThreadSafe):
+class WinContextMenu:
+    _instance = None
 
-    def __init__(self) -> None:
+    @classmethod
+    def get_instance(cls, icons_folder: Path) -> 'WinContextMenu':
+        if cls._instance is None:
+            cls._instance = WinContextMenu(icons_folder)
+        return cls._instance
+
+    def __init__(self, icons_folder: Path) -> None:
         """Set context menu for all users, or for current user ONLY"""
         super().__init__()
 
         self.MENU_NAME = "File Conversor"
-        self.ICON_FILE_PATH = Path(f"{Environment.get_icons_folder()}/icon.ico").resolve()
+        self.ICON_FILE_PATH = Path(f"{icons_folder}/icon.ico").resolve()
 
         self.ROOT_KEY_USER = rf"HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
         self.ROOT_KEY_MACHINE = rf"HKEY_LOCAL_MACHINE\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
@@ -69,7 +54,7 @@ class WinContextMenu(AbstractSingletonThreadSafe):
     def register_callback(self, function: Callable[[Self], None]) -> None:
         self._register_callbacks.append(function)
 
-    def add_extension(self, ext: str, commands: list[WinContextCommand]):
+    def add_extension(self, ext: str, commands: Iterable[WinContextCommand]):
         """
         Add extension and context menu for commands
 
@@ -93,7 +78,6 @@ class WinContextMenu(AbstractSingletonThreadSafe):
                     "@": cmd.command,
                 }),
             ])
-        logger.debug(f"Added commands for '{root_key}'")
 
 
 __all__ = [

@@ -110,7 +110,7 @@ jobs:
 
       - name: Check installed choco app
         run: |
-          file_conversor --version
+          file_conversor --self-test
         shell: bash
 
       - name: Publish Choco package

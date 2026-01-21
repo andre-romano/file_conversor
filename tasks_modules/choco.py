@@ -48,7 +48,7 @@ Run ``file_conversor -h`` to explore all available commands and options.
 
 ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/andre-romano/file_conversor@master/assets/gui.jpg)
 
-Run ``file_conversor gui start`` to launch the GUI application or double click the Windows Shortcut.
+Run ``file_conversor_gui`` to launch the GUI application or double click the Windows Shortcut.
 
 ### Windows Context Menu (Windows OS only)
 

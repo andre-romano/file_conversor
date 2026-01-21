@@ -315,3 +315,7 @@ def get_whl_file(path: str | Path = "dist"):
         if PROJECT_VERSION in str(whl):
             return whl
     raise RuntimeError(f"WHL file not found in '{path}'")
+
+
+def get_null_dev() -> str:
+    return "NUL" if os.name == "nt" else "/dev/null"

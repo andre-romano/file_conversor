@@ -1,6 +1,5 @@
 # src\file_conversor\config\config.py
 
-import json
 import locale
 
 from pathlib import Path
@@ -63,7 +62,7 @@ class Configuration:
     @classmethod
     def __load(cls) -> ConfigurationData:
         if cls.__config_path.exists():
-            return ConfigurationData(**json.loads(cls.__config_path.read_text()))
+            return ConfigurationData.model_validate_json(cls.__config_path.read_text())
         return cls.__reset()
 
     @classmethod
@@ -115,8 +114,7 @@ class Configuration:
         """Save app configuration file"""
         if cls.__data is None:
             raise RuntimeError("Configuration data is not set.")
-        data_dict = cls.__data.to_dict()
-        json_str = json.dumps(data_dict, indent=2)
+        json_str = cls.__data.model_dump_json(indent=2)
         cls.__config_path.write_text(json_str)
 
     @classmethod

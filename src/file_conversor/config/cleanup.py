@@ -1,7 +1,6 @@
 # src\file_conversor\config\cleanup.py
 
 import atexit
-import sys
 
 from typing import Callable
 

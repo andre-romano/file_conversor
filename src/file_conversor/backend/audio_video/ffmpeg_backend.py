@@ -21,7 +21,7 @@ from file_conversor.backend.audio_video.format_container import FormatContainer
 from file_conversor.config import Environment, Log, get_translation
 
 from file_conversor.utils.validators import check_file_format
-from file_conversor.utils.command_manager import CommandManager
+from file_conversor.utils.formatters import get_output_file
 
 from file_conversor.system import is_windows
 
@@ -51,6 +51,11 @@ class FFmpegBackend(AbstractFFmpegBackend):
                 filepath.unlink()
             except Exception as e:
                 logger.warning(f"Failed to remove log file '{filepath}': {e}")
+
+    @staticmethod
+    def build_filter(name: str) -> FFmpegFilter:
+        """ Build FFmpegFilter from string name. """
+        return FFmpegFilter.from_str(name)
 
     def __init__(
         self,
@@ -183,7 +188,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output file not set')}")
 
         logdir = self._output_file.parent
-        self._pass_logfile = logdir / CommandManager.get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
+        self._pass_logfile = logdir / get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
         logger.debug(f"{_('Temporary 2-pass log file')}: {self._pass_logfile}")
 
     def set_files(self, input_file: str | Path, output_file: str | Path):

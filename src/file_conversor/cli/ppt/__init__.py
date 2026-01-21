@@ -1,22 +1,41 @@
 # src\file_conversor\cli\ppt\__init__.py
 
-import typer
+from enum import Enum
 
 # user-provided modules
+from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
+
+from file_conversor.cli.ppt.convert_cmd import PptConvertTyperCommand
+
 from file_conversor.config.locale import get_translation
-
-from file_conversor.cli.ppt._typer import COMMAND_NAME
-
-from file_conversor.cli.ppt.convert_cmd import typer_cmd as convert_cmd
 
 _ = get_translation()
 
-ppt_cmd = typer.Typer(
-    name=COMMAND_NAME,
-    help=f"{_('Presentation file manipulation')} {_('(requires LibreOffice)')})",
-)
-ppt_cmd.add_typer(convert_cmd)
+
+class PptTyperGroup(AbstractTyperGroup):
+    class Panels(Enum):
+        NONE = None
+
+    class Commands(Enum):
+        CONVERT = "convert"
+
+    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            help=f"{_('Presentation file manipulation')} {_('(requires LibreOffice)')})",
+        )
+
+        # add subcommands
+        self.add(
+            PptConvertTyperCommand(
+                group_name=group_name,
+                command_name=self.Commands.CONVERT.value,
+                rich_help_panel=self.Panels.NONE.value,
+            ),
+        )
+
 
 __all__ = [
-    "ppt_cmd",
+    "PptTyperGroup",
 ]

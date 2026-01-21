@@ -1,25 +1,17 @@
 
 # src\file_conversor\cli\video\compress_cmd.py
-import typer
 
 from pathlib import Path
-from typing import Annotated, Any, Callable, List
-
-from rich import print
+from typing import Annotated, Any, Callable, Iterable, List
 
 # user-provided modules
-from file_conversor.backend import FFmpegBackend
+from file_conversor.cli._utils import AbstractTyperCommand
+from file_conversor.cli._utils.typer import FormatOption, InputFilesArgument, OutputDirOption, TargetFileSizeOption, VideoEncodingSpeedOption, VideoQualityOption
 
-from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper, EXTERNAL_DEPENDENCIES
-
-from file_conversor.cli.video._typer import TRANSFORMATION_PANEL as RICH_HELP_PANEL
-from file_conversor.cli.video._typer import COMMAND_NAME, COMPRESS_NAME
+from file_conversor.cli.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 
 from file_conversor.config import Environment, Configuration, State, Log
 from file_conversor.config.locale import get_translation
-
-from file_conversor.utils import ProgressManager, CommandManager
-from file_conversor.utils.typer_utils import FormatOption, InputFilesArgument, OutputDirOption, TargetFileSizeOption, VideoEncodingSpeedOption, VideoQualityOption
 
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
@@ -31,93 +23,66 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
-typer_cmd = typer.Typer()
 
+class VideoCompressTyperCommand(AbstractTyperCommand):
+    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
 
-def register_ctx_menu(ctx_menu: WinContextMenu):
-    icons_folder_path = Environment.get_icons_folder()
-    # IMG2PDF commands
-    for ext in FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS:
-        ctx_menu.add_extension(f".{ext}", [
-            WinContextCommand(
-                name="compress",
-                description="Compress",
-                command=f'cmd.exe /c "{Environment.get_executable()} "{COMMAND_NAME}" "{COMPRESS_NAME}" "%1""',
-                icon=str(icons_folder_path / "compress.ico"),
-            ),
-        ])
+    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+        icons_folder_path = Environment.get_icons_folder()
+        for ext in FFmpegCmdHelper.BACKEND.SUPPORTED_IN_VIDEO_FORMATS:
+            ctx_menu.add_extension(f".{ext}", [
+                WinContextCommand(
+                    name="compress",
+                    description="Compress",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
+                    icon=str(icons_folder_path / "compress.ico"),
+                ),
+            ])
 
+    def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
+        super().__init__(
+            rich_help_panel=rich_help_panel,
+            group_name=group_name,
+            command_name=command_name,
+            function=self.compress,
+            help=f"""
+    {_('Compress a video file to a target file size.')}
 
-# register commands in windows context menu
-ctx_menu = WinContextMenu.get_instance()
-ctx_menu.register_callback(register_ctx_menu)
+    {_('Outputs an video file with _compressed at the end.')}
+""",
+            epilog=f"""
+    **{_('Examples')}:**
 
+    - `file_conversor {group_name} {command_name} input_file.avi -od D:/Downloads --target-size 30M`
 
-def execute_video_compress_cmd(
-    input_files: List[Path],
-    target_size: str,
-    video_encoding_speed: str | None,
-    video_quality: str | None,
-    file_format: str,
-    output_dir: Path,
-    progress_callback: Callable[[float], Any] = lambda p: p,
-):
-    ffmpeg_cmd_helper = FFmpegCmdHelper(
-        install_deps=CONFIG.install_deps,
-        verbose=STATE.loglevel.get().is_verbose(),
-        overwrite_output=STATE.overwrite_output.enabled,
-    )
+    - `file_conversor {group_name} {command_name} input_file1.mp4 -ts 50M`
+""")
 
-    # Set arguments for FFmpeg command helper
-    ffmpeg_cmd_helper.set_input(input_files)
-    ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_compressed", output_dir=output_dir)
+    def compress(
+        self,
+        input_files: Annotated[List[Path], InputFilesArgument(FFmpegCmdHelper.BACKEND.SUPPORTED_IN_VIDEO_FORMATS)],
+        target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (size[K|M|G]) [0 = do not limit output file size]")}")],
+        video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegCmdHelper.BACKEND.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
+        video_quality: Annotated[str | None, VideoQualityOption(FFmpegCmdHelper.BACKEND.QUALITY_PRESETS)] = CONFIG.video_quality,
+        file_format: Annotated[str, FormatOption(FFmpegCmdHelper.BACKEND.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
+        output_dir: Annotated[Path, OutputDirOption()] = Path(),
+    ):
+        ffmpeg_cmd_helper = FFmpegCmdHelper(
+            install_deps=CONFIG.install_deps,
+            verbose=STATE.loglevel.get().is_verbose(),
+            overwrite_output=STATE.overwrite_output.enabled,
+        )
 
-    ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
-    ffmpeg_cmd_helper.set_target_size(target_size)
+        # Set arguments for FFmpeg command helper
+        ffmpeg_cmd_helper.set_input(input_files)
+        ffmpeg_cmd_helper.set_output(file_format=file_format, out_stem="_compressed", output_dir=output_dir)
 
-    ffmpeg_cmd_helper.execute(
-        progress_callback=lambda p, pm: progress_callback(pm.update_progress(p)),
-    )
+        ffmpeg_cmd_helper.set_video_settings(encoding_speed=video_encoding_speed, quality=video_quality)
+        ffmpeg_cmd_helper.set_target_size(target_size)
 
-
-@typer_cmd.command(
-    name=COMPRESS_NAME,
-    rich_help_panel=RICH_HELP_PANEL,
-    help=f"""
-        {_('Compress a video file to a target file size.')}
-
-        {_('Outputs an video file with _compressed at the end.')}
-    """,
-    epilog=f"""
-        **{_('Examples')}:**
-
-        - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file.avi -od D:/Downloads --target-size 30M`
-
-        - `file_conversor {COMMAND_NAME} {COMPRESS_NAME} input_file1.mp4 -ts 50M`
-    """)
-def compress(
-    input_files: Annotated[List[Path], InputFilesArgument(FFmpegBackend.SUPPORTED_IN_VIDEO_FORMATS)],
-
-    target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (size[K|M|G]) [0 = do not limit output file size]")}")],
-
-    video_encoding_speed: Annotated[str | None, VideoEncodingSpeedOption(FFmpegBackend.ENCODING_SPEEDS)] = CONFIG.video_encoding_speed,
-    video_quality: Annotated[str | None, VideoQualityOption(FFmpegBackend.QUALITY_PRESETS)] = CONFIG.video_quality,
-
-    file_format: Annotated[str, FormatOption(FFmpegBackend.SUPPORTED_OUT_VIDEO_FORMATS)] = CONFIG.video_format,
-
-    output_dir: Annotated[Path, OutputDirOption()] = Path(),
-):
-    execute_video_compress_cmd(
-        input_files=input_files,
-        target_size=target_size,
-        video_encoding_speed=video_encoding_speed,
-        video_quality=video_quality,
-        file_format=file_format,
-        output_dir=output_dir,
-    )
+        ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
-    "typer_cmd",
-    "EXTERNAL_DEPENDENCIES",
+    "VideoCompressTyperCommand",
 ]

@@ -140,11 +140,13 @@ def deps(c: InvokeContext):
 
 
 @task(pre=[clean_htmlcov, locales.build])
-def tests(c: InvokeContext, args: str = ""):
-    print("[bold] Running tests ... [/]")
-    result = c.run(f"pdm run pytest {args.strip()}")
+def tests(c: InvokeContext, app: str = f"python -m {PROJECT_NAME}"):
+    print("[bold] Running self tests ... [/]")
+    cmd = f"pdm run {app} --self-test"
+    print(f"    [italic]$ {cmd}[/]")
+    result = c.run(cmd)
     assert (result is not None) and (result.return_code == 0)
-    print("[bold] Running tests ... [/][bold green]OK[/]")
+    print("[bold] Running self tests ... [/][bold green]OK[/]")
 
 
 # @task(pre=[clean_uml,])
@@ -166,12 +168,61 @@ def check(c: InvokeContext, exe: str | Path = ""):
     if not app_exe:
         raise RuntimeError(f"'{exe}' not found in PATH")
     print(f"[bold] Found:[/] '{app_exe}'")
+
+    print(f"[bold] Checking version ...")
     result = c.run(f'"{app_exe}" -V')
-    assert result is not None
+    assert result is not None and result.return_code == 0
     if PROJECT_VERSION not in result.stdout:
         raise RuntimeError(f"'{exe}' version mismatch. Expected: '{PROJECT_VERSION}'.")
-    assert result.return_code == 0
+
+    # run self tests
+    tests(c, app=f'"{app_exe}"')
     print(f"[bold] Checking app '{exe}' ... [/][bold green]OK[/]")
+
+
+@task(pre=[clean_logs])
+def importtime(c: InvokeContext):
+    # self, cumulative, module_name
+    modules_data: list[tuple[float, float, str]] = []
+    print(f"[bold] Measuring import time for app ... [/]")
+    for module in ["cli"]:
+        import_time_log = Path(f"import_time_{module}.log")
+        import_time_log.unlink(missing_ok=True)
+
+        result = c.run(f'pdm run python -X importtime -m {PROJECT_NAME}.{module}', hide=True, warn=True)
+        assert result is not None
+
+        import_time_log.write_text(result.stderr)
+        if not import_time_log.exists():
+            raise RuntimeError("Import time log file not created")
+
+        # parse data
+        for line in import_time_log.read_text().splitlines():
+            try:
+                # parse line
+                line = line.replace("import time:", "").strip()
+                time_self, time_cumulative, module_name = line.split("|")
+                time_self, time_cumulative, module_name = int(time_self.strip()), int(time_cumulative.strip()), module_name.strip()
+                time_self, time_cumulative = round(time_self / 1000, 2), round(time_cumulative / 1000, 2)  # convert to ms
+                if (
+                    re.match(rf"^.*\.", module_name) and
+                    not re.match(rf"^{PROJECT_NAME}\.{module}$", module_name)
+                ):
+                    continue
+                modules_data.append((time_self, time_cumulative, module_name))
+            except Exception as e:
+                pass
+
+        # sort and get top 10
+        modules_data.sort(key=lambda x: x[1], reverse=True)
+        modules_data = modules_data[:10]
+        print()
+        print(f"[bold] Top 10 imported modules for '{module}': [/]")
+        for time_self, time_cumulative, module_name in modules_data:
+            print(f"    cumulative={time_cumulative:>8.2f} ms,   self={time_self:>6.2f} ms,   module={module_name}")
+
+    print()
+    print(f"[bold] Measuring import time for app ... [/][bold green]OK[/]")
 
 
 @task
