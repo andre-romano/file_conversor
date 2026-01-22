@@ -101,7 +101,7 @@ class TestAbstractBackend:
             )
 
         # unsupported OS
-        backend_with_pkg_and_path = AbstractBackend(
+        AbstractBackend(
             pkg_managers={
                 _DummyPkgManagerUnsupportedOS({
                     "cmd.exe": "dummy_dependency_1",
@@ -109,4 +109,3 @@ class TestAbstractBackend:
                 })
             }, install_answer=True,
         )
-        assert backend_with_pkg_and_path is not None
