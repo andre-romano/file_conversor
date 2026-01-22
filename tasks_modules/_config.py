@@ -42,6 +42,10 @@ I18N_PATH = Path(PYPROJECT["tool"]["myproject"]["locales_path"])
 ICON_APP = Path(rf"{ICONS_PATH}/icon.ico")
 I18N_TEMPLATE = Path(rf"{I18N_PATH}/messages.pot")
 
+LICENSE_PATH = Path("LICENSE")
+NOTICE_PATH = Path("NOTICE")
+THIRD_PARTY_LICENSES_PATH = Path("THIRD_PARTY_LICENSES.md")
+
 MANIFEST_IN_PATH = Path("MANIFEST.in")
 RELEASE_NOTES_PATH = Path("RELEASE_NOTES.md")
 README_PATH = Path("README.md")
@@ -79,7 +83,7 @@ SOURCE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/archive/refs/tags/
 
 ICON_URL = f"http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{str(ICONS_PATH).replace("\\", "/")}/icon.png"
 
-LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/LICENSE"
+LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/{LICENSE_PATH.relative_to(Path())}"
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 EMBEDPY_URL = f"https://www.python.org/ftp/python/{PYTHON_VERSION}/python-{PYTHON_VERSION}-embed-amd64.zip"

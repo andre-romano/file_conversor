@@ -67,6 +67,8 @@ SolidCompression=yes
 ShowLanguageDialog=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
+LicenseFile={LICENSE_PATH.resolve()}
+InfoBeforeFile={NOTICE_PATH.resolve()}
 SetupIconFile={ICON_APP.resolve()}
 UninstallDisplayIcon={APP_ICON_RELATIVE_DIR}
 SourceDir={Path(".").resolve()}
@@ -74,8 +76,18 @@ OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
 AlwaysRestart=yes
 
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+Name: "pt"; MessagesFile: "compiler:Languages\Portuguese.isl"
+
 [Files]
 Source: "{zip.BUILD_DIR.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
+Source: "{LICENSE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
+Source: "{NOTICE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
+Source: "{THIRD_PARTY_LICENSES_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -94,8 +106,8 @@ StatusMsg: "Setting permissions to all users ..."; Filename: "icacls.exe"; Param
 
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated
-StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
+StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser; RunOnceId: "cleanup_files"
 
 ''', encoding="utf-8")
     assert setup_iss_path.exists()
