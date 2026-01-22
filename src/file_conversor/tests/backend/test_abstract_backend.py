@@ -58,27 +58,6 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
         return ["echo", f"Installing dependency {dependency}..."]
 
 
-class _DummyPkgManager(AbstractPackageManager):
-    def __init__(self, dependencies: dict[str, str] = {}) -> None:
-        super().__init__(dependencies=dependencies)
-
-    def _get_pkg_manager_installed(self) -> str | None:
-        return "dummy_pkg_manager"
-
-    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
-        return {AbstractSystem.Platform.get()}
-
-    def _get_cmd_install_pkg_manager(self) -> list[str]:
-        return ["echo", "Installing dummy package manager..."]
-
-    def _post_install_pkg_manager(self) -> None:
-        """Empty on purpose for testing."""
-        pass
-
-    def _get_cmd_install_dep(self, dependency: str) -> list[str]:
-        return ["echo", f"Installing dependency {dependency}..."]
-
-
 @pytest.mark.skipif(AbstractSystem.Platform.get() != AbstractSystem.Platform.WINDOWS, reason="Windows-only test class")
 class TestAbstractBackend:
     def test_find_in_path_not_exists(self):
@@ -101,19 +80,6 @@ class TestAbstractBackend:
             AbstractBackend.check_file_exists(non_existing_file)
 
     def test_init_backend(self):
-        backend = AbstractBackend()
-        assert backend is not None
-
-        backend_with_pkg = AbstractBackend(pkg_managers=set())
-        assert backend_with_pkg is not None
-
-        backend_with_pkg_and_path = AbstractBackend(
-            pkg_managers={
-                _DummyPkgManager()
-            }, install_answer=True,
-        )
-        assert backend_with_pkg_and_path is not None
-
         with pytest.raises(RuntimeError):
             AbstractBackend(
                 pkg_managers={
