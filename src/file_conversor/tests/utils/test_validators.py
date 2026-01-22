@@ -133,11 +133,3 @@ class TestUtilsValidators:
             check_valid_options("option4", options)
         with pytest.raises(typer.BadParameter):
             check_valid_options(["option1", "option5"], options)
-
-    def test_check_ip_format(self):
-        assert check_ip_format("192.168.1.1") == "192.168.1.1"
-        assert check_ip_format("255.255.255.255") == "255.255.255.255"
-        with pytest.raises(typer.BadParameter):
-            check_ip_format("256.100.50.25")
-        with pytest.raises(typer.BadParameter):
-            check_ip_format("192.168.1")

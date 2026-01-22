@@ -215,23 +215,6 @@ def check_valid_options(data: Any | None, valid_options: Iterable):
     return data
 
 
-def check_ip_format(data: str | None) -> str | None:
-    exception = typer.BadParameter(f"'{data}' {_('is not a valid IP address')}.")
-    if not data:
-        return data
-    parts = data.split(".")
-    if len(parts) != 4:
-        raise exception
-    for part in parts:
-        try:
-            number = int(part)
-            if number < 0 or number > 255:
-                raise exception
-        except ValueError:
-            raise exception
-    return data
-
-
 __all__ = [
     "prompt_retry_on_exception",
     "check_file_size_format",
@@ -243,5 +226,4 @@ __all__ = [
     "check_positive_integer",
     "check_file_format",
     "check_valid_options",
-    "check_ip_format",
 ]
