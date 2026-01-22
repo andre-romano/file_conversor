@@ -116,7 +116,12 @@ class SelfTests:
                 logger.warning(f" {_('Tests folder not found at')} '{tests_path}'. {_('Skipping pytest self-tests.')}")
                 return
 
-            result = pytest.main(["-v", "--tb=short", "--disable-warnings", str(tests_path)])
+            result = pytest.main([
+                "--color=yes",
+                "--tb=short",
+                "--disable-warnings",
+                str(tests_path),
+            ])
             if result != 0:
                 return RuntimeError(f"{_('Some pytest self-tests have failed with exit-code')} {result}. {_('Please check the logs.')}")
         except ImportError:

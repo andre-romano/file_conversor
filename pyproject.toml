@@ -84,7 +84,7 @@ locales_path = "src/file_conversor/.locales"
 
 [tool.pytest.ini_options]
 testpaths = ["src/file_conversor/tests"]
-addopts = "--cache-clear --ff --cov=src --cov-report=html --cov-report=xml"
+addopts = "--cache-clear --ff --color=yes --cov=src --cov-report=html --cov-report=xml"
 filterwarnings = [
     "ignore:The 'is_flag' and 'flag_value' parameters are not supported by Typer",
     # supress pymupdf warnings
