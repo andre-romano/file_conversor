@@ -77,6 +77,7 @@ def clean_changelog(c: InvokeContext):
 @task(pre=[mkdirs])
 def clean_requirements(c: InvokeContext):
     remove_path_pattern(f"requirements.txt")
+    remove_path_pattern(f"requirements-*.txt")
 
 
 @task(pre=[clean_logs,
@@ -114,11 +115,31 @@ def licenses(c: InvokeContext):
 
 
 @task(pre=[clean_requirements,])
-def requirements(c: InvokeContext, prod: bool = True):
-    print("[bold]Generating requirements.txt ... [/]")
-    result = c.run(f"pdm export -f requirements --without-hashes {'--prod' if prod else ''} > requirements.txt")
+def requirements(c: InvokeContext):
+    def get_pdm_export_cmd(group: str):
+        group_opts: list[str]
+        requirements_file: Path
+        if group == "prod":
+            group_opts, requirements_file = ["--prod"], Path("requirements.txt")
+        elif group == "dev":
+            group_opts, requirements_file = ["--dev"], Path("requirements-dev.txt")
+        else:
+            group_opts, requirements_file = ["-G", group], Path(f"requirements-{group}.txt")
+        return [
+            "pdm",
+            "export",
+            "-f", "requirements",
+            "--without-hashes",
+            *group_opts,
+            "-o", str(requirements_file),
+        ]
+
+    print("[bold]Generating requirements.txt files ... [/]")
+    for group, deps in get_dependencies_dict().items():
+        print(f"    Exporting group {group} ({len(deps)} dependencies) ...")
+        result = c.run(" ".join(get_pdm_export_cmd(group)))
     assert (result is not None) and (result.return_code == 0)
-    print("[bold]Generating requirements.txt ... [/][bold green]OK[/]")
+    print("[bold]Generating requirements.txt files ... [/][bold green]OK[/]")
 
 
 @task(pre=[clean_deps,])

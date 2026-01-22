@@ -323,3 +323,11 @@ def get_whl_file(path: str | Path = "dist"):
 
 def get_null_dev() -> str:
     return "NUL" if os.name == "nt" else "/dev/null"
+
+
+def get_dependencies_dict() -> dict[str, list[str]]:
+    return {
+        "prod": PYPROJECT["project"]["dependencies"],
+        **PYPROJECT["project"]["optional-dependencies"],
+        **PYPROJECT["dependency-groups"],
+    }

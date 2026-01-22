@@ -28,6 +28,10 @@ SQLServer
 RELEASE_NOTES.md
 CHANGELOG.md
 
+# generated files
+requirements.txt
+requirements-*.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

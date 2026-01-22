@@ -142,9 +142,9 @@ def clean_unused_files(c: InvokeContext, dry_run: bool = False):
     human_size, size_bytes_orig = _config.get_dir_size(BUILD_DIR)
     print(f"Size BEFORE cleaning: {human_size} ({BUILD_DIR})")
 
-    remove_path_pattern("**/test", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path_pattern("**/tests", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
-    remove_path_pattern("**/testing", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    # remove_path_pattern("**/test", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    # remove_path_pattern("**/tests", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
+    # remove_path_pattern("**/testing", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
     remove_path_pattern("**/docs", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
     remove_path_pattern("**/examples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
     remove_path_pattern("**/samples", base_path=PORTABLE_PYTHON_DIR, dry_run=dry_run)
