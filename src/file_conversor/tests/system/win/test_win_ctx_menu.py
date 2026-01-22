@@ -1,6 +1,5 @@
 # tests/system/test_win_ctx_menu.py
 
-import platform
 import pytest
 
 from file_conversor.config import Environment

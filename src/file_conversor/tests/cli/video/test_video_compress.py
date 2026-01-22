@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, VideoTyperGroup
+from file_conversor.cli import AppTyperGroup, VideoTyperGroup
 from file_conversor.cli.video import VideoCompressTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -20,7 +20,7 @@ class TestVideoCompress:
 
         for in_path, out_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.VIDEO.value, VideoTyperGroup.Commands.COMPRESS.value,
+                AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.COMPRESS.value,
                 str(in_path),
                 "-ts", " 200K",
                 *TestTyper.get_format_params(out_path),
@@ -30,4 +30,4 @@ class TestVideoCompress:
             assert out_path.exists()
 
     def test_video_compress_help(self,):
-        TestTyper.invoke_test_help(AppCommands.VIDEO.value, VideoTyperGroup.Commands.COMPRESS.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.COMPRESS.value)

@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, PdfTyperGroup
+from file_conversor.cli import AppTyperGroup, PdfTyperGroup
 from file_conversor.cli.pdf import PdfConvertTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -20,7 +20,7 @@ class TestPdfConvert:
 
         for in_path, out_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.PDF.value, PdfTyperGroup.Commands.CONVERT.value,
+                AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.CONVERT.value,
                 str(in_path),
                 *TestTyper.get_format_params(out_path),
                 *TestTyper.get_out_dir_params(out_path),
@@ -29,4 +29,4 @@ class TestPdfConvert:
             assert out_path.with_name(f"test_1{out_path.suffix}").exists()
 
     def test_pdf_convert_help(self,):
-        TestTyper.invoke_test_help(AppCommands.PDF.value, PdfTyperGroup.Commands.CONVERT.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.CONVERT.value)

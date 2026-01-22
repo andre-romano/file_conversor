@@ -4,7 +4,13 @@
 import pytest
 import typer
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH, app_cmd
+from file_conversor.cli import AppTyperGroup
+from file_conversor.tests.utils import TestTyper, DATA_PATH
+
+
+def _get_app_cmd():
+    app_cmd = AppTyperGroup().get_typer()
+    return typer.main.get_command(app_cmd)
 
 
 class TestCLI:
@@ -34,10 +40,10 @@ class TestCLI:
 
     def test_help_flag(self,):
         result = TestTyper.invoke("--help")
-        ctx = typer.Context(typer.main.get_command(app_cmd))
+        ctx = typer.Context(_get_app_cmd())
         assert ctx.command.get_help(ctx) in result.output
 
     def test_help_short_flag(self,):
         result = TestTyper.invoke("-h")
-        ctx = typer.Context(typer.main.get_command(app_cmd))
+        ctx = typer.Context(_get_app_cmd())
         assert ctx.command.get_help(ctx) in result.output

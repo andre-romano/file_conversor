@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, VideoTyperGroup
+from file_conversor.cli import AppTyperGroup, VideoTyperGroup
 from file_conversor.cli.video import VideoListFormatsTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -20,11 +20,11 @@ class TestVideoListFormats:
 
         for in_path, out_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.VIDEO.value, VideoTyperGroup.Commands.LIST_FORMATS.value,
+                AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.LIST_FORMATS.value,
                 *TestTyper.get_format_params(out_path),
             )
             assert result.exit_code == 0
             assert "mp4" in result.stdout
 
     def test_video_list_formats_help(self,):
-        TestTyper.invoke_test_help(AppCommands.VIDEO.value, VideoTyperGroup.Commands.LIST_FORMATS.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.LIST_FORMATS.value)

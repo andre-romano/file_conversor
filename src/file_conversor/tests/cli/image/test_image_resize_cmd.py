@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, ImageTyperGroup
+from file_conversor.cli import AppTyperGroup, ImageTyperGroup
 from file_conversor.cli.image import ImageResizeTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -17,7 +17,7 @@ class TestImageResize:
         out_path: Path = tmp_path / "test_resized.png"
 
         result = TestTyper.invoke(
-            AppCommands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value,
+            AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value,
             str(in_path),
             "-s", "2.0",
             *TestTyper.get_out_dir_params(out_path),
@@ -30,7 +30,7 @@ class TestImageResize:
         out_path: Path = tmp_path / "test_resized.png"
 
         result = TestTyper.invoke(
-            AppCommands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value,
+            AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value,
             str(in_path),
             "-w", "1024",
             *TestTyper.get_out_dir_params(out_path),
@@ -39,4 +39,4 @@ class TestImageResize:
         assert out_path.exists()
 
     def test_image(self,):
-        TestTyper.invoke_test_help(AppCommands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value)

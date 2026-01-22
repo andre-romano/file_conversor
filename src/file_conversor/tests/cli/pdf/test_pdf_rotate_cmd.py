@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, PdfTyperGroup
+from file_conversor.cli import AppTyperGroup, PdfTyperGroup
 from file_conversor.cli.pdf import PdfRotateTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -18,7 +18,7 @@ class TestPdfRotate:
         out_path: Path = tmp_path / "test_rotated.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.PDF.value, PdfTyperGroup.Commands.ROTATE.value,
+            AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.ROTATE.value,
             str(in_path),
             "-r", "1-:90",
             *TestTyper.get_out_dir_params(out_path),
@@ -27,4 +27,4 @@ class TestPdfRotate:
         assert out_path.exists()
 
     def test_pdf_rotate_help(self,):
-        TestTyper.invoke_test_help(AppCommands.PDF.value, PdfTyperGroup.Commands.ROTATE.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.ROTATE.value)

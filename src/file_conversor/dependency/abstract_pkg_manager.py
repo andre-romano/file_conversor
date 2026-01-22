@@ -4,8 +4,6 @@
 This module provides functionalities for handling external backends.
 """
 
-import os
-import platform
 import shutil
 import subprocess
 
@@ -13,8 +11,8 @@ from typing import Any, Callable, Iterable, Protocol
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Environment, Log, get_translation
+from file_conversor.system.abstract_system import AbstractSystem
 
 LOG = Log.get_instance()
 
@@ -27,7 +25,7 @@ class PackageManagerProtocol(Protocol):
         """ Returns package manager path, if already installed in system. """
         ...
 
-    def _get_supported_oses(self) -> set[str]:
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
         """ Returns the package manager supported OSes. """
         ...
 
@@ -55,7 +53,6 @@ class AbstractPackageManager(PackageManagerProtocol):
         :param dependencies: External dependencies to check. Format {``executable: dependency``}.        
         """
         super().__init__()
-        self._os_type = platform.system()
         self._dependencies = dependencies
         self._pre_install_dep_callbacks: list[Callable[[], Any]] = []
         self._post_install_dep_callbacks: list[Callable[[], Any]] = []
@@ -87,7 +84,7 @@ class AbstractPackageManager(PackageManagerProtocol):
         """
         return self._get_pkg_manager_installed()
 
-    def get_supported_oses(self) -> set[str]:
+    def get_supported_oses(self) -> set[AbstractSystem.Platform]:
         """
         Gets the package manager supported OSes.
 
@@ -152,17 +149,9 @@ class AbstractPackageManager(PackageManagerProtocol):
         if not env:
             logger.debug("No env PATH to set for pkg manager")
             return
-        if self._os_type not in self.get_supported_oses():
+        if AbstractSystem.Platform.get() not in self.get_supported_oses():
             return
-        # check if needs to add path
-        env_paths = os.environ["PATH"].split(os.pathsep)
-        for path_str in env:
-            path_str = str(path_str)
-            if path_str in env_paths:
-                logger.debug(f"Skipping path '{path_str}'. Already in ENV")
-                continue
-            env_paths.append(path_str)
-        os.environ["PATH"] = os.pathsep.join(env_paths)
+        Environment.set_env_paths(env)
 
     def _check_os_supported(self):
         """ 
@@ -170,8 +159,9 @@ class AbstractPackageManager(PackageManagerProtocol):
 
         :raises RuntimeError: if package manager not supported in the OS.
         """
-        if self._os_type not in self.get_supported_oses():
-            raise RuntimeError(f"{_("Package manager is not supported on")} '{self._os_type}'.")
+        _platform = AbstractSystem.Platform.get()
+        if _platform not in self.get_supported_oses():
+            raise RuntimeError(f"{_("Package manager is not supported on")} '{_platform}'.")
 
 
 __all__ = [

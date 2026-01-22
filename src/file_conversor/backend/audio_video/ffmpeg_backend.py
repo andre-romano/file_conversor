@@ -23,7 +23,7 @@ from file_conversor.config import Environment, Log, get_translation
 from file_conversor.utils.validators import check_file_format
 from file_conversor.utils.formatters import get_output_file
 
-from file_conversor.system import is_windows
+from file_conversor.system import System
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -354,7 +354,9 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
         original_output_file = self._output_file
         if pass_num == 1:
-            self._output_file = Path("NUL" if is_windows() else "/dev/null")
+            self._output_file = Path("/dev/null")
+            if System.Platform.get() == System.Platform.WINDOWS:
+                self._output_file = Path("NUL")
 
         try:
             self._execute()

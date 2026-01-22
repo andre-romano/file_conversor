@@ -10,16 +10,6 @@ from file_conversor.config.locale import get_translation
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.office._convert_protocol import ConvertProtocol
 
-from file_conversor.system import is_windows
-
-# conditional import
-if is_windows():
-    import pythoncom  # pyright: ignore[reportMissingModuleSource]
-    from win32com import client  # pyright: ignore[reportMissingModuleSource]
-else:
-    pythoncom = None
-    client = None
-
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -40,8 +30,9 @@ class Win32Com:
         self._app = None
 
     def __enter__(self):
-        if not client or not pythoncom:
-            raise OSError("Win32Com is only available in Windows OS")
+        import pythoncom  # pyright: ignore[reportMissingModuleSource]
+        from win32com import client  # pyright: ignore[reportMissingModuleSource]
+
         pythoncom.CoInitialize()  # Initialize COM for this thread
         self._app = client.Dispatch(self._prog_id)
         try:
@@ -52,14 +43,14 @@ class Win32Com:
         return self._app
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        import pythoncom  # pyright: ignore[reportMissingModuleSource]
         try:
             if self._app:
                 self._app.Quit()
         except Exception:
             logger.warning(f"Fail to quit Win32Com prog_id '{self._prog_id}'. Try again later.")
         self._app = None
-        if pythoncom:
-            pythoncom.CoUninitialize()  # Uninitialize COM for this thread
+        pythoncom.CoUninitialize()  # Uninitialize COM for this thread
         # Returning False means exceptions (if any) will propagate
         return False
 
@@ -88,7 +79,9 @@ class AbstractMSOfficeBackend(AbstractBackend, ConvertProtocol):
 
     def is_available(self) -> bool:
         """Returns True if MS Office App is available, False otherwise"""
-        if not pythoncom:
+        try:
+            import pythoncom
+        except ImportError:
             return False
         try:
             pythoncom.CoInitialize()

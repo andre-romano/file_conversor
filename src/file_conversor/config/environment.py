@@ -1,10 +1,10 @@
 # src\file_conversor\config\environment.py
 
+import os
 import subprocess
 import shutil
 import sys
 import platformdirs
-import platform
 
 from importlib.resources import files
 from importlib.metadata import version
@@ -166,11 +166,6 @@ class Environment(AbstractSingletonThreadSafe):
         path.touch(mode=mode, exist_ok=exists_ok)
 
     @classmethod
-    def get_system_platform(cls) -> str:
-        """Get the current system platform."""
-        return platform.system()
-
-    @classmethod
     def get_executable(cls) -> str:
         """Get the executable path for this app's CLI."""
         res = ""
@@ -220,7 +215,7 @@ class Environment(AbstractSingletonThreadSafe):
         return data_path
 
     @classmethod
-    def get_version(cls) -> str:
+    def get_app_version(cls) -> str:
         """Get the current version of the app."""
         return version(cls.get_app_name())
 
@@ -233,6 +228,28 @@ class Environment(AbstractSingletonThreadSafe):
     def get_app_name(cls) -> str:
         """Get the app name."""
         return cls.__APP_NAME
+
+    @classmethod
+    def get_python_version(cls) -> str:
+        """Get the current Python version."""
+        return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+
+    @classmethod
+    def get_python_implementation(cls) -> str:
+        """Get the current Python implementation."""
+        return sys.implementation.name
+
+    @classmethod
+    def set_env_paths(cls, env: list[Path | str]):
+        # check if needs to add path
+        env_paths = os.environ["PATH"].split(os.pathsep)
+        for path_str in env:
+            path_str = str(path_str)
+            if path_str in env_paths:
+                logger.debug(f"Skipping path '{path_str}'. Already in ENV")
+                continue
+            env_paths.append(path_str)
+        os.environ["PATH"] = os.pathsep.join(env_paths)
 
     @classmethod
     def run_nowait(cls,

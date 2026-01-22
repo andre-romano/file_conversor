@@ -1,21 +1,21 @@
 
 # tests\backend\test_scoop_pkg_manager.py
 
-import platform
 import pytest
 
 from pathlib import Path
 
 # user-provided imports
 from file_conversor.dependency import ScoopPackageManager
+from file_conversor.system.abstract_system import AbstractSystem
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH, app_cmd
+from file_conversor.tests.utils import TestTyper, DATA_PATH
 
 
 class TestScoopPackageManager:
     def test_get_pkg_manager_installed(self) -> None:
         """Test ScoopPackageManager when Scoop is installed."""
-        if platform.system() != "Windows":
+        if AbstractSystem.Platform.get() != AbstractSystem.Platform.WINDOWS:
             pytest.skip("Scoop is only supported on Windows.")
         pkg_manager = ScoopPackageManager(dependencies={"wget": "1.21.1"})
         if pkg_manager._get_pkg_manager_installed():
@@ -25,7 +25,7 @@ class TestScoopPackageManager:
         """Test ScoopPackageManager supported OSes."""
         pkg_manager = ScoopPackageManager(dependencies={"wget": "1.21.1"})
         supported_oses = pkg_manager._get_supported_oses()
-        assert "Windows" in supported_oses
+        assert AbstractSystem.Platform.WINDOWS in supported_oses
 
     def test_get_cmd_install_pkg_manager(self) -> None:
         """Test ScoopPackageManager install command."""

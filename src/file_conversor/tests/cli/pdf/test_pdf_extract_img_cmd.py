@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, PdfTyperGroup
+from file_conversor.cli import AppTyperGroup, PdfTyperGroup
 from file_conversor.cli.pdf import PdfExtractImgTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -17,11 +17,11 @@ class TestPdfExtractImg:
         out_path: Path = tmp_path / "test.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.PDF.value, PdfTyperGroup.Commands.EXTRACT_IMG.value,
+            AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.EXTRACT_IMG.value,
             str(in_path),
             *TestTyper.get_out_dir_params(out_path),
         )
         assert result.exit_code == 0
 
     def test_pdf_extract_img_help(self,):
-        TestTyper.invoke_test_help(AppCommands.PDF.value, PdfTyperGroup.Commands.EXTRACT_IMG.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.EXTRACT_IMG.value)

@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, ImageTyperGroup
+from file_conversor.cli import AppTyperGroup, ImageTyperGroup
 from file_conversor.cli.image import ImageToPdfTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -17,7 +17,7 @@ class TestImageToPdf:
         out_path: Path = tmp_path / "test.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.IMAGE.value, ImageTyperGroup.Commands.TO_PDF.value,
+            AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.TO_PDF.value,
             str(in_path),
             *TestTyper.get_out_file_params(out_path),
         )
@@ -25,4 +25,4 @@ class TestImageToPdf:
         assert out_path.exists()
 
     def test_image_to_pdf_help(self,):
-        TestTyper.invoke_test_help(AppCommands.IMAGE.value, ImageTyperGroup.Commands.TO_PDF.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.TO_PDF.value)

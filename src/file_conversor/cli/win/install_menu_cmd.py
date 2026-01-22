@@ -13,7 +13,7 @@ from file_conversor.backend import WinRegBackend
 
 from file_conversor.config import Environment, Configuration, State, Log, get_translation
 
-from file_conversor.system.win import WinContextMenu, restart_explorer
+from file_conversor.system import WinContextMenu, WindowsSystem, System
 
 # get app config
 CONFIG = Configuration.get()
@@ -63,8 +63,8 @@ class WinInstallMenuTyperCommand(AbstractTyperCommand):
         logger.info(f"{_('Installing app context menu in Windows Explorer')} ...")
         winreg_backend.import_file(reg_file)
 
-        if reboot_explorer:
-            restart_explorer()
+        if reboot_explorer and isinstance(System, WindowsSystem):
+            System.restart_explorer()
         else:
             logger.warning("Restart explorer.exe or log off from Windows, to make changes effective immediately.")
 

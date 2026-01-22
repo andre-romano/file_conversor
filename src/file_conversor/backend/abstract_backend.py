@@ -5,7 +5,6 @@ This module provides functionalities for handling external backends.
 """
 
 import os
-import platform
 import shutil
 import typer
 
@@ -15,8 +14,8 @@ from pathlib import Path
 # user-provided imports
 from file_conversor.dependency import AbstractPackageManager
 
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Log, get_translation
+from file_conversor.system import AbstractSystem
 
 LOG = Log.get_instance()
 
@@ -82,7 +81,7 @@ class AbstractBackend:
         :raises RuntimeError: Cannot install missing dependency.
         """
         # identify OS and package manager
-        os_type = platform.system()
+        os_type = AbstractSystem.Platform.get()
         for pkg_mgr in self._pkg_managers:
             if os_type not in pkg_mgr.get_supported_oses():
                 continue

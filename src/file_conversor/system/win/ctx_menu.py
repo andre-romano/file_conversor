@@ -5,8 +5,8 @@ from typing import Iterable, Self, Callable
 from pathlib import Path
 
 # user-provided modules
+from file_conversor.system.win.windows_system import WindowsSystem
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
-from file_conversor.system.win.utils import is_admin
 
 
 @dataclass
@@ -40,7 +40,7 @@ class WinContextMenu:
         self.ROOT_KEY_USER = rf"HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
         self.ROOT_KEY_MACHINE = rf"HKEY_LOCAL_MACHINE\Software\Classes\SystemFileAssociations\{{ext}}\shell\FileConversor"
 
-        self._root_key_template = self.ROOT_KEY_MACHINE if is_admin() else self.ROOT_KEY_USER
+        self._root_key_template = self.ROOT_KEY_MACHINE if WindowsSystem.is_admin() else self.ROOT_KEY_USER
         self._reg_file = WinRegFile()
         self._register_callbacks: list[Callable[[Self], None]] = []
 

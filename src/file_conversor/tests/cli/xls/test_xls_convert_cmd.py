@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, XlsTyperGroup
+from file_conversor.cli import AppTyperGroup, XlsTyperGroup
 from file_conversor.cli.xls import XlsConvertTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -21,7 +21,7 @@ class TestXlsConvert:
 
         for in_path, out_path in test_cases:
             process = TestTyper.run(
-                AppCommands.XLS.value, XlsTyperGroup.Commands.CONVERT.value,
+                AppTyperGroup.Commands.XLS.value, XlsTyperGroup.Commands.CONVERT.value,
                 str(in_path),
                 *TestTyper.get_format_params(out_path),
                 *TestTyper.get_out_dir_params(out_path),
@@ -30,4 +30,4 @@ class TestXlsConvert:
         assert out_path.exists()
 
     def test_xls_convert_help(self,):
-        TestTyper.invoke_test_help(AppCommands.XLS.value, XlsTyperGroup.Commands.CONVERT.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.XLS.value, XlsTyperGroup.Commands.CONVERT.value)

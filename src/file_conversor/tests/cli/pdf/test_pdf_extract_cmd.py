@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, PdfTyperGroup
+from file_conversor.cli import AppTyperGroup, PdfTyperGroup
 from file_conversor.cli.pdf import PdfExtractTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -17,7 +17,7 @@ class TestPdfExtract:
         out_path: Path = tmp_path / "test_extracted.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.PDF.value, PdfTyperGroup.Commands.EXTRACT.value,
+            AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.EXTRACT.value,
             str(in_path),
             "-pg", "1-1",
             *TestTyper.get_out_dir_params(out_path),
@@ -26,4 +26,4 @@ class TestPdfExtract:
         assert out_path.exists()
 
     def test_pdf(self,):
-        TestTyper.invoke_test_help(AppCommands.PDF.value, PdfTyperGroup.Commands.EXTRACT.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.EXTRACT.value)

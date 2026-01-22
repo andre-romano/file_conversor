@@ -1,22 +1,20 @@
 # tests/system/test_win_utils.py
 
 import os
-import platform
 import subprocess
 import pytest
 
-from file_conversor.system.win.utils import _get_window_hwnd
-from file_conversor.system.win.utils import *
+from file_conversor.system import AbstractSystem, WindowsSystem
 
 
-@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-specific tests")
+@pytest.mark.skipif(AbstractSystem.Platform.get() != AbstractSystem.Platform.WINDOWS, reason="Windows-specific tests")
 class TestWinUtils:
     def test_is_admin(self,):
-        print("Is admin:", is_admin())
-        assert isinstance(is_admin(), bool)
+        print("Is admin:", WindowsSystem.is_admin())
+        assert isinstance(WindowsSystem.is_admin(), bool)
 
     def test_reload_user_path(self,):
-        reload_user_path()
+        WindowsSystem.reload_user_path()
         reloaded_path = os.environ.get("PATH", "")
         assert reloaded_path != ""
 
@@ -29,7 +27,8 @@ class TestWinUtils:
             original_popen = subprocess.Popen
             subprocess.run = lambda *args, **kwargs: None
             subprocess.Popen = lambda *args, **kwargs: None
-            restart_explorer()
+
+            WindowsSystem.restart_explorer()
         except Exception as e:
             pytest.fail(f"restart_explorer raised an exception: {e}")
         finally:
@@ -39,10 +38,12 @@ class TestWinUtils:
     def test_get_window_hwnd(self,):
         # mock ctypes.windll.user32.FindWindowW to return a fake hwnd
         import ctypes
+
         original_findwindoww = ctypes.windll.user32.FindWindowW
         ctypes.windll.user32.FindWindowW = lambda *args, **kwargs: 12345  # pyright: ignore[reportAttributeAccessIssue]
+
         try:
-            hwnd = _get_window_hwnd("NonExistentWindowTitle")
+            hwnd = WindowsSystem._get_window_hwnd("NonExistentWindowTitle")
             assert hwnd == 12345
         except RuntimeError as e:
             pytest.fail(f"_get_window_hwnd raised an exception: {e}")
@@ -58,8 +59,9 @@ class TestWinUtils:
         ctypes.windll.user32.FindWindowW = lambda *args, **kwargs: 12345  # pyright: ignore[reportAttributeAccessIssue]
         ctypes.windll.user32.LoadImageW = lambda *args, **kwargs: 67890  # pyright: ignore[reportAttributeAccessIssue]
         ctypes.windll.user32.SendMessageW = lambda *args, **kwargs: 0  # pyright: ignore[reportAttributeAccessIssue]
+
         try:
-            set_window_icon("NonExistentWindowTitle", "C:\\Path\\To\\Icon.ico")
+            WindowsSystem.set_window_icon("NonExistentWindowTitle", "C:\\Path\\To\\Icon.ico")
         except Exception as e:
             pytest.fail(f"set_window_icon raised an exception: {e}")
         finally:
@@ -77,7 +79,7 @@ class TestWinUtils:
         ctypes.windll.user32.SendMessageW = lambda *args, **kwargs: 0  # pyright: ignore[reportAttributeAccessIssue]
         try:
             with pytest.raises(RuntimeError):
-                set_window_icon("NonExistentWindowTitle", "C:\\Path\\To\\Icon.ico")
+                WindowsSystem.set_window_icon("NonExistentWindowTitle", "C:\\Path\\To\\Icon.ico")
         except Exception as e:
             pytest.fail(f"set_window_icon raised an exception: {e}")
         finally:

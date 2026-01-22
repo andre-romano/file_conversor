@@ -1,7 +1,6 @@
 
 # tests\backend\test_abstract_backend.py
 
-import platform
 import pytest
 
 from pathlib import Path
@@ -9,6 +8,8 @@ from pathlib import Path
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.dependency import AbstractPackageManager
+
+from file_conversor.system.abstract_system import AbstractSystem
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
 
@@ -22,8 +23,8 @@ class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"NonExistingOS123"}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.LINUX}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -43,8 +44,8 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"DummyOS", platform.system()}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.get()}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -64,8 +65,8 @@ class _DummyPkgManager(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return "dummy_pkg_manager"
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"DummyOS", platform.system()}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.get()}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -78,7 +79,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", f"Installing dependency {dependency}..."]
 
 
-@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
+@pytest.mark.skipif(AbstractSystem.Platform.get() != AbstractSystem.Platform.WINDOWS, reason="Windows-only test class")
 class TestAbstractBackend:
     def test_find_in_path_not_exists(self):
         assert AbstractBackend.find_in_path("cmd.exe").exists()

@@ -5,16 +5,16 @@ import shutil
 import subprocess
 import sys
 
-from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable
 
 from typer.testing import CliRunner
 
 # user-provided imports
-from file_conversor.cli import app_cmd
+from file_conversor.cli import AppTyperGroup
 from file_conversor.config.environment import Environment
 
+app_cmd = AppTyperGroup().get_typer()
 
 DATA_PATH = (Environment.get_resources_folder() / "tests" / ".data").resolve()
 

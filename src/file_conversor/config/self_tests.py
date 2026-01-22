@@ -29,24 +29,38 @@ class SelfTests:
     }
 
     @classmethod
-    def _get_internal_dependencies(cls) -> list[str]:
-        """ Get the list of internal dependencies. """
+    def _get_internal_dependencies(cls) -> list[tuple[str, bool]]:
+        """ 
+        Get the list of internal dependencies from pyproject.toml. 
+        :return A list of tuples (dependency, required).
+        """
         import toml
-        import re
 
         pyproject_toml_path = Environment.get_resources_folder() / "pyproject.toml"
         if not pyproject_toml_path.exists():
             pyproject_toml_path = Path() / "pyproject.toml"
         PYPROJECT = toml.load(pyproject_toml_path)
 
-        dependencies: list[str] = []
+        dependencies: list[tuple[str, bool]] = []
         for dep in PYPROJECT["project"]["dependencies"]:
-            match = re.match(r"^[a-zA-Z0-9_\-]+", dep)
-            if not match:
-                raise RuntimeError(f"{_('Cannot parse dependency:')} '{dep}' {_('from pyproject.toml')}")
-            package_name = match.group(0)  # Get the package name (before any version specifier)
-            dependencies.append(package_name)
+            dependencies.append((dep, True))
+        for dep_list in PYPROJECT["project"].get("optional-dependencies", {}).values():
+            dependencies.extend(
+                (dep, False)
+                for dep in dep_list
+            )
         return dependencies
+
+    @classmethod
+    def _parse_package_name_from_dependency(cls, dependency: str) -> str:
+        """ Parse a dependency string to extract the package name. """
+        import re
+
+        match = re.match(r"^[a-zA-Z0-9_\-]+", dependency)
+        if not match:
+            raise RuntimeError(f"{_('Cannot parse dependency:')} '{dependency}' {_('from pyproject.toml')}")
+        package_name = match.group(0)  # Get the package name (before any version specifier)
+        return package_name
 
     @classmethod
     def _should_skip_dependency_by_os(cls, dependency: str) -> bool:
@@ -66,21 +80,24 @@ class SelfTests:
 
         exception: Exception | None = None
         logger.info(f"  {_('Checking internal dependencies:')}")
-        for dependency in cls._get_internal_dependencies():
+        for dependency, required in cls._get_internal_dependencies():
+            package_name = cls._parse_package_name_from_dependency(dependency)
+            if cls._should_skip_dependency_by_os(dependency):
+                logger.warning(f"    [bold yellow]SKIPPED[/]\t{package_name} (not supported on this platform)")
+                continue
             try:
-                if cls._should_skip_dependency_by_os(dependency):
-                    logger.warning(f"    [bold yellow]⚠[/]\t{dependency} (skipped on this platform)")
-                    continue
-
-                dependency = cls.__INTERNAL_DEPENDENCY_TRANSLATION.get(dependency, dependency)
-                importlib.import_module(dependency)
-                logger.info(f"    [bold green]OK[/]\t- {dependency}")
-            except Exception as e:
-                logger.info(f"    [bold red]FAIL[/]\t- {dependency}")
-                exception = e
+                package_name = cls.__INTERNAL_DEPENDENCY_TRANSLATION.get(package_name, package_name)
+                importlib.import_module(package_name)
+                logger.info(f"    [bold green]FOUND[/]\t- {package_name}")
+            except ImportError as e:
+                if required:
+                    logger.info(f"    [bold red]NOT FOUND[/]\t- {package_name}")
+                    exception = e
+                else:
+                    logger.info(f"    [bold yellow]NOT FOUND[/]\t- {package_name} ([yellow]optional[/])")
 
         if exception is not None:
-            return RuntimeError(f"{_('Some dependencies are missing or cannot be imported. Please check the logs.')}")
+            return RuntimeError(f"{_('Some required dependencies are missing or cannot be imported. Please check the logs.')}")
 
     @classmethod
     def _check_external_dependencies(cls) -> Exception | None:

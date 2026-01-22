@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, TextTyperGroup
+from file_conversor.cli import AppTyperGroup, TextTyperGroup
 from file_conversor.cli.text import TextCheckTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -19,10 +19,10 @@ class TestTextCheck:
 
         for in_path, _ in test_cases:
             result = TestTyper.invoke(
-                AppCommands.TEXT.value, TextTyperGroup.Commands.CHECK.value,
+                AppTyperGroup.Commands.TEXT.value, TextTyperGroup.Commands.CHECK.value,
                 str(in_path),
             )
             assert result.exit_code == 0
 
     def test_text_check_help(self,):
-        TestTyper.invoke_test_help(AppCommands.TEXT.value, TextTyperGroup.Commands.CHECK.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.TEXT.value, TextTyperGroup.Commands.CHECK.value)

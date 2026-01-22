@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, PdfTyperGroup
+from file_conversor.cli import AppTyperGroup, PdfTyperGroup
 from file_conversor.cli.pdf import PdfDecryptTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -17,7 +17,7 @@ class TestPdfDecrypt:
         out_path: Path = tmp_path / "test_encrypted.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.PDF.value, PdfTyperGroup.Commands.ENCRYPT.value,
+            AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.ENCRYPT.value,
             str(in_path),
             "-op", "1234",
             *TestTyper.get_out_dir_params(out_path),
@@ -29,7 +29,7 @@ class TestPdfDecrypt:
         out_path: Path = tmp_path / "test_encrypted_decrypted.pdf"
 
         result = TestTyper.invoke(
-            AppCommands.PDF.value, PdfTyperGroup.Commands.DECRYPT.value,
+            AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.DECRYPT.value,
             str(in_path),
             "-p", "1234",
             *TestTyper.get_out_dir_params(out_path),
@@ -38,4 +38,4 @@ class TestPdfDecrypt:
         assert out_path.exists()
 
     def test_pdf_decrypt_help(self,):
-        TestTyper.invoke_test_help(AppCommands.PDF.value, PdfTyperGroup.Commands.DECRYPT.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.PDF.value, PdfTyperGroup.Commands.DECRYPT.value)

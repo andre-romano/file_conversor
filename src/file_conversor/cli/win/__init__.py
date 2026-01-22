@@ -24,11 +24,12 @@ class WinTyperGroup(AbstractTyperGroup):
         UNINSTALL_MENU = "uninstall-menu"
         RESTART_EXPLORER = "restart-explorer"
 
-    def __init__(self, group_name: str, rich_help_panel: str) -> None:
+    def __init__(self, group_name: str, rich_help_panel: str, hidden: bool) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,
             group_name=group_name,
             help=_("Windows OS commands (for Windows ONLY)"),
+            hidden=hidden,
         )
 
         # add subcommands

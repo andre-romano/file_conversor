@@ -8,7 +8,7 @@ from file_conversor.cli._utils import AbstractTyperCommand
 
 from file_conversor.config import Configuration, Log, get_translation
 
-from file_conversor.system import win
+from file_conversor.system import WinContextMenu, WindowsSystem, System
 
 # get app config
 CONFIG = Configuration.get()
@@ -21,7 +21,7 @@ logger = LOG.getLogger(__name__)
 class WinRestartExplorerTyperCommand(AbstractTyperCommand):
     EXTERNAL_DEPENDENCIES = set()
 
-    def register_ctx_menu(self, ctx_menu: win.WinContextMenu) -> None:
+    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # No context menu to register
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
@@ -40,8 +40,9 @@ class WinRestartExplorerTyperCommand(AbstractTyperCommand):
 """)
 
     def restart_explorer(self):
-        logger.info(f"{_('Restarting explorer.exe')} ...")
-        win.restart_explorer()
+        if isinstance(System, WindowsSystem):
+            logger.info(f"{_('Restarting explorer.exe')} ...")
+            System.restart_explorer()
 
 
 __all__ = [

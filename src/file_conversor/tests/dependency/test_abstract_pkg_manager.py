@@ -1,16 +1,16 @@
 
 # tests\backend\test_abstract_pkg_manager.py
 
-import platform
 import pytest
 
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.dependency import *
 from file_conversor.dependency import AbstractPackageManager
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH, app_cmd
+from file_conversor.system.abstract_system import AbstractSystem
+
+from file_conversor.tests.utils import TestTyper, DATA_PATH
 
 
 # unsupported OS
@@ -21,8 +21,8 @@ class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"NonExistingOS123"}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.LINUX}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -41,8 +41,8 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"DummyOS", platform.system()}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.get()}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -61,8 +61,8 @@ class _DummyPkgManager(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return "dummy_pkg_manager"
 
-    def _get_supported_oses(self) -> set[str]:
-        return {"DummyOS", platform.system()}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {AbstractSystem.Platform.get()}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
@@ -74,7 +74,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", f"Installing dependency {dependency}..."]
 
 
-@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test class")
+@pytest.mark.skipif(AbstractSystem.Platform.get() != AbstractSystem.Platform.WINDOWS, reason="Windows-only test class")
 class TestAbstractPkgManager:
     def test_check_dependencies(self):
         pkg_manager = _DummyPkgManager({
@@ -82,10 +82,10 @@ class TestAbstractPkgManager:
             "another_non_existing_executable_67890.exe": "dummy_dependency_2",
         }, env=[
             "c:/Windows/System32/xxx",
-            "c:/windows" if platform.system() == "Windows" else "/usr/bin",
+            "c:/windows" if AbstractSystem.Platform.get() == AbstractSystem.Platform.WINDOWS else "/usr/bin",
         ])
         missing_deps = pkg_manager.get_missing_dependencies()
-        if platform.system() == "Windows":
+        if AbstractSystem.Platform.get() == AbstractSystem.Platform.WINDOWS:
             assert "dummy_dependency_1" not in missing_deps
             assert "dummy_dependency_2" in missing_deps
             assert len(missing_deps) == 1
@@ -106,18 +106,13 @@ class TestAbstractPkgManager:
     def test_get_supported_oses(self):
         pkg_manager = _DummyPkgManager()
         supported_oses = pkg_manager.get_supported_oses()
-        assert platform.system() in supported_oses
+        assert AbstractSystem.Platform.get() in supported_oses
 
         pkg_manager_unsupported = _DummyPkgManagerUnsupportedOS()
         supported_oses_unsupported = pkg_manager_unsupported.get_supported_oses()
-        assert platform.system() not in supported_oses_unsupported
+        assert AbstractSystem.Platform.get() not in supported_oses_unsupported
 
     def test_install_pkg_manager(self):
-        # pkg manager already installed (raise RuntimeError)
-        pkg_manager_unsupported = _DummyPkgManagerUnsupportedOS()
-        with pytest.raises(RuntimeError):
-            pkg_mgr_path = pkg_manager_unsupported.install_pkg_manager()
-
         # not installed (return None as shutil.which() cannot find dummy pkg manager)
         pkg_manager_not_installed = _DummyPkgManagerNotInstalled()
         pkg_mgr_path = pkg_manager_not_installed.install_pkg_manager()

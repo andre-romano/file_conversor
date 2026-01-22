@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from file_conversor.cli._typer import AppCommands, ImageTyperGroup
+from file_conversor.cli import AppTyperGroup, ImageTyperGroup
 from file_conversor.cli.image import ImageAntialiasTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -18,7 +18,7 @@ class TestImageAntialias:
 
         for in_path, out_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.IMAGE.value, ImageTyperGroup.Commands.ANTIALIAS.value,
+                AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.ANTIALIAS.value,
                 str(in_path),
                 "-r", "3",
                 *TestTyper.get_out_dir_params(out_path),
@@ -27,4 +27,4 @@ class TestImageAntialias:
             assert out_path.exists()
 
     def test_image_antialias_help(self,):
-        TestTyper.invoke_test_help(AppCommands.IMAGE.value, ImageTyperGroup.Commands.ANTIALIAS.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.ANTIALIAS.value)

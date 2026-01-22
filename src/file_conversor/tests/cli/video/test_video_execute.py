@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.cli._typer import AppCommands, VideoTyperGroup
+from file_conversor.cli import AppTyperGroup, VideoTyperGroup
 from file_conversor.cli.video import VideoExecuteTyperCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -20,7 +20,7 @@ class TestVideoExecute:
 
         for in_path, out_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.VIDEO.value, VideoTyperGroup.Commands.EXECUTE.value,
+                AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.EXECUTE.value,
                 str(in_path),
                 *TestTyper.get_format_params(out_path),
                 *TestTyper.get_out_dir_params(out_path),
@@ -29,4 +29,4 @@ class TestVideoExecute:
             assert out_path.exists()
 
     def test_video_execute_help(self,):
-        TestTyper.invoke_test_help(AppCommands.VIDEO.value, VideoTyperGroup.Commands.EXECUTE.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.EXECUTE.value)

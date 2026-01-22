@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from file_conversor.cli._typer import AppCommands, EbookTyperGroup
+from file_conversor.cli import AppTyperGroup, EbookTyperGroup
 from file_conversor.cli.ebook import EbookConvertCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -19,7 +19,7 @@ class TestEbookConvert:
 
         for in_path, out_path in test_cases:
             process = TestTyper.run(
-                AppCommands.EBOOK.value, EbookTyperGroup.Commands.CONVERT.value,
+                AppTyperGroup.Commands.EBOOK.value, EbookTyperGroup.Commands.CONVERT.value,
                 str(in_path),
                 *TestTyper.get_format_params(out_path),
                 *TestTyper.get_out_dir_params(out_path),
@@ -28,4 +28,4 @@ class TestEbookConvert:
         assert out_path.exists()
 
     def test_ebook_convert_help(self,):
-        TestTyper.invoke_test_help(AppCommands.EBOOK.value, EbookTyperGroup.Commands.CONVERT.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.EBOOK.value, EbookTyperGroup.Commands.CONVERT.value)

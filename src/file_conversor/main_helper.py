@@ -1,14 +1,13 @@
 
 # src\file_conversor\main_helper.py
 
-import subprocess
 import sys
 
-from typing import Callable
+from typing import Any, Callable
 
 # user provided imports
-from file_conversor.config import State, Log, get_translation, add_cleanup_task
-from file_conversor.system import reload_user_path
+from file_conversor.config import State, Log, get_translation
+from file_conversor.system import System
 
 # Get app config
 STATE = State.get()
@@ -18,40 +17,66 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-def _cleanup():
-    """Cleanup function to be called on exit."""
-    logger.debug(f"{_('Shutting down log system')} ...")
-    LOG.shutdown()
+class MainHelper:
+    __cleanup_tasks: list[Callable[[], None]] = []
 
+    @classmethod
+    def _on_exit(cls):
+        """Cleanup function to be called on exit."""
+        logger.debug(f"{_('Shutting down log system')} ...")
+        LOG.shutdown()
 
-# Entry point of the app
-def main_helper(start_app_callback: Callable[[], None]) -> None:
-    try:
-        # Register cleanup for normal exits
-        add_cleanup_task(_cleanup)
+    @classmethod
+    def _register_cleanup_tasks(cls):
+        """Register cleanup tasks to be executed on exit."""
+        import atexit
 
-        # config env variables
-        reload_user_path()
+        def _atextit_callback():
+            logger.debug("Running cleanup tasks ...")
+            for task in cls.__cleanup_tasks:
+                try:
+                    task()
+                except Exception as e:
+                    logger.error(f"Error in cleanup task {task}: {repr(e)}", exc_info=True)
+        atexit.register(_atextit_callback)
 
-        # begin app
-        start_app_callback()
+    @classmethod
+    def add_cleanup_task(cls, func: Callable[[], Any]) -> None:
+        """Add a cleanup task to be executed on exit."""
+        cls.__cleanup_tasks.append(func)
 
-        # terminate app
-        sys.exit(0)
-    except Exception as e:
-        debug_mode = STATE.loglevel.level.is_debug()
-        error_type = str(type(e))
-        error_type = error_type.split("'")[1]
-        logger.error(f"{error_type} ({e})", exc_info=True if debug_mode else None)
-        if isinstance(e, subprocess.CalledProcessError):
-            logger.error(f"CMD: {e.cmd} ({e.returncode})")
-            logger.error(f"STDERR: {e.stderr}")
-            logger.error(f"STDOUT: {e.stdout}")
-        if debug_mode:
-            raise
-        sys.exit(1)
+    @classmethod
+    def run(cls, app_callback: Callable[[], Any]) -> None:
+        """ Run the main helper with the provided callback. """
+        try:
+            System.reload_user_path()
+
+            # register cleanup tasks
+            cls._register_cleanup_tasks()
+
+            # begin app
+            app_callback()
+
+            # terminate app
+            sys.exit(0)
+        except Exception as e:
+            import subprocess
+
+            debug_mode = STATE.loglevel.level.is_debug()
+            error_type = str(type(e))
+            error_type = error_type.split("'")[1]
+            logger.error(f"{error_type} ({e})", exc_info=True if debug_mode else None)
+
+            if isinstance(e, subprocess.CalledProcessError):
+                logger.error(f"CMD: {e.cmd} ({e.returncode})")
+                logger.error(f"STDERR: {e.stderr}")
+                logger.error(f"STDOUT: {e.stdout}")
+
+            if debug_mode:
+                raise
+            sys.exit(1)
 
 
 __all__ = [
-    "main_helper",
+    "MainHelper",
 ]

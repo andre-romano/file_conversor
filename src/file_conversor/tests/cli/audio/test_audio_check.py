@@ -4,7 +4,7 @@
 import pytest
 from pathlib import Path
 
-from file_conversor.cli._typer import AppCommands, AudioTyperGroup
+from file_conversor.cli import AppTyperGroup, AudioTyperGroup
 from file_conversor.cli.audio import AudioCheckCommand
 
 from file_conversor.tests.utils import TestTyper, DATA_PATH
@@ -19,10 +19,10 @@ class TestAudioCheck:
 
         for in_path in test_cases:
             result = TestTyper.invoke(
-                AppCommands.AUDIO.value, AudioTyperGroup.Commands.CHECK.value,
+                AppTyperGroup.Commands.AUDIO.value, AudioTyperGroup.Commands.CHECK.value,
                 str(in_path),
             )
             assert result.exit_code == 0
 
     def test_audio_check_help(self,):
-        TestTyper.invoke_test_help(AppCommands.AUDIO.value, AudioTyperGroup.Commands.CHECK.value)
+        TestTyper.invoke_test_help(AppTyperGroup.Commands.AUDIO.value, AudioTyperGroup.Commands.CHECK.value)

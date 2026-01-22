@@ -7,12 +7,11 @@ import shutil
 from pathlib import Path
 
 # user-provided imports
-from file_conversor.system import _PLATFORM_WINDOWS
-
-from file_conversor.config import Environment, Log
-from file_conversor.config.locale import get_translation
-
 from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
+
+from file_conversor.system import AbstractSystem, System
+
+from file_conversor.config import Environment, Log, get_translation
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -44,8 +43,8 @@ class ScoopPackageManager(AbstractPackageManager):
     def _get_pkg_manager_installed(self) -> str | None:
         return shutil.which("scoop")
 
-    def _get_supported_oses(self) -> set[str]:
-        return {_PLATFORM_WINDOWS}
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        return {System.Platform.WINDOWS, System.Platform.MACOS}
 
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return [

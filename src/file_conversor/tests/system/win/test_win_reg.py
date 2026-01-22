@@ -1,6 +1,5 @@
 # tests/system/test_win.py
 
-import platform
 import pytest
 
 from file_conversor.system.win import WinRegFile, WinRegKey
