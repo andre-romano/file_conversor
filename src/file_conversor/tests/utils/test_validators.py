@@ -3,7 +3,7 @@
 import pytest
 import typer
 
-from file_conversor.utils.validators import *
+from file_conversor.utils.validators import check_dir_exists, check_file_exists, check_file_format, check_file_size_format, check_is_bool_or_none, check_path_exists, check_positive_integer, check_valid_options, check_video_resolution, prompt_retry_on_exception
 
 
 class TestUtilsValidators:

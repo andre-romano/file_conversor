@@ -19,6 +19,7 @@ class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
         super().__init__(dependencies=dependencies)
 
     def _get_pkg_manager_installed(self) -> str | None:
+        """ empty on purpose for testing. """
         return None
 
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
@@ -28,6 +29,7 @@ class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """ empty on purpose for testing. """
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
@@ -39,6 +41,7 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
         super().__init__(dependencies=dependencies)
 
     def _get_pkg_manager_installed(self) -> str | None:
+        """ empty on purpose for testing. """
         return None
 
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
@@ -48,6 +51,7 @@ class _DummyPkgManagerNotInstalled(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """ empty on purpose for testing. """
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
@@ -68,6 +72,7 @@ class _DummyPkgManager(AbstractPackageManager):
         return ["echo", "Installing dummy package manager..."]
 
     def _post_install_pkg_manager(self) -> None:
+        """ empty on purpose for testing. """
         pass
 
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
