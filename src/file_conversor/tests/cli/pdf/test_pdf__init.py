@@ -1,11 +1,9 @@
 # tests\cli\test_pdf_cmd.py
 
-from pathlib import Path
 
 # user-provided modules
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-
-from file_conversor.tests.utils import TestTyper, DATA_PATH
+from file_conversor.tests.utils import TestTyper
 
 
 class TestPdfHelp:

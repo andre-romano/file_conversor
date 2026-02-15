@@ -4,10 +4,10 @@ import sys
 
 from pathlib import Path
 
-# user provided imports
 from file_conversor.config.environment import Environment
-from file_conversor.config.log import Log
 from file_conversor.config.locale import get_translation
+from file_conversor.config.log import Log
+
 
 # Get app config
 LOG = Log.get_instance()
@@ -98,6 +98,7 @@ class SelfTests:
 
         if exception is not None:
             return RuntimeError(f"{_('Some required dependencies are missing or cannot be imported. Please check the logs.')}")
+        return None
 
     @classmethod
     def _check_external_dependencies(cls) -> Exception | None:
@@ -114,7 +115,7 @@ class SelfTests:
             tests_path = Environment.get_resources_folder() / "tests"
             if not tests_path.exists():
                 logger.warning(f" {_('Tests folder not found at')} '{tests_path}'. {_('Skipping pytest self-tests.')}")
-                return
+                return None
 
             result = pytest.main([
                 "--color=yes",

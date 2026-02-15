@@ -1,28 +1,33 @@
 # tasks\_config.py
 
 import hashlib
-import sys
 import os
 import re
 import shutil
+import sys
 import tomllib
 import zipfile
+
+from email.utils import formatdate
+from pathlib import Path
+from typing import Any, Iterable
+
 import requests
 
 from invoke.context import Context as InvokeContext
-from typing import Any, Iterable
-from pathlib import Path
-from email.utils import formatdate
-
 from rich import print
+
 
 # Read version from pyproject.toml
 PYPROJECT: dict[str, Any]
 with open("pyproject.toml", "rb") as f:
-    PYPROJECT = tomllib.load(f)
+    PYPROJECT = tomllib.load(f)   # pyright: ignore[reportConstantRedefinition]
 
 # CONSTANTS
-PROJECT_AUTHORS: list[str] = list(str(a["name"]) if isinstance(a, dict) else str(a) for a in PYPROJECT["project"]["authors"])
+PROJECT_AUTHORS: list[str] = [
+    str(a["name"]) if isinstance(a, dict) else str(a)  # pyright: ignore[reportUnknownArgumentType]
+    for a in PYPROJECT["project"]["authors"]
+]
 PROJECT_KEYWORDS: list[str] = PYPROJECT["project"]["keywords"]
 
 PROJECT_NAME = str(PYPROJECT["project"]["name"])
@@ -142,7 +147,7 @@ def remove_path_pattern(path_pattern: str, base_path: Path = Path(), dry_run: bo
         print("[bold green]OK[/]")
 
 
-def mkdir(dirs: Iterable):
+def mkdir(dirs: Iterable[str] | Iterable[Path]):
     for dir in dirs:
         Path(dir).mkdir(parents=True, exist_ok=True)
         if not Path(dir).exists():
@@ -166,7 +171,7 @@ def get_dir_size(path: Path | str) -> tuple[str, float]:
     return (f"{total:.2f} PB", total)
 
 
-def get_url(url: str, cache: bool = True, **kwargs) -> tuple[bytes, Path | None]:
+def get_url(url: str, cache: bool = True, **kwargs: Any) -> tuple[bytes, Path | None]:
     cache_file: Path | None = None
     if cache:
         cache_file = CACHE_DIR / hashlib.sha256(url.encode("utf-8")).hexdigest()
@@ -183,7 +188,7 @@ def get_url(url: str, cache: bool = True, **kwargs) -> tuple[bytes, Path | None]
         del kwargs["stream"]
 
     print(f"Accessing url '{url}' ... ", end="")
-    response = requests.get(url, headers=headers, stream=True, **kwargs)
+    response = requests.get(url, headers=headers, stream=True, **kwargs)  # noqa: S113
     print(f"[bold blue]{response.status_code}[/]")
 
     if not response.ok:
@@ -214,7 +219,7 @@ def get_hash(data: bytes | str | Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def get_remote_hash(url: str, cache: bool = True, **kwargs) -> str:
+def get_remote_hash(url: str, cache: bool = True, **kwargs: Any) -> str:
     return get_hash(get_url(url, cache=cache, **kwargs)[0])
 
 
@@ -223,6 +228,7 @@ def verify_with_sha256_file(sha_file: Path):
         try:
             expected, name = line.strip().split()
         except:
+            """ Skip invalid lines """
             continue
         print(f"'{name}': ", end="")
         actual = get_hash(sha_file.parent / name)
@@ -233,13 +239,16 @@ def verify_with_sha256_file(sha_file: Path):
 
 
 def parse_manifest_includes() -> list[str]:
-    add_data_list = []
+    add_data_list: list[str] = []
     if not MANIFEST_IN_PATH.exists():
         raise RuntimeError(f"Manifest file '{MANIFEST_IN_PATH}' not exists")
     for line in MANIFEST_IN_PATH.read_text().splitlines():
         match = re.match(r"^[\s]*include[\s]+(.+)", line)
         if match:
-            add_data_list.extend([filepath.strip() for filepath in match.group(1).split()])
+            add_data_list.extend([
+                filepath.strip()
+                for filepath in match.group(1).split()
+            ])
             continue
 
         match = re.match(r"^[\s]*recursive-include[\s]+([^\s]+)", line)

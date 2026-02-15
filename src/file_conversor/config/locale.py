@@ -1,22 +1,21 @@
 
 # src\file_conversor\config\locale.py
-
-import gettext  # app translations / locales
-import locale
-import pycountry
-
-from babel import Locale
-from rich import print
 from typing import Callable
 
-from file_conversor.config.environment import Environment
+from rich import print
+
 from file_conversor.config.config import Configuration
+from file_conversor.config.environment import Environment
+
 
 CONFIG = Configuration.get()
 
-AVAILABLE_LANGUAGES: set[str] = set([str(mo.relative_to(Environment.get_locales_folder()).parts[0]) for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")])
+AVAILABLE_LANGUAGES: set[str] = {
+    str(mo.relative_to(Environment.get_locales_folder()).parts[0])
+    for mo in Environment.get_locales_folder().glob("**/LC_MESSAGES/*.mo")
+}
 
-_gettext_instance: Callable[[str], str] | None = None
+_translation_cache: dict[str, Callable[[str], str]] = {}
 
 
 def _get_lang_name_babel(lang_code: str) -> str:
@@ -28,17 +27,19 @@ def _get_lang_name_babel(lang_code: str) -> str:
     :return: Language name (e.g., "English", "Français", "Español")
     :raises Exception: If language code is invalid or name not found.
     """
+    from babel import Locale
+
     locale = Locale.parse(lang_code)
     try:
         display_lang = normalize_lang_code(CONFIG.language)[:2].lower()
         lang = locale.get_display_name(display_lang)
         if not lang:
             raise ValueError(f"No language name found for display language '{display_lang}'.")
-    except:
+    except Exception as e:
         display_lang = get_default_language()[:2].lower()
         lang = locale.get_display_name(display_lang)
         if not lang:
-            raise ValueError(f"No language name found for display language '{display_lang}'.")
+            raise ValueError(f"No language name found for display language '{display_lang}'.") from e
     return lang
 
 
@@ -50,6 +51,8 @@ def _get_lang_name_pycountry(lang_code: str) -> str:
     :return: Language name (e.g., "English", "Français", "Español")
     :raises Exception: If language code is invalid or name not found.
     """
+    import pycountry
+
     CUSTOM_LANG_ALIASES = {
         "chi_sim": "Chinese (Simplified)",
         "chi_tra": "Chinese (Traditional)",
@@ -89,6 +92,8 @@ def normalize_lang_code(lang: str | None) -> str:
 # Get translations
 def get_system_locale():
     """Get system default locale"""
+    import locale
+
     lang, _ = locale.getlocale()
     return lang
 
@@ -97,9 +102,10 @@ def get_translation():
     """
     Get translation mechanism, based on user preferences.
     """
-    global _gettext_instance
-    if _gettext_instance:
-        return _gettext_instance
+    import gettext  # app translations / locales
+
+    if "gettext" in _translation_cache:
+        return _translation_cache["gettext"]
 
     languages: list[str] = []
     try:
@@ -117,8 +123,8 @@ def get_translation():
             languages=languages,
             fallback=True,
         )
-        _gettext_instance = translation.gettext
-        return _gettext_instance
+        _translation_cache["gettext"] = translation.gettext
+        return _translation_cache["gettext"]
     except:
         _print_debug()
         print(f"Languages tried: {languages}")
@@ -137,11 +143,11 @@ def get_language_name(lang_code: str) -> str:
 
     try:
         return _get_lang_name_babel(lang_code).title()
-    except Exception as e:
-        pass
+    except Exception:
+        """ If babel fails (e.g., due to missing locale data), fallback to pycountry. If that also fails, fallback to the original code. """
     try:
         return _get_lang_name_pycountry(lang_code).title()
-    except Exception as e:
+    except Exception:
         print(f"[bold]WARNING[/]: Could not parse language code '{lang_code}'. Falling back to '{lang_code}'.")
         return lang_code
 

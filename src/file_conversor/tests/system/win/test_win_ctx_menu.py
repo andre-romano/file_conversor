@@ -1,9 +1,9 @@
 # tests/system/test_win_ctx_menu.py
 
-import pytest
 
 from file_conversor.config import Environment
 from file_conversor.system.win import WinContextCommand, WinContextMenu
+
 
 icons_folder = Environment.get_icons_folder()
 

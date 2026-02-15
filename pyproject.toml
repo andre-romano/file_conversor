@@ -63,6 +63,8 @@ dev = [
     "deep-translator>=1.11.4",
     "requests>=2.32.5",
     "pip-licenses>=5.5.0",
+    "pylint>=4.0.4",
+    "ruff>=0.15.0",
 ]
 
 [tool.pdm] 
@@ -93,10 +95,61 @@ filterwarnings = [
     "ignore:builtin type SwigPyObject has no __module__ attribute",
 ]
 
+[tool.ruff]
+# controls which rules are reported (warnings)
+select = [
+    "I", # Import-order rules
+    "B", # flake8-bugbear rules (code quality and likely bugs)
+    "F", # Pyflakes rules (logical errors)
+    "N", # Naming convention rules
+    "S", # Security issues
+    "SLF", # private member rules (ex: private members that are not used, private members that are used outside of their class, etc)
+    "RET", # return-related rules (ex: functions that return None but are not annotated with Optional, functions that have inconsistent return types, etc)
+    "ARG", # argument-related rules (ex: functions that have too many arguments, functions that have arguments that are not used, etc)
+    "PIE", # Pie rules (ex: functions that are too complex, functions that have too many branches, etc)
+    "PLE", # Pylint errors (code that is likely to cause errors, code that is not following best practices, etc)
+    "PLW", # Pylint warnings (code that is not following best practices, code that is likely to cause errors, etc)
+    "SIM", # similarity rules (ex: code that is duplicated, code that is similar to other code, etc)
+    # "C90", # McCabe complexity (complexity for functions and methods)
+    "C4", # McCabe complexity (complexity for list and dict comprehensions)
+]
+# controls which rule warnings are ignored (not reported) - might still be fixed by the --fix option, or VSCode's Ruff extension
+ignore = [
+    "I001", # Unsorted imports diagnostic (no warning - fixer will still sort them)
+    "B008", # do not perform function calls in argument defaults
+    "B017", # assert ExceptionType is not specific enough
+    "B021", # f-string docstrings are not supported
+    "E501", # line too long
+    "W291", # trailing whitespace
+    "W293", # blank line contains whitespace
+    "F403", # 'from module import *' used; unable to detect undefined names
+    "F405", # name may be undefined, or defined from star imports
+    "F541", # f-string is missing placeholders
+    "N802", # function name should be lowercase
+    "N806", # variable in function should be lowercase
+    "N818", # Exception name should be named with an Error suffix
+    "S101", # use of assert detected. The enclosed code will be removed when compiling to optimised bytecode.
+    "S110", # try-except-pass detected. 
+    "S112", # try-except-continue detected. 
+    "S201", # Flask debug mode is enabled.
+    "RET504", # Unnecessary assignment to `process` before `return` statement    
+    "SIM212", # if expressions that check against a negated condition.
+]
+
+[tool.ruff.lint.isort]
+order-by-type = true # true = Classes < Constants < Functions < Variables
+combine-as-imports = true # true = from x import y, z 
+force-single-line = false # false = do not force single line imports
+force-sort-within-sections = false # false = do not mix "from" with "import"
+case-sensitive = false # false = ignore case when sorting
+known-first-party = ["src", "file_conversor"] # first-party modules
+lines-between-types = 1
+lines-after-imports = 2
+
 [tool.pyright]
 # Specify the language server (Pylance should be set by default if using Pyright)
 languageServer = "Pylance"
-typeCheckingMode = "basic"      # Type checking mode (options: "off", "basic", "strict")
+typeCheckingMode = "strict"      # Type checking mode (options: "off", "basic", "strict")
 diagnosticMode = "workspace"    # Diagnostic mode (options: "workspace", "openFiles")
 
 extraPaths = ["src"]            # Extra search path
@@ -104,24 +157,20 @@ autoSearchPaths = true          # Automatically adds paths to the environment
 indexing = true                 # Enable indexing for better suggestions
 useLibraryCodeForTypes = true   # Use type stubs from libraries for better error detection
 
-# Report all types of issues including circular imports AND
-reportImportCycles = true 
-# Duplicate imports, deprecated features, unused functions and classes
-reportDuplicateImport = "warning"
-reportDeprecated = "warning"
-reportUnusedFunction = "warning"
-reportUnusedClass = "warning"
-
-# INHERITANCE ISSUES
-reportMissingSuperCall = "error"           # missing super() call in a constructor
-reportInconsistentConstructor = "error"    # inconsistent constructor signatures
-reportIncompatibleMethodOverride = "error" # incompatible method overrides (base class)
-reportOverlappingOverload = "error"        # overlapping overloads
+# CODE ISSUES
+reportImportCycles = "error"      # Importacao circular - importacoes que criam ciclos entre modulos
+reportUnreachable = "error"             # unreachable code
+reportUnnecessaryIsInstance = "none" # isinstance() call that can be simplified
 
 # TYPE ISSUES
-reportIncompleteStub = "error" # Incomplete stub files
-reportInvalidStubStatement = "error" # Invalid statements in stub files
-reportPropertyTypeMismatch = "error" # Property type mismatch
+reportUnknownLambdaType = "none" # lambda functions with unknown types
+reportMissingReturnType = "warning" # Missing return types
+reportMissingParameterType = "warning" # Missing parameter types
+
+# CLASS ISSUES
+reportMissingSuperCall = "error"           # missing super() call in a constructor
+reportUninitializedInstanceVariable = "error"  # uninitialized instance variables
+reportPropertyTypeMismatch = "error" # Property type mismatch - type of property does not match type of getter/setter
 
 # Exclude files from analysis
 ignore = [

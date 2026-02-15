@@ -1,13 +1,11 @@
 # src/file_conversor/cli/_utils/abstract_typer_group.py
 
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Protocol, override
+
 import typer
 import typer.core
-
-from enum import Enum
-from typing import Any, Callable, Protocol, Self
-from dataclasses import dataclass
-
-# user-provided modules
 
 
 class GetTyperProtocol(Protocol):
@@ -84,6 +82,7 @@ class AbstractTyperGroup(GetTyperProtocol):
         for obj in objs:
             self._typer_cmd.add_typer(obj.get_typer())
 
+    @override
     def get_typer(self) -> typer.Typer:
         return self._typer_cmd
 

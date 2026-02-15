@@ -4,16 +4,14 @@
 This module provides functionalities for handling files using ``pdf2docx`` backend.
 """
 
-import pdf2docx
-
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable
-
-# user-provided imports
-from file_conversor.config import Environment, Log, State
-from file_conversor.config.locale import get_translation
 
 from file_conversor.backend.abstract_backend import AbstractBackend
+
+# user-provided imports
+from file_conversor.config import Log, get_translation
+
 
 LOG = Log.get_instance()
 
@@ -26,12 +24,12 @@ class PDF2DOCXBackend(AbstractBackend):
     A class that provides an interface for handling files using ``pdf2docx``.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "pdf": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "docx": {},
-    }
+    class SupportedInFormats(Enum):
+        PDF = "pdf"
+
+    class SupportedOutFormats(Enum):
+        DOCX = "docx"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
@@ -49,7 +47,7 @@ class PDF2DOCXBackend(AbstractBackend):
     def convert(self,
                 output_file: str | Path,
                 input_file: str | Path,
-                password: str | None = None,
+                password: str = "",
                 ):
         """
         Convert input files into output file.
@@ -61,6 +59,7 @@ class PDF2DOCXBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
         """
+        import pdf2docx  # pyright: ignore[reportMissingTypeStubs]
 
         input_file = Path(input_file).resolve()
         output_file = Path(output_file).resolve()
@@ -69,13 +68,14 @@ class PDF2DOCXBackend(AbstractBackend):
 
         converter = pdf2docx.Converter(
             str(input_file),
-            password=password,  # pyright: ignore[reportArgumentType]
+            password=password or None,  # pyright: ignore[reportArgumentType]
         )
         if converter.fitz_doc.is_encrypted and not password:
             raise ValueError(_("Password is required for encrypted PDF files"))
-        converter.convert(
+        converter.convert(  # pyright: ignore[reportUnknownMemberType]
             str(output_file),
         )
+        converter.close()
 
 
 __all__ = [

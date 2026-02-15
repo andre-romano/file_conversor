@@ -1,9 +1,10 @@
 # src\file_conversor\system\__init__.py
 
+from file_conversor.system.abstract_system import *
 from file_conversor.system.lin import *
 from file_conversor.system.mac import *
 from file_conversor.system.win import *
-from file_conversor.system.abstract_system import *
+
 
 System: AbstractSystem
 if AbstractSystem.Platform.get() == AbstractSystem.Platform.WINDOWS:

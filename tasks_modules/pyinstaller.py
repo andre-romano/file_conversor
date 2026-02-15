@@ -1,20 +1,20 @@
 # tasks_modules\pyinstaller.py
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config, base
+from tasks_modules import _config, base, locales
 from tasks_modules._config import *
 
-from tasks_modules import locales
 
 APP_FOLDER = Path(f"dist/{PROJECT_NAME}")
 APP_EXE = APP_FOLDER / (f"{PROJECT_NAME}" if not base.WINDOWS else f"{PROJECT_NAME}.exe")
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         "build",
         "dist",
@@ -22,12 +22,12 @@ def mkdirs(c: InvokeContext):
     ])
 
 
-@task(pre=[mkdirs])
-def clean_app_folder(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_app_folder(_: InvokeContext):
     _config.remove_path_pattern(str(APP_FOLDER))
 
 
-@task(pre=[mkdirs, locales.build])
+@task(pre=[mkdirs, locales.build])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def copy_dependencies(c: InvokeContext):
     print("[bold]Copying dependencies into pyinstaller ...[/]")
     SITE_PACKAGES = APP_FOLDER / "_internal"
@@ -49,7 +49,7 @@ def copy_dependencies(c: InvokeContext):
     print("[bold]Copying dependencies into pyinstaller ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_app_folder,], post=[copy_dependencies,])
+@task(pre=[clean_app_folder,], post=[copy_dependencies,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
     SHIM_PATH = Path(rf"src/{PROJECT_NAME}/__shim__.py")
 
@@ -72,6 +72,6 @@ def build(c: InvokeContext):
     print(f"[bold] Building Pyinstaller (EXE) ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,],)
+@task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c, exe=APP_FOLDER / f"{PROJECT_NAME}")
+    base.check(c, exe=APP_FOLDER / f"{PROJECT_NAME}")  # pyright: ignore[reportUnknownMemberType]

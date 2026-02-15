@@ -1,12 +1,12 @@
 # src/file_conversor\system\abstract_system.py
 
-import platform
 
 from enum import Enum
-from typing import Protocol
+from typing import Protocol, override
 
 # user-provided imports
 from file_conversor.config import Log
+
 
 LOG = Log.get_instance()
 
@@ -33,12 +33,14 @@ class AbstractSystem(SystemProtocol):
 
         @classmethod
         def get(cls) -> 'AbstractSystem.Platform':
+            import platform
             try:
                 return cls(platform.system())
-            except ValueError:
+            except ValueError as e:
                 logger.warning(f"Unknown platform: {platform.system()}")
-                raise NotImplementedError(f"Platform {platform.system()} is not supported.")
+                raise NotImplementedError(f"Platform {platform.system()} is not supported.") from e
 
+        @override
         def __str__(self) -> str:
             return f"{self.get_name()} {self.get_version()} ({self.get_arch()})"
 
@@ -46,10 +48,16 @@ class AbstractSystem(SystemProtocol):
             return self.value
 
         def get_version(self):
+            import platform
             return platform.version()
 
         def get_arch(self):
+            import platform
             return platform.machine()
+
+        def get_processor(self):
+            import platform
+            return platform.processor()
 
 
 __all__ = [

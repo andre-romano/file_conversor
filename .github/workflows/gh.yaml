@@ -78,6 +78,12 @@ jobs:
           pdm run invoke base.tests
         shell: bash
 
+      - name: Linting app on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == needs.read-python-version.outputs.PY_MAX
+        run: |
+          pdm run invoke base.lint
+        shell: bash
+
   build:
     name: Build distribution on windows-latest
     runs-on: windows-latest

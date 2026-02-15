@@ -1,11 +1,10 @@
 # tests\cli\hash\test__init.py
 
 from file_conversor.cli import AppTyperGroup, HashTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestHashHelp:
+class TestHashHelpCLI:
     def test_hash_help(self,):
         result = TestTyper.invoke(AppTyperGroup.Commands.HASH.value, "--help")
         for mode in HashTyperGroup.Commands:

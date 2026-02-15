@@ -1,15 +1,14 @@
 # tasks_modules\inno.py
 
-import os
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, choco, zip
 from tasks_modules._config import *
 
-from tasks_modules import choco, base, zip
 
 INNO_PATH = Path("inno")
 INNO_ISS = INNO_PATH / "setup.iss"
@@ -21,25 +20,25 @@ INNO_APP_GUI_EXE = Path(zip.APP_GUI_EXE.name)
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         f"{INNO_PATH}",
         "dist",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_inno(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_inno(_: InvokeContext):
     _config.remove_path_pattern(f"{INNO_PATH}/*")
 
 
-@task(pre=[mkdirs])
-def clean_exe(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_exe(_: InvokeContext):
     _config.remove_path_pattern(f"{INSTALL_APP_WIN_EXE}")
 
 
-@task(pre=[clean_inno, zip.check])
-def create_manifest(c: InvokeContext):
+@task(pre=[clean_inno, zip.check])  # pyright: ignore[reportUntypedFunctionDecorator]
+def create_manifest(_: InvokeContext):
     """Update inno files, based on pyproject.toml"""
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
@@ -117,7 +116,7 @@ StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /
     print(setup_iss_path.read_text())
 
 
-@task(pre=[choco.install])
+@task(pre=[choco.install])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def install(c: InvokeContext):
     if shutil.which("iscc"):
         return
@@ -128,7 +127,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'iscc' not found in PATH")
 
 
-@task(pre=[clean_exe, create_manifest, install,])
+@task(pre=[clean_exe, create_manifest, install,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/]")
     result = c.run(f"iscc /Qp \"{INNO_ISS}\"")
@@ -138,7 +137,7 @@ def build(c: InvokeContext):
     print(f"[bold] Building Installer (EXE) ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,],)
+@task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/]')
     _config.remove_path_pattern(f"{INSTALL_PATH.relative_to(Path())}/*")
@@ -176,6 +175,6 @@ def uninstall_app(c: InvokeContext):
     print(rf'[bold] Uninstalling {PROJECT_NAME} via Inno .EXE ... [/][bold green]OK[/]')
 
 
-@task(pre=[install_app,], post=[uninstall_app,])
+@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_EXE}")
+    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_EXE}")  # pyright: ignore[reportUnknownMemberType]

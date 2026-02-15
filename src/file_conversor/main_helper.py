@@ -6,8 +6,9 @@ import sys
 from typing import Any, Callable
 
 # user provided imports
-from file_conversor.config import State, Log, get_translation
+from file_conversor.config import Log, State, get_translation
 from file_conversor.system import System
+
 
 # Get app config
 STATE = State.get()

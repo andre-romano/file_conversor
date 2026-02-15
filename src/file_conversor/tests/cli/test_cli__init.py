@@ -1,11 +1,10 @@
 
 # tests\cli\test_app__init.py
 
-import pytest
 import typer
 
 from file_conversor.cli import AppTyperGroup
-from file_conversor.tests.utils import TestTyper, DATA_PATH
+from file_conversor.tests.utils import TestTyper
 
 
 def _get_app_cmd():

@@ -3,14 +3,12 @@
 
 from enum import Enum
 
-# user-provided modules
 from file_conversor.cli._utils import AbstractTyperGroup
-
-from file_conversor.cli.audio.check_cmd import AudioCheckCommand
-from file_conversor.cli.audio.convert_cmd import AudioConvertCommand
-from file_conversor.cli.audio.info_cmd import AudioInfoCommand
-
+from file_conversor.cli.audio.check_cli import AudioCheckCLI
+from file_conversor.cli.audio.convert_cli import AudioConvertCLI
+from file_conversor.cli.audio.info_cli import AudioInfoCLI
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -35,17 +33,17 @@ class AudioTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            AudioConvertCommand(
+            AudioConvertCLI(
                 group_name=group_name,
                 command_name=self.Commands.CONVERT.value,
                 rich_help_panel=self.Panels.NONE.value,
             ),
-            AudioInfoCommand(
+            AudioInfoCLI(
                 group_name=group_name,
                 command_name=self.Commands.INFO.value,
                 rich_help_panel=self.Panels.NONE.value,
             ),
-            AudioCheckCommand(
+            AudioCheckCLI(
                 group_name=group_name,
                 command_name=self.Commands.CHECK.value,
                 rich_help_panel=self.Panels.NONE.value,

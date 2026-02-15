@@ -1,17 +1,15 @@
 # src\file_conversor\backend\office\abstract_libreoffice_backend.py
 
 from pathlib import Path
-from typing import Any, Callable
-
-# user-provided imports
-from file_conversor.config import Environment, Log
-from file_conversor.config.locale import get_translation
+from typing import override
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.office._convert_protocol import ConvertProtocol
 
-from file_conversor.dependency.brew_pkg_manager import BrewPackageManager
-from file_conversor.dependency.scoop_pkg_manager import ScoopPackageManager
+# user-provided imports
+from file_conversor.config import Environment, Log, get_translation
+from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 LOG = Log.get_instance()
 
@@ -58,41 +56,27 @@ class AbstractLibreofficeBackend(AbstractBackend, ConvertProtocol):
 
         self._libreoffice_bin = self.find_in_path("soffice")
 
+    @override
     def convert(
         self,
-        files: list[ConvertProtocol.FilesDataModel],
-        file_processed_callback: Callable[[Path], Any] | None = None,
+        input_path: Path,
+        output_path: Path,
     ):
-        """
-        Convert input file into an output file.
+        output_dir = output_path.parent
+        output_format = output_path.suffix.lstrip(".").lower()
 
-        :param files: List of FilesDataModel containing input and output file paths.    
-
-        :raises FileNotFoundError: if input file not found.
-        """
-        for file_data_model in files:
-            self.check_file_exists(file_data_model.input_file)
-
-            input_path = file_data_model.input_file.resolve()
-            output_path = file_data_model.output_file.resolve()
-
-            output_dir = output_path.parent
-            output_format = output_path.suffix.lstrip(".").lower()
-
-            # Execute command
-            process = Environment.run(
-                str(self._libreoffice_bin),
-                "--headless",
-                "--convert-to",
-                str(output_format),
-                "--outdir",
-                str(output_dir),
-                str(input_path)
-            )
-            if any(p.startswith("Error:") for p in (process.stdout or "", process.stderr or "")):
-                raise RuntimeError(f"LibreOffice conversion failed: {process.stdout or ''} {process.stderr or ''}")
-            if file_processed_callback:
-                file_processed_callback(input_path)
+        # Execute command
+        process = Environment.run(
+            str(self._libreoffice_bin),
+            "--headless",
+            "--convert-to",
+            str(output_format),
+            "--outdir",
+            str(output_dir),
+            str(input_path)
+        )
+        if any(p.startswith("Error:") for p in (process.stdout or "", process.stderr or "")):
+            raise RuntimeError(f"LibreOffice conversion failed: {process.stdout or ''} {process.stderr or ''}")
 
 
 __all__ = [

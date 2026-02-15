@@ -1,9 +1,13 @@
 # src\file_conversor\backend\office\writer_backend.py
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
-from file_conversor.backend.office.abstract_libreoffice_backend import AbstractLibreofficeBackend
+from enum import Enum
+
+from file_conversor.backend.office.abstract_libreoffice_backend import (
+    AbstractLibreofficeBackend,
+)
+from file_conversor.config import Log, get_translation
+
 
 LOG = Log.get_instance()
 
@@ -16,18 +20,17 @@ class LibreofficeWriterBackend(AbstractLibreofficeBackend):
     A class that provides an interface for handling doc files using ``writer`` (libreoffice).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
-        "pdf": {},
-        "html": {},
-    }
+    class SupportedInFormats(Enum):
+        DOC = "doc"
+        DOCX = "docx"
+        ODT = "odt"
+
+    class SupportedOutFormats(Enum):
+        DOC = "doc"
+        DOCX = "docx"
+        ODT = "odt"
+        PDF = "pdf"
+        HTML = "html"
 
     def __init__(
         self,

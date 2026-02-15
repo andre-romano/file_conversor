@@ -1,41 +1,46 @@
 # src\file_conversor\system\win\reg.py
 
 import json
-import re
 
 from pathlib import Path
-from typing import Iterable, Self
-
-# user-provided imports
+from typing import Any, Iterable, Self, override
 
 
 class WinRegKey:
-    KEY_RE = re.compile(r'^\[(.*?)\]$')
-    VALUE_RE = re.compile(r'^(?:"([^"]+)"|@)=(?:"(.*)"|dword:[0-9a-fA-F]+|hex:[0-9a-fA-F,]+)$')
+    KEY_RE: str = r'^\[(.*?)\]$'
+    VALUE_RE: str = r'^(?:"([^"]+)"|@)=(?:"(.*)"|dword:[0-9a-fA-F]+|hex:[0-9a-fA-F,]+)$'
 
     def __init__(self, path: str) -> None:
         r"""Initializes RegKey with path of type HKEY_*\\* """
         super().__init__()
         self._data: dict[str, str] = {}
-        self.path = path
+        self._path: str = path
 
     @property
-    def path(self):
+    def data(self) -> dict[str, str]:
+        return self._data.copy()
+
+    @property
+    def path(self) -> str:
         return self._path
 
     @path.setter
-    def path(self, p):
+    def path(self, p: str):
         self._path = p
 
-    def __eq__(self, other):
+    @override
+    def __eq__(self, other: Any):
         return isinstance(other, WinRegKey) and self.path == other.path
 
+    @override
     def __hash__(self):
         return hash(self.path)
 
+    @override
     def __str__(self) -> str:
         return self.path
 
+    @override
     def __repr__(self) -> str:
         res = [f"[{self._path}]"]
         for name, content in self._data.items():
@@ -71,8 +76,6 @@ class WinRegKey:
             content_str = f"dword:{content:08x}"  # Pad to 8 digits
         elif isinstance(content, bytes):
             content_str = f"hex:{content.hex()}"
-        else:
-            raise TypeError(f"Content '{content}' type is not str|int.")
 
         self._data[name_str] = content_str
         # logger.debug(f'Add value "{name_str}={content_str}"')
@@ -86,7 +89,7 @@ class WinRegKey:
 
     def update(self, key: Self | dict[str, str | int | bytes]) -> Self:
         if isinstance(key, WinRegKey):
-            self._data.update(key._data)
+            self._data.update(key.data)
         else:
             for name, content in key.items():
                 self.add_value(name, content)
@@ -109,14 +112,19 @@ class WinRegFile:
         elif isinstance(input_path_or_winregfile, WinRegFile):
             self.update(input_path_or_winregfile)
 
+    @override
     def __str__(self) -> str:
         return self.__repr__()
 
+    @override
     def __repr__(self) -> str:
         res = ["Windows Registry Editor Version 5.00"]
-        for name, key in self._data.items():
+        for _, key in self._data.items():
             res.append(repr(key))
         return "\n\n".join(res)
+
+    def __len__(self):
+        return len(self._data)
 
     def __iter__(self):
         return self._data.__iter__()
@@ -124,10 +132,7 @@ class WinRegFile:
     def __getitem__(self, key: str | WinRegKey):
         if isinstance(key, str):
             return self._data[key]
-        elif isinstance(key, WinRegKey):
-            return self._data[key.path]
-        else:
-            raise KeyError("Key search supports only str|WinRegKey")
+        return self._data[key.path]
 
     def items(self):
         return self._data.items()
@@ -185,6 +190,8 @@ class WinRegFile:
         :raises FileNotFoundError: Input file not exists.
         :raises RuntimeError: Invalid REG format. Value not associated with key.
         """
+        import re
+
         input_path = Path(input_path)
         if not input_path.exists():
             raise FileNotFoundError(f"Input file '{input_path}' not exists")

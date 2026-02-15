@@ -1,27 +1,27 @@
 # tasks_modules\pypi.py
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, locales
 from tasks_modules._config import *
 
-from tasks_modules import base, locales
 
 to_remove: set[Path] = set()
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         "build",
         "dist",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_whl(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_whl(_: InvokeContext):
     remove_path_pattern("dist/*.whl")
     remove_path_pattern("dist/*.tar.gz")
 
@@ -34,8 +34,8 @@ def check_requirements(c: InvokeContext):
     print("[bold]Checking requirements ... [/][bold green]OK[/]")
 
 
-@task(pre=[locales.build])
-def copy_includes(c: InvokeContext):
+@task(pre=[locales.build])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
+def copy_includes(_: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ...[/]")
     for include in _config.parse_manifest_includes():
         include_path = Path(include)
@@ -47,8 +47,8 @@ def copy_includes(c: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ... [/][bold green]OK[/]")
 
 
-@task(pre=[locales.build])
-def remove_includes(c: InvokeContext):
+@task(pre=[locales.build])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
+def remove_includes(_: InvokeContext):
     print("[bold]Removing MANIFEST.in includes ...[/]")
     for path in to_remove:
         if path.exists():
@@ -56,7 +56,7 @@ def remove_includes(c: InvokeContext):
     print("[bold]Removing MANIFEST.in includes ... [/][bold green]OK[/]")
 
 
-@task(pre=[check_requirements, clean_whl, copy_includes,], post=[remove_includes,])
+@task(pre=[check_requirements, clean_whl, copy_includes,], post=[remove_includes,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
     print(f"[bold] Building PyPi package ... [/]")
     result = c.run(f"pdm build")
@@ -70,7 +70,7 @@ def build(c: InvokeContext):
     print(f"[bold] Checking .WHL build ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,],)
+@task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_app(c: InvokeContext):
     print(f"[bold] Installing PyPi package ... [/]")
     whl_path = _config.get_whl_file()
@@ -88,12 +88,12 @@ def uninstall_app(c: InvokeContext):
     print(f"[bold] Uninstalling PyPi package ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_app,], post=[uninstall_app,])
+@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c)
+    base.check(c)  # pyright: ignore[reportUnknownMemberType]
 
 
-@task(pre=[build, ])
+@task(pre=[build, ])  # pyright: ignore[reportUntypedFunctionDecorator]
 def test(c: InvokeContext):
     print(f"[bold] Testing PyPi ... [/]")
     result = c.run(f"pdm run twine upload --repository testpypi dist/*.whl dist/*.tar.gz")
@@ -101,7 +101,7 @@ def test(c: InvokeContext):
     print(f"[bold] Testing PyPi ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,],)
+@task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to PyPi ... [/]")
     result = c.run(f"pdm run twine upload dist/*.whl dist/*.tar.gz")

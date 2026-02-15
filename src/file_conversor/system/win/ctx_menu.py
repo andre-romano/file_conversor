@@ -1,12 +1,11 @@
 # src\file_conversor\system\win\context_menu.py
 
 from dataclasses import dataclass
-from typing import Iterable, Self, Callable
 from pathlib import Path
+from typing import Callable, Iterable, Self
 
-# user-provided modules
-from file_conversor.system.win.windows_system import WindowsSystem
 from file_conversor.system.win.reg import WinRegFile, WinRegKey
+from file_conversor.system.win.windows_system import WindowsSystem
 
 
 @dataclass

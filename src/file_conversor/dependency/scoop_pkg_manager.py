@@ -5,13 +5,12 @@ import os
 import shutil
 
 from pathlib import Path
-
-# user-provided imports
-from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
-
-from file_conversor.system import AbstractSystem, System
+from typing import override
 
 from file_conversor.config import Environment, Log, get_translation
+from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
+from file_conversor.system import AbstractSystem, System
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -40,12 +39,15 @@ class ScoopPackageManager(AbstractPackageManager):
 
         self.add_pre_install_callback(self._ensure_buckets)
 
+    @override
     def _get_pkg_manager_installed(self) -> str | None:
         return shutil.which("scoop")
 
+    @override
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
         return {System.Platform.WINDOWS, System.Platform.MACOS}
 
+    @override
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return [
             "powershell",
@@ -55,11 +57,13 @@ class ScoopPackageManager(AbstractPackageManager):
             "iwr -useb get.scoop.sh | iex"
         ]
 
+    @override
     def _post_install_pkg_manager(self) -> None:
         # update current PATH (current process path)
         scoop_shims = os.path.expandvars(r"%USERPROFILE%\scoop\shims")
         os.environ["PATH"] += os.pathsep + scoop_shims
 
+    @override
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         pkg_mgr_bin = self._get_pkg_manager_installed()
         pkg_mgr_bin = pkg_mgr_bin if pkg_mgr_bin else "SCOOP_NOT_FOUND"

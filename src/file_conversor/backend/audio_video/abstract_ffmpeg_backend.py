@@ -1,16 +1,17 @@
 # src\file_conversor\backend\audio_video\abstract_ffmpeg_backend.py
 
-from typing import Any, Iterable
+from enum import Enum
+from typing import cast
 
-# user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-
-from file_conversor.backend.audio_video.format_container import AbstractRegisterManager, AudioFormatContainer, VideoFormatContainer
-
-from file_conversor.config import Environment, Log
+from file_conversor.backend.audio_video.container import (
+    AudioFormatContainers,
+    VideoFormatContainers,
+)
+from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
-
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -23,58 +24,44 @@ class AbstractFFmpegBackend(AbstractBackend):
     AbstractFFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
-    ENCODING_SPEEDS = ["fast", "medium", "slow"]
-    QUALITY_PRESETS = ["high", "medium", "low"]
+    class SupportedInAudioFormats(Enum):
+        AAC = "aac"
+        AC3 = "ac3"
+        FLAC = "flac"
+        M4A = "m4a"
+        MP3 = "mp3"
+        OGG = "ogg"
+        OPUS = "opus"
+        WAV = "wav"
+        WMA = "wma"
 
-    SUPPORTED_IN_AUDIO_FORMATS = {
-        'aac': {},
-        'ac3': {},
-        'flac': {},
-        'm4a': {},
-        'mp3': {},
-        'ogg': {},
-        'opus': {},
-        'wav': {},
-        'wma': {},
-    }
-    SUPPORTED_IN_VIDEO_FORMATS = {
-        '3gp': {},
-        'asf': {},
-        'avi': {},
-        'flv': {},
-        'h264': {},
-        'hevc': {},
-        'm4v': {},
-        'mkv': {},
-        'mov': {},
-        'mp4': {},
-        'mpeg': {},
-        'mpg': {},
-        'webm': {},
-        'wmv': {},
-    }
-    SUPPORTED_IN_FORMATS = SUPPORTED_IN_AUDIO_FORMATS | SUPPORTED_IN_VIDEO_FORMATS
+    class SupportedInVideoFormats(Enum):
+        _3GP = "3gp"
+        ASF = "asf"
+        AVI = "avi"
+        FLV = "flv"
+        H264 = "h264"
+        HEVC = "hevc"
+        M4V = "m4v"
+        MKV = "mkv"
+        MOV = "mov"
+        MP4 = "mp4"
+        MPEG = "mpeg"
+        MPG = "mpg"
+        WEBM = "webm"
+        WMV = "wmv"
 
-    SUPPORTED_OUT_AUDIO_FORMATS = AudioFormatContainer.get_registered()
-    SUPPORTED_OUT_VIDEO_FORMATS = VideoFormatContainer.get_registered()
-    SUPPORTED_OUT_FORMATS = SUPPORTED_OUT_VIDEO_FORMATS | SUPPORTED_OUT_AUDIO_FORMATS
+    SupportedInFormats = cast(type[Enum], Enum("SupportedInFormats", {
+        **{fmt.name: fmt.value for fmt in SupportedInAudioFormats},
+        **{fmt.name: fmt.value for fmt in SupportedInVideoFormats},
+    }))
 
-    @classmethod
-    def __get_supported_codecs(cls, supported_format: dict[str, AbstractRegisterManager.ConstructorDataModel], is_audio: bool, ext: str | None = None) -> Iterable[str]:
-        res: set[str] = set()
-        codecs_kwarg = "available_audio_codecs" if is_audio else "available_video_codecs"
-        for cont_ext, constructor in supported_format.items():
-            if not ext or (ext == cont_ext):
-                res.update(constructor.kwargs[codecs_kwarg])
-        return sorted(res)
-
-    @classmethod
-    def get_supported_audio_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_FORMATS, is_audio=True, ext=ext)
-
-    @classmethod
-    def get_supported_video_codecs(cls, ext: str | None = None) -> Iterable[str]:
-        return cls.__get_supported_codecs(cls.SUPPORTED_OUT_FORMATS, is_audio=False, ext=ext)
+    SupportedOutAudioFormats = AudioFormatContainers
+    SupportedOutVideoFormats = VideoFormatContainers
+    SupportedOutFormats = cast(type[Enum], Enum("SupportedOutFormats", {
+        **{fmt.name: fmt.value for fmt in SupportedOutAudioFormats},
+        **{fmt.name: fmt.value for fmt in SupportedOutVideoFormats},
+    }))
 
     def __init__(
         self,

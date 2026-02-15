@@ -1,13 +1,13 @@
 # tasks_modules\embedpy.py
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # type: ignore
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, pypi
 from tasks_modules._config import *
 
-from tasks_modules import base, pypi
 
 BUILD_DIR = Path("build") / PROJECT_NAME
 PORTABLE_PYTHON_DIR = BUILD_DIR / "python"
@@ -23,7 +23,7 @@ PORTABLE_SHIM_GUI_VBS = BUILD_DIR / f"{PROJECT_NAME}_gui.vbs"
 
 
 def get_pip_install_cmd(*modules: str):
-    cmd = " ".join([
+    return " ".join([
         f'"{PORTABLE_PYTHON_EXE.resolve()}"', "-m",
         "pip",
         "install",
@@ -32,22 +32,21 @@ def get_pip_install_cmd(*modules: str):
         "--prefix", f"{PORTABLE_PYTHON_DIR.resolve()}",
         *modules,
     ])
-    return cmd
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         "build",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_build(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_build(_: InvokeContext):
     remove_path_pattern(f"build/*")
 
 
-@task(pre=[clean_build])
+@task(pre=[clean_build])  # pyright: ignore[reportUntypedFunctionDecorator]
 def get_portable_python(c: InvokeContext):
     if not base.WINDOWS:
         raise RuntimeError("Portable Python is only available on Windows")
@@ -55,12 +54,12 @@ def get_portable_python(c: InvokeContext):
     print(f"[bold] Getting portable Python ... [/]")
     PORTABLE_PYTHON_DIR.parent.mkdir(parents=True, exist_ok=True)
 
-    _, CACHED_PYTHON_ZIP = _config.get_url(EMBEDPY_URL)
-    if not CACHED_PYTHON_ZIP or not CACHED_PYTHON_ZIP.exists():
-        raise RuntimeError(f"'{CACHED_PYTHON_ZIP}' not found")
+    _, cached_python_zip = _config.get_url(EMBEDPY_URL)
+    if not cached_python_zip or not cached_python_zip.exists():
+        raise RuntimeError(f"'{cached_python_zip}' not found")
 
-    print(f"Extracting '{CACHED_PYTHON_ZIP}' ... ", end="")
-    _config.extract(src=CACHED_PYTHON_ZIP, dst=PORTABLE_PYTHON_DIR)
+    print(f"Extracting '{cached_python_zip}' ... ", end="")
+    _config.extract(src=cached_python_zip, dst=PORTABLE_PYTHON_DIR)
     assert PORTABLE_PYTHON_DIR.exists()
     print(f"[bold green]OK[/]")
 
@@ -73,8 +72,8 @@ def get_portable_python(c: InvokeContext):
     print(f"[bold] Getting portable Python ... [/][bold green]OK[/]")
 
 
-@task(pre=[get_portable_python],)
-def config_import(c: InvokeContext):
+@task(pre=[get_portable_python],)  # pyright: ignore[reportUntypedFunctionDecorator]
+def config_import(_: InvokeContext):
     print(f"[bold] Configuring pip ... [/]")
     for path in PORTABLE_PYTHON_DIR.glob("*._pth"):
         content = path.read_text()
@@ -86,17 +85,17 @@ def config_import(c: InvokeContext):
         if "import site" not in content:
             content += "\nimport site\n"
 
-        content_list = []
+        content_list: list[str] = []
         for line in content.splitlines():
-            line = line.strip()
-            if line and line not in content_list:
-                content_list.append(line)
-                print(line)
+            line_parsed = line.strip()
+            if line_parsed and line_parsed not in content_list:
+                content_list.append(line_parsed)
+                print(line_parsed)
         path.write_text("\n".join(content_list).strip() + "\n", encoding="utf-8")
         print(f"Updated '{path}'")
 
 
-@task(pre=[config_import],)
+@task(pre=[config_import],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_pip(c: InvokeContext):
     print(f"[bold] Installing pip ... [/]")
 
@@ -125,7 +124,7 @@ def install_pip(c: InvokeContext):
     print(f"[bold] Installing pip ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_pip],)
+@task(pre=[install_pip],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_setuptools(c: InvokeContext):
     print(f"[bold] Installing setuptools ... [/]")
     cmd = get_pip_install_cmd("setuptools", "wheel")
@@ -137,7 +136,7 @@ def install_setuptools(c: InvokeContext):
 
 
 @task
-def clean_unused_files(c: InvokeContext, dry_run: bool = False):
+def clean_unused_files(_: InvokeContext, dry_run: bool = False):
     print(f"[bold] Cleaning unused files ... [/]")
     human_size, size_bytes_orig = _config.get_dir_size(BUILD_DIR)
     print(f"Size BEFORE cleaning: {human_size} ({BUILD_DIR})")
@@ -164,7 +163,7 @@ def clean_unused_files(c: InvokeContext, dry_run: bool = False):
     print(f"[bold] Cleaning unused files ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_setuptools, pypi.build])
+@task(pre=[install_setuptools, pypi.build])  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_app(c: InvokeContext):
     print(f"[bold] Installing app {PROJECT_NAME} ... [/]")
 
@@ -183,7 +182,7 @@ def install_app(c: InvokeContext):
     print(f"[bold] Installing app {PROJECT_NAME} ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_app],)
+@task(pre=[install_app],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def create_shim(c: InvokeContext):
     print(f"[bold] Creating shim ... [/]")
 
@@ -230,12 +229,12 @@ def create_shim(c: InvokeContext):
     print(f"[bold] Creating shim ... [/][bold green]OK[/]")
 
 
-@task(pre=[create_shim])
+@task(pre=[create_shim])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
     pass
 
 
-@task(pre=[build,])
+@task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
     print("[bold] Checking shim ... [/]")
     result = c.run(f'"{PORTABLE_SHIM_CLI_BAT.resolve()}" --version')

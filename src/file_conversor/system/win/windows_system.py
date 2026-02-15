@@ -4,6 +4,7 @@
 import os
 
 from pathlib import Path
+from typing import override
 
 # user-provided imports
 from file_conversor.system.abstract_system import AbstractSystem
@@ -28,6 +29,7 @@ class WindowsSystem(AbstractSystem):
         return hwnd
 
     @classmethod
+    @override
     def is_admin(cls) -> bool:
         import ctypes
         try:
@@ -36,11 +38,12 @@ class WindowsSystem(AbstractSystem):
                 return res != 0
             if isinstance(res, bool):
                 return res
-        except:
-            pass
+        except Exception:
+            """In case of any exception (e.g., ctypes not available), assume not admin."""
         return False
 
     @classmethod
+    @override
     def reload_user_path(cls):
         """Reload user PATH in current process."""
         import winreg
@@ -50,12 +53,12 @@ class WindowsSystem(AbstractSystem):
 
     @classmethod
     def restart_explorer(cls):
-        import time
         import subprocess
+        import time
 
         # Step 1: kill explorer.exe
         subprocess.run(
-            ["taskkill", "/f", "/im", "explorer.exe"],
+            ["taskkill", "/f", "/im", "explorer.exe"],  # noqa: S607
             capture_output=True,
             text=True,  # Capture output as text (Python 3.7+)
             check=True,
@@ -63,8 +66,8 @@ class WindowsSystem(AbstractSystem):
         # Wait briefly to ensure process termination
         time.sleep(0.5)  # Increased delay for stability
         # Step 2: Restart explorer.exe
-        subprocess.Popen(
-            "explorer.exe",
+        subprocess.Popen(  # noqa: S602
+            "explorer.exe",  # noqa: S607
             shell=True,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,

@@ -1,13 +1,17 @@
 # src\file_conversor\backend\office\word_backend.py
 
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
+
+from file_conversor.backend.office.abstract_msoffice_backend import (
+    AbstractMSOfficeBackend,
+    Win32Com,
+)
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Log, get_translation
 
-from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
 
@@ -20,22 +24,41 @@ class WordBackend(AbstractMSOfficeBackend):
     A class that provides an interface for handling doc files using ``word`` (comtypes).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "doc": {},
-        "docx": {},
-        "odt": {},
-        "pdf": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        # format = wdFormat VBA code
-        # https://learn.microsoft.com/en-us/office/vba/api/word.wdsaveformat
-        "doc": {'format': 0},
-        "docx": {'format': 16},
-        "odt": {'format': 23},
-        "pdf": {'format': 17},
-        "html": {'format': 8},
-    }
-    EXTERNAL_DEPENDENCIES = set()
+    class SupportedInFormats(Enum):
+        DOC = "doc"
+        DOCX = "docx"
+        ODT = "odt"
+        PDF = "pdf"
+
+    class SupportedOutFormats(Enum):
+        DOC = "doc"
+        DOCX = "docx"
+        ODT = "odt"
+        PDF = "pdf"
+        HTML = "html"
+
+        @property
+        def format(self) -> int:
+            """ 
+            Get wdFormat VBA code, check API docs below:
+
+            https://learn.microsoft.com/en-us/office/vba/api/word.wdsaveformat
+
+            :return: VBA code for the format
+            """
+            match self:
+                case WordBackend.SupportedOutFormats.DOC:
+                    return 0
+                case WordBackend.SupportedOutFormats.DOCX:
+                    return 16
+                case WordBackend.SupportedOutFormats.ODT:
+                    return 23
+                case WordBackend.SupportedOutFormats.PDF:
+                    return 17
+                case WordBackend.SupportedOutFormats.HTML:
+                    return 8
+
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -54,32 +77,24 @@ class WordBackend(AbstractMSOfficeBackend):
             verbose=verbose,
         )
 
+    @override
     def convert(
         self,
-        files: list[AbstractMSOfficeBackend.FilesDataModel],
-        file_processed_callback: Callable[[Path], Any] | None = None,
+        input_path: Path,
+        output_path: Path,
     ):
         with Win32Com(self.PROG_ID, visible=None) as word:
-            for file_data_model in files:
-                self.check_file_exists(file_data_model.input_file)
+            output_path = output_path.with_suffix(output_path.suffix.lower())
 
-                input_path = Path(file_data_model.input_file).resolve()
+            out_ext = output_path.suffix[1:]
+            format_vba_code = WordBackend.SupportedOutFormats(out_ext.upper()).format
 
-                output_path = Path(file_data_model.output_file).resolve()
-                output_path = output_path.with_suffix(output_path.suffix.lower())
-
-                out_ext = output_path.suffix[1:]
-                out_config = WordBackend.SUPPORTED_OUT_FORMATS[out_ext]
-
-                doc = word.Documents.Open(str(input_path))
-                doc.SaveAs(
-                    str(output_path),
-                    FileFormat=out_config['format'],
-                )
-                doc.Close()
-
-                if file_processed_callback:
-                    file_processed_callback(input_path)
+            doc = word.Documents.Open(str(input_path))
+            doc.SaveAs(
+                str(output_path),
+                FileFormat=format_vba_code,
+            )
+            doc.Close()
 
 
 __all__ = [

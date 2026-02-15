@@ -4,11 +4,10 @@ from enum import Enum
 
 # user-provided modules
 from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
-
-from file_conversor.cli.pipeline.create_cmd import PipelineCreateTyperCommand
-from file_conversor.cli.pipeline.execute_cmd import PipelineExecuteTyperCommand
-
+from file_conversor.cli.pipeline.create_cli import PipelineCreateCLI
+from file_conversor.cli.pipeline.execute_cli import PipelineExecuteCLI
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -40,12 +39,12 @@ class PipelineTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            PipelineCreateTyperCommand(
+            PipelineCreateCLI(
                 group_name=group_name,
                 command_name=self.Commands.CREATE.value,
                 rich_help_panel=self.Panels.NONE.value,
             ),
-            PipelineExecuteTyperCommand(
+            PipelineExecuteCLI(
                 group_name=group_name,
                 command_name=self.Commands.EXECUTE.value,
                 rich_help_panel=self.Panels.NONE.value,

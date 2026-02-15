@@ -5,7 +5,7 @@ from enum import Enum
 # user-provided modules
 from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
 
-from file_conversor.cli.ppt.convert_cmd import PptConvertTyperCommand
+from file_conversor.cli.ppt.convert_cli import PptConvertCLI
 
 from file_conversor.config.locale import get_translation
 
@@ -28,7 +28,7 @@ class PptTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            PptConvertTyperCommand(
+            PptConvertCLI(
                 group_name=group_name,
                 command_name=self.Commands.CONVERT.value,
                 rich_help_panel=self.Panels.NONE.value,

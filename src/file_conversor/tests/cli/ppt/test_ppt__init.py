@@ -2,11 +2,10 @@
 
 # user-provided modules
 from file_conversor.cli import AppTyperGroup, PptTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestPptHelp:
+class TestPptHelpCLI:
     def test_ppt_help(self):
         result = TestTyper.invoke(AppTyperGroup.Commands.PPT.value, "--help")
         for mode in PptTyperGroup.Commands:

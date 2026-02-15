@@ -1,13 +1,15 @@
 # src\file_conversor\backend\office\excel_backend.py
 
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
-# user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.backend.office.abstract_msoffice_backend import (
+    AbstractMSOfficeBackend,
+    Win32Com,
+)
+from file_conversor.config import Log, get_translation
 
-from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
 
@@ -20,22 +22,43 @@ class ExcelBackend(AbstractMSOfficeBackend):
     A class that provides an interface for handling doc files using ``excel`` (comtypes).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "xls": {},
-        "xlsx": {},
-        "ods": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        # format = xlFormat VBA code
-        # https://learn.microsoft.com/en-us/office/vba/api/excel.xlfileformat
-        "xls": {'format': 56},
-        "xlsx": {'format': 51},
-        "ods": {'format': 60},
-        "csv": {'format': 6},
-        "pdf": {'format': 57},
-        "html": {'format': 44},
-    }
-    EXTERNAL_DEPENDENCIES = set()
+    class SupportedInFormats(Enum):
+        XLS = "xls"
+        XLSX = "xlsx"
+        ODS = "ods"
+
+    class SupportedOutFormats(Enum):
+        XLS = "xls"
+        XLSX = "xlsx"
+        ODS = "ods"
+        CSV = "csv"
+        PDF = "pdf"
+        HTML = "html"
+
+        @property
+        def format(self) -> int:
+            """ 
+            Get xlFormat VBA code, check API docs below:
+
+            https://learn.microsoft.com/en-us/office/vba/api/excel.xlfileformat
+
+            :return: VBA code for the format
+            """
+            match self:
+                case ExcelBackend.SupportedOutFormats.XLS:
+                    return 56
+                case ExcelBackend.SupportedOutFormats.XLSX:
+                    return 51
+                case ExcelBackend.SupportedOutFormats.ODS:
+                    return 60
+                case ExcelBackend.SupportedOutFormats.CSV:
+                    return 6
+                case ExcelBackend.SupportedOutFormats.PDF:
+                    return 57
+                case ExcelBackend.SupportedOutFormats.HTML:
+                    return 44
+
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -54,50 +77,34 @@ class ExcelBackend(AbstractMSOfficeBackend):
             verbose=verbose,
         )
 
+    @override
     def convert(
         self,
-        files: list[AbstractMSOfficeBackend.FilesDataModel],
-        file_processed_callback: Callable[[Path], Any] | None = None,
+        input_path: Path,
+        output_path: Path,
     ):
-        """
-        Convert input file into an output file.
-
-        :param files: List of FilesDataModel containing input and output file paths.    
-
-        :raises FileNotFoundError: if input file not found.
-        :raises RuntimeError: if os != Windows.
-        """
         with Win32Com(self.PROG_ID, visible=False) as excel:
-            for file_data_model in files:
-                input_path = Path(file_data_model.input_file).resolve()
+            output_path = output_path.with_suffix(output_path.suffix.lower())
 
-                output_path = Path(file_data_model.output_file).resolve()
-                output_path = output_path.with_suffix(output_path.suffix.lower())
+            out_ext = output_path.suffix[1:]
+            format_vba_code = ExcelBackend.SupportedOutFormats(out_ext.upper()).format
 
-                self.check_file_exists(str(input_path))
-
-                out_ext = output_path.suffix[1:]
-                out_config = ExcelBackend.SUPPORTED_OUT_FORMATS[out_ext]
-
-                workbook = excel.Workbooks.Open(str(input_path))
-                if output_path.suffix.lower() == ".pdf":
-                    workbook.ExportAsFixedFormat(
-                        Filename=str(output_path),
-                        Type=0,  # = pdf
-                        Quality=0,
-                        IncludeDocProperties=True,
-                        IgnorePrintAreas=False,
-                        OpenAfterPublish=False,
-                    )
-                else:
-                    workbook.SaveAs(
-                        str(output_path),
-                        FileFormat=out_config['format'],
-                    )
-                workbook.Close(SaveChanges=False)
-
-                if file_processed_callback:
-                    file_processed_callback(input_path)
+            workbook = excel.Workbooks.Open(str(input_path))
+            if output_path.suffix.lower() == ".pdf":
+                workbook.ExportAsFixedFormat(
+                    Filename=str(output_path),
+                    Type=0,  # = pdf
+                    Quality=0,
+                    IncludeDocProperties=True,
+                    IgnorePrintAreas=False,
+                    OpenAfterPublish=False,
+                )
+            else:
+                workbook.SaveAs(
+                    str(output_path),
+                    FileFormat=format_vba_code,
+                )
+            workbook.Close(SaveChanges=False)
 
 
 __all__ = [

@@ -4,15 +4,13 @@
 This module provides functionalities for handling ebook files using Calibre.
 """
 
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Iterable
 
-# user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-
 from file_conversor.config import Environment, Log, get_translation
-
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -25,27 +23,25 @@ class CalibreBackend(AbstractBackend):
     CalibreBackend is a class that provides an interface for handling ebook files using Calibre.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        'azw': {},
-        'azw3': {},
-        'azw4': {},
-        'cbr': {},
-        'cbz': {},
-        'epub': {},
-        'fb2': {},
-        'mobi': {},
-    }
+    class SupportedInFormats(Enum):
+        AZW = "azw"
+        AZW3 = "azw3"
+        AZW4 = "azw4"
+        CBR = "cbr"
+        CBZ = "cbz"
+        EPUB = "epub"
+        FB2 = "fb2"
+        MOBI = "mobi"
 
-    SUPPORTED_OUT_FORMATS = {
-        'azw3': {},
-        'docx': {},
-        'epub': {},
-        'fb2': {},
-        'mobi': {},
-        'pdf': {},
-    }
+    class SupportedOutFormats(Enum):
+        AZW3 = "azw3"
+        DOCX = "docx"
+        EPUB = "epub"
+        FB2 = "fb2"
+        MOBI = "mobi"
+        PDF = "pdf"
 
-    EXTERNAL_DEPENDENCIES = {
+    EXTERNAL_DEPENDENCIES: set[str] = {
         "ebook-convert",
     }
 

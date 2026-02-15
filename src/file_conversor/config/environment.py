@@ -1,93 +1,104 @@
 # src\file_conversor\config\environment.py
 
 import os
-import subprocess
 import shutil
+import subprocess
 import sys
-import platformdirs
 
-from importlib.resources import files
-from importlib.metadata import version
-
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
-# user provided imports
 from file_conversor.config.log import Log
-from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
+
 
 # Get app config
 logger = Log.get_instance().getLogger(__name__)
 
 
-class Environment(AbstractSingletonThreadSafe):
-
+class Environment:
     __APP_NAME = f"file_conversor"
 
     class UserFolder(Enum):
         @classmethod
-        def RUNTIME(cls) -> Path:
+        def runtime(cls) -> Path:
+            import platformdirs
             return platformdirs.user_runtime_path().resolve()
 
         @classmethod
-        def DATA(cls) -> Path:
+        def data(cls) -> Path:
+            import platformdirs
             return platformdirs.user_data_path().resolve()
 
         @classmethod
-        def CONFIG(cls) -> Path:
+        def config(cls) -> Path:
+            import platformdirs
             return platformdirs.user_config_path().resolve()
 
         @classmethod
-        def CACHE(cls) -> Path:
+        def cache(cls) -> Path:
+            import platformdirs
             return platformdirs.user_cache_path().resolve()
 
         @classmethod
-        def LOG(cls) -> Path:
+        def log(cls) -> Path:
+            import platformdirs
             return platformdirs.user_log_path().resolve()
 
         @classmethod
-        def STATE(cls) -> Path:
+        def state(cls) -> Path:
+            import platformdirs
             return platformdirs.user_state_path().resolve()
 
         @classmethod
-        def MUSIC(cls) -> Path:
+        def music(cls) -> Path:
+            import platformdirs
             return platformdirs.user_music_path().resolve()
 
         @classmethod
-        def PICTURES(cls) -> Path:
+        def pictures(cls) -> Path:
+            import platformdirs
             return platformdirs.user_pictures_path().resolve()
 
         @classmethod
-        def VIDEOS(cls) -> Path:
+        def videos(cls) -> Path:
+            import platformdirs
             return platformdirs.user_videos_path().resolve()
 
         @classmethod
-        def DOCUMENTS(cls) -> Path:
+        def documents(cls) -> Path:
+            import platformdirs
             return platformdirs.user_documents_path().resolve()
 
         @classmethod
-        def DOWNLOADS(cls) -> Path:
+        def downloads(cls) -> Path:
+            import platformdirs
             return platformdirs.user_downloads_path().resolve()
 
         @classmethod
-        def DESKTOP(cls) -> Path:
+        def desktop(cls) -> Path:
+            import platformdirs
             return platformdirs.user_desktop_path().resolve()
 
     class SiteFolder(Enum):
         @classmethod
-        def RUNTIME(cls) -> Path:
+        def runtime(cls) -> Path:
+            import platformdirs
             return platformdirs.site_runtime_path().resolve()
 
         @classmethod
-        def DATA(cls) -> Path:
+        def data(cls) -> Path:
+            import platformdirs
             return platformdirs.site_data_path().resolve()
 
         @classmethod
-        def CONFIG(cls) -> Path:
+        def config(cls) -> Path:
+            import platformdirs
             return platformdirs.site_config_path().resolve()
 
         @classmethod
-        def CACHE(cls) -> Path:
+        def cache(cls) -> Path:
+            import platformdirs
             return platformdirs.site_cache_path().resolve()
 
     @classmethod
@@ -166,6 +177,11 @@ class Environment(AbstractSingletonThreadSafe):
         path.touch(mode=mode, exist_ok=exists_ok)
 
     @classmethod
+    def get_cpu_count(cls) -> int:
+        """Get the number of CPU threads available."""
+        return os.cpu_count() or 4
+
+    @classmethod
     def get_executable(cls) -> str:
         """Get the executable path for this app's CLI."""
         res = ""
@@ -183,33 +199,30 @@ class Environment(AbstractSingletonThreadSafe):
     @classmethod
     def get_resources_folder(cls) -> Path:
         """Get the absolute path of the included folders in pip."""
+        from importlib.resources import files
         files_obj = files(cls.__APP_NAME)
-        res_path = Path(str(files_obj)).resolve()
-        return res_path
+        return Path(str(files_obj)).resolve()
 
     @classmethod
     def get_web_folder(cls) -> Path:
-        web_path = cls.get_resources_folder() / ".web"
         # logger.debug(f"Web path: {web_path}")
-        return web_path
+        return cls.get_resources_folder() / ".web"
 
     @classmethod
     def get_icons_folder(cls) -> Path:
         """Get the absolute path of the included folders in pip."""
-        icons_path = cls.get_resources_folder() / ".icons"
         # logger.debug(f"Icons path: {icons_path}")
-        return icons_path
+        return cls.get_resources_folder() / ".icons"
 
     @classmethod
     def get_locales_folder(cls) -> Path:
-        locales_path = cls.get_resources_folder() / ".locales"
         # logger.debug(f"Locales path: {locales_path}")
-        return locales_path
+        return cls.get_resources_folder() / ".locales"
 
     @classmethod
     def get_data_folder(cls) -> Path:
         """Get the app data folder."""
-        data_path = cls.UserFolder.DATA() / cls.get_app_name()
+        data_path = cls.UserFolder.data() / cls.get_app_name()
         data_path.mkdir(parents=True, exist_ok=True)
         # logger.debug(f"App data path: {data_path}")
         return data_path
@@ -217,6 +230,7 @@ class Environment(AbstractSingletonThreadSafe):
     @classmethod
     def get_app_version(cls) -> str:
         """Get the current version of the app."""
+        from importlib.metadata import version
         return version(cls.get_app_name())
 
     @classmethod
@@ -243,8 +257,8 @@ class Environment(AbstractSingletonThreadSafe):
     def set_env_paths(cls, env: list[Path | str]):
         # check if needs to add path
         env_paths = os.environ["PATH"].split(os.pathsep)
-        for path_str in env:
-            path_str = str(path_str)
+        for path in env:
+            path_str = str(path)
             if path_str in env_paths:
                 logger.debug(f"Skipping path '{path_str}'. Already in ENV")
                 continue
@@ -256,12 +270,12 @@ class Environment(AbstractSingletonThreadSafe):
                    *cmd: str,
                    text: bool = True,
                    encoding: str | None = None,
-                   env: dict | None = None,
+                   env: dict[str, Any] | None = None,
                    cwd: str | Path | None = None,
                    stdout: int | None = subprocess.PIPE,
                    stderr: int | None = subprocess.STDOUT,
-                   **kwargs,
-                   ) -> subprocess.Popen:
+                   **kwargs: Any,
+                   ) -> subprocess.Popen[Any]:
         """
         Run a process within Python using a standardized API
 
@@ -277,7 +291,7 @@ class Environment(AbstractSingletonThreadSafe):
         logger.debug(f"Starting process ...")
         logger.debug(f"{" ".join(cmd)}")
 
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # noqa: S603
             cmd,
             stdin=kwargs.get("stdin"),
             stdout=stdout,
@@ -298,12 +312,12 @@ class Environment(AbstractSingletonThreadSafe):
             *cmd: str,
             text: bool = True,
             encoding: str | None = None,
-            env: dict | None = None,
+            env: dict[str, Any] | None = None,
             cwd: str | Path | None = None,
             stdout: int | None = subprocess.PIPE,
             stderr: int | None = subprocess.STDOUT,
-            **kwargs,
-            ) -> subprocess.CompletedProcess:
+            **kwargs: Any,
+            ) -> subprocess.CompletedProcess[Any]:
         """
         Run a process within Python, and wait for it to finish.
 
@@ -354,7 +368,7 @@ class Environment(AbstractSingletonThreadSafe):
     @classmethod
     def check_returncode(
         cls,
-        process: subprocess.Popen | subprocess.CompletedProcess,
+        process: subprocess.Popen[Any] | subprocess.CompletedProcess[Any],
         out_lines: list[str] | None = None,
         err_lines: list[str] | None = None,
     ):

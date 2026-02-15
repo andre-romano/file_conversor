@@ -1,11 +1,13 @@
 # tasks_modules\git.py
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # type: ignore
+
+from tasks_modules import _config, base, locales, pypi
 
 # user provided
 from tasks_modules._config import *
-from tasks_modules import _config, base, locales, pypi
 
 
 @task
@@ -20,7 +22,7 @@ def check_pending_commit(c: InvokeContext):
 
 
 @task
-def check_files_updated(c: InvokeContext):
+def check_files_updated(_: InvokeContext):
     print("Please make sure you have updated the following files:")
     print(f"  FEATURE_SET.md")
     print(f"  MANIFEST.in")
@@ -48,7 +50,7 @@ def checksum(c: InvokeContext):
     print(INSTALL_APP_HASH.read_text())
 
     if shutil.which("sha256sum"):
-        with c.cd(str(INSTALL_APP_HASH.parent)):
+        with c.cd(str(INSTALL_APP_HASH.parent)):  # type: ignore
             c.run(f"sha256sum -c {INSTALL_APP_HASH.name}")
     else:
         _config.verify_with_sha256_file(INSTALL_APP_HASH)
@@ -72,7 +74,7 @@ def changelog(c: InvokeContext):
     print(f"[bold] Generating {changelog_path} ... OK [/]")
 
 
-@task(pre=[changelog,])
+@task(pre=[changelog,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... [/]")
     if RELEASE_NOTES_PATH.exists():
@@ -85,7 +87,7 @@ def release_notes(c: InvokeContext):
     print(f"[bold] Creating release notes ... OK [/]")
 
 
-@task(pre=[check_pending_commit, check_files_updated, pypi.check_requirements, locales.translate, base.tests])
+@task(pre=[check_pending_commit, check_files_updated, pypi.check_requirements, locales.translate, base.lint, base.tests])   # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def tag(c: InvokeContext):
     print(f"[bold] Git tagging {GIT_RELEASE} ... [/]")
     result = c.run(f"git push --all")
@@ -110,7 +112,7 @@ def untag(c: InvokeContext):
     print(f"[bold] Removing tag {GIT_RELEASE} from GitHub ... [/][bold green]OK[/]")
 
 
-@task(pre=[release_notes, checksum])
+@task(pre=[release_notes, checksum])  # pyright: ignore[reportUntypedFunctionDecorator]
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to GitHub ... [/]")
     gh_cmd = [

@@ -1,18 +1,14 @@
 # src\file_conversor\tests\utils.py
 
-import shlex
-import shutil
-import subprocess
-import sys
-
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Iterable
 
 from typer.testing import CliRunner
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup
 from file_conversor.config.environment import Environment
+
 
 app_cmd = AppTyperGroup().get_typer()
 
@@ -24,6 +20,7 @@ class TestTyper:
 
     @classmethod
     def dependencies_installed(cls, deps: Iterable[str]):
+        import shutil
         return all(shutil.which(dep) is not None for dep in deps)
 
     @classmethod
@@ -49,20 +46,23 @@ class TestTyper:
     @staticmethod
     def invoke(*cmd_list: str):
         print(f"Args: {' '.join([f'"{c}"' for c in cmd_list])}")
-        result = TestTyper.RUNNER.invoke(app_cmd, cmd_list)
-        return result
+        return TestTyper.RUNNER.invoke(app_cmd, cmd_list)
 
     @staticmethod
     def run(*cmd_list: str):
+        import shlex
+        import subprocess
+        import sys
+
         exe_cmd_list = shlex.split(f'"{sys.executable}" -m "{Environment.get_app_name()}"')
 
         cmd = exe_cmd_list.copy()
         cmd.extend(cmd_list)
         print(f"Args: {' '.join([f'"{c}"' for c in cmd])}")
 
-        process = subprocess.run(cmd,
+        return subprocess.run(cmd,  # noqa: S603
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
                                  universal_newlines=True,
+                                 check=True
                                  )
-        return process

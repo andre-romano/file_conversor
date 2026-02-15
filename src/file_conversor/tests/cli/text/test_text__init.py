@@ -2,11 +2,10 @@
 
 # user-provided modules
 from file_conversor.cli import AppTyperGroup, TextTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestTextHelp:
+class TestTextHelpCLI:
     def test_text_help(self,):
         result = TestTyper.invoke(AppTyperGroup.Commands.TEXT.value, "--help")
         for mode in TextTyperGroup.Commands:

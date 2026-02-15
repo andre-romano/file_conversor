@@ -1,9 +1,13 @@
 # src\file_conversor\backend\office\calc_backend.py
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
-from file_conversor.backend.office.abstract_libreoffice_backend import AbstractLibreofficeBackend
+from enum import Enum
+
+from file_conversor.backend.office.abstract_libreoffice_backend import (
+    AbstractLibreofficeBackend,
+)
+from file_conversor.config import Log, get_translation
+
 
 LOG = Log.get_instance()
 
@@ -16,19 +20,18 @@ class LibreofficeCalcBackend(AbstractLibreofficeBackend):
     A class that provides an interface for handling doc files using ``calc`` (libreoffice).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "xls": {},
-        "xlsx": {},
-        "ods": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "xls": {},
-        "xlsx": {},
-        "ods": {},
-        "csv": {},
-        "pdf": {},
-        "html": {},
-    }
+    class SupportedInFormats(Enum):
+        XLS = "xls"
+        XLSX = "xlsx"
+        ODS = "ods"
+
+    class SupportedOutFormats(Enum):
+        XLS = "xls"
+        XLSX = "xlsx"
+        ODS = "ods"
+        CSV = "csv"
+        PDF = "pdf"
+        HTML = "html"
 
     def __init__(
         self,

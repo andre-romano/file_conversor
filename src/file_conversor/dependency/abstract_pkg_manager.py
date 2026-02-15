@@ -5,14 +5,13 @@ This module provides functionalities for handling external backends.
 """
 
 import shutil
-import subprocess
 
-from typing import Any, Callable, Iterable, Protocol
 from pathlib import Path
+from typing import Any, Callable, Iterable, Protocol
 
-# user-provided imports
 from file_conversor.config import Environment, Log, get_translation
 from file_conversor.system.abstract_system import AbstractSystem
+
 
 LOG = Log.get_instance()
 
@@ -102,13 +101,15 @@ class AbstractPackageManager(PackageManagerProtocol):
         :raises RuntimeError: if pkg_mgr cannot be installed, or OS not supported.
         :raises subprocess.CalledProcessError: package manager could not be installed in system.
         """
+        import subprocess
+
         if self.get_pkg_manager_installed():
             return
         self._check_os_supported()
 
         logger.info(f"{_('Installing package manager')} ...")
         logger.debug(f"{self._get_cmd_install_pkg_manager()}")
-        subprocess.run(self._get_cmd_install_pkg_manager(), check=True)
+        subprocess.run(self._get_cmd_install_pkg_manager(), check=True)  # noqa: S603
 
         if self.get_pkg_manager_installed():
             raise RuntimeError(f"{_('Unable to install package manager in system')}.")
@@ -123,6 +124,8 @@ class AbstractPackageManager(PackageManagerProtocol):
         :raises RuntimeError: package manager NOT installed in system, or OS not supported.
         :raises subprocess.CalledProcessError: dependency could not be installed in system.
         """
+        import subprocess
+
         if not self.get_pkg_manager_installed():
             raise RuntimeError("Package manager NOT installed in system.")
         self._check_os_supported()
@@ -130,9 +133,11 @@ class AbstractPackageManager(PackageManagerProtocol):
         logger.info(f"{_('Running pre-install dependency commands')} ...")
         for callback in self._pre_install_dep_callbacks:
             callback()
+
         logger.info(f"{_('Installing missing dependencies')} {list(dependencies)} ...")
         for dep in dependencies:
-            subprocess.run(self._get_cmd_install_dep(dep), check=True)
+            subprocess.run(self._get_cmd_install_dep(dep), check=True)  # noqa: S603
+
         logger.info(f"{_('Running post-install dependency commands')} ...")
         for callback in self._post_install_dep_callbacks:
             callback()

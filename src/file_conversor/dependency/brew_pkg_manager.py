@@ -5,13 +5,12 @@ import os
 import shutil
 
 from pathlib import Path
-
-# user-provided imports
-from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
-
-from file_conversor.system import AbstractSystem, System
+from typing import override
 
 from file_conversor.config.locale import get_translation
+from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
+from file_conversor.system import AbstractSystem, System
+
 
 _ = get_translation()
 
@@ -40,18 +39,23 @@ class BrewPackageManager(AbstractPackageManager):
                 os.environ["PATH"] += os.pathsep + path
                 break
 
+    @override
     def _get_pkg_manager_installed(self):
         return shutil.which("brew")
 
+    @override
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
         return {System.Platform.LINUX, System.Platform.MACOS}
 
+    @override
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ['bash', '-c', 'export HOMEBREW_NO_INSTALL_CLEANUP=1 ; curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash']
 
+    @override
     def _post_install_pkg_manager(self) -> None:
         self._fix_path()
 
+    @override
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         pkg_mgr_bin = self._get_pkg_manager_installed()
         pkg_mgr_bin = pkg_mgr_bin if pkg_mgr_bin else "BREW_NOT_FOUND"

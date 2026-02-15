@@ -6,16 +6,18 @@ This module provides functionalities for handling external backends.
 
 import os
 import shutil
+
+from pathlib import Path
+from typing import Iterable
+
 import typer
 
-from typing import Iterable
-from pathlib import Path
+from file_conversor.config import Log, get_translation
 
 # user-provided imports
 from file_conversor.dependency import AbstractPackageManager
-
-from file_conversor.config import Log, get_translation
 from file_conversor.system import AbstractSystem
+
 
 LOG = Log.get_instance()
 
@@ -27,7 +29,6 @@ class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.
     """
-
     @staticmethod
     def find_in_path(name: str | Path) -> Path:
         """
@@ -70,7 +71,7 @@ class AbstractBackend:
         :raises RuntimeError: Cannot install missing dependency or unknown OS detected.
         """
         super().__init__()
-        self._pkg_managers = pkg_managers if pkg_managers else set()
+        self._pkg_managers: set[AbstractPackageManager] = pkg_managers if pkg_managers else set()
         self._install_answer = install_answer
 
         self.verify_missing_deps()

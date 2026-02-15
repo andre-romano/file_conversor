@@ -3,11 +3,10 @@
 
 # user-provided modules
 from file_conversor.cli import AppTyperGroup, PipelineTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestPipelineHelp:
+class TestPipelineHelpCLI:
     def test_pipeline_help(self,):
         result = TestTyper.invoke(AppTyperGroup.Commands.PIPELINE.value, "--help")
         for mode in PipelineTyperGroup.Commands:

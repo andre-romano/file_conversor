@@ -1,59 +1,65 @@
 
 # tests\backend\test_abstract_backend.py
 
+from typing import override
+
 import pytest
 
-from pathlib import Path
-
-# user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.dependency import AbstractPackageManager
-
 from file_conversor.system.abstract_system import AbstractSystem
+from file_conversor.tests.utils import DATA_PATH
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
 # unsupported OS
 
 
 class _DummyPkgManagerUnsupportedOS(AbstractPackageManager):
-    def __init__(self, dependencies: dict[str, str] = {}) -> None:
-        super().__init__(dependencies=dependencies)
+    def __init__(self, dependencies: dict[str, str] | None = None) -> None:
+        super().__init__(dependencies=dependencies or {})
 
+    @override
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
+    @override
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
         return {AbstractSystem.Platform.LINUX}
 
+    @override
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
 
+    @override
     def _post_install_pkg_manager(self) -> None:
         """Empty on purpose for testing."""
-        pass
 
+    @override
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         return ["echo", f"Installing dependency {dependency}..."]
 
 
 class _DummyPkgManagerNotInstalled(AbstractPackageManager):
-    def __init__(self, dependencies: dict[str, str] = {}) -> None:
-        super().__init__(dependencies=dependencies)
+    def __init__(self, dependencies: dict[str, str] | None = None) -> None:
+        super().__init__(dependencies=dependencies or {})
 
+    @override
     def _get_pkg_manager_installed(self) -> str | None:
         return None
 
+    @override
     def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
         return {AbstractSystem.Platform.get()}
 
+    @override
     def _get_cmd_install_pkg_manager(self) -> list[str]:
         return ["echo", "Installing dummy package manager..."]
 
+    @override
     def _post_install_pkg_manager(self) -> None:
         """Empty on purpose for testing."""
-        pass
 
+    @override
     def _get_cmd_install_dep(self, dependency: str) -> list[str]:
         return ["echo", f"Installing dependency {dependency}..."]
 

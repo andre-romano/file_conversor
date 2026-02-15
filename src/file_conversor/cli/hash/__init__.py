@@ -4,10 +4,10 @@ from enum import Enum
 
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperGroup
+from file_conversor.cli.hash.check_cli import HashCheckCLI
+from file_conversor.cli.hash.create_cli import HashCreateCLI
 from file_conversor.config.locale import get_translation
 
-from file_conversor.cli.hash.check_cmd import HashCheckCommand
-from file_conversor.cli.hash.create_cmd import HashCreateCommand
 
 _ = get_translation()
 
@@ -31,12 +31,12 @@ class HashTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            HashCheckCommand(
+            HashCheckCLI(
                 group_name=group_name,
                 command_name=self.Commands.CHECK.value,
                 rich_help_panel=self.Panels.NONE.value,
             ),
-            HashCreateCommand(
+            HashCreateCLI(
                 group_name=group_name,
                 command_name=self.Commands.CREATE.value,
                 rich_help_panel=self.Panels.NONE.value,

@@ -1,13 +1,17 @@
 # src\file_conversor\backend\office\powerpoint_backend.py
 
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
+
+from file_conversor.backend.office.abstract_msoffice_backend import (
+    AbstractMSOfficeBackend,
+    Win32Com,
+)
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import Log, get_translation
 
-from file_conversor.backend.office.abstract_msoffice_backend import AbstractMSOfficeBackend, Win32Com
 
 LOG = Log.get_instance()
 
@@ -20,20 +24,37 @@ class PowerPointBackend(AbstractMSOfficeBackend):
     A class that provides an interface for handling doc files using ``powerpoint`` (comtypes).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "ppt": {},
-        "pptx": {},
-        "odp": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        # format = wdFormat VBA code
-        # https://learn.microsoft.com/en-us/office/vba/api/powerpoint.ppsaveasfiletype
-        "ppt": {'format': 1},
-        "pptx": {'format': 24},
-        "odp": {'format': 35},
-        "pdf": {'format': 32},
-    }
-    EXTERNAL_DEPENDENCIES = set()
+    class SupportedInFormats(Enum):
+        PPT = "ppt"
+        PPTX = "pptx"
+        ODP = "odp"
+
+    class SupportedOutFormats(Enum):
+        PPT = "ppt"
+        PPTX = "pptx"
+        ODP = "odp"
+        PDF = "pdf"
+
+        @property
+        def format(self) -> int:
+            """ 
+            Get VBA code for the format, check API docs below:
+
+            https://learn.microsoft.com/en-us/office/vba/api/powerpoint.ppsaveasfiletype
+
+            :return: VBA code for the format
+            """
+            match self:
+                case PowerPointBackend.SupportedOutFormats.PPT:
+                    return 1
+                case PowerPointBackend.SupportedOutFormats.PPTX:
+                    return 24
+                case PowerPointBackend.SupportedOutFormats.ODP:
+                    return 35
+                case PowerPointBackend.SupportedOutFormats.PDF:
+                    return 32
+
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -52,33 +73,25 @@ class PowerPointBackend(AbstractMSOfficeBackend):
             verbose=verbose,
         )
 
+    @override
     def convert(
         self,
-        files: list[AbstractMSOfficeBackend.FilesDataModel],
-        file_processed_callback: Callable[[Path], Any] | None = None,
+        input_path: Path,
+        output_path: Path,
     ):
         with Win32Com(self.PROG_ID, visible=None) as powerpoint:
-            for file_data_model in files:
-                input_path = Path(file_data_model.input_file).resolve()
+            output_path = output_path.with_suffix(output_path.suffix.lower())
 
-                output_path = Path(file_data_model.output_file).resolve()
-                output_path = output_path.with_suffix(output_path.suffix.lower())
+            out_ext = output_path.suffix[1:]
+            file_format_vba_code = PowerPointBackend.SupportedOutFormats(out_ext.upper()).format
 
-                self.check_file_exists(str(input_path))
-
-                out_ext = output_path.suffix[1:]
-                out_config = PowerPointBackend.SUPPORTED_OUT_FORMATS[out_ext]
-
-                # powerpoint.Visible -> True  # needed for powerpoint
-                presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)
-                presentation.SaveAs(
-                    str(output_path),
-                    FileFormat=out_config['format'],
-                )
-                presentation.Close()
-
-                if file_processed_callback:
-                    file_processed_callback(input_path)
+            # powerpoint.Visible -> True  # needed for powerpoint
+            presentation = powerpoint.Presentations.Open(str(input_path), WithWindow=False)
+            presentation.SaveAs(
+                str(output_path),
+                FileFormat=file_format_vba_code,
+            )
+            presentation.Close()
 
 
 __all__ = [

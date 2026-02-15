@@ -4,16 +4,16 @@
 This module provides functionalities for handling Windows Registry using ``reg`` backend.
 """
 
-import subprocess
-import tempfile
-
+from enum import Enum
 from pathlib import Path
+from typing import Any, Callable
+
+from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
 from file_conversor.config import Environment, Log
-
 from file_conversor.system.win import WinRegFile
-from file_conversor.backend.abstract_backend import AbstractBackend
+
 
 LOG = Log.get_instance()
 
@@ -25,12 +25,12 @@ class WinRegBackend(AbstractBackend):
     A class that provides an interface for handling .REG files using ``reg``.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "reg": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "reg": {},
-    }
+    class SupportedInFormats(Enum):
+        REG = "reg"
+
+    class SupportedOutFormats(Enum):
+        REG = "reg"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(self, verbose: bool = False):
@@ -46,15 +46,19 @@ class WinRegBackend(AbstractBackend):
 
     def import_file(
         self,
-        input_file_or_winreg: str | Path | WinRegFile,
+        input_file_or_winreg: Path | WinRegFile,
+        progress_callback: Callable[[float], Any] = lambda p: p,
     ):
         """
         Import registry info from input .REG file.
 
         :param input_file_or_winreg: Input REG file, or WinRegFile.        
+        :param progress_callback: Callback function to report progress, with a float parameter from 0.0 to 100.0. Defaults to a no-op lambda.
 
         :raises subprocess.CalledProcessError: if reg cannot import registry file
         """
+        import tempfile
+
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file = (Path(temp_dir) / ".out.reg").resolve().__str__()
 
@@ -69,18 +73,23 @@ class WinRegBackend(AbstractBackend):
             Environment.run(
                 f"{self._reg_bin}", "import", f"{temp_file}",
             )
+            progress_callback(100.0)
 
     def delete_keys(
         self,
-        input_file_or_winreg: str | Path | WinRegFile,
+        input_file_or_winreg: Path | WinRegFile,
+        progress_callback: Callable[[float], Any] = lambda p: p,
     ):
         """
         Loads registry keys from input .REG file, and deletes them from windows registry.
 
-        :param input_file_or_winreg: Input .REG file.        
+        :param input_file_or_winreg: Input .REG file.     
+        :param progress_callback: Callback function to report progress, with a float parameter from 0.0 to 100.0. Defaults to a no-op lambda.   
 
         :raises subprocess.CalledProcessError: if reg cannot delete registry keys
         """
+        import subprocess
+
         winregfile: WinRegFile
         if isinstance(input_file_or_winreg, WinRegFile):
             winregfile = input_file_or_winreg
@@ -106,6 +115,7 @@ class WinRegBackend(AbstractBackend):
             )
 
             logger.debug(f"'{key.path}' deleted")
+            progress_callback(100.0 / len(winregfile))
 
 
 __all__ = [

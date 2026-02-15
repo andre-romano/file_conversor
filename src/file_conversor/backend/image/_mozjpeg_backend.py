@@ -3,20 +3,16 @@
 """
 This module provides functionalities for handling files using mozjpeg.
 """
-
-import subprocess
-
+from enum import Enum
 from pathlib import Path
+from typing import Any
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
-
-from file_conversor.utils.validators import check_file_format
-
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -24,18 +20,18 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
+class MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     """
     Provides an interface for handling files using mozjpeg.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        'jpeg': {},
-        'jpg': {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        'jpg': {},
-    }
+    class SupportedInFormats(Enum):
+        JPG = "jpg"
+        JPEG = "jpeg"
+
+    class SupportedOutFormats(Enum):
+        JPG = "jpg"
+
     EXTERNAL_DEPENDENCIES: set[str] = {
         "cjpeg",
     }
@@ -74,7 +70,7 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
         input_file: str | Path,
         output_file: str | Path,
         quality: int,
-        **kwargs,
+        **kwargs: Any,  # noqa: ARG002
     ):
         """
         Execute the command to compress the input file.
@@ -88,6 +84,8 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
 
         :raises RuntimeError: If backend encounters an error during execution.
         """
+        import subprocess
+
         # Execute the command
         process = Environment.run(
             f"{self._mozjpeg_bin}",
@@ -107,5 +105,5 @@ class _MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
 
 
 __all__ = [
-    "_MozJPEGBackend",
+    "MozJPEGBackend",
 ]

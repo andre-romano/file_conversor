@@ -1,27 +1,24 @@
 # tests\utils\test_formatters.py
 
-import math
+
 import pytest
-from pathlib import Path
 
 from file_conversor.utils.formatters import (
     escape_xml,
-    parse_traceback_list,
-    parse_js_to_py,
-    parse_ffmpeg_filter,
-    parse_image_resize_scale,
-    parse_pdf_rotation,
-    parse_pdf_pages,
-    normalize_degree,
-    parse_bytes,
-    format_bytes,
-    format_bitrate,
     format_alphanumeric,
+    format_bitrate,
+    format_bytes,
     format_file_types_webview,
     format_py_to_js,
-    format_traceback_str,
     format_traceback_html,
-    format_in_out_files_tuple,
+    format_traceback_str,
+    normalize_degree,
+    parse_bytes,
+    parse_ffmpeg_filter,
+    parse_js_to_py,
+    parse_pdf_pages,
+    parse_pdf_rotation,
+    parse_traceback_list,
 )
 
 
@@ -33,7 +30,7 @@ class TestUtilsFormatters:
 
     def test_parse_traceback_list(self):
         try:
-            1 / 0  # type: ignore
+            1 / 0  # type: ignore  # noqa: B018
         except Exception as e:
             tb_list = parse_traceback_list(e)
             assert isinstance(tb_list, list)
@@ -54,7 +51,7 @@ class TestUtilsFormatters:
         assert parse_js_to_py("[1, 2, 3]") == [1, 2, 3]
         assert parse_js_to_py('{"key": "value"}') == {"key": "value"}
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017, B018
             parse_js_to_py("{invalid: }")
 
     def test_parse_ffmpeg_filter(self):
@@ -87,23 +84,6 @@ class TestUtilsFormatters:
             "y": "10"
         }
 
-    def test_parse_image_resize_scale(self, monkeypatch):
-        with pytest.raises(RuntimeError):
-            parse_image_resize_scale(None, None, quiet=True)
-
-        monkeypatch.setattr("builtins.input", lambda x: "2.0")
-        scale = parse_image_resize_scale(None, None, quiet=False)
-        assert scale is not None and math.isclose(scale, 2.0)
-
-        scale = parse_image_resize_scale(2.0, None, quiet=True)
-        assert scale is not None and math.isclose(scale, 2.0)
-
-        scale = parse_image_resize_scale(None, 800, quiet=True)
-        assert scale is None
-
-        scale = parse_image_resize_scale(1.5, 600, quiet=True)
-        assert scale is not None and math.isclose(scale, 1.5)
-
     def test_parse_pdf_rotation(self):
         rotation_args = ["1:90", "2-4:-90", "5:180"]
         rotation_dict = parse_pdf_rotation(rotation_args, last_page=5)
@@ -126,12 +106,8 @@ class TestUtilsFormatters:
         with pytest.raises(RuntimeError):
             parse_pdf_rotation(["3-1:90"], last_page=5)
 
-    def test_parse_pdf_pages(self, monkeypatch):
-        monkeypatch.setattr("builtins.input", lambda x: "1,3,5")
-        pages = parse_pdf_pages(None)
-        assert pages == [0, 2, 4]
-
-        pages = parse_pdf_pages("2,4,6")
+    def test_parse_pdf_pages(self):
+        pages = parse_pdf_pages(["2", "4", "6"])
         assert pages == [1, 3, 5]
 
         pages = parse_pdf_pages(["2-4", "6"])
@@ -140,7 +116,7 @@ class TestUtilsFormatters:
         with pytest.raises(RuntimeError):
             parse_pdf_pages(["4-2"])
 
-        pages = parse_pdf_pages("3-")
+        pages = parse_pdf_pages(["3-"])
         assert pages == [2]  # Assuming last_page is not needed here
 
     def test_normalize_degree(self):
@@ -208,28 +184,15 @@ class TestUtilsFormatters:
 
     def test_format_traceback_str(self):
         try:
-            1 / 0  # type: ignore
+            1 / 0  # type: ignore  # noqa: B018
         except Exception as e:
             tb_str = format_traceback_str(e)
             assert "ZeroDivisionError" in tb_str
 
     def test_format_traceback_html(self):
         try:
-            1 / 0  # type: ignore
+            1 / 0  # type: ignore  # noqa: B018
         except Exception as e:
             tb_html = format_traceback_html(e)
             assert "ZeroDivisionError" in tb_html
             assert "&lt;traceback&gt;" not in tb_html  # Ensure HTML is properly formatted
-
-    def test_format_in_out_files_tuple(self):
-        files = format_in_out_files_tuple(input_files=[Path("input.txt")], file_format="png", output_dir=Path("/output"), overwrite_output=True)
-        for in_file, out_file in files:
-            assert in_file == Path("input.txt")
-            assert out_file == Path("/output/input.png")
-
-        files = format_in_out_files_tuple(input_files=[Path("input.jpg"), Path("input2.jpg")], file_format=".png", output_dir=Path("/output"), overwrite_output=True)
-        for in_file, out_file in files:
-            if in_file == Path("input.jpg"):
-                assert out_file == Path("/output/input.png")
-            elif in_file == Path("input2.jpg"):
-                assert out_file == Path("/output/input2.png")

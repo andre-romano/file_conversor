@@ -2,11 +2,13 @@
 # tasks_modules\choco.py
 
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
 from tasks_modules import _config, base, zip
 from tasks_modules._config import *
+
 
 VAGRANT_PATH = Path(f"vagrant")
 
@@ -19,6 +21,7 @@ CHOCO_DEPS = {
     "chocolatey-core.extension": "1.3.3",
 }
 
+CHOCO_DESCRIPTION_MAX_LENGTH = 4000
 CHOCO_DESCRIPTION = rf"""
 A powerful Python-based CLI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
 
@@ -95,8 +98,8 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 *For full feature set, check* [`FEATURE_SET.md`](https://github.com/andre-romano/file_conversor/blob/master/FEATURE_SET.md)
 """
 
-if len(CHOCO_DESCRIPTION) >= 4000:
-    raise RuntimeError("CHOCO_DESCRIPTION must be < 4000 characters")
+if len(CHOCO_DESCRIPTION) >= CHOCO_DESCRIPTION_MAX_LENGTH:
+    raise RuntimeError(f"CHOCO_DESCRIPTION must be < {CHOCO_DESCRIPTION_MAX_LENGTH} characters")
 
 
 def escape_xml(text: str | None) -> str:
@@ -115,33 +118,33 @@ def escape_xml(text: str | None) -> str:
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         CHOCO_PATH,
         "dist",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_choco(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_choco(_: InvokeContext):
     remove_path_pattern(f"{CHOCO_PATH}/*")
 
 
-@task(pre=[mkdirs])
-def clean_nupkg(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_nupkg(_: InvokeContext):
     remove_path_pattern("dist/*.nupkg")
 
 
-@task(pre=[clean_choco, ])
-def create_manifest(c: InvokeContext):
+@task(pre=[clean_choco, ])  # pyright: ignore[reportUntypedFunctionDecorator]
+def create_manifest(_: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Chocolatey manifest files ... [/]")
-    CHOCO_TOOLS_PATH = Path(f"{CHOCO_PATH}/tools")
-    CHOCO_TOOLS_PATH.mkdir(parents=True, exist_ok=True)
+    choco_tools_path = Path(f"{CHOCO_PATH}/tools")
+    choco_tools_path.mkdir(parents=True, exist_ok=True)
 
     # chocolateyInstall.ps1
-    install_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyInstall.ps1")
+    install_ps1_path = Path(f"{choco_tools_path}/chocolateyInstall.ps1")
     install_ps1_path.write_text(rf'''
 $ErrorActionPreference = 'Stop'
 
@@ -167,7 +170,7 @@ Install-BinFile -Name "{PROJECT_NAME}" -Path $exePath
     assert install_ps1_path.exists()
 
     # chocolateyUninstall.ps1
-    uninstall_ps1_path = Path(f"{CHOCO_TOOLS_PATH}/chocolateyUninstall.ps1")
+    uninstall_ps1_path = Path(f"{choco_tools_path}/chocolateyUninstall.ps1")
     uninstall_ps1_path.write_text(rf"""
 $ErrorActionPreference = 'Stop'
 
@@ -256,7 +259,7 @@ def install(c: InvokeContext):
         raise RuntimeError("'choco' not found in PATH")
 
 
-@task(pre=[clean_nupkg, create_manifest, install,])
+@task(pre=[clean_nupkg, create_manifest, install,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
     if not CHOCO_NUSPEC.exists():
         raise RuntimeError(f"Nuspec file '{CHOCO_NUSPEC}' not found!")
@@ -269,7 +272,7 @@ def build(c: InvokeContext):
     print(f"[bold] Building choco package ... [/][bold green]OK[/]")
 
 
-@task(pre=[build, base.is_admin,],)
+@task(pre=[build, base.is_admin,],)   # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing choco package ... [/]')
     dist_path = Path(rf".\dist")
@@ -278,7 +281,7 @@ def install_app(c: InvokeContext):
     print(rf'[bold] Installing choco package ... [/][bold green]OK[/]')
 
 
-@task(pre=[base.is_admin,])
+@task(pre=[base.is_admin,])   # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def uninstall_app(c: InvokeContext):
     print(rf'[bold] Uninstalling choco package ... [/]')
     result = c.run(rf'choco uninstall -y "{PROJECT_NAME}"')
@@ -286,12 +289,12 @@ def uninstall_app(c: InvokeContext):
     print(rf'[bold] Uninstalling choco package ... [/][bold green]OK[/]')
 
 
-@task(pre=[install_app,], post=[uninstall_app,])
+@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c)
+    base.check(c)   # pyright: ignore[reportUnknownMemberType]
 
 
-@task(pre=[build,])
+@task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def publish(c: InvokeContext, api_key: str = ""):
     print(rf'[bold] Publishing choco package ... [/]')
     for nupkg_path in Path("dist").glob("*.nupkg"):

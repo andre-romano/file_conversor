@@ -4,20 +4,19 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-from PIL import Image, ImageFilter, ImageEnhance, ImageOps
+from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Iterable
+
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 from PIL.ExifTags import TAGS
 
-from pathlib import Path
-from enum import Enum
-from typing import Any, Iterable
+from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
 from file_conversor.config import Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.formatters import normalize_degree
-
-from file_conversor.backend.abstract_backend import AbstractBackend
 
 LOG = Log.get_instance()
 
@@ -34,12 +33,11 @@ class PillowBackend(AbstractBackend):
         MODE = "mode"
 
         def get(self):
-            if self == PillowBackend.AntialiasAlgorithm.MEDIAN:
-                return ImageFilter.MedianFilter
-            elif self == PillowBackend.AntialiasAlgorithm.MODE:
-                return ImageFilter.ModeFilter
-            else:
-                raise ValueError(f"Invalid AntialiasAlgorithm: {self}")
+            match self:
+                case PillowBackend.AntialiasAlgorithm.MEDIAN:
+                    return ImageFilter.MedianFilter
+                case PillowBackend.AntialiasAlgorithm.MODE:
+                    return ImageFilter.ModeFilter
 
     class PillowFilter(Enum):
         BLUR = "blur"
@@ -52,39 +50,34 @@ class PillowBackend(AbstractBackend):
         EMBOSS = "emboss"
         EMBOSS_EDGE = "emboss_edge"
 
-        def get(self):
-            if self == PillowBackend.PillowFilter.BLUR:
-                return ImageFilter.BLUR
+        def get(self) -> type[ImageFilter.Filter]:
+            match self:
+                case PillowBackend.PillowFilter.BLUR:
+                    return ImageFilter.BLUR
 
-            elif self == PillowBackend.PillowFilter.SMOOTH:
-                return ImageFilter.SMOOTH
+                case PillowBackend.PillowFilter.SMOOTH:
+                    return ImageFilter.SMOOTH
 
-            elif self == PillowBackend.PillowFilter.SMOOTH_MORE:
-                return ImageFilter.SMOOTH_MORE
+                case PillowBackend.PillowFilter.SMOOTH_MORE:
+                    return ImageFilter.SMOOTH_MORE
 
-            elif self == PillowBackend.PillowFilter.SHARPEN:
-                return ImageFilter.DETAIL
+                case PillowBackend.PillowFilter.SHARPEN:
+                    return ImageFilter.DETAIL
 
-            elif self == PillowBackend.PillowFilter.SHARPEN_MORE:
-                return ImageFilter.SHARPEN
+                case PillowBackend.PillowFilter.SHARPEN_MORE:
+                    return ImageFilter.SHARPEN
 
-            elif self == PillowBackend.PillowFilter.EDGE_ENHANCE:
-                return ImageFilter.EDGE_ENHANCE
+                case PillowBackend.PillowFilter.EDGE_ENHANCE:
+                    return ImageFilter.EDGE_ENHANCE
 
-            elif self == PillowBackend.PillowFilter.EDGE_ENHANCE_MORE:
-                return ImageFilter.EDGE_ENHANCE_MORE
+                case PillowBackend.PillowFilter.EDGE_ENHANCE_MORE:
+                    return ImageFilter.EDGE_ENHANCE_MORE
 
-            elif self == PillowBackend.PillowFilter.EMBOSS:
-                return ImageFilter.EMBOSS
+                case PillowBackend.PillowFilter.EMBOSS:
+                    return ImageFilter.EMBOSS
 
-            elif self == PillowBackend.PillowFilter.EMBOSS_EDGE:
-                return ImageFilter.CONTOUR
-
-            else:
-                raise ValueError(f"Invalid PillowFilter: {self}")
-
-    Exif = Image.Exif
-    Exif_TAGS = TAGS
+                case PillowBackend.PillowFilter.EMBOSS_EDGE:
+                    return ImageFilter.CONTOUR
 
     class ResamplingOption(Enum):
         BICUBIC = "bicubic"
@@ -92,43 +85,76 @@ class PillowBackend(AbstractBackend):
         LANCZOS = "lanczos"
         NEAREST = "nearest"
 
-        def get(self):
-            if self == PillowBackend.ResamplingOption.BICUBIC:
-                return Image.Resampling.BICUBIC
-            elif self == PillowBackend.ResamplingOption.BILINEAR:
-                return Image.Resampling.BILINEAR
-            elif self == PillowBackend.ResamplingOption.LANCZOS:
-                return Image.Resampling.LANCZOS
-            elif self == PillowBackend.ResamplingOption.NEAREST:
-                return Image.Resampling.NEAREST
-            else:
-                raise ValueError(f"Invalid ResamplingOption: {self}")
+        def get(self) -> Image.Resampling:
+            match self:
+                case PillowBackend.ResamplingOption.BICUBIC:
+                    return Image.Resampling.BICUBIC
+                case PillowBackend.ResamplingOption.BILINEAR:
+                    return Image.Resampling.BILINEAR
+                case PillowBackend.ResamplingOption.LANCZOS:
+                    return Image.Resampling.LANCZOS
+                case PillowBackend.ResamplingOption.NEAREST:
+                    return Image.Resampling.NEAREST
 
-    SUPPORTED_IN_FORMATS = {
-        "bmp": {},
-        "gif": {},
-        "ico": {},
-        "jfif": {},
-        "jpg": {},
-        "jpeg": {},
-        "jpe": {},
-        "png": {},
-        "psd": {},
-        "tif": {},
-        "tiff": {},
-        "webp": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "bmp": {"format": "BMP"},
-        "gif": {"format": "GIF"},
-        "ico": {"format": "ICO"},
-        "jpg": {"format": "JPEG"},
-        "apng": {"format": "PNG"},
-        "png": {"format": "PNG"},
-        "pdf": {"format": "PDF"},
-        "tif": {"format": "TIFF"},
-        "webp": {"format": "WEBP"},
-    }
+    class MirrorAxis(Enum):
+        X = "x"
+        Y = "y"
+
+        def get(self) -> Callable[[Image.Image], Image.Image]:
+            match self:
+                case PillowBackend.MirrorAxis.X:
+                    return ImageOps.mirror
+                case PillowBackend.MirrorAxis.Y:
+                    return ImageOps.flip
+
+    Exif = Image.Exif
+    Exif_TAGS = TAGS
+
+    class SupportedInFormats(Enum):
+        BMP = "bmp"
+        GIF = "gif"
+        ICO = "ico"
+        JFIF = "jfif"
+        JPG = "jpg"
+        JPEG = "jpeg"
+        JPE = "jpe"
+        PNG = "png"
+        PSD = "psd"
+        TIF = "tif"
+        TIFF = "tiff"
+        WEBP = "webp"
+
+    class SupportedOutFormats(Enum):
+        BMP = "bmp"
+        GIF = "gif"
+        ICO = "ico"
+        JPG = "jpg"
+        APNG = "apng"
+        PNG = "png"
+        PDF = "pdf"
+        TIF = "tif"
+        WEBP = "webp"
+
+        @property
+        def format(self) -> str:
+            match self:
+                case PillowBackend.SupportedOutFormats.BMP:
+                    return "BMP"
+                case PillowBackend.SupportedOutFormats.GIF:
+                    return "GIF"
+                case PillowBackend.SupportedOutFormats.ICO:
+                    return "ICO"
+                case PillowBackend.SupportedOutFormats.JPG:
+                    return "JPEG"
+                case PillowBackend.SupportedOutFormats.APNG | PillowBackend.SupportedOutFormats.PNG:
+                    return "PNG"
+                case PillowBackend.SupportedOutFormats.PDF:
+                    return "PDF"
+                case PillowBackend.SupportedOutFormats.TIF:
+                    return "TIFF"
+                case PillowBackend.SupportedOutFormats.WEBP:
+                    return "WEBP"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(self, verbose: bool = False,):
@@ -140,22 +166,18 @@ class PillowBackend(AbstractBackend):
         super().__init__()
         self._verbose = verbose
 
-    def info(self, input_file: str | Path,) -> Exif:
+    def info(self, input_file: Path) -> Exif:
         """
         Get EXIF info from input file.
 
         :param input_file: Input image file.
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
         return img.getexif()
 
     def resize(self,
-               output_file: str | Path,
-               input_file: str | Path,
+               output_file: Path,
+               input_file: Path,
                width: int | None,
                scale: float | None = None,
                resampling: ResamplingOption = ResamplingOption.BICUBIC,
@@ -168,11 +190,7 @@ class PillowBackend(AbstractBackend):
         :param width: Width in pixels.
         :param scale: Scale image in proportion. Must be >0 (if used).
         :param resampling: Resampling algorithm used.
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         with self._open(input_file) as img:
             if scale:
                 if scale <= 0:
@@ -184,19 +202,19 @@ class PillowBackend(AbstractBackend):
                 raise RuntimeError(_("Width must be > 0"))
             height = int(width * float(img.height) / img.width)
 
-            img = img.resize(
+            img_processed = img.resize(
                 size=(width, height),
                 resample=resampling.get()
             )
             self._save(
-                img,
+                img_processed,
                 output_file,
             )
 
     def convert(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         quality: int = 90,
         optimize: bool = True,
     ):
@@ -209,12 +227,7 @@ class PillowBackend(AbstractBackend):
         :param optimize: Improve file size, without losing quality (lossless compression). Valid only for JPG, PNG, WEBP out formats Defaults to True.
 
         :raises ValueError: invalid quality value. Valid values are 1-100.
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-        if quality < 1 or quality > 100:
-            raise ValueError(f"{_('Invalid quality level. Valid values are')} 1-100.")
-
         img = self._open(input_file)
         self._save(
             img,
@@ -225,8 +238,8 @@ class PillowBackend(AbstractBackend):
 
     def rotate(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         rotate: int,
         resampling: ResamplingOption = ResamplingOption.BICUBIC,
     ):
@@ -237,14 +250,8 @@ class PillowBackend(AbstractBackend):
         :param input_file: Input image file.
         :param rotate: Rotation degrees (-360-360).
         :param resampling: Resampling algorithm used.
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         # parse rotation argument
-        rotate = normalize_degree(rotate)
-
         img = self._open(input_file)
         img = img.rotate(-rotate, resample=resampling.get(), expand=True)  # clockwise rotation
         self._save(
@@ -252,23 +259,19 @@ class PillowBackend(AbstractBackend):
             output_file,
         )
 
-    def mirror(self, output_file: str | Path, input_file: str | Path, x_y: bool):
+    def mirror(self, output_file: Path, input_file: Path, axis: MirrorAxis):
         """
         Mirror input file in relation X or Y axis.
 
         :param output_file: Output image file.
         :param input_file: Input image file.
-        :param x_y: Mirror in relation to x or y axis. True for X axis (mirror image horizontally). False for Y axis (flip image vertically).
-
-        :raises FileNotFoundError: if input file not found.
+        :param axis: Mirror in relation to x or y axis. 
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
-        if x_y:
-            img = ImageOps.mirror(img)
-        else:
-            img = ImageOps.flip(img)
+
+        transform_callback = axis.get()
+        img = transform_callback(img)
+
         self._save(
             img,
             output_file,
@@ -276,8 +279,8 @@ class PillowBackend(AbstractBackend):
 
     def blur(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         blur_pixels: int,
     ):
         """
@@ -286,11 +289,7 @@ class PillowBackend(AbstractBackend):
         :param output_file: Output image file.
         :param input_file: Input image file.        
         :param blur_pixels: Blur radius (in pixels). Higher number = more blur.        
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
         img = img.filter(
             ImageFilter.GaussianBlur(radius=blur_pixels)
@@ -302,8 +301,8 @@ class PillowBackend(AbstractBackend):
 
     def unsharp_mask(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         radius: float,
         percent: int,
         threshold: int,
@@ -317,11 +316,7 @@ class PillowBackend(AbstractBackend):
         :param radius: Pixels to blur.
         :param percent: Strength of sharpening.
         :param threshold: How different pixels must be from neighbors to be sharpened (controls noise amplification).
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
         img = img.filter(ImageFilter.UnsharpMask(
             radius=radius,
@@ -335,8 +330,8 @@ class PillowBackend(AbstractBackend):
 
     def antialias(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         radius: int,
         algorithm: AntialiasAlgorithm = AntialiasAlgorithm.MEDIAN,
     ):
@@ -348,11 +343,7 @@ class PillowBackend(AbstractBackend):
 
         :param radius: Box radius (kernel size) to calculate pixel averaging.
         :param algorithm: Algorithm used. Available options are "median" (default, replaces each pixel with the median of its neighbors), "mode" (replaces each pixel with the most common (mode) pixel value in the neighborhood).
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
 
         filter_algo = algorithm.get()
@@ -365,8 +356,8 @@ class PillowBackend(AbstractBackend):
 
     def enhance(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         color_factor: float = 1.0,
         contrast_factor: float = 1.0,
         brightness_factor: float = 1.0,
@@ -383,10 +374,8 @@ class PillowBackend(AbstractBackend):
         :param brightness_factor: 0.0 = black | 1.0 = original brightness | 2.0 very bright
         :param sharpness_factor: 0.0 = blurred | 1.0 = original | 2.0 sharpen edges
 
-        :raises FileNotFoundError: if input file not found.
-        """
-        self.check_file_exists(input_file)
 
+        """
         img = self._open(input_file)
         img = ImageEnhance.Color(img).enhance(color_factor)
         img = ImageEnhance.Contrast(img).enhance(contrast_factor)
@@ -399,8 +388,8 @@ class PillowBackend(AbstractBackend):
 
     def filter(
         self,
-        output_file: str | Path,
-        input_file: str | Path,
+        output_file: Path,
+        input_file: Path,
         filters: Iterable[PillowFilter],
     ):
         """
@@ -431,11 +420,7 @@ class PillowBackend(AbstractBackend):
         - "emboss": {_('Create 3D emboss effect in the image')}
 
         - "emboss_draw": {_('Draw edge contours of the image')}
-
-        :raises FileNotFoundError: if input file not found.
         """
-        self.check_file_exists(input_file)
-
         img = self._open(input_file)
         for filter in filters:
             img = img.filter(filter.get())
@@ -454,7 +439,7 @@ class PillowBackend(AbstractBackend):
     def _save(
         self,
         img: Image.Image,
-        output_file: str | Path,
+        output_file: Path,
         quality: int = 90,
         optimize: bool = True,
     ):
@@ -472,14 +457,13 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        file_format = self.SUPPORTED_OUT_FORMATS[out_ext]["format"]
-        file_format = file_format.upper()  # ensure uppercase format
+        file_format = self.SupportedOutFormats(out_ext).format
 
         # save parameters
         params: dict[str, Any] = {
             "quality": quality,
             "optimize": optimize,
-            "lossless": True if quality == 100 else False,  # valid only for WEBP
+            "lossless": quality == 100,  # valid only for WEBP
         }
 
         try:
@@ -496,11 +480,13 @@ class PillowBackend(AbstractBackend):
             elif file_format in ("PNG", "WEBP") and img.mode not in ("RGB", "RGBA"):
                 img = img.convert("RGBA")
 
-            elif file_format == "TIFF" and img.mode not in ("RGB", "RGBA", "L"):
+            elif (
+                file_format == "TIFF" and img.mode not in ("RGB", "RGBA", "L")
+            ) or (
+                file_format == "BMP" and img.mode not in ("RGB",)
+            ):
                 img = img.convert("RGB")
 
-            elif file_format == "BMP" and img.mode not in ("RGB",):
-                img = img.convert("RGB")
         except Exception as e:
             logger.error(f"{_('Image correction failed')}: {e}")
             raise

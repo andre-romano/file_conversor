@@ -4,6 +4,7 @@ import locale
 
 from pathlib import Path
 from typing import Any
+
 from pydantic import BaseModel
 
 from file_conversor.config.environment import Environment
@@ -12,41 +13,45 @@ from file_conversor.config.environment import Environment
 class ConfigurationData(BaseModel):
     """Configuration data structure"""
 
-    cache_enabled: bool
+    cache_enabled: bool = True     # Enable HTTP cache
     """http cache enabled"""
-    cache_expire_after: int
+    cache_expire_after: int = int(30 * 24 * 60 * 60)  # HTTP cache expiration time in seconds (30 days)
     """http cache expiration time in seconds"""
-    port: int
+    api_port: int = 5000              # Default port (flask app)
     """Default port (flask app)"""
     language: str
     """Default: system language or "en_US" """
-    install_deps: bool | None
+    install_deps: bool | None = True      # Default: ask user to confirm dependency installation
     """Default: ask user to confirm dependency installation"""
-    audio_bitrate: int
+    audio_bitrate: int | None = None        # Default audio bitrate in kbps
     """Default audio bitrate in kbps"""
-    video_bitrate: int
+    video_bitrate: int | None = None        # Default video bitrate in kbps
     """Default video bitrate in kbps"""
-    video_format: str
+    audio_format: str = "mp3"     # Default audio format
+    """Default audio format"""
+    video_format: str = "mp4"     # Default video format
     """Default video format"""
-    video_encoding_speed: str
+    video_profile: str = "medium"  # Default video profile
+    """Default video profile"""
+    video_encoding_speed: str = "medium"  # Default video encoding speed
     """Default video encoding speed"""
-    video_quality: str
+    video_quality: str = "medium"  # Default video quality
     """Default video quality"""
-    image_quality: int
+    image_quality: int = 90        # Default image quality 90%
     """Default image quality 90%"""
-    image_dpi: int
+    image_dpi: int = 200           # Default image => PDF dpi
     """Default image => PDF dpi"""
-    image_fit: str
+    image_fit: str = "into"        # Default image => PDF fit mode
     """Default image => PDF fit mode"""
-    image_page_size: str | None
+    image_page_size: str = "none"    # Default image => PDF page size
     """Default image => PDF page size"""
-    image_resampling: str
+    image_resampling: str = "bicubic"  # Default image resampling algorithm
     """Default image resampling algorithm"""
-    pdf_compression: str
+    pdf_compression: str = "medium"  # Default PDF compression level
     """Default PDF compression level"""
-    gui_zoom: int
+    gui_zoom: int = 100            # Default GUI zoom level
     """Default GUI zoom level"""
-    gui_output_dir: str
+    gui_output_dir: str = str(Environment.UserFolder.downloads())  # Default output directory
     """Default output directory"""
 
     def to_dict(self) -> dict[str, Any]:
@@ -67,30 +72,12 @@ class Configuration:
 
     @classmethod
     def __reset(cls) -> ConfigurationData:
-        language = "en_US"
-        if locale.getlocale() and locale.getlocale()[0]:
-            language = locale.getlocale()[0] or language
-
-        return ConfigurationData(
-            cache_enabled=True,     # Enable HTTP cache
-            cache_expire_after=int(30 * 24 * 60 * 60),  # HTTP cache expiration time in seconds (30 days)
-            port=5000,              # Default port (flask app)
-            language=language,      # Default: system language or "en_US"
-            install_deps=True,      # Default: ask user to confirm dependency installation
-            audio_bitrate=0,        # Default audio bitrate in kbps
-            video_bitrate=0,        # Default video bitrate in kbps
-            video_format="mp4",     # Default video format
-            video_encoding_speed="medium",  # Default video encoding speed
-            video_quality="medium",  # Default video quality
-            image_quality=90,        # Default image quality 90%
-            image_dpi=200,           # Default image => PDF dpi
-            image_fit='into',        # Default image => PDF fit mode
-            image_page_size=None,    # Default image => PDF page size
-            image_resampling="bicubic",  # Default image resampling algorithm
-            pdf_compression="medium",  # Default PDF compression level
-            gui_zoom=100,            # Default GUI zoom level
-            gui_output_dir=str(Environment.UserFolder.DOWNLOADS()),  # Default output directory
-        )
+        match locale.getlocale():
+            case (None, _):
+                language = "en_US"
+            case (lang, _):
+                language = lang
+        return ConfigurationData(language=language)
 
     @classmethod
     def set(cls, new_config: ConfigurationData) -> None:

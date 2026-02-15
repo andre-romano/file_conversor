@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
+import re
 import sys
 import tomllib
-import re
 
 
 def get_version_parts(version: str):
@@ -44,27 +44,27 @@ def add_version(version: str, amount: int = 1):
 
 
 def get_python_version():
-    MIN = ""
-    MAX = ""
+    min_version = ""
+    max_version = ""
     with open("pyproject.toml", "rb") as f:
         pyproject = tomllib.load(f)
     if "project" in pyproject and "requires-python" in pyproject["project"]:
-        requires_python = pyproject["project"]["requires-python"].split(",")
-        for req in requires_python:
-            req = req.strip()
+        requires_python: str = pyproject["project"]["requires-python"].split(",")
+        for req_orig in requires_python:
+            req = req_orig.strip()
             if req.startswith(">="):
-                MIN = req[2:].strip()
+                min_version = req[2:].strip()
             elif req.startswith(">"):
-                MIN = req[1:].strip()
-                major, minor, patch = add_version(MIN)
-                MIN = f"{major}.{minor}.{patch}"
+                min_version = req[1:].strip()
+                major, minor, patch = add_version(min_version)
+                min_version = f"{major}.{minor}.{patch}"
             elif req.startswith("<="):
-                MAX = req[2:].strip()
+                max_version = req[2:].strip()
             elif req.startswith("<"):
-                MAX = req[1:].strip()
-                major, minor, patch = sub_version(MAX)
-                MAX = f"{major}.{minor}.{patch}"
-    return MIN, MAX
+                max_version = req[1:].strip()
+                major, minor, patch = sub_version(max_version)
+                max_version = f"{major}.{minor}.{patch}"
+    return min_version, max_version
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 # src/file_conversor/cli/_utils/abstract_typer_command.py
 
-import typer
+from typing import Any, Callable, Protocol
 
-from typing import Any, Callable, Iterable, Protocol, Self
+import typer
 
 # user-provided modules
 from file_conversor.config.environment import Environment

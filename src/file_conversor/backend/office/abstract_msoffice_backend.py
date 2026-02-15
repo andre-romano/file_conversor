@@ -1,14 +1,13 @@
 # src\file_conversor\backend\office\abstract_msoffice_backend.py
 
-from pathlib import Path
-from typing import Any, Callable
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from typing import Any
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.office._convert_protocol import ConvertProtocol
+from file_conversor.config import Log, get_translation
+
 
 LOG = Log.get_instance()
 
@@ -17,7 +16,7 @@ logger = LOG.getLogger(__name__)
 
 
 class Win32Com:
-    def __init__(self, prog_id, visible: bool | None = None):
+    def __init__(self, prog_id: str, visible: bool | None = None):
         """
         Win32Com dispatch wrapper class
 
@@ -31,6 +30,7 @@ class Win32Com:
 
     def __enter__(self):
         import pythoncom  # pyright: ignore[reportMissingModuleSource]
+
         from win32com import client  # pyright: ignore[reportMissingModuleSource]
 
         pythoncom.CoInitialize()  # Initialize COM for this thread
@@ -42,7 +42,7 @@ class Win32Com:
             pass  # Some COM objects don't have Visible
         return self._app
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
         import pythoncom  # pyright: ignore[reportMissingModuleSource]
         try:
             if self._app:
@@ -63,7 +63,7 @@ class AbstractMSOfficeBackend(AbstractBackend, ConvertProtocol):
     def __init__(
         self,
         prog_id: str,
-        install_deps: bool | None,
+        install_deps: bool | None,  # noqa: ARG002
         verbose: bool = False,
     ):
         """
@@ -85,8 +85,8 @@ class AbstractMSOfficeBackend(AbstractBackend, ConvertProtocol):
             return False
         try:
             pythoncom.CoInitialize()
-            clsid = pythoncom.ProgIDFromCLSID(self.PROG_ID)
-            return clsid is not None
+            clsid = pythoncom.ProgIDFromCLSID(self.PROG_ID)  # pyright: ignore[reportUnknownMemberType]
+            return clsid is not None and clsid != ""  # pyright: ignore[reportUnnecessaryComparison]
         except:
             logger.warning(f"Microsoft Office '{self.PROG_ID}' backend not available.")
             return False

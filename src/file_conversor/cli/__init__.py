@@ -1,11 +1,13 @@
 # src\file_conversor\cli\__init__.py
 
+import contextlib
 import sys
-import typer
 
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated
+
+import typer
 
 # user-provided imports
 from file_conversor.cli._utils import AbstractTyperGroup
@@ -16,19 +18,24 @@ from file_conversor.cli.config import ConfigTyperGroup
 from file_conversor.cli.doc import DocTyperGroup
 from file_conversor.cli.ebook import EbookTyperGroup
 from file_conversor.cli.hash import HashTyperGroup
-from file_conversor.cli.video import VideoTyperGroup
 from file_conversor.cli.image import ImageTyperGroup
 from file_conversor.cli.pdf import PdfTyperGroup
 from file_conversor.cli.pipeline import PipelineTyperGroup
 from file_conversor.cli.ppt import PptTyperGroup
 from file_conversor.cli.text import TextTyperGroup
+from file_conversor.cli.video import VideoTyperGroup
 from file_conversor.cli.win import WinTyperGroup
 from file_conversor.cli.xls import XlsTyperGroup
 
+# CORE
 from file_conversor.config import Configuration, Environment, Log, State
-from file_conversor.config.locale import AVAILABLE_LANGUAGES, get_system_locale, get_translation
-
+from file_conversor.config.locale import (
+    AVAILABLE_LANGUAGES,
+    get_system_locale,
+    get_translation,
+)
 from file_conversor.system import System
+
 
 # Get app config
 CONFIG = Configuration.get()
@@ -78,11 +85,10 @@ def _version_callback(value: bool):
 def _self_test_callback(value: bool):
     if not value:
         return
-    try:
+
+    with contextlib.suppress(typer.Exit):
         # show version info
         _version_callback(True)
-    except typer.Exit:
-        pass
 
     from file_conversor.config.self_tests import SelfTests
     SelfTests().run_self_tests()
@@ -117,60 +123,59 @@ class AppTyperGroup(AbstractTyperGroup):
     @classmethod
     def _main_callback(
         cls,
-        no_log: Annotated[bool, typer.Option(
+        no_log: Annotated[bool, typer.Option(  # noqa: ARG003
             "--no-log", "-nl",
             help=_("Disable file logs"),
             callback=_no_log_callback,
             is_flag=True,
         )] = False,
-        no_progress: Annotated[bool, typer.Option(
+        no_progress: Annotated[bool, typer.Option(  # noqa: ARG003
             "--no-progress", "-np",
             help=f"{_('Disable progress bars')}",
             callback=_no_progress_callback,
             is_flag=True,
         )] = False,
-        quiet: Annotated[bool, typer.Option(
+        quiet: Annotated[bool, typer.Option(  # noqa: ARG003
             "--quiet", "-q",
             help=f"{_('Enable quiet mode (only display errors and progress bars)')}",
             callback=_quiet_callback,
             is_flag=True,
         )] = False,
-        verbose: Annotated[bool, typer.Option(
+        verbose: Annotated[bool, typer.Option(  # noqa: ARG003
             "--verbose", "-v",
             help=_("Enable verbose mode"),
             callback=_verbose_callback,
             is_flag=True,
         )] = False,
-        debug: Annotated[bool, typer.Option(
+        debug: Annotated[bool, typer.Option(  # noqa: ARG003
             "--debug", "-d",
             help=_("Enable debug mode"),
             callback=_debug_callback,
             is_flag=True,
         )] = False,
-        overwrite_output: Annotated[bool, typer.Option(
+        overwrite_output: Annotated[bool, typer.Option(  # noqa: ARG003
             "--overwrite-output", "-oo",
             help=f"{_('Overwrite output files')}. Defaults to False (do not overwrite).",
             callback=_overwrite_output_callback,
             is_flag=True,
         )] = False,
-        version: Annotated[bool, typer.Option(
+        version: Annotated[bool, typer.Option(  # noqa: ARG003
             "--version", "-V",
             help=_("Display version"),
             callback=_version_callback,
             is_flag=True,
         )] = False,
-        self_test: Annotated[bool, typer.Option(
+        self_test: Annotated[bool, typer.Option(  # noqa: ARG003
             "--self-test", "-st",
             help=_("Run self tests"),
             callback=_self_test_callback,
             is_flag=True,
         )] = False,
     ):
-        try:
-            # show version info
-            _version_callback(True)
-        except typer.Exit:
-            pass
+        with contextlib.suppress(typer.Exit):
+            # show version info (if debug mode is enabled)
+            _version_callback(debug)
+
         logger.debug(f"Command: {sys.argv}")
         # Environment.get_executable()
         logger.debug(f"Working directory: {Path().resolve()}")

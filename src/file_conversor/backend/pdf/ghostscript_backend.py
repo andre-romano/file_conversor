@@ -3,20 +3,17 @@
 """
 This module provides functionalities for handling files using ``ghostscript`` backend.
 """
-
-import re
-
-from pathlib import Path
-
 from enum import Enum
+from pathlib import Path
 from typing import Any, Callable
+
+from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
+from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
-from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.dependency import ScoopPackageManager, BrewPackageManager
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -31,13 +28,14 @@ class GhostscriptBackend(AbstractBackend):
     class OutputFileFormat(Enum):
         PDF = "pdf"
 
-        def get(self):
-            if self.value == "pdf":
-                return "pdfwrite"
-            raise ValueError(f"Unsupported output file format: {self.value}")
+        def _get_opt(self) -> str:
+            match self:
+                case GhostscriptBackend.OutputFileFormat.PDF:
+                    return "pdfwrite"
 
-        def get_options(self) -> list[str]:
-            return [f"-sDEVICE={self.get()}"]
+        @property
+        def options(self) -> list[str]:
+            return [f"-sDEVICE={self._get_opt()}"]
 
     class Compression(Enum):
         HIGH = "high"
@@ -49,19 +47,20 @@ class GhostscriptBackend(AbstractBackend):
         NONE = "none"
         """600 dpi quality - no compression / highest quality"""
 
-        def get(self):
-            if self.value == "high":
-                return "screen"
-            if self.value == "medium":
-                return "ebook"
-            if self.value == "low":
-                return "printer"
-            if self.value == "none":
-                return "prepress"
-            raise ValueError(f"Unsupported compression level: {self.value}")
+        def _get_opt(self) -> str:
+            match self:
+                case GhostscriptBackend.Compression.HIGH:
+                    return "screen"
+                case GhostscriptBackend.Compression.MEDIUM:
+                    return "ebook"
+                case GhostscriptBackend.Compression.LOW:
+                    return "printer"
+                case GhostscriptBackend.Compression.NONE:
+                    return "prepress"
 
-        def get_options(self) -> list[str]:
-            return [f"-dPDFSETTINGS=/{self.get()}"]
+        @property
+        def options(self) -> list[str]:
+            return [f"-dPDFSETTINGS=/{self._get_opt()}"]
 
     class CompatibilityPreset(Enum):
         PRESET_1_3 = "1.3"
@@ -69,27 +68,28 @@ class GhostscriptBackend(AbstractBackend):
         PRESET_1_4 = "1.4"
         """legacy option"""
         PRESET_1_5 = "1.5"
-        """good campatibility / support for object stream compression"""
+        """good compatibility / support for object stream compression"""
         PRESET_1_6 = "1.6"
         """medium campatibility / support for JPEG2000 compression"""
         PRESET_1_7 = "1.7"
         """low campatibility / support for 3D and transparency"""
 
-        def get(self):
-            if self.value == "1.3":
-                return "1.3"
-            if self.value == "1.4":
-                return "1.4"
-            if self.value == "1.5":
-                return "1.5"
-            if self.value == "1.6":
-                return "1.6"
-            if self.value == "1.7":
-                return "1.7"
-            raise ValueError(f"Unsupported compatibility preset: {self.value}")
+        def _get_opt(self) -> str:
+            match self:
+                case GhostscriptBackend.CompatibilityPreset.PRESET_1_3:
+                    return "1.3"
+                case GhostscriptBackend.CompatibilityPreset.PRESET_1_4:
+                    return "1.4"
+                case GhostscriptBackend.CompatibilityPreset.PRESET_1_5:
+                    return "1.5"
+                case GhostscriptBackend.CompatibilityPreset.PRESET_1_6:
+                    return "1.6"
+                case GhostscriptBackend.CompatibilityPreset.PRESET_1_7:
+                    return "1.7"
 
-        def get_options(self) -> list[str]:
-            return [f"-dCompatibilityLevel={self.get()}"]  # PDF preset
+        @property
+        def options(self) -> list[str]:
+            return [f"-dCompatibilityLevel={self._get_opt()}"]  # PDF preset
 
     class Downsampling(Enum):
         HIGH = "high"
@@ -99,17 +99,18 @@ class GhostscriptBackend(AbstractBackend):
         LOW = "low"
         """fast processing / low quality"""
 
-        def get(self):
-            if self.value == "high":
-                return "Bicubic"
-            if self.value == "medium":
-                return "Average"
-            if self.value == "low":
-                return "Subsample"
-            raise ValueError(f"Unsupported downsampling type: {self.value}")
+        def _get_opt(self) -> str:
+            match self:
+                case GhostscriptBackend.Downsampling.HIGH:
+                    return "Bicubic"
+                case GhostscriptBackend.Downsampling.MEDIUM:
+                    return "Average"
+                case GhostscriptBackend.Downsampling.LOW:
+                    return "Subsample"
 
-        def get_options(self) -> list[str]:
-            value = self.get()
+        @property
+        def options(self) -> list[str]:
+            value = self._get_opt()
             return [
                 f"-dDownsampleColorImages=true",
                 f"-dDownsampleGrayImages=true",
@@ -125,17 +126,18 @@ class GhostscriptBackend(AbstractBackend):
         PNG = "png"
         """PNG format (great support / high file size)"""
 
-        def get(self):
-            if self.value == "jpx":
-                return "JPXEncode"
-            if self.value == "jpg":
-                return "DCTEncode"
-            if self.value == "png":
-                return "FlateEncode"
-            raise ValueError(f"Unsupported image compression format: {self.value}")
+        def _get_opt(self) -> str:
+            match self:
+                case GhostscriptBackend.ImageCompression.JPX:
+                    return "JPXEncode"
+                case GhostscriptBackend.ImageCompression.JPG:
+                    return "DCTEncode"
+                case GhostscriptBackend.ImageCompression.PNG:
+                    return "FlateEncode"
 
-        def get_options(self) -> list[str]:
-            value = self.get()
+        @property
+        def options(self) -> list[str]:
+            value = self._get_opt()
             return [
                 f"-dAutoFilterColorImages=false",
                 f"-dAutoFilterGrayImages=false",
@@ -153,30 +155,28 @@ class GhostscriptBackend(AbstractBackend):
         HIGH = "high"
         """high compression / low quality"""
 
-        def get(self):
-            if self.value == "none":
-                return 99
-            if self.value == "low":
-                return 90
-            if self.value == "medium":
-                return 80
-            if self.value == "high":
-                return 70
-            raise ValueError(f"Unsupported JPEG compression level: {self.value}")
+        def _get_opt(self) -> int:
+            match self:
+                case GhostscriptBackend.JPEGCompression.NONE:
+                    return 99
+                case GhostscriptBackend.JPEGCompression.LOW:
+                    return 90
+                case GhostscriptBackend.JPEGCompression.MEDIUM:
+                    return 80
+                case GhostscriptBackend.JPEGCompression.HIGH:
+                    return 70
 
         def get_options(self) -> list[str]:
             return [
-                f"-dJPEGQ={self.get()}",
+                f"-dJPEGQ={self._get_opt()}",
             ]
 
-    SUPPORTED_IN_FORMATS = {
-        "pdf": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "pdf": {
-            "out_file_format": OutputFileFormat.PDF,
-        },
-    }
+    class SupportedInFormats(Enum):
+        PDF = "pdf"
+
+    class SupportedOutFormats(Enum):
+        PDF = "pdf"
+
     EXTERNAL_DEPENDENCIES = {
         "gs",
     }
@@ -242,6 +242,8 @@ class GhostscriptBackend(AbstractBackend):
         :param line: Ghostscript output line.
         :return: Number of pages or None if not found.
         """
+        import re
+
         match = re.search(r'Processing pages (\d+) through (\d+)', line)
         if not match:
             return None
@@ -258,6 +260,8 @@ class GhostscriptBackend(AbstractBackend):
         :param line: Ghostscript output line.
         :return: Progress percentage or None if not found.
         """
+        import re
+
         match = re.search(r'Page\s*(\d+)', line)
         if not match:
             return None
@@ -295,20 +299,17 @@ class GhostscriptBackend(AbstractBackend):
         out_path = out_path.with_suffix(out_path.suffix.lower())
 
         out_ext = out_path.suffix[1:]
-        if out_ext not in self.SUPPORTED_OUT_FORMATS:
-            raise ValueError(f"Output format '{out_ext}' not supported")
-
-        out_file_format: GhostscriptBackend.OutputFileFormat = self.SUPPORTED_OUT_FORMATS[out_ext]["out_file_format"]
+        out_file_format: GhostscriptBackend.OutputFileFormat = GhostscriptBackend.OutputFileFormat[out_ext.upper()]
 
         # build command
         command = self._get_gs_command()
 
         # add options
-        command.extend(out_file_format.get_options())  # file_device options
-        command.extend(compression_level.get_options())  # compression options
-        command.extend(compatibility_preset.get_options())  # compatibility options
-        command.extend(downsampling_type.get_options())  # downsampling options
-        command.extend(image_compression.get_options())  # set image compression
+        command.extend(out_file_format.options)  # file_device options
+        command.extend(compression_level.options)  # compression options
+        command.extend(compatibility_preset.options)  # compatibility options
+        command.extend(downsampling_type.options)  # downsampling options
+        command.extend(image_compression.options)  # set image compression
 
         # adjust JPEG compression if needed
         if image_compression == GhostscriptBackend.ImageCompression.JPG:

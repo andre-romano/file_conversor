@@ -1,32 +1,32 @@
 # src\file_conversor\utils\formatters.py
 
-import json
-import math
-import re
-import traceback
-
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 # user-provided modules
 from file_conversor.config.locale import get_translation
 
+
 _ = get_translation()
 
 
-@staticmethod
 def get_output_file(
-        output_file: str | Path,
-        stem: str | None = None,
-        suffix: str | None = None,
+    input_file: Path,
+    output_dir: Path = Path(),
+    out_stem: str = "",
+    out_suffix: str | None = None,
 ):
     """
     Get output file based on input
     """
-    output_file = Path(output_file)
-    output_name = output_file.with_stem(f"{output_file.with_suffix("").name}{stem or ""}")
-    output_name = output_name.with_suffix(suffix if suffix is not None else output_file.suffix)
-    return Path(output_name.name)
+    output_filename = f"{input_file.stem}{out_stem}"
+    if out_suffix:
+        output_filename += f".{out_suffix.strip('.')}"
+    elif out_suffix == "":
+        output_filename += ""
+    else:
+        output_filename += input_file.suffix
+    return output_dir / output_filename
 
 
 def escape_xml(text: Any | str | None) -> str:
@@ -47,6 +47,8 @@ def escape_xml(text: Any | str | None) -> str:
 
 def normalize_degree(deg: float | int) -> int:
     """Normalize clockwise degree to 0-360"""
+    import math
+
     # parse rotation argument
     degree = int(math.fmod(deg, 360))
     if degree < 0:
@@ -54,7 +56,7 @@ def normalize_degree(deg: float | int) -> int:
     return degree
 
 
-def parse_traceback_list(exc: Exception) -> list[str]:
+def parse_traceback_list(_: Exception) -> list[str]:
     """
     Parse traceback to get specific frame.
 
@@ -62,32 +64,50 @@ def parse_traceback_list(exc: Exception) -> list[str]:
 
     :return: List of str.
     """
+    import traceback
     return traceback.format_exc().splitlines()
 
 
-def parse_js_to_py(value: str) -> Any:
+def parse_js_to_py(value: str | None) -> Any:
     # Attempt to convert to appropriate type
     # Handle null value
+    import json
+    import re
+
     if value is None or value.lower() in ('', 'null', 'none', 'undefined'):
         return None
     # Handle boolean values
-    elif value.lower() in ('true', 'on'):
+    if value.lower() in ('true', 'on'):
         return True
-    elif value.lower() in ('false', 'off'):
+    if value.lower() in ('false', 'off'):
         return False
     # Handle numeric values
-    elif re.match(r'^-?\d+([\.,]\d+)?$', value):
+    if re.match(r'^-?\d+([\.,]\d+)?$', value):
         if '.' in value or ',' in value:
             return float(value.replace(',', '.'))
-        else:
-            return int(value)
+        return int(value)
     # Handle JSON arrays and objects
-    elif value[0] in ('[', '{',) and value[-1] in (']', '}',):
+    if value[0] in ('[', '{',) and value[-1] in (']', '}',):
         return json.loads(value.replace("'", '"'))
     return value  # return as string
 
 
-def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
+def parse_ffmpeg_resolution(resolution: str | None) -> tuple[int, int] | None:
+    """
+    Parse FFmpeg resolution string to (width, height).
+
+    :param filter: FFmpeg resolution string.
+    :returns: (width, height)
+    """
+    if not resolution:
+        return None
+    splitted = tuple(int(dim) for dim in resolution.split(':'))
+    if len(splitted) != 2:
+        raise ValueError(f"{_('Invalid resolution format')} '{resolution}'. {_('Valid format is WIDTH:HEIGHT')}.")
+    return splitted
+
+
+def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list[str], dict[str, str]]:
     """
     Parse FFmpeg filter string to name, args, kwargs.
 
@@ -97,9 +117,9 @@ def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
     if not filter:
         return "", [], {}
     splitted = filter.split("=", maxsplit=1)
-    name = splitted[0]
-    args = splitted[1].split(":") if len(splitted) > 1 else []
-    kwargs = {}
+    name: str = splitted[0]
+    args: list[str] = splitted[1].split(":") if len(splitted) > 1 else []
+    kwargs: dict[str, str] = {}
     for arg in args.copy():
         arg_splitted = arg.split("=")
         arg_name = arg_splitted[0]
@@ -111,19 +131,12 @@ def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list, dict]:
     return name, args, kwargs
 
 
-def parse_image_resize_scale(scale: float | None, width: int | None, quiet: bool):
-    if not scale and not width:
-        if quiet:
-            raise RuntimeError(f"{_('Scale and width not provided')}")
-        userinput = str(input(f"{_('Output image scale (e.g., 1.5)')}"))
-        scale = float(userinput)
-    return scale
-
-
 def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
     """Parse PDF rotation argument to dict of page: degree (0-based)."""
     # get rotation dict in format {page: rotation}
-    rotation_dict = {}
+    import re
+
+    rotation_dict: dict[int, int] = {}
     for arg in rotation:
         match = re.search(r'(\d+)(-(\d*))?:(-?\d+)', arg)
         if not match:
@@ -146,16 +159,11 @@ def parse_pdf_rotation(rotation: list[str], last_page: int) -> dict[int, int]:
     return rotation_dict
 
 
-def parse_pdf_pages(pages: list[str] | str | None) -> list[int]:
+def parse_pdf_pages(pages: list[str]) -> list[int]:
     """Parse PDF pages argument to list of page numbers (0-based)."""
-    if not pages:
-        pages_str = input(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}")
-        pages = str(pages_str)
-
-    if isinstance(pages, str):
-        pages = [p.strip() for p in pages.split(",")]
-
     # parse user input
+    import re
+
     pages_list: list[int] = []
     for arg in pages:
         match = re.compile(r'(\d+)(-(\d*))?').search(arg)
@@ -186,13 +194,13 @@ def parse_bytes(target_size: str | None) -> int:
     size_value = float(target_size[:-1])
     if size_unit.isdigit():
         return round(float(target_size))
-    elif size_unit == "K":
+    if size_unit == "K":
         return round(size_value * 1024.0)
-    elif size_unit == "M":
+    if size_unit == "M":
         return round(size_value * 1024.0 * 1024.0)
-    elif size_unit == "G":
+    if size_unit == "G":
         return round(size_value * 1024.0 * 1024.0 * 1024.0)
-    elif size_unit == "T":
+    if size_unit == "T":
         return round(size_value * 1024.0 * 1024.0 * 1024.0 * 1024.0)
     raise ValueError(f"{_('Invalid size format')} '{target_size}'.")
 
@@ -216,13 +224,15 @@ def format_bitrate(bps: int) -> str:
         return f"{bps / (1024 * 1024 * 1024):.1f} Gbps"
     if bps >= 1024 * 1024:
         return f"{bps / (1024 * 1024):.1f} Mbps"
-    elif bps >= 1024:
+    if bps >= 1024:
         return f"{bps / 1024:.1f} Kbps"
     return f"{bps} bps"
 
 
 def format_alphanumeric(text: str) -> str:
     """Format text to be alphanumeric only (remove non-alphanumeric characters)."""
+    import re
+
     formatted = text
     formatted = re.sub(r'[áàâäãå]', 'a', formatted)
     formatted = re.sub(r'[éèëê]', 'e', formatted)
@@ -255,6 +265,8 @@ def format_file_types_webview(*file_types: str, description: str = "") -> str:
 
 def format_py_to_js(value: Any) -> str:
     """Convert Python value to JavaScript-compatible string."""
+    import json
+
     if isinstance(value, Path):
         value = str(value.resolve())
     data = json.dumps(value)
@@ -302,29 +314,6 @@ def format_traceback_html(exc: Exception, debug: bool = True) -> str:
     ] + [exc_formatted])
 
 
-def format_in_out_files_tuple(
-    input_files: list[Path],
-    file_format: str,
-    output_dir: Path,
-    overwrite_output: bool,
-):
-    """
-    Get input and output files for conversion.
-
-    :param input_files: List of input file paths.
-    :param format: Output file format.
-    :param output_dir: Output directory path.
-    :param overwrite_output: Whether to overwrite existing output files.
-
-    :raises FileExistsError: if output file exists and overwrite is disabled.
-    """
-    for input_file in input_files:
-        output_file = output_dir / get_output_file(input_file, suffix=f".{file_format.lstrip('.')}")
-        if not overwrite_output and output_file.exists():
-            raise FileExistsError(f"{_("File")} '{output_file}' {_("exists")}. {_("Use")} 'file_conversor -oo' {_("to overwrite")}.")
-        yield input_file, output_file
-
-
 __all__ = [
     "get_output_file",
     "escape_xml",
@@ -332,7 +321,6 @@ __all__ = [
     "parse_traceback_list",
     "parse_js_to_py",
     "parse_ffmpeg_filter",
-    "parse_image_resize_scale",
     "parse_pdf_rotation",
     "parse_pdf_pages",
     "parse_bytes",
@@ -343,5 +331,4 @@ __all__ = [
     "format_py_to_js",
     "format_traceback_str",
     "format_traceback_html",
-    "format_in_out_files_tuple",
 ]

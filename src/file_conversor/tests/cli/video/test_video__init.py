@@ -3,11 +3,10 @@
 
 # user-provided modules
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestVideoHelp:
+class TestVideoHelpCLI:
     def test_video_help(self,):
         result = TestTyper.invoke(AppTyperGroup.Commands.VIDEO.value, "--help")
         for mode in VideoTyperGroup.Commands:

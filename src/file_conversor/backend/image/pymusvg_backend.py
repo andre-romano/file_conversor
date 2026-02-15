@@ -4,8 +4,7 @@
 This module provides functionalities for handling SVG files using ``pymupdf`` backend.
 """
 
-import fitz  # pymupdf
-
+from enum import Enum
 from pathlib import Path
 
 # user-provided imports
@@ -17,13 +16,13 @@ class PyMuSVGBackend(AbstractBackend):
     A class that provides an interface for handling SVG files using ``pymupdf``.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "svg": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "png": {},
-        "jpg": {},
-    }
+    class SupportedInFormats(Enum):
+        SVG = "svg"
+
+    class SupportedOutFormats(Enum):
+        PNG = "png"
+        JPG = "jpg"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
@@ -39,8 +38,8 @@ class PyMuSVGBackend(AbstractBackend):
         self._verbose = verbose
 
     def convert(self,
-                output_file: str | Path,
-                input_file: str | Path,
+                output_file: Path,
+                input_file: Path,
                 dpi: int = 200,
                 ):
         """
@@ -53,18 +52,14 @@ class PyMuSVGBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found
         :raises ValueError: if output format is unsupported
         """
-        input_file = Path(input_file).resolve()
-        output_file = Path(output_file).resolve()
-
-        self.check_file_exists(input_file)
+        import fitz  # pyright: ignore[reportMissingTypeStubs] # pymupdf
 
         # open file
         doc = fitz.open(str(input_file))
 
-        # => .png, .jpg OUTPUT
-        for page in doc:
-            pix = page.get_pixmap(dpi=dpi)  # type: ignore
-            pix.save(str(output_file))  # type: ignore
+        for page in doc:  # pyright: ignore[reportUnknownVariableType]
+            pix = page.get_pixmap(dpi=dpi)   # pyright: ignore[reportUnknownVariableType, reportAttributeAccessIssue, reportUnknownMemberType]
+            pix.save(str(output_file))   # pyright: ignore[reportUnknownMemberType]
 
 
 __all__ = [

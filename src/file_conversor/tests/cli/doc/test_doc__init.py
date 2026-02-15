@@ -1,11 +1,10 @@
 # tests\cli\doc\test__init.py
 
 from file_conversor.cli import AppTyperGroup, DocTyperGroup
+from file_conversor.tests.utils import TestTyper
 
-from file_conversor.tests.utils import TestTyper, DATA_PATH
 
-
-class TestDocHelp:
+class TestDocHelpCLI:
     def test_doc_help(self,):
         result = TestTyper.invoke(AppTyperGroup.Commands.DOC.value, "--help")
         for mode in DocTyperGroup.Commands:

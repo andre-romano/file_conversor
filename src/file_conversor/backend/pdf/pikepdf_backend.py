@@ -4,17 +4,15 @@
 This module provides functionalities for handling PDF files using ``pikepdf`` backend (qpdf python wrapper).
 """
 
-import pikepdf
-
-from pikepdf import ObjectStreamMode
-
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable
+
+from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
 from file_conversor.config.log import Log
 
-from file_conversor.backend.abstract_backend import AbstractBackend
 
 LOG = Log.get_instance()
 
@@ -26,12 +24,12 @@ class PikePDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``pikepdf`` (qpdf python wrapper).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "pdf": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "pdf": {},
-    }
+    class SupportedInFormats(Enum):
+        PDF = "pdf"
+
+    class SupportedOutFormats(Enum):
+        PDF = "pdf"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
@@ -49,6 +47,7 @@ class PikePDFBackend(AbstractBackend):
     @staticmethod
     def is_encrypted(file_path: str | Path) -> bool:
         """Checks if PDF file is encrypted"""
+        import pikepdf
         try:
             with pikepdf.open(file_path):
                 return False  # opened without password → not encrypted
@@ -57,10 +56,10 @@ class PikePDFBackend(AbstractBackend):
 
     def compress(
         self,
-        input_file: str | Path,
-        output_file: str | Path,
+        input_file: Path,
+        output_file: Path,
         linearize: bool = True,
-        decrypt_password: str | None = None,
+        decrypt_password: str = "",
         progress_callback: Callable[[int], Any] | None = None,
     ):
         """
@@ -75,11 +74,13 @@ class PikePDFBackend(AbstractBackend):
         :raises FileNotFoundError: if input file not found.
         :raises PDFError, ForeignObjectError: if qpdf errors.
         """
-        self.check_file_exists(input_file)
+        import pikepdf
+
+        from pikepdf import ObjectStreamMode
 
         # Open PDF (with password if provided)
         preserve_encryption: bool = (decrypt_password != "" and self.is_encrypted(input_file))
-        with pikepdf.open(input_file, password=decrypt_password or "") as pdf:
+        with pikepdf.open(input_file, password=decrypt_password) as pdf:
             # Save optimized PDF
             pdf.save(output_file,
                      encryption=preserve_encryption,  # preserve encryption

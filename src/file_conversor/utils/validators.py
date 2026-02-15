@@ -1,15 +1,16 @@
 # src\file_conversor\utils\validators.py
 
-import math
 import os
 import sys
-import typer
 
 from pathlib import Path
-from typing import Any, Callable, Iterable, List
+from typing import Any, Callable, Iterable
+
+import typer
 
 # user provided imports
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -23,6 +24,7 @@ def is_close(num1: int | float, num2: int | float, rel_tol: float = 1e-9, abs_to
     :param rel_tol: Relative tolerance.
     :param abs_tol: Absolute tolerance.
     """
+    import math
     return math.isclose(num1, num2, rel_tol=rel_tol, abs_tol=abs_tol)
 
 
@@ -45,7 +47,7 @@ def prompt_retry_on_exception(
         show_default: bool = True,
         check_callback: Callable[[Any], Any] | None = None,
         retries: int | None = None,
-        **prompt_kwargs,
+        **prompt_kwargs: Any,
 ) -> Any:
     """
     Prompts the user for input, retrying on exception.
@@ -83,9 +85,16 @@ def prompt_retry_on_exception(
                     show_default=show_default,
                     **prompt_kwargs,
                 )
-            return check_callback(res) if check_callback else res
-        except:
-            pass
+            match check_callback(res) if check_callback else True:
+                case False:
+                    raise typer.BadParameter("Invalid input.")
+                case callback_res if isinstance(callback_res, Exception):
+                    raise callback_res
+                case _:
+                    """empty case for valid input"""
+            return res
+        except Exception as e:
+            print(f"[bold red][ERROR][/]: {e}")
     raise typer.Abort()
 
 
@@ -101,8 +110,8 @@ def check_file_size_format(data: str | None) -> str | None:
     size_value = -1
     try:
         size_value = float(data[:-1])
-    except ValueError:
-        raise exception
+    except ValueError as e:
+        raise exception from e
 
     if size_value < 0:
         raise exception
@@ -150,7 +159,7 @@ def check_dir_exists(data: str | Path | None, mkdir: bool = False) -> Path | Non
     return data
 
 
-def check_is_bool_or_none(data: str | bool | None) -> bool | None:
+def check_is_bool_or_none(data: Any) -> bool | None:
     """
     Checks if the provided input is a valid bool or None.
     """
@@ -177,37 +186,28 @@ def check_positive_integer(num: int | float | None, allow_zero: bool = False):
     return num
 
 
-def check_file_format(filename_or_iter: list | dict | set | str | Path | None, format_dict: Iterable[str], exists: bool = False):
+def check_file_format(filename_or_list: Path | Iterable[Path] | None, file_formats: Iterable[str], exists: bool = False):
     """
     Checks if the provided format is supported.
 
-    :param filename_or_iter: Filename or iterable list
-    :param format_dict: Format {format:options} or [format]
+    :param filename_or_list: Filename or iterable list
+    :param file_formats: Supported file formats
     :param exists: Check if file exists. Default False (do not check).
 
     :raises typer.BadParameter: Unsupported format, or file not found.
     :raises TypeError: Invalid parameter type.
     """
-    file_list = []
-    if isinstance(filename_or_iter, (list, dict, set)):
-        file_list = list(filename_or_iter)
-    elif isinstance(filename_or_iter, (str | Path)):
-        file_list.append(str(filename_or_iter))
-    elif filename_or_iter is None:
-        return filename_or_iter
-    else:
-        raise TypeError(f"{_('Invalid type')} '{type(filename_or_iter)}' {_('for')} filename_or_iter. {_('Valid values are Iterable | str | None')}.")
-    for filename in file_list:
-        file_path = Path(filename)
-        file_format = file_path.suffix[1:]
-        if format_dict and file_format not in format_dict:
-            raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join([str(f) for f in format_dict])}.")
+    file_list: list[Path] = [filename_or_list] if isinstance(filename_or_list, Path) else list(filename_or_list or [])
+    for path in file_list:
+        file_format = path.suffix[1:]
+        if file_formats and file_format not in file_formats:
+            raise typer.BadParameter(f"\n{_('Unsupported format')} '{file_format}'. {_('Supported formats are')}: {', '.join([str(f) for f in file_formats])}.")
         if exists:
-            check_file_exists(file_path)
-    return filename_or_iter
+            check_file_exists(path)
+    return filename_or_list
 
 
-def check_valid_options(data: Any | None, valid_options: Iterable):
+def check_valid_options(data: Any | None, valid_options: Iterable[Any]) -> Any | None:
     if not data:
         return data
     if data not in valid_options:

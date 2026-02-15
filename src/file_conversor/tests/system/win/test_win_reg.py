@@ -1,5 +1,7 @@
 # tests/system/test_win.py
 
+from pathlib import Path
+
 import pytest
 
 from file_conversor.system.win import WinRegFile, WinRegKey
@@ -9,29 +11,29 @@ class TestWinReg:
     def test_winregkey_add_and_del_value(self,):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.add_value("TestValue", "TestContent")
-        assert key._data["TestValue"] == "TestContent"
+        assert key._data["TestValue"] == "TestContent"  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
         key.del_value("TestValue")
-        assert "TestValue" not in key._data
+        assert "TestValue" not in key._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
     def test_winregkey_add(self,):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.add_value("IntValue", 123)
-        assert key._data["IntValue"].startswith("dword:")
-        assert key._data["IntValue"].endswith(f"{123:08x}")
+        assert key._data["IntValue"].startswith("dword:")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert key._data["IntValue"].endswith(f"{123:08x}")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
         key.add_value("BytesValue", b"\x01\x02")
-        assert key._data["BytesValue"].startswith("hex:")
-        assert key._data["BytesValue"].endswith(f"{b"\x01\x02".hex()}")
+        assert key._data["BytesValue"].startswith("hex:")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert key._data["BytesValue"].endswith(f"{b'\x01\x02'.hex()}")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
         key.add_value("StrValue", "TEST")
-        assert key._data["StrValue"] == "TEST"
+        assert key._data["StrValue"] == "TEST"  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
     def test_winregkey_update_with_dict(self,):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.update({"A": "B", "C": 42})
-        assert key._data["A"] == "B"
-        assert key._data["C"].startswith("dword:")
-        assert key._data["C"].endswith(f"{42:08x}")
+        assert key._data["A"] == "B"  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert key._data["C"].startswith("dword:")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert key._data["C"].endswith(f"{42:08x}")  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
     def test_winregkey_repr_and_str(self,):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
@@ -46,9 +48,9 @@ class TestWinReg:
         regfile = WinRegFile()
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         regfile.add_key(key)
-        assert key.path in regfile._data
+        assert key.path in regfile._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
         regfile.del_key(key)
-        assert key.path not in regfile._data
+        assert key.path not in regfile._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
     def test_winregfile_add_same_key(self,):
         key1 = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
@@ -77,8 +79,8 @@ class TestWinReg:
         key1 = WinRegKey(r"HKEY_CURRENT_USER\Software\Test1")
         key2 = WinRegKey(r"HKEY_CURRENT_USER\Software\Test2")
         regfile.update([key1, key2])
-        assert key1.path in regfile._data
-        assert key2.path in regfile._data
+        assert key1.path in regfile._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert key2.path in regfile._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
     def test_winregfile_str_and_repr(self,):
         regfile = WinRegFile()
@@ -97,7 +99,7 @@ class TestWinReg:
         regfile.add_key(key)
         assert regfile[key.path] == key
         assert regfile[key] == key
-        with pytest.raises(KeyError):
+        with pytest.raises(AttributeError):
             regfile[123]  # type: ignore
 
     def test_winregfile_items_iter(self,):
@@ -109,7 +111,7 @@ class TestWinReg:
         assert items[0][1] == key
         assert next(iter(regfile)) == key.path
 
-    def test_winregfile_dumps_and_dump(self, tmp_path):
+    def test_winregfile_dumps_and_dump(self, tmp_path: Path):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.add_value("A", "B")
 
@@ -129,7 +131,7 @@ class TestWinReg:
         assert "[HKEY_CURRENT_USER\\Software\\Test]" in content
         assert '"A"="B"' in content
 
-    def test_winregfile_load(self, tmp_path):
+    def test_winregfile_load(self, tmp_path: Path):
         key = WinRegKey(r"HKEY_CURRENT_USER\Software\Test")
         key.add_value("A", "B")
 
@@ -139,12 +141,12 @@ class TestWinReg:
         regfile.dump(out_file)
 
         loaded = WinRegFile(out_file)
-        assert "HKEY_CURRENT_USER\\Software\\Test" in loaded._data
-        assert loaded._data["HKEY_CURRENT_USER\\Software\\Test"]._data["A"] == "B"
+        assert "HKEY_CURRENT_USER\\Software\\Test" in loaded._data  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        assert loaded._data["HKEY_CURRENT_USER\\Software\\Test"]._data["A"] == "B"  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
         assert '[HKEY_CURRENT_USER\\Software\\Test]' in repr(loaded)
         assert '"A"="B"' in repr(loaded)
 
-    def test_winregfile_load_invalid_file(self, tmp_path):
+    def test_winregfile_load_invalid_file(self, tmp_path: Path):
         bad_file = tmp_path / "bad.reg"
         bad_file.write_text("not a reg file", encoding="utf-16")
         with pytest.raises(RuntimeError):

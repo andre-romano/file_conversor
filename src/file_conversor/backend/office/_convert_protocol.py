@@ -2,25 +2,22 @@
 # src/file_conversor/backend/office/convert_protocol.py
 
 from pathlib import Path
-from dataclasses import dataclass
-from typing import Any, Callable, Protocol
+from typing import Protocol
 
 
 class ConvertProtocol(Protocol):
-    @dataclass
-    class FilesDataModel:
-        input_file: Path
-        output_file: Path
 
     def convert(
         self,
-        files: list[FilesDataModel],
-        file_processed_callback: Callable[[Path], Any] | None = None,
-    ):
+        input_path: Path,
+        output_path: Path,
+    ) -> None:
         """
         Convert input file into an output file.
 
-        :param files: List of FilesDataModel containing input and output file paths.    
+        :param input_path: Path to input file.
+        :param output_path: Path to output file.
+        :param file_processed_callback: Callback function called when a file is processed.
 
         :raises FileNotFoundError: if input file not found.
         """

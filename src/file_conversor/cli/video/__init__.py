@@ -5,19 +5,18 @@ from enum import Enum
 
 # user-provided modules
 from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
-
-from file_conversor.cli.video.check_cmd import VideoCheckTyperCommand
-from file_conversor.cli.video.compress_cmd import VideoCompressTyperCommand
-from file_conversor.cli.video.convert_cmd import VideoConvertTyperCommand
-from file_conversor.cli.video.enhance_cmd import VideoEnhanceTyperCommand
-from file_conversor.cli.video.execute_cmd import VideoExecuteTyperCommand
-from file_conversor.cli.video.info_cmd import VideoInfoTyperCommand
-from file_conversor.cli.video.list_formats_cmd import VideoListFormatsTyperCommand
-from file_conversor.cli.video.mirror_cmd import VideoMirrorTyperCommand
-from file_conversor.cli.video.resize_cmd import VideoResizeTyperCommand
-from file_conversor.cli.video.rotate_cmd import VideoRotateTyperCommand
-
+from file_conversor.cli.video.check_cli import VideoCheckCLI
+from file_conversor.cli.video.compress_cli import VideoCompressCLI
+from file_conversor.cli.video.convert_cli import VideoConvertCLI
+from file_conversor.cli.video.enhance_cli import VideoEnhanceCLI
+from file_conversor.cli.video.execute_cli import VideoExecuteCLI
+from file_conversor.cli.video.info_cli import VideoInfoCLI
+from file_conversor.cli.video.list_formats_cli import VideoListFormatsCLI
+from file_conversor.cli.video.mirror_cli import VideoMirrorCLI
+from file_conversor.cli.video.resize_cli import VideoResizeCLI
+from file_conversor.cli.video.rotate_cli import VideoRotateCLI
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -49,54 +48,54 @@ class VideoTyperGroup(AbstractTyperGroup):
         # add subcommands
         self.add(
             # TRANSFORMATION_PANEL
-            VideoConvertTyperCommand(
+            VideoConvertCLI(
                 group_name=group_name,
                 command_name=self.Commands.CONVERT.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            VideoCompressTyperCommand(
+            VideoCompressCLI(
                 group_name=group_name,
                 command_name=self.Commands.COMPRESS.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            VideoEnhanceTyperCommand(
+            VideoEnhanceCLI(
                 group_name=group_name,
                 command_name=self.Commands.ENHANCE.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            VideoMirrorTyperCommand(
+            VideoMirrorCLI(
                 group_name=group_name,
                 command_name=self.Commands.MIRROR.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            VideoRotateTyperCommand(
+            VideoRotateCLI(
                 group_name=group_name,
                 command_name=self.Commands.ROTATE.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            VideoResizeTyperCommand(
+            VideoResizeCLI(
                 group_name=group_name,
                 command_name=self.Commands.RESIZE.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
 
             # OTHERS_PANEL
-            VideoCheckTyperCommand(
+            VideoCheckCLI(
                 group_name=group_name,
                 command_name=self.Commands.CHECK.value,
                 rich_help_panel=self.Panels.OTHERS.value,
             ),
-            VideoInfoTyperCommand(
+            VideoInfoCLI(
                 group_name=group_name,
                 command_name=self.Commands.INFO.value,
                 rich_help_panel=self.Panels.OTHERS.value,
             ),
-            VideoListFormatsTyperCommand(
+            VideoListFormatsCLI(
                 group_name=group_name,
                 command_name=self.Commands.LIST_FORMATS.value,
                 rich_help_panel=self.Panels.OTHERS.value,
             ),
-            VideoExecuteTyperCommand(
+            VideoExecuteCLI(
                 group_name=group_name,
                 command_name=self.Commands.EXECUTE.value,
                 rich_help_panel=self.Panels.OTHERS.value,

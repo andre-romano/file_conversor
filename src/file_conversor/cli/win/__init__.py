@@ -5,11 +5,14 @@ from enum import Enum
 # user-provided modules
 from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
 
-from file_conversor.cli.win.install_menu_cmd import WinInstallMenuTyperCommand
-from file_conversor.cli.win.restart_explorer_cmd import WinRestartExplorerTyperCommand
-from file_conversor.cli.win.uninstall_menu_cmd import WinUninstallMenuTyperCommand
+# CLI
+from file_conversor.cli.win.install_menu_cli import WinInstallMenuCLI
+from file_conversor.cli.win.restart_explorer_cli import WinRestartExplorerCLI
+from file_conversor.cli.win.uninstall_menu_cli import WinUninstallMenuCLI
 
+# CORE
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -35,19 +38,19 @@ class WinTyperGroup(AbstractTyperGroup):
         # add subcommands
         self.add(
             # OTHERS_PANEL
-            WinRestartExplorerTyperCommand(
+            WinRestartExplorerCLI(
                 group_name=group_name,
                 command_name=self.Commands.RESTART_EXPLORER.value,
                 rich_help_panel=self.Panels.OTHERS.value,
             ),
 
             # CONTEXT_MENU_PANEL
-            WinInstallMenuTyperCommand(
+            WinInstallMenuCLI(
                 group_name=group_name,
                 command_name=self.Commands.INSTALL_MENU.value,
                 rich_help_panel=self.Panels.CONTEXT_MENU.value,
             ),
-            WinUninstallMenuTyperCommand(
+            WinUninstallMenuCLI(
                 group_name=group_name,
                 command_name=self.Commands.UNINSTALL_MENU.value,
                 rich_help_panel=self.Panels.CONTEXT_MENU.value,

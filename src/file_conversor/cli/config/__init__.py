@@ -5,11 +5,10 @@ from enum import Enum
 
 # user-provided modules
 from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
-
-from file_conversor.cli.config.set_cmd import ConfigSetCommand
-from file_conversor.cli.config.show_cmd import ConfigShowCommand
-
+from file_conversor.cli.config.set_cli import ConfigSetCLI
+from file_conversor.cli.config.show_cli import ConfigShowCLI
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -32,12 +31,12 @@ class ConfigTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            ConfigShowCommand(
+            ConfigShowCLI(
                 group_name=group_name,
                 command_name=self.Commands.SHOW.value,
                 rich_help_panel=self.Panels.NONE.value,
             ),
-            ConfigSetCommand(
+            ConfigSetCLI(
                 group_name=group_name,
                 command_name=self.Commands.SET.value,
                 rich_help_panel=self.Panels.NONE.value,

@@ -1,13 +1,11 @@
 # tasks_modules\zip.py
 
-from pathlib import Path
-from invoke.tasks import task
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config
+from tasks_modules import _config, base, embedpy
 from tasks_modules._config import *
 
-from tasks_modules import base, embedpy
 
 BUILD_DIR = embedpy.BUILD_DIR
 
@@ -17,33 +15,33 @@ APP_GUI_EXE = embedpy.PORTABLE_SHIM_GUI_VBS
 if base.WINDOWS:
     INSTALL_APP_CURR = INSTALL_APP_WIN
 elif base.LINUX:
-    INSTALL_APP_CURR = INSTALL_APP_LIN
+    INSTALL_APP_CURR = INSTALL_APP_LIN  # pyright: ignore[reportConstantRedefinition]
 else:
-    INSTALL_APP_CURR = INSTALL_APP_MAC
+    INSTALL_APP_CURR = INSTALL_APP_MAC  # pyright: ignore[reportConstantRedefinition]
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         "dist",
         "build",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_build(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_build(_: InvokeContext):
     remove_path_pattern(f"build/*")
 
 
-@task(pre=[mkdirs])
-def clean_zip(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_zip(_: InvokeContext):
     _config.remove_path_pattern(f"{INSTALL_APP_WIN}")
     _config.remove_path_pattern(f"{INSTALL_APP_LIN}")
     _config.remove_path_pattern(f"{INSTALL_APP_MAC}")
 
 
-@task(pre=[clean_zip, embedpy.check],)
-def build(c: InvokeContext):
+@task(pre=[clean_zip, embedpy.check],)  # pyright: ignore[reportUntypedFunctionDecorator]
+def build(_: InvokeContext):
     print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/]")
 
     human_size, size_bytes_orig = get_dir_size(BUILD_DIR)
@@ -58,8 +56,8 @@ def build(c: InvokeContext):
     print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/][bold green]OK[/]")
 
 
-@task(pre=[build,],)
-def extract_app(c: InvokeContext):
+@task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
+def extract_app(_: InvokeContext):
     print(rf'[bold] Extracting {INSTALL_APP_CURR} ... [/]')
     _config.remove_path_pattern(str(BUILD_DIR))
     _config.extract(src=INSTALL_APP_CURR, dst=BUILD_DIR.parent)
@@ -68,7 +66,7 @@ def extract_app(c: InvokeContext):
     print(rf'[bold] Extracting {INSTALL_APP_CURR} ... [/][bold green]OK[/]')
 
 
-@task(pre=[extract_app,])
+@task(pre=[extract_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
     print("[bold] Checking .ZIP ... [/]")
     if not base.WINDOWS:

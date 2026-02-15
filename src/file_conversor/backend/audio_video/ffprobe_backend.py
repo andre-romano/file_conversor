@@ -7,15 +7,15 @@ This module provides functionalities for handling audio and video files using FF
 import json
 
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any
 
 # user-provided imports
-from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
-
+from file_conversor.backend.audio_video.abstract_ffmpeg_backend import (
+    AbstractFFmpegBackend,
+)
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
 
-from file_conversor.utils.validators import check_file_format
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -81,7 +81,7 @@ class FFprobeBackend(AbstractFFmpegBackend):
         except ValueError:
             return 0.0
 
-    def info(self, file_path: str | Path) -> dict:
+    def info(self, file_path: str | Path) -> dict[str, Any]:
         """
         Get file metadata in JSON format
 

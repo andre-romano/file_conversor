@@ -4,21 +4,20 @@
 This module provides functionalities for handling PDF files using ``pypdf`` backend.
 """
 
+from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Iterable, Sequence
+
 from pypdf import PdfReader, PdfWriter
 from pypdf.constants import UserAccessPermissions
 
-from enum import Enum
-from pathlib import Path
-
-from typing import Any, Callable, Iterable, Sequence
-
-# user-provided imports
-from file_conversor.config import Log
-
-from file_conversor.utils.formatters import normalize_degree
-
 from file_conversor.backend.abstract_backend import AbstractBackend
 
+# user-provided imports
+from file_conversor.config import Log, get_translation
+
+
+_ = get_translation()
 LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
@@ -28,16 +27,24 @@ class PyPDFBackend(AbstractBackend):
     """
     A class that provides an interface for handling PDF files using ``pypdf``.
     """
+    class Rotation(Enum):
+        """Rotation degrees for PDF page rotation."""
+        DEG_0 = 0
+        DEG_90 = 90
+        DEG_180 = 180
+        DEG_270 = 270
 
-    SUPPORTED_IN_FORMATS = {
-        "pdf": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "pdf": {},
-    }
+    class SupportedInFormats(Enum):
+        PDF = "pdf"
+
+    class SupportedOutFormats(Enum):
+        PDF = "pdf"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     class EncryptionPermission(Enum):
+        """PDF user access permissions."""
+
         NONE = 'none'
         """ No permissions granted to user (read-only) """
 
@@ -68,29 +75,29 @@ class PyPDFBackend(AbstractBackend):
         ALL = 'all'
         """ All permissions granted to user. """
 
-        def get(self):
+        def get(self) -> UserAccessPermissions:
             """Get permission value."""
-            if self.value == 'none':
-                return UserAccessPermissions(0)
-            if self.value == 'annotate':
-                return UserAccessPermissions.ADD_OR_MODIFY
-            if self.value == 'fill_forms':
-                return UserAccessPermissions.FILL_FORM_FIELDS
-            if self.value == 'modify':
-                return UserAccessPermissions.MODIFY
-            if self.value == 'modify_pages':
-                return UserAccessPermissions.ASSEMBLE_DOC
-            if self.value == 'copy':
-                return UserAccessPermissions.EXTRACT
-            if self.value == 'accessibility':
-                return UserAccessPermissions.EXTRACT_TEXT_AND_GRAPHICS
-            if self.value == 'print_lq':
-                return UserAccessPermissions.PRINT
-            if self.value == 'print_hq':
-                return UserAccessPermissions.PRINT_TO_REPRESENTATION
-            if self.value == 'all':
-                return UserAccessPermissions.all()
-            raise ValueError(f"Permission '{self.value}' is invalid.")
+            match self:
+                case PyPDFBackend.EncryptionPermission.NONE:
+                    return UserAccessPermissions(0)
+                case PyPDFBackend.EncryptionPermission.ANNOTATE:
+                    return UserAccessPermissions.ADD_OR_MODIFY
+                case PyPDFBackend.EncryptionPermission.FILL_FORMS:
+                    return UserAccessPermissions.FILL_FORM_FIELDS
+                case PyPDFBackend.EncryptionPermission.MODIFY:
+                    return UserAccessPermissions.MODIFY
+                case PyPDFBackend.EncryptionPermission.MODIFY_PAGES:
+                    return UserAccessPermissions.ASSEMBLE_DOC
+                case PyPDFBackend.EncryptionPermission.COPY:
+                    return UserAccessPermissions.EXTRACT
+                case PyPDFBackend.EncryptionPermission.ACCESSIBILITY:
+                    return UserAccessPermissions.EXTRACT_TEXT_AND_GRAPHICS
+                case PyPDFBackend.EncryptionPermission.PRINT_LQ:
+                    return UserAccessPermissions.PRINT
+                case PyPDFBackend.EncryptionPermission.PRINT_HQ:
+                    return UserAccessPermissions.PRINT_TO_REPRESENTATION
+                case PyPDFBackend.EncryptionPermission.ALL:
+                    return UserAccessPermissions.all()
 
     class EncryptionAlgorithm(Enum):
         """PDF encryption algorithms."""
@@ -101,24 +108,22 @@ class PyPDFBackend(AbstractBackend):
         RC4_128 = "rc4-128"
         RC4_40 = "rc4-40"
 
-        def get(self):
+        def get(self) -> str:
             """Get algorithm value."""
-            if self.value == "aes-256":
-                return "AES-256"
-            if self.value == "aes-256-r5":
-                return "AES-256-R5"
-            if self.value == "aes-128":
-                return "AES-128"
-            if self.value == "rc4-128":
-                return "RC4-128"
-            if self.value == "rc4-40":
-                return "RC4-40"
-            raise ValueError(f"Encryption algorithm '{self.value}' is invalid.")
+            match self:
+                case PyPDFBackend.EncryptionAlgorithm.AES_256:
+                    return "AES-256"
+                case PyPDFBackend.EncryptionAlgorithm.AES_256_R5:
+                    return "AES-256-R5"
+                case PyPDFBackend.EncryptionAlgorithm.AES_128:
+                    return "AES-128"
+                case PyPDFBackend.EncryptionAlgorithm.RC4_128:
+                    return "RC4-128"
+                case PyPDFBackend.EncryptionAlgorithm.RC4_40:
+                    return "RC4-40"
 
     @staticmethod
-    def len(
-            input_file: str | Path,
-    ) -> int:
+    def len(input_file: Path) -> int:
         """
         Get number of pages of input file.
 
@@ -146,15 +151,12 @@ class PyPDFBackend(AbstractBackend):
         self._verbose = verbose
 
     def _merge(self,
-               input_file: str | Path,
+               input_file: Path,
                writer: PdfWriter,
                password: str = "",
                progress_callback: Callable[[float], Any] = lambda p: p,
                ):
         """ Merge input file into a PdfWriter. """
-        input_file = Path(input_file)
-        self.check_file_exists(input_file)
-
         with PdfReader(input_file) as reader:
             if password and reader.is_encrypted:
                 reader.decrypt(password)
@@ -165,9 +167,9 @@ class PyPDFBackend(AbstractBackend):
                 progress_callback(i * 100.0 / pages_len)
 
     def merge(self,
-              output_file: str | Path,
-              input_files: Sequence[str | Path],
-              password: str | None = None,
+              output_file: Path,
+              input_files: Sequence[Path],
+              password: str = "",
               progress_callback: Callable[[float], Any] = lambda p: p,
               ):
         """
@@ -180,16 +182,15 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found.
         """
-        output_file = Path(output_file).with_suffix(".pdf")
         completed = 0.0
         file_progress = 100.0 / len(input_files)
 
         with PdfWriter() as writer:
-            for idx, input_file in enumerate(input_files, start=1):
+            for _, input_file in enumerate(input_files, start=1):
                 self._merge(
                     input_file=input_file,
                     writer=writer,
-                    password=password or "",
+                    password=password,
                     progress_callback=lambda p, completed=completed: progress_callback(completed + (p * file_progress / 100.0)),
                 )
                 completed += file_progress
@@ -197,42 +198,45 @@ class PyPDFBackend(AbstractBackend):
             progress_callback(100.0)
 
     def split(self,
-              output_file: str | Path,
-              input_file: str | Path,
-              password: str | None = None,
+              input_file: Path,
+              overwrite_output: bool,
+              password: str = "",
+              out_dir: Path = Path(),
               progress_callback: Callable[[float], Any] = lambda p: p,
               ):
         """
         Split input files into 1-page PDF output files.
 
-        :param output_file: Output PDF file (will be appended with ``_X.pdf`` where ``X`` is the page number)
-        :param input_file: Input PDF file
+        :param input_file: Input PDF file (Output PDF file = input + ``_X.pdf`` where ``X`` is the page number)
+        :param overwrite_output: Whether to overwrite existing output files.
         :param password: Decryption password. Defaults to "".
         :param progress_callback: Progress callback (0-100). Defaults to a no-op.
 
         :raises FileNotFoundError: if input file not found
         """
-        self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix("")
+        output_path = out_dir / input_file.with_suffix("").name
 
         with PdfReader(input_file) as reader:
             if password and reader.is_encrypted:
                 reader.decrypt(password)
 
             pages_len = len(reader.pages)
-            for i, page in enumerate(reader.pages):
+            for idx, page in enumerate(reader.pages, start=1):
+                output_file = Path(f"{output_path}_{idx}.pdf")
+                if not overwrite_output and output_file.exists():
+                    raise FileExistsError(f"{_('File')} '{output_file}' {_('exists')}")
+
                 with PdfWriter() as writer:
                     writer.add_page(page)
-                    writer.write(f"{output_path}_{i + 1}.pdf")
+                    writer.write(output_file)
 
-                    progress = 100.0 * (float(i) / pages_len)
-                    progress_callback(progress)
+                progress_callback(100.0 * (float(idx) / pages_len))
 
     def extract(self,
-                output_file: str | Path,
-                input_file: str | Path,
+                output_file: Path,
+                input_file: Path,
                 pages: Sequence[int],
-                password: str | None = None,
+                password: str = "",
                 progress_callback: Callable[[float], Any] = lambda p: p,
                 ):
         """
@@ -246,8 +250,6 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix(".pdf")
 
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if password and reader.is_encrypted:
@@ -260,16 +262,15 @@ class PyPDFBackend(AbstractBackend):
                     raise ValueError(f"PDF '{input_file}' has only {len(reader.pages)} pages. Cannot extract page {page_num + 1}.")
                 writer.add_page(reader.pages[page_num])
 
-                progress = 100.0 * (float(idx) / pages_len)
-                progress_callback(progress)
-            writer.write(output_path)
+                progress_callback(100.0 * (float(idx) / pages_len))
+            writer.write(output_file)
             progress_callback(100.0)
 
     def rotate(self,
-               output_file: str | Path,
-               input_file: str | Path,
-               rotations: dict[int, int],
-               decrypt_password: str | None = None,
+               output_file: Path,
+               input_file: Path,
+               rotations: dict[int, Rotation],
+               decrypt_password: str = "",
                progress_callback: Callable[[float], Any] = lambda p: p,
                ):
         """
@@ -277,49 +278,38 @@ class PyPDFBackend(AbstractBackend):
 
         :param output_file: Output PDF file.
         :param input_file: Input PDF file.
-        :param rotations: Dict format { page_num: rotation_degrees }. Degree must be 0 or multiples of 90 degrees - positive or negative.
+        :param rotations: Dict format { page_num: rotation_degrees }. Rotation degrees must be one of the values in the Rotations enum.
         :param decrypt_password: Password used to decrypt file, if needed. Defaults to None (do not decrypt).
         :param progress_callback: Progress callback (0-100). Defaults to None.
 
-        :raises FileNotFoundError: if input file not found
-        :raises ValueError: if rotation degree is invalid (valid values are 0 or multiples of 90 degrees - positive or negative).        
+        :raises FileNotFoundError: if input file not found        
         """
-        self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix(".pdf")
-
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
 
             pages_len = len(reader.pages)
             for i, page in enumerate(reader.pages):
-                rotation = int(rotations.get(i, 0))
-
-                # parse rotation argument
-                rotation = normalize_degree(rotation)
-
-                if rotation not in (0, 90, 180, 270):
-                    raise ValueError(f"Page '{i}' rotation {rotation} is invalid. Rotation must be 0, 90, 180 or 270 degrees.")
+                rotation = rotations.get(i, self.Rotation.DEG_0)
 
                 # execute page rotation
                 logger.debug(f"Rotating page {i} by {rotation} deg")
-                if rotation > 0:
-                    page.rotate(rotation)  # clockwise: 90, 180, 270
+                if rotation.value > 0:
+                    page.rotate(rotation.value)  # clockwise: 90, 180, 270
                 writer.add_page(page)
 
-                progress = 100.0 * (float(i) / pages_len)
-                progress_callback(progress)
+                progress_callback(100.0 * (float(i) / pages_len))
 
             # save output file
-            writer.write(output_path)
+            writer.write(output_file)
             progress_callback(100.0)
 
     def encrypt(self,
-                output_file: str | Path,
-                input_file: str | Path,
+                output_file: Path,
+                input_file: Path,
                 owner_password: str,
-                user_password: str | None = None,
-                decrypt_password: str | None = None,
+                user_password: str = "",
+                decrypt_password: str = "",
                 encryption_algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256,
                 permissions: Iterable[EncryptionPermission] | None = None,
                 progress_callback: Callable[[float], Any] = lambda p: p,
@@ -348,9 +338,6 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix(".pdf")
-
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             if decrypt_password and reader.is_encrypted:
                 reader.decrypt(decrypt_password)
@@ -364,8 +351,7 @@ class PyPDFBackend(AbstractBackend):
             pages_len = len(reader.pages)
             for i, page in enumerate(reader.pages, start=0):
                 writer.add_page(page)
-                progress = 100.0 * (float(i) / pages_len)
-                progress_callback(progress)
+                progress_callback(100.0 * (float(i) / pages_len))
 
             # Encrypt with user and owner passwords
             writer.encrypt(
@@ -377,12 +363,12 @@ class PyPDFBackend(AbstractBackend):
             )
 
             # save output file
-            writer.write(output_path)
+            writer.write(output_file)
             progress_callback(100.0)
 
     def decrypt(self,
-                output_file: str | Path,
-                input_file: str | Path,
+                output_file: Path,
+                input_file: Path,
                 password: str,
                 progress_callback: Callable[[float], Any] = lambda p: p,
                 ):
@@ -396,9 +382,6 @@ class PyPDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix(".pdf")
-
         with PdfReader(input_file) as reader, PdfWriter() as writer:
             # decrypt file
             if reader.is_encrypted:
@@ -408,11 +391,10 @@ class PyPDFBackend(AbstractBackend):
             pages_len = len(reader.pages)
             for i, page in enumerate(reader.pages, start=0):
                 writer.add_page(page)
-                progress = 100.0 * (float(i) / pages_len)
-                progress_callback(progress)
+                progress_callback(100.0 * (float(i) / pages_len))
 
             # save file
-            writer.write(output_path)
+            writer.write(output_file)
             progress_callback(100.0)
 
 

@@ -5,25 +5,28 @@ This module provides functionalities for handling audio and video files using FF
 """
 
 import subprocess
-import re
 
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable
 
 # user-provided imports
-from file_conversor.backend.audio_video.abstract_ffmpeg_backend import AbstractFFmpegBackend
+from file_conversor.backend.audio_video.abstract_ffmpeg_backend import (
+    AbstractFFmpegBackend,
+)
+from file_conversor.backend.audio_video.codec import (
+    FFmpegAudioCodecs,
+    FFmpegVideoCodec,
+    FFmpegVideoCodecs,
+)
+from file_conversor.backend.audio_video.container.format_container import (
+    FormatContainer,
+)
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
-
-from file_conversor.backend.audio_video.ffmpeg_filter import FFmpegFilter
-from file_conversor.backend.audio_video.ffmpeg_codec import FFmpegAudioCodec, FFmpegVideoCodec
-from file_conversor.backend.audio_video.format_container import FormatContainer
-
+from file_conversor.backend.audio_video.filter.ffmpeg_filter import FFmpegFilter
 from file_conversor.config import Environment, Log, get_translation
-
-from file_conversor.utils.validators import check_file_format
+from file_conversor.system import System
 from file_conversor.utils.formatters import get_output_file
 
-from file_conversor.system import System
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -39,6 +42,10 @@ class FFmpegBackend(AbstractFFmpegBackend):
     EXTERNAL_DEPENDENCIES: set[str] = {
         "ffmpeg",
     }
+
+    VideoProfile = FFmpegVideoCodec.ProfileSetting
+    VideoQuality = FFmpegVideoCodec.QualitySetting
+    VideoEncoding = FFmpegVideoCodec.EncodingSetting
 
     @staticmethod
     def _clean_two_pass_log_file(logfile: Path | None):
@@ -90,16 +97,18 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._output_file: Path | None = None
         self._pass_logfile: Path | None = None
 
-        self._audio_bitrate: int | None = None
-        self._video_bitrate: int | None = None
+        self._audio_bitrate: int = -1
+        self._video_bitrate: int = -1
 
         self._progress_callback: Callable[[float], Any] | None = None
 
     def _execute_progress_callback(
         self,
-        process: subprocess.Popen,
+        process: subprocess.Popen[Any],
     ):
         """returns output lines read"""
+        import re
+
         lines: list[str] = []
         PROGRESS_RE = re.compile(r'time=(\d+):(\d+):([\d\.]+)')
 
@@ -127,7 +136,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
                 self._progress_callback(progress)
         return lines
 
-    def _set_input_file(self, input_file: str | Path):
+    def _set_input_file(self, input_file: Path):
         """
         Set the input file and check if it has a supported format.
 
@@ -138,22 +147,11 @@ class FFmpegBackend(AbstractFFmpegBackend):
         """
         self._in_opts = []
 
-        # check file is found
-        self._input_file = Path(input_file).resolve()
-        if not self._input_file.exists() and not self._input_file.is_file():
-            raise FileNotFoundError(f"Input file '{input_file}' not found")
-
-        # check if the input file has a supported format
-        check_file_format(self._input_file, self.SUPPORTED_IN_FORMATS)
-
-        # set the input format options based on the file extension
-        in_ext = self._input_file.suffix[1:].lower()
-        for k, v in self.SUPPORTED_IN_FORMATS[in_ext].items():
-            self._in_opts.extend([str(k), str(v)])
+        self._input_file = input_file.resolve()
 
     def _set_output_file(
             self,
-            output_file: str | Path,
+            output_file: Path,
     ):
         """
         Set the output file and check if it has a supported format.
@@ -164,23 +162,24 @@ class FFmpegBackend(AbstractFFmpegBackend):
         """
         self._out_opts = []
 
-        # create out dir (if it does not exists)
-        self._output_file = Path(output_file).resolve()
-        self._output_file = self._output_file.with_suffix(self._output_file.suffix.lower())
+        self._output_file = output_file.with_suffix(output_file.suffix.lower())
 
+        out_ext: str = ""
         if self._output_file.name == "-":
             logger.warning("Null container selected. No output file will be created.")
             out_ext = "null"
         else:
             self._output_file.parent.mkdir(parents=True, exist_ok=True)
 
-            # check if the output file has a supported format
-            check_file_format(self._output_file, self.SUPPORTED_OUT_FORMATS)
-
             # set the output format options based on the file extension
             out_ext = self._output_file.suffix[1:]
-        constructor = self.SUPPORTED_OUT_FORMATS[out_ext]
-        self._out_container = FormatContainer(*constructor.args, **constructor.kwargs)
+
+        if out_ext in self.SupportedOutAudioFormats:
+            self._out_container = self.SupportedOutAudioFormats(out_ext).container
+        elif out_ext in self.SupportedOutVideoFormats:
+            self._out_container = self.SupportedOutVideoFormats(out_ext).container
+        else:
+            raise ValueError(f"{_('Unsupported output format:')} {out_ext}")
         self._set_pass_logfile()
 
     def _set_pass_logfile(self):
@@ -188,10 +187,15 @@ class FFmpegBackend(AbstractFFmpegBackend):
             raise RuntimeError(f"{_('Output file not set')}")
 
         logdir = self._output_file.parent
-        self._pass_logfile = logdir / get_output_file(self._output_file, stem="-ffmpeg2pass", suffix="")
+        self._pass_logfile = get_output_file(
+            output_dir=logdir,
+            input_file=self._output_file,
+            out_stem="-ffmpeg2pass",
+            out_suffix="",
+        )
         logger.debug(f"{_('Temporary 2-pass log file')}: {self._pass_logfile}")
 
-    def set_files(self, input_file: str | Path, output_file: str | Path):
+    def set_files(self, input_file: Path, output_file: Path):
         """
         Set input/output files, and default global options
 
@@ -201,90 +205,90 @@ class FFmpegBackend(AbstractFFmpegBackend):
         self._set_input_file(input_file)
         self._set_output_file(output_file)
 
-    def _set_codec(
-            self,
-            is_audio: bool,
-            codec: str | None = None,
-            bitrate: int | None = None,
-            filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
-    ):
-        if not self._out_container:
-            raise RuntimeError(f"{_('Output container not set')}")
-
-        if codec:
-            if is_audio:
-                self._out_container.audio_codec = FFmpegAudioCodec.from_str(codec)
-            else:
-                self._out_container.video_codec = FFmpegVideoCodec.from_str(codec)
-
-        codec_obj = self._out_container.audio_codec if is_audio else self._out_container.video_codec
-
-        if bitrate is not None and bitrate > 0:
-            if is_audio:
-                self._audio_bitrate = bitrate
-            else:
-                self._video_bitrate = bitrate
-            codec_obj.set_bitrate(bitrate)
-
-        if filters:
-            if isinstance(filters, FFmpegFilter):
-                filters = [filters]
-            codec_obj.set_filters(*filters)
-
     def set_audio_codec(
         self,
-        codec: str | None = None,
+        *filters: FFmpegFilter,
+        codec: FFmpegAudioCodecs | None = None,
         bitrate: int | None = None,
-        filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
     ):
         """
         Set audio codec and bitrate
 
         :param codec: Codec to use. Defaults to None (use container default codec).      
-        :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
+        :param bitrate: Bitrate to use (in kbps). Defaults to -1 (use FFmpeg defaults).      
         :param filters: Filters to use. Defaults to None (do not use any filter).      
 
         :raises RuntimeErrors: if output container not set
         """
-        self._set_codec(is_audio=True, codec=codec, bitrate=bitrate, filters=filters)
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+
+        if codec:
+            self._out_container.audio_codec = codec.codec
+
+        audio_codec = self._out_container.audio_codec
+        audio_codec.set_filters(*filters)
+
+        if bitrate is not None:
+            audio_codec.set_bitrate(bitrate)
 
     def set_video_codec(
         self,
-        codec: str | None = None,
+        *filters: FFmpegFilter,
+        codec: FFmpegVideoCodecs | None = None,
         bitrate: int | None = None,
-        filters: FFmpegFilter | Iterable[FFmpegFilter] | None = None,
-        encoding_speed: str | None = None,
-        quality_setting: str | None = None,
+        profile_setting: VideoProfile | None = None,
+        encoding_speed: VideoEncoding | None = None,
+        quality_setting: VideoQuality | None = None,
     ):
         """
         Seet video codec and bitrate
 
         :param codec: Codec to use. Defaults to None (use container default codec).      
-        :param bitrate: Bitrate to use (in kbps). Defaults to None (use FFmpeg defaults).      
+        :param bitrate: Bitrate to use (in kbps). Defaults to -1 (use FFmpeg defaults).      
         :param filters: Filters to use. Defaults to None (do not use any filter).      
         :param encoding_speed: Encoding speed to use. Defaults to None (use codec default speed).      
         :param quality_setting: Quality setting to use. Defaults to None (use codec default quality).
 
         :raises RuntimeErrors: if output container not set
         """
-        self._set_codec(is_audio=False, codec=codec, bitrate=bitrate, filters=filters)
         if not self._out_container:
             raise RuntimeError(f"{_('Output container not set')}")
 
-        if encoding_speed:
-            self._out_container.video_codec.set_encoding_speed(encoding_speed)
+        if codec:
+            self._out_container.video_codec = codec.codec
 
-        if (not bitrate or bitrate == 0) and quality_setting:
-            self._out_container.video_codec.set_quality_setting(quality_setting)
+        video_codec = self._out_container.video_codec
+        video_codec.set_filters(*filters)
+
+        if bitrate is not None:
+            video_codec.set_bitrate(bitrate)
+
+        if profile_setting != None:
+            video_codec.set_profile(profile_setting)
+
+        if encoding_speed != None:
+            video_codec.set_encoding_speed(encoding_speed)
+
+        if quality_setting != None:
+            video_codec.set_quality_setting(quality_setting)
 
     def _get_two_pass_options(self, pass_num: int) -> list[str]:
         if pass_num <= 0:
             return []
 
-        if self._audio_bitrate and self._audio_bitrate <= 0:
+        if not self._out_container:
+            raise RuntimeError(f"{_('Output container not set')}")
+
+        audio_codec = self._out_container.audio_codec
+        video_codec = self._out_container.video_codec
+
+        if audio_codec.bitrate <= 0:
             raise ValueError(f"{_('Audio Bitrate cannot be 0 when using two-pass mode.')}")
-        if self._video_bitrate and self._video_bitrate <= 0:
+
+        if video_codec.bitrate <= 0:
             raise ValueError(f"{_('Video Bitrate cannot be 0 when using two-pass mode.')}")
+
         if not self._pass_logfile:
             raise RuntimeError(f"{_('2-pass log file not set')}")
 
@@ -296,7 +300,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
 
     def _execute(self):
         # build ffmpeg command
-        ffmpeg_command = []
+        ffmpeg_command: list[str] = []
         ffmpeg_command.extend([str(self._ffmpeg_bin)])  # ffmpeg CLI
         ffmpeg_command.extend(self._global_options)    # set global options
         ffmpeg_command.extend(self._in_opts)           # set in options

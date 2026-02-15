@@ -1,36 +1,39 @@
 # tasks_modules\scoop.py
 
 import json
+
 from pathlib import Path
-from invoke.tasks import task
+
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
 from tasks_modules import _config, base, zip
 from tasks_modules._config import *
+
 
 SCOOP_PATH = Path("bucket")
 SCOOP_JSON = SCOOP_PATH / f"{PROJECT_NAME}.json"
 
 SCOOP_APP_EXE = zip.APP_EXE.relative_to(zip.BUILD_DIR)
 
-SCOOP_DEPS = {
+SCOOP_DEPS: dict[str, str] = {
 }
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     _config.mkdir([
         f"{SCOOP_PATH}",
     ])
 
 
-@task(pre=[mkdirs])
-def clean_scoop(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_scoop(_: InvokeContext):
     remove_path_pattern(f"{SCOOP_PATH}/*")
 
 
-@task(pre=[clean_scoop, ])
-def manifest(c: InvokeContext):
+@task(pre=[clean_scoop, ])  # pyright: ignore[reportUntypedFunctionDecorator]
+def manifest(_: InvokeContext):
     """Update choco files, based on pyproject.toml"""
 
     print("[bold] Updating Scoop manifest files ... [/]")
@@ -42,7 +45,7 @@ def manifest(c: InvokeContext):
     ).replace(PROJECT_VERSION, "$version")
 
     # bucket/file_conersor.json
-    json_obj = {
+    json_obj: dict[str, Any] = {
         "version": PROJECT_VERSION,
         "description": PROJECT_DESCRIPTION,
         "homepage": PROJECT_HOMEPAGE,
@@ -93,12 +96,12 @@ def install(c: InvokeContext):
         raise RuntimeError("'scoop' not found in PATH")
 
 
-@task(pre=[manifest,])
+@task(pre=[manifest,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(c: InvokeContext):
-    pass
+    """ Build the scoop manifest file (bucket/file_conversor.json) """
 
 
-@task(pre=[build, install],)
+@task(pre=[build, install],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_app(c: InvokeContext):
     print(f"[bold] Installing scoop package ... [/]")
     result = c.run(rf'scoop install "{SCOOP_JSON}"')
@@ -106,7 +109,7 @@ def install_app(c: InvokeContext):
     print(f"[bold] Installing scoop package ... [/][bold green]OK[/]")
 
 
-@task(pre=[install])
+@task(pre=[install])  # pyright: ignore[reportUntypedFunctionDecorator]
 def uninstall_app(c: InvokeContext):
     print(f"[bold] Uninstalling scoop package ... [/]")
     result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')
@@ -114,12 +117,12 @@ def uninstall_app(c: InvokeContext):
     print(f"[bold] Uninstalling scoop package ... [/][bold green]OK[/]")
 
 
-@task(pre=[install_app,], post=[uninstall_app,])
+@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c)
+    base.check(c)  # pyright: ignore[reportUnknownMemberType]
 
 
-@task(pre=[build,])
+@task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def publish(c: InvokeContext):
     print(f"[bold] Publishing to Scoop (using GitHub) ... [/]")
 

@@ -1,21 +1,35 @@
 # tests\utils\test_validators.py
 
+
+from pathlib import Path
+
 import pytest
 import typer
 
-from file_conversor.utils.validators import check_dir_exists, check_file_exists, check_file_format, check_file_size_format, check_is_bool_or_none, check_path_exists, check_positive_integer, check_valid_options, check_video_resolution, prompt_retry_on_exception
+from file_conversor.utils.validators import (
+    check_dir_exists,
+    check_file_exists,
+    check_file_format,
+    check_file_size_format,
+    check_is_bool_or_none,
+    check_path_exists,
+    check_positive_integer,
+    check_valid_options,
+    check_video_resolution,
+    prompt_retry_on_exception,
+)
 
 
 class TestUtilsValidators:
-    def test_prompt_retry_on_exception(self, monkeypatch):
+    def test_prompt_retry_on_exception(self, monkeypatch):  # type: ignore
         inputs = iter(["invalid", "42"])
 
-        def mock_prompt(*args, **kwargs):
+        def mock_prompt(*args, **kwargs):  # type: ignore  # noqa: ARG001
             return next(inputs)
 
-        monkeypatch.setattr(typer, "prompt", mock_prompt)
+        monkeypatch.setattr(typer, "prompt", mock_prompt)  # type: ignore
 
-        def check_callback(value):
+        def check_callback(value: str):
             ivalue = int(value)
             if ivalue < 0 or ivalue > 100:
                 raise ValueError("Value must be between 0 and 100")
@@ -23,11 +37,11 @@ class TestUtilsValidators:
 
         result = prompt_retry_on_exception(
             text="Enter a number between 0 and 100:",
-            type=str,
+            type=int,
             check_callback=check_callback,
             retries=2
         )
-        assert result == 42
+        assert int(result) == 42
 
     def test_check_file_size_format(self):
         assert check_file_size_format("0") == "0"
@@ -52,7 +66,7 @@ class TestUtilsValidators:
         with pytest.raises(typer.BadParameter):
             check_video_resolution("1920:1080:60")
 
-    def test_check_path_exists(self, tmp_path):
+    def test_check_path_exists(self, tmp_path: Path):
         existing_path = tmp_path
         existing_file = tmp_path / "existing_file.txt"
         existing_file.touch()
@@ -66,7 +80,7 @@ class TestUtilsValidators:
         with pytest.raises(typer.BadParameter):
             check_path_exists(existing_file, exists=False)
 
-    def test_check_file_exists(self, tmp_path):
+    def test_check_file_exists(self, tmp_path: Path):
         existing_file = tmp_path / "existing_file.txt"
         existing_file.touch()
         non_existing_file = tmp_path / "non_existing_file.txt"
@@ -79,7 +93,7 @@ class TestUtilsValidators:
         with pytest.raises(typer.BadParameter):
             check_file_exists(non_existing_file)
 
-    def test_check_dir_exists(self, tmp_path):
+    def test_check_dir_exists(self, tmp_path: Path):
         existing_dir = tmp_path / "existing_dir"
         existing_dir.mkdir()
         non_existing_dir = tmp_path / "non_existing_dir"
@@ -116,14 +130,20 @@ class TestUtilsValidators:
 
     def test_check_file_format(self):
         format_dict = {"txt": "Text File", "md": "Markdown File"}
-        assert check_file_format("document.txt", format_dict) == "document.txt"
-        assert check_file_format(["file1.md", "file2.txt"], format_dict) == ["file1.md", "file2.txt"]
-        assert check_file_format({"file3.txt": 1, "file4.md": 2}, format_dict) == {"file3.txt": 1, "file4.md": 2}
-        assert check_file_format({"file5.txt", "file6.md"}, format_dict) == {"file5.txt", "file6.md"}
+        doc_path = Path("document.txt")
+        assert check_file_format(doc_path, format_dict) == doc_path
+
+        files_path = [Path("file1.md"), Path("file2.txt")]
+        assert check_file_format(files_path, format_dict) == files_path
+
+        files_path = {Path("file3.txt"), Path("file4.md")}
+        assert check_file_format(files_path, format_dict) == files_path
+
         with pytest.raises(typer.BadParameter):
-            check_file_format("image.jpg", format_dict)
+            check_file_format({Path("image.jpg")}, format_dict)
+
         with pytest.raises(typer.BadParameter):
-            check_file_format(["doc.pdf", "notes.txt"], format_dict)
+            check_file_format([Path("doc.txt"), Path("notes.pdf")], format_dict)
 
     def test_check_valid_options(self):
         options = ["option1", "option2", "option3"]

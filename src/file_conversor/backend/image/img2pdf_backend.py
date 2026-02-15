@@ -4,13 +4,12 @@
 This module provides functionalities for handling PDF files using ``img2pdf`` backend.
 """
 
-import img2pdf
-
-from pathlib import Path
 from datetime import datetime
-
-from typing import Any, Iterable
 from enum import Enum
+from pathlib import Path
+from typing import Any, Iterable
+
+import img2pdf  # pyright: ignore[reportMissingTypeStubs]
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -26,14 +25,15 @@ class Img2PDFBackend(AbstractBackend):
         FILL = "fill"
 
         def get(self) -> img2pdf.FitMode:
-            if self == Img2PDFBackend.FitMode.INTO:
-                return img2pdf.FitMode.into
-            elif self == Img2PDFBackend.FitMode.FILL:
-                return img2pdf.FitMode.fill
-            else:
-                raise ValueError(f"Invalid FitMode: {self}")
+            match self:
+                case self.INTO:
+                    return img2pdf.FitMode.into
+                case self.FILL:
+                    return img2pdf.FitMode.fill
 
     class PageLayout(Enum):
+        NONE = "none"
+
         A0 = "a0"
         A0_LANDSCAPE = "a0-landscape"
 
@@ -53,45 +53,46 @@ class Img2PDFBackend(AbstractBackend):
         LETTER_LANDSCAPE = "letter-landscape"
 
         def get(self) -> tuple[float, float]:
-            if self == Img2PDFBackend.PageLayout.A0:
-                return (84.10, 118.90)  # A0 in cm
-            elif self == Img2PDFBackend.PageLayout.A0_LANDSCAPE:
-                return (118.90, 84.10)  # A0 Landscape in cm
-            elif self == Img2PDFBackend.PageLayout.A1:
-                return (59.40, 84.10)  # A1 in cm
-            elif self == Img2PDFBackend.PageLayout.A1_LANDSCAPE:
-                return (84.10, 59.40)  # A1 Landscape in cm
-            elif self == Img2PDFBackend.PageLayout.A2:
-                return (42.00, 59.40)  # A2 in cm
-            elif self == Img2PDFBackend.PageLayout.A2_LANDSCAPE:
-                return (59.40, 42.00)  # A2 Landscape in cm
-            elif self == Img2PDFBackend.PageLayout.A3:
-                return (29.70, 42.00)  # A3 in cm
-            elif self == Img2PDFBackend.PageLayout.A3_LANDSCAPE:
-                return (42.00, 29.70)  # A3 Landscape in cm
-            elif self == Img2PDFBackend.PageLayout.A4:
-                return (21.00, 29.70)  # A4 in cm
-            elif self == Img2PDFBackend.PageLayout.A4_LANDSCAPE:
-                return (29.70, 21.00)  # A4 Landscape in cm
-            elif self == Img2PDFBackend.PageLayout.LETTER:
-                return (21.59, 27.94)  # Letter in cm
-            elif self == Img2PDFBackend.PageLayout.LETTER_LANDSCAPE:
-                return (27.94, 21.59)  # Letter Landscape in cm
-            else:
-                raise ValueError(f"Invalid PageLayout: {self}")
+            match self:
+                case Img2PDFBackend.PageLayout.NONE:
+                    raise ValueError("PageLayout.NONE does not have a defined page size.")
+                case Img2PDFBackend.PageLayout.A0:
+                    return (84.10, 118.90)  # A0 in cm
+                case Img2PDFBackend.PageLayout.A0_LANDSCAPE:
+                    return (118.90, 84.10)  # A0 Landscape in cm
+                case Img2PDFBackend.PageLayout.A1:
+                    return (59.40, 84.10)  # A1 in cm
+                case Img2PDFBackend.PageLayout.A1_LANDSCAPE:
+                    return (84.10, 59.40)  # A1 Landscape in cm
+                case Img2PDFBackend.PageLayout.A2:
+                    return (42.00, 59.40)  # A2 in cm
+                case Img2PDFBackend.PageLayout.A2_LANDSCAPE:
+                    return (59.40, 42.00)  # A2 Landscape in cm
+                case Img2PDFBackend.PageLayout.A3:
+                    return (29.70, 42.00)  # A3 in cm
+                case Img2PDFBackend.PageLayout.A3_LANDSCAPE:
+                    return (42.00, 29.70)  # A3 Landscape in cm
+                case Img2PDFBackend.PageLayout.A4:
+                    return (21.00, 29.70)  # A4 in cm
+                case Img2PDFBackend.PageLayout.A4_LANDSCAPE:
+                    return (29.70, 21.00)  # A4 Landscape in cm
+                case Img2PDFBackend.PageLayout.LETTER:
+                    return (21.59, 27.94)  # Letter in cm
+                case Img2PDFBackend.PageLayout.LETTER_LANDSCAPE:
+                    return (27.94, 21.59)  # Letter Landscape in cm
 
-    SUPPORTED_IN_FORMATS = {
-        "jpeg": {},
-        "jpg": {},
-        "png": {},
-        "tiff": {},
-        "tif": {},
-        "bmp": {},
-        "gif": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "pdf": {},
-    }
+    class SupportedInFormats(Enum):
+        JPEG = "jpeg"
+        JPG = "jpg"
+        PNG = "png"
+        TIFF = "tiff"
+        TIF = "tif"
+        BMP = "bmp"
+        GIF = "gif"
+
+    class SupportedOutFormats(Enum):
+        PDF = "pdf"
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
@@ -99,7 +100,7 @@ class Img2PDFBackend(AbstractBackend):
         verbose: bool = False,
     ):
         """
-        Initialize the ``pypdf`` backend
+        Initialize the ``img2pdf`` backend
 
         :param verbose: Verbose logging. Defaults to False.      
         """
@@ -107,10 +108,10 @@ class Img2PDFBackend(AbstractBackend):
         self._verbose = verbose
 
     def to_pdf(self,
-               output_file: str | Path,
+               output_file: Path,
                input_files: Iterable[str | Path],
                image_fit: FitMode = FitMode.INTO,
-               page_size: tuple[float, float] | PageLayout | None = None,
+               page_size: tuple[float, float] | PageLayout = PageLayout.NONE,
                dpi: int = 200,
                include_metadata: bool = True
                ):
@@ -135,9 +136,7 @@ class Img2PDFBackend(AbstractBackend):
 
         :raises FileNotFoundError: if input file not found
         """
-        for input_file in input_files:
-            self.check_file_exists(input_file)
-        output_path = Path(output_file).with_suffix(".pdf")
+        output_path = output_file.with_suffix(".pdf")
 
         # get current day
         now = datetime.now()
@@ -156,18 +155,14 @@ class Img2PDFBackend(AbstractBackend):
             })
 
         # page layout
-        if page_size:
-            page_sz: tuple[float, float]
-            if isinstance(page_size, tuple):
-                page_sz = page_size
-            else:
-                page_sz = page_size.get()
-            opts['layout_fun'] = img2pdf.get_layout_fun(
-                pagesize=tuple(img2pdf.cm_to_pt(x) for x in page_sz),
+        if page_size and page_size != Img2PDFBackend.PageLayout.NONE:
+            page_sz: tuple[float, float] = page_size if isinstance(page_size, tuple) else page_size.get()
+            opts['layout_fun'] = img2pdf.get_layout_fun(  # pyright: ignore[reportUnknownMemberType]
+                pagesize=tuple(img2pdf.cm_to_pt(x) for x in page_sz),  # pyright: ignore[reportUnknownMemberType]
                 fit=image_fit.get(),
             )
 
-        buffer = img2pdf.convert(*input_files, **opts)
+        buffer = img2pdf.convert(*input_files, **opts)  # pyright: ignore[reportUnknownMemberType]
         if not buffer:
             raise RuntimeError(f"Error converting files to PDF: {input_files}")
 

@@ -1,9 +1,13 @@
 # src\file_conversor\backend\office\impress_backend.py
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
-from file_conversor.backend.office.abstract_libreoffice_backend import AbstractLibreofficeBackend
+from enum import Enum
+
+from file_conversor.backend.office.abstract_libreoffice_backend import (
+    AbstractLibreofficeBackend,
+)
+from file_conversor.config import Log, get_translation
+
 
 LOG = Log.get_instance()
 
@@ -16,17 +20,16 @@ class LibreofficeImpressBackend(AbstractLibreofficeBackend):
     A class that provides an interface for handling doc files using ``impress`` (libreoffice).
     """
 
-    SUPPORTED_IN_FORMATS = {
-        "ppt": {},
-        "pptx": {},
-        "odp": {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        "ppt": {},
-        "pptx": {},
-        "odp": {},
-        "pdf": {},
-    }
+    class SupportedInFormats(Enum):
+        PPT = "ppt"
+        PPTX = "pptx"
+        ODP = "odp"
+
+    class SupportedOutFormats(Enum):
+        PPT = "ppt"
+        PPTX = "pptx"
+        ODP = "odp"
+        PDF = "pdf"
 
     def __init__(
         self,

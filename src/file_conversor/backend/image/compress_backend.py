@@ -1,19 +1,17 @@
 # src\file_conversor\backend\compress_backend.py
 
+from enum import Enum
 from pathlib import Path
-
-from dataclasses import dataclass
 from typing import Any
 
-# user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
-
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.backend.image._gifsicle_backend import GifSicleBackend
+from file_conversor.backend.image._mozjpeg_backend import MozJPEGBackend
+from file_conversor.backend.image._oxipng_backend import OxiPNGBackend
 
-from file_conversor.backend.image._gifsicle_backend import _GifSicleBackend
-from file_conversor.backend.image._mozjpeg_backend import _MozJPEGBackend
-from file_conversor.backend.image._oxipng_backend import _OxiPNGBackend
+# user-provided imports
+from file_conversor.config import Log, get_translation
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -26,24 +24,28 @@ class CompressBackend(AbstractBackend):
     Provides an interface for handling image file compression using multiple backends.
     """
 
-    @dataclass
-    class CompressBackendDataModel:
-        """ Data model to select CompressBackends. """
-        cls: type[_GifSicleBackend | _MozJPEGBackend | _OxiPNGBackend]
+    class SupportedInFormats(Enum):
+        GIF = GifSicleBackend.SupportedInFormats.GIF.value
+        JPG = MozJPEGBackend.SupportedInFormats.JPG.value
+        JPEG = MozJPEGBackend.SupportedInFormats.JPEG.value
+        PNG = OxiPNGBackend.SupportedInFormats.PNG.value
 
-    SUPPORTED_IN_FORMATS: dict[str, CompressBackendDataModel] = {
-        "gif": CompressBackendDataModel(cls=_GifSicleBackend),
+        @property
+        def backend(self) -> type[GifSicleBackend | MozJPEGBackend | OxiPNGBackend]:
+            match self:
+                case CompressBackend.SupportedInFormats.GIF:
+                    return GifSicleBackend
+                case CompressBackend.SupportedInFormats.JPG | CompressBackend.SupportedInFormats.JPEG:
+                    return MozJPEGBackend
+                case CompressBackend.SupportedInFormats.PNG:
+                    return OxiPNGBackend
 
-        "jpg": CompressBackendDataModel(cls=_MozJPEGBackend),
-        "jpeg": CompressBackendDataModel(cls=_MozJPEGBackend),
+    SupportedOutFormats = SupportedInFormats
 
-        "png": CompressBackendDataModel(cls=_OxiPNGBackend),
-    }
-    SUPPORTED_OUT_FORMATS = SUPPORTED_IN_FORMATS
     EXTERNAL_DEPENDENCIES = {
-        *_GifSicleBackend.EXTERNAL_DEPENDENCIES,
-        *_MozJPEGBackend.EXTERNAL_DEPENDENCIES,
-        *_OxiPNGBackend.EXTERNAL_DEPENDENCIES,
+        *GifSicleBackend.EXTERNAL_DEPENDENCIES,
+        *MozJPEGBackend.EXTERNAL_DEPENDENCIES,
+        *OxiPNGBackend.EXTERNAL_DEPENDENCIES,
     }
 
     def __init__(
@@ -61,8 +63,8 @@ class CompressBackend(AbstractBackend):
         """
         super().__init__()
         # get required dependencies
-        for backend in CompressBackend.SUPPORTED_IN_FORMATS.values():
-            backend.cls(
+        for mode in CompressBackend.SupportedInFormats:
+            mode.backend(
                 install_deps=install_deps,
                 verbose=verbose,
             )
@@ -73,7 +75,7 @@ class CompressBackend(AbstractBackend):
         self,
         input_file: str | Path,
         output_file: str | Path,
-        **kwargs,
+        **kwargs: Any,
     ):
         """
         Execute the command to compress the input file.
@@ -92,9 +94,7 @@ class CompressBackend(AbstractBackend):
 
         out_ext = output_file.suffix[1:]
 
-        backend_datamodel = CompressBackend.SUPPORTED_OUT_FORMATS[out_ext]
-
-        backend = backend_datamodel.cls(
+        backend = CompressBackend.SupportedOutFormats(out_ext).backend(
             install_deps=self._install_deps,
             verbose=self._verbose,
         )

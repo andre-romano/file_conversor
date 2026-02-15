@@ -3,13 +3,14 @@
 import os
 import platform
 
-from invoke.tasks import task
-
 from pathlib import Path
 
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
+
 # user provided
-from tasks_modules import _config, locales
+from tasks_modules import locales
 from tasks_modules._config import *
+
 
 WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
@@ -17,7 +18,7 @@ MACOS = (platform.system() == "Darwin")
 
 
 @task
-def mkdirs(c: InvokeContext):
+def mkdirs(_: InvokeContext):
     dirs = [
         "build",
         "dist",
@@ -33,49 +34,49 @@ def mkdirs(c: InvokeContext):
 
 
 @task
-def clean_logs(c: InvokeContext):
+def clean_logs(_: InvokeContext):
     remove_path_pattern(f"**/*.log")
     remove_path_pattern(f"**/*.log.*")
 
 
-@task(pre=[mkdirs])
-def clean_build(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_build(_: InvokeContext):
     remove_path_pattern(f"build/*")
 
 
-@task(pre=[mkdirs])
-def clean_dist(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_dist(_: InvokeContext):
     remove_path_pattern(f"dist/*")
 
 
-@task(pre=[mkdirs])
-def clean_cache(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_cache(_: InvokeContext):
     remove_path_pattern(f"{CACHE_DIR}/*")
 
 
-@task(pre=[mkdirs])
-def clean_htmlcov(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_htmlcov(_: InvokeContext):
     remove_path_pattern(f"htmlcov/*")
 
 
-@task(pre=[mkdirs])
-def clean_docs(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_docs(_: InvokeContext):
     remove_path_pattern(f"docs/*")
 
 
-@task(pre=[mkdirs])
-def clean_deps(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_deps(_: InvokeContext):
     remove_path_pattern(f"deps/*")
 
 
-@task(pre=[mkdirs])
-def clean_changelog(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_changelog(_: InvokeContext):
     remove_path_pattern(f"CHANGELOG.md")
     remove_path_pattern(f"RELEASE_NOTES.md")
 
 
-@task(pre=[mkdirs])
-def clean_requirements(c: InvokeContext):
+@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean_requirements(_: InvokeContext):
     remove_path_pattern(f"requirements.txt")
     remove_path_pattern(f"requirements-*.txt")
 
@@ -88,16 +89,16 @@ def clean_requirements(c: InvokeContext):
            clean_docs,
            clean_deps,
            clean_changelog,
-           ])
-def clean(c: InvokeContext):
+           ])  # pyright: ignore[reportUntypedFunctionDecorator]
+def clean(_: InvokeContext):
     pass
 
 
 @task
 def licenses(c: InvokeContext):
     print("[bold]Generating THIRD_PARTY_LICENSES.md licenses report ... [/]")
-    THIRD_PARTY_LICENSES_FILE = Path("THIRD_PARTY_LICENSES.md")
-    THIRD_PARTY_LICENSES_FILE.unlink(missing_ok=True)
+    third_party_licenses_file = Path("THIRD_PARTY_LICENSES.md")
+    third_party_licenses_file.unlink(missing_ok=True)
     result = c.run(" ".join([
         "pdm",
         "run",
@@ -106,15 +107,15 @@ def licenses(c: InvokeContext):
         "--with-authors",
         "--with-urls",
         # "--with-license-file",
-        f"--output-file={THIRD_PARTY_LICENSES_FILE}",
+        f"--output-file={third_party_licenses_file}",
     ]))
     assert (result is not None) and (result.return_code == 0)
-    assert THIRD_PARTY_LICENSES_FILE.exists()
-    git_commit_push(c, THIRD_PARTY_LICENSES_FILE, message=f"ci: third party licenses file for {GIT_RELEASE}")
+    assert third_party_licenses_file.exists()
+    git_commit_push(c, third_party_licenses_file, message=f"ci: third party licenses file for {GIT_RELEASE}")
     print("[bold]Generating THIRD_PARTY_LICENSES.md licenses report ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_requirements,])
+@task(pre=[clean_requirements,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def requirements(c: InvokeContext):
     def get_pdm_export_cmd(group: str):
         group_opts: list[str]
@@ -138,11 +139,11 @@ def requirements(c: InvokeContext):
     for group, deps in get_dependencies_dict().items():
         print(f"    Exporting group {group} ({len(deps)} dependencies) ...")
         result = c.run(" ".join(get_pdm_export_cmd(group)))
-    assert (result is not None) and (result.return_code == 0)
+        assert (result is not None) and (result.return_code == 0)
     print("[bold]Generating requirements.txt files ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_deps,])
+@task(pre=[clean_deps,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def deps(c: InvokeContext):
     print("[bold]Checking for circular dependencies ... [/]")
     result = c.run(" ".join([
@@ -160,7 +161,7 @@ def deps(c: InvokeContext):
     print("[bold]Checking for circular dependencies ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_htmlcov, locales.build])
+@task(pre=[clean_htmlcov, locales.build])   # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def tests(c: InvokeContext, app: str = f"python -m {PROJECT_NAME}"):
     print("[bold] Running self tests ... [/]")
     cmd = f"pdm run {app} --self-test"
@@ -201,7 +202,47 @@ def check(c: InvokeContext, exe: str | Path = ""):
     print(f"[bold] Checking app '{exe}' ... [/][bold green]OK[/]")
 
 
-@task(pre=[clean_logs])
+@task
+def pylint(c: InvokeContext):
+    print("[bold] Running pylint ... [/]")
+    for module in ["src", "tests", "tasks_modules"]:
+        print(f"    Running pylint for module '{module}' ...")
+        result = c.run(" ".join([
+            "pdm",
+            "run",
+            "pylint",
+            "-j", "0",
+            module,
+        ]))
+        assert (result is not None) and (result.return_code == 0)
+        print(f"    Running pylint for module '{module}' ... [/][bold green]OK[/]")
+    print("[bold] Running pylint ... [/][bold green]OK[/]")
+
+
+@task
+def ruff(c: InvokeContext):
+    print("[bold] Running linter ... [/]")
+    result = c.run(" ".join([
+        "pdm",
+        "run",
+        "ruff",
+        "check",
+        "--no-fix",
+        "--config", "./pyproject.toml",
+        "src",
+        "tests",
+        "tasks_modules",
+    ]))
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold] Running linter ... [/][bold green]OK[/]")
+
+
+@task(pre=[ruff, pylint])  # pyright: ignore[reportUntypedFunctionDecorator]
+def lint(c: InvokeContext):
+    """Run all linters and code quality checks."""
+
+
+@task(pre=[clean_logs])  # pyright: ignore[reportUntypedFunctionDecorator]
 def importtime(c: InvokeContext):
     # self, cumulative, module_name
     modules_data: list[tuple[float, float, str]] = []
@@ -221,8 +262,8 @@ def importtime(c: InvokeContext):
         for line in import_time_log.read_text().splitlines():
             try:
                 # parse line
-                line = line.replace("import time:", "").strip()
-                time_self, time_cumulative, module_name = line.split("|")
+                line_parsed = line.replace("import time:", "").strip()
+                time_self, time_cumulative, module_name = line_parsed.split("|")
                 time_self, time_cumulative, module_name = int(time_self.strip()), int(time_cumulative.strip()), module_name.strip()
                 time_self, time_cumulative = round(time_self / 1000, 2), round(time_cumulative / 1000, 2)  # convert to ms
                 if (
@@ -231,8 +272,8 @@ def importtime(c: InvokeContext):
                 ):
                     continue
                 modules_data.append((time_self, time_cumulative, module_name))
-            except Exception as e:
-                pass
+            except Exception:
+                """ ignore parsing errors """
 
         # sort and get top 10
         modules_data.sort(key=lambda x: x[1], reverse=True)
@@ -247,7 +288,7 @@ def importtime(c: InvokeContext):
 
 
 @task
-def is_admin(c: InvokeContext):
+def is_admin(_: InvokeContext):
     print(f"[bold] Checking for admin rights ... [/]")
     if WINDOWS:
         try:
@@ -255,8 +296,7 @@ def is_admin(c: InvokeContext):
             if ctypes.windll.shell32.IsUserAnAdmin():  # pyright: ignore[reportAttributeAccessIssue]
                 return
         except:
-            pass
-    else:
-        if os.geteuid() == 0:  # type: ignore
-            return
+            """ If any error occurs (e.g., due to missing permissions), we assume the user is not admin. """
+    elif os.geteuid() == 0:   # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+        return
     raise RuntimeError("User is not admin")

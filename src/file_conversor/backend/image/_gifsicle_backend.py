@@ -4,15 +4,16 @@
 This module provides functionalities for handling files using gifsicle.
 """
 
+from enum import Enum
 from pathlib import Path
+from typing import Any
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-
 from file_conversor.config import Environment, Log
 from file_conversor.config.locale import get_translation
-
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -20,17 +21,17 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
+class GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     """
     Provides an interface for handling files using gifsicle.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        'gif': {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        'gif': {},
-    }
+    class SupportedInFormats(Enum):
+        GIF = "gif"
+
+    class SupportedOutFormats(Enum):
+        GIF = "gif"
+
     EXTERNAL_DEPENDENCIES: set[str] = {
         "gifsicle",
     }
@@ -69,7 +70,7 @@ class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
         input_file: str | Path,
         output_file: str | Path,
         compression_level: int = 3,
-        **kwargs,
+        **kwargs: Any,  # noqa: ARG002
     ):
         """
         Execute command to compress the input file.
@@ -93,5 +94,5 @@ class _GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
 
 
 __all__ = [
-    "_GifSicleBackend",
+    "GifSicleBackend",
 ]

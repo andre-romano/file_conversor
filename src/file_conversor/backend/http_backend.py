@@ -4,16 +4,19 @@
 This module provides functionalities for handling repositories using HTTP.
 """
 
-import requests
-import requests_cache
-
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.config import (
+    Configuration,
+    Environment,
+    Log,
+    get_translation,
+)
 
-from file_conversor.config import Configuration, State, Environment, Log, AbstractSingletonThreadSafe, get_translation
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -26,16 +29,18 @@ class NetworkError(RuntimeError):
     """Base exception for network-related errors in HttpBackend."""
 
 
-class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
+class HttpBackend(AbstractBackend):
     """
     HttpBackend is a class that provides an interface for handling HTTP requests.
     """
 
-    SUPPORTED_IN_FORMATS = {}
+    class SupportedInFormats(Enum):
+        pass
 
-    SUPPORTED_OUT_FORMATS = {}
+    class SupportedOutFormats(Enum):
+        pass
 
-    EXTERNAL_DEPENDENCIES = set()
+    EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(
         self,
@@ -49,6 +54,9 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
         :param cache_name: Name of the cache file. Defaults to ".http_cache".  
         :param cache_expire_after: Cache expiration time in seconds. Defaults to 1 day
         """
+        import requests
+        import requests_cache
+
         super().__init__()
         self._verbose = verbose
         self._cache_file = Environment.get_data_folder() / ".http_cache.sqlite"
@@ -67,6 +75,7 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
 
     def clear_cache(self):
         """Clear the HTTP cache."""
+        import requests_cache
         requests_cache.clear()
         logger.warning(_("HTTP cache cleared."))
 
@@ -75,7 +84,7 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
         url: str,
         cache_enabled: bool = True,
         timeout: tuple[int, int] | None = (5, 10),
-        **kwargs,
+        **kwargs: Any,
     ) -> Any:
         """Get JSON data from a URL.
 
@@ -89,21 +98,21 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
         """
         session = self._cached_session if cache_enabled else self._plain_session
         try:
-            response = session.get(url, timeout=timeout, **kwargs)
+            response = session.get(url, timeout=timeout, **kwargs)  # pyright: ignore[reportUnknownMemberType]
             if not response.ok:
                 raise NetworkError(f"Response code: {response.status_code} - {response.text}")
             return response.json()
         except Exception as e:
-            raise NetworkError(f"{_('Error during JSON fetch from url')} '{url}': {repr(e)}")
+            raise NetworkError(f"{_('Error during JSON fetch from url')} '{url}': {repr(e)}") from e
 
     def download(
         self,
         url: str,
-        dest_file: str | Path,
+        dest_file: Path,
         cache_enabled: bool = False,
         timeout: tuple[int, int] | None = (5, 600),
-        progress_callback: Callable[[float], Any] | None = None,
-        **kwargs,
+        progress_callback: Callable[[float], Any] = lambda p: p,
+        **kwargs: Any,
     ):
         """
         Download a file from a URL.
@@ -117,26 +126,26 @@ class HttpBackend(AbstractBackend, AbstractSingletonThreadSafe):
 
         :raises NetworkError: if the download fails.
         """
-        dest_file = Path(dest_file).resolve()
+        dest_file = dest_file.resolve()
         dest_file.parent.mkdir(parents=True, exist_ok=True)
+
         downloaded_bytes = 0.0
 
         session = self._cached_session if cache_enabled else self._plain_session
         try:
-            with session.get(url, timeout=timeout, stream=True, **kwargs) as response:
+            with session.get(url, timeout=timeout, stream=True, **kwargs) as response:  # pyright: ignore[reportUnknownMemberType]
                 if not response.ok:
                     raise NetworkError(f"{_('Response code')}: {response.status_code} - {response.text}")
-                total_size = float(response.headers.get("content-length", 0))
+                total_size = float(response.headers.get("content-length", 0))  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType]
                 with dest_file.open("wb") as f:
                     for data in response.iter_content(chunk_size=1024):
                         f.write(data)
                         downloaded_bytes += len(data)
-                        if progress_callback:
-                            progress_callback(downloaded_bytes / total_size * 100)
+                        progress_callback(downloaded_bytes / total_size * 100)
             if not dest_file.exists():
                 raise FileNotFoundError(f"'{dest_file}'")
         except Exception as e:
-            raise NetworkError(f"{_('Network error during download')}: {repr(e)}")
+            raise NetworkError(f"{_('Network error during download')}: {repr(e)}") from e
 
 
 __all__ = [

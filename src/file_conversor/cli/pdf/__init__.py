@@ -2,22 +2,20 @@
 
 from enum import Enum
 
-# user-provided modules
+from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
+from file_conversor.cli.pdf.compress_cli import PdfCompressCLI
+from file_conversor.cli.pdf.convert_cli import PdfConvertCLI
+from file_conversor.cli.pdf.decrypt_cli import PdfDecryptCLI
+from file_conversor.cli.pdf.encrypt_cli import PdfEncryptCLI
+from file_conversor.cli.pdf.extract_cli import PdfExtractCLI
+from file_conversor.cli.pdf.extract_img_cli import PdfExtractImgCLI
+from file_conversor.cli.pdf.merge_cli import PdfMergeCLI
+from file_conversor.cli.pdf.ocr_cli import PdfOcrCLI
+from file_conversor.cli.pdf.repair_cli import PdfRepairCLI
+from file_conversor.cli.pdf.rotate_cli import PdfRotateCLI
+from file_conversor.cli.pdf.split_cli import PdfSplitCLI
 from file_conversor.config.locale import get_translation
 
-from file_conversor.cli._utils.abstract_typer_group import AbstractTyperGroup
-
-from file_conversor.cli.pdf.compress_cmd import PdfCompressTyperCommand
-from file_conversor.cli.pdf.convert_cmd import PdfConvertTyperCommand
-from file_conversor.cli.pdf.decrypt_cmd import PdfDecryptTyperCommand
-from file_conversor.cli.pdf.encrypt_cmd import PdfEncryptTyperCommand
-from file_conversor.cli.pdf.extract_cmd import PdfExtractTyperCommand
-from file_conversor.cli.pdf.extract_img_cmd import PdfExtractImgTyperCommand
-from file_conversor.cli.pdf.merge_cmd import PdfMergeTyperCommand
-from file_conversor.cli.pdf.ocr_cmd import PdfOcrTyperCommand
-from file_conversor.cli.pdf.repair_cmd import PdfRepairTyperCommand
-from file_conversor.cli.pdf.rotate_cmd import PdfRotateTyperCommand
-from file_conversor.cli.pdf.split_cmd import PdfSplitTyperCommand
 
 _ = get_translation()
 
@@ -57,64 +55,64 @@ class PdfTyperGroup(AbstractTyperGroup):
         # add subcommands
         self.add(
             # SECURITY_PANEL
-            PdfEncryptTyperCommand(
+            PdfEncryptCLI(
                 group_name=group_name,
                 command_name=self.Commands.ENCRYPT.value,
                 rich_help_panel=self.Panels.SECURITY.value,
             ),
-            PdfDecryptTyperCommand(
+            PdfDecryptCLI(
                 group_name=group_name,
                 command_name=self.Commands.DECRYPT.value,
                 rich_help_panel=self.Panels.SECURITY.value,
             ),
 
             # TRANSFORMATION_PANEL
-            PdfCompressTyperCommand(
+            PdfCompressCLI(
                 group_name=group_name,
                 command_name=self.Commands.COMPRESS.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            PdfExtractTyperCommand(
+            PdfExtractCLI(
                 group_name=group_name,
                 command_name=self.Commands.EXTRACT.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            PdfMergeTyperCommand(
+            PdfMergeCLI(
                 group_name=group_name,
                 command_name=self.Commands.MERGE.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            PdfRotateTyperCommand(
+            PdfRotateCLI(
                 group_name=group_name,
                 command_name=self.Commands.ROTATE.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            PdfSplitTyperCommand(
+            PdfSplitCLI(
                 group_name=group_name,
                 command_name=self.Commands.SPLIT.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
-            PdfOcrTyperCommand(
+            PdfOcrCLI(
                 group_name=group_name,
                 command_name=self.Commands.OCR.value,
                 rich_help_panel=self.Panels.TRANSFORMATION.value,
             ),
 
             # OTHERS_PANEL
-            PdfConvertTyperCommand(
+            PdfConvertCLI(
                 group_name=group_name,
                 command_name=self.Commands.CONVERT.value,
-                rich_help_panel=self.Panels.TRANSFORMATION.value,
+                rich_help_panel=self.Panels.OTHERS.value,
             ),
-            PdfExtractImgTyperCommand(
+            PdfExtractImgCLI(
                 group_name=group_name,
                 command_name=self.Commands.EXTRACT_IMG.value,
-                rich_help_panel=self.Panels.TRANSFORMATION.value,
+                rich_help_panel=self.Panels.OTHERS.value,
             ),
-            PdfRepairTyperCommand(
+            PdfRepairCLI(
                 group_name=group_name,
                 command_name=self.Commands.REPAIR.value,
-                rich_help_panel=self.Panels.TRANSFORMATION.value,
+                rich_help_panel=self.Panels.OTHERS.value,
             ),
         )
 

@@ -6,17 +6,15 @@ This module provides functionalities for handling files using oxipng.
 
 import shutil
 
+from enum import Enum
 from pathlib import Path
+from typing import Any
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
-
-from file_conversor.config import Environment, Log
-from file_conversor.config.locale import get_translation
-
-from file_conversor.utils.validators import check_file_format
-
+from file_conversor.config import Environment, Log, get_translation
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+
 
 _ = get_translation()
 LOG = Log.get_instance()
@@ -24,17 +22,16 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
+class OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     """
     Provides an interface for handling files using oxipng.
     """
 
-    SUPPORTED_IN_FORMATS = {
-        'png': {},
-    }
-    SUPPORTED_OUT_FORMATS = {
-        'png': {},
-    }
+    class SupportedInFormats(Enum):
+        PNG = "png"
+
+    SupportedOutFormats = SupportedInFormats
+
     EXTERNAL_DEPENDENCIES: set[str] = {
         "oxipng",
     }
@@ -74,7 +71,7 @@ class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
         output_file: str | Path,
         strip_metadata: bool = True,
         compression_level: int = 6,
-        **kwargs,
+        **kwargs: Any,  # noqa: ARG002
     ):
         """
         Execute command to compress the input file.
@@ -107,5 +104,5 @@ class _OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
 
 
 __all__ = [
-    "_OxiPNGBackend",
+    "OxiPNGBackend",
 ]

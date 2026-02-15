@@ -1,12 +1,11 @@
 # tasks_modules\locales.py
 
 import polib
-from deep_translator import GoogleTranslator
 
-from invoke.tasks import task
+from deep_translator import GoogleTranslator  # pyright: ignore[reportMissingTypeStubs]
+from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config
 from tasks_modules._config import *
 
 
@@ -28,7 +27,7 @@ def _translate_locale(c: InvokeContext, path: Path):
     for entry in po.untranslated_entries():
         try:
             print(f"\tTranslating '{lang_id}/{entry.msgid}' ... ", end="")
-            entry.msgstr = entry.msgid if locale == "en_US" else translator.translate(entry.msgid)
+            entry.msgstr = entry.msgid if locale == "en_US" else translator.translate(entry.msgid)  # pyright: ignore[reportUnknownMemberType]
             print(f"[bold green]OK[/]")
         except Exception as e:
             print(f"[bold red]FAILED[/]")
@@ -50,8 +49,8 @@ def template(c: InvokeContext):
     print(f"[bold] Creating locales template (.pot) ... [/][bold green]OK[/]")
 
 
-@task(pre=[template])
-def create(c, locale: str):
+@task(pre=[template])  # pyright: ignore[reportUntypedFunctionDecorator]
+def create(c: InvokeContext, locale: str):
     """
     Create a locale (e.g., en_US, pt_BR, etc) translation using Babel.
 
@@ -63,8 +62,8 @@ def create(c, locale: str):
     print(f"[bold] Creating new locale '{locale}' ... [/][bold green]OK[/]")
 
 
-@task(post=[template])
-def backup_i18n(c: InvokeContext):
+@task(post=[template])  # pyright: ignore[reportUntypedFunctionDecorator]
+def backup_i18n(_: InvokeContext):
     """ Backup locales' .PO files"""
     print(f"[bold] Backing up locales .po files ... [/]")
     for path in I18N_PATH.rglob("*.po"):
@@ -74,7 +73,7 @@ def backup_i18n(c: InvokeContext):
 
 
 @task
-def recover_i18n(c: InvokeContext):
+def recover_i18n(_: InvokeContext):
     """ Recover locales' .PO files from backup"""
     print(f"[bold] Recovering individual locale translations from backup ... [/]")
     for po_bak_path in I18N_PATH.rglob("*.po.bak"):
@@ -97,7 +96,7 @@ def recover_i18n(c: InvokeContext):
     print(f"[bold] Recovering individual locale translations from backup ... [/][bold green]OK[/]")
 
 
-@task(pre=[backup_i18n], post=[recover_i18n])
+@task(pre=[backup_i18n], post=[recover_i18n])  # pyright: ignore[reportUntypedFunctionDecorator]
 def update(c: InvokeContext):
     """ Update locales' .PO files based on current template (.pot)"""
     print(f"[bold] Updating locales based on template .pot file ... [/]")
@@ -106,7 +105,7 @@ def update(c: InvokeContext):
     print(f"[bold] Updating locales based on template .pot file ... [/][bold green]OK[/]")
 
 
-@task(pre=[update])
+@task(pre=[update])  # pyright: ignore[reportUntypedFunctionDecorator]
 def translate(c: InvokeContext):
     """ Translate locales' .PO files using Google Translate"""
     exception = None
@@ -132,7 +131,7 @@ def translate(c: InvokeContext):
 
 
 @task
-def build(c: InvokeContext):
+def build(c: InvokeContext) -> None:
     """ Build locales' .MO files based on .PO files ..."""
     print(f"[bold] Building locales .mo files ... [/]")
     result = c.run(f"pdm run pybabel compile -d {I18N_PATH}")

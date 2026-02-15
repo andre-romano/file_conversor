@@ -1,42 +1,39 @@
 # src\file_conversor\cli\utils\utils_typer.py
 
-import typer
-from typer.models import OptionInfo
+from typing import Iterable
 
-from pathlib import Path
-from typing import Annotated, Any, Iterable, List
+import typer
+
+from typer.models import OptionInfo
 
 # user-provided modules
 from file_conversor.config.locale import get_translation
-from file_conversor.utils.validators import check_dir_exists, check_file_format, check_file_size_format, check_positive_integer, check_valid_options, check_video_resolution
+from file_conversor.utils.validators import (
+    check_dir_exists,
+    check_file_format,
+    check_file_size_format,
+    check_video_resolution,
+)
+
 
 _ = get_translation()
 
 
-def InputFilesArgument(backend_or_iterable: type | dict | list | None = None):
-    list_formats: Iterable[str]
-    if not backend_or_iterable:
-        list_formats = ["*"]
-    elif isinstance(backend_or_iterable, (dict, list)):
-        list_formats = backend_or_iterable
-    else:
-        list_formats = backend_or_iterable.SUPPORTED_IN_FORMATS
+def InputFilesArgument(file_formats: Iterable[str] | None = None):
+    file_formats = list(file_formats or [])
+    if not file_formats:
+        file_formats = ["*"]
     return typer.Argument(
-        help=f"{_('Input files')} ({', '.join(list_formats)})",
-        callback=lambda x: check_file_format(x, [] if "*" in list_formats else list_formats, exists=True),
+        help=f"{_('Input files')} ({', '.join(file_formats)})",
+        callback=lambda x: check_file_format(x, [] if "*" in file_formats else file_formats, exists=True),  # pyright: ignore[reportUnknownArgumentType]
     )
 
 
-def FormatOption(backend_or_iterable: type | dict | list) -> OptionInfo:
+def FormatOption() -> OptionInfo:
     """--format, -f"""
-    if isinstance(backend_or_iterable, (dict, list)):
-        list_formats: list[str] | dict[str, Any] = backend_or_iterable
-    else:
-        list_formats: list[str] | dict[str, Any] = backend_or_iterable.SUPPORTED_OUT_FORMATS
     return typer.Option(
         "--format", "-f",
-        help=f"{_('Output format')} ({', '.join(list_formats)})",
-        callback=lambda x: check_valid_options(x, list_formats),
+        help=f"{_('Output format')}",
     )
 
 
@@ -45,16 +42,17 @@ def OutputDirOption() -> OptionInfo:
     return typer.Option(
         "--output-dir", "-od",
         help=f"{_('Output directory')}. {_('Defaults to current working directory')}.",
-        callback=lambda x: check_dir_exists(x, mkdir=True),
+        callback=lambda x: check_dir_exists(x, mkdir=True),  # pyright: ignore[reportUnknownArgumentType]
     )
 
 
-def OutputFileOption(backend: type) -> OptionInfo:
+def OutputFileOption(file_formats: Iterable[str]) -> OptionInfo:
     """--output-file, -of"""
+    file_formats = list(file_formats)
     return typer.Option(
         "--output-file", "-of",
-        help=f"{_('Output file')} ({', '.join(backend.SUPPORTED_OUT_FORMATS)}). {_('Defaults to None')} ({_('use the same 1st input file as output name')}).",
-        callback=lambda x: check_file_format(x, backend.SUPPORTED_OUT_FORMATS),
+        help=f"{_('Output file')} ({', '.join(file_formats)}). {_('Defaults to None')} ({_('use the same 1st input file as output name')}).",
+        callback=lambda x: check_file_format(x, file_formats),  # pyright: ignore[reportUnknownArgumentType]
     )
 
 #################
@@ -72,13 +70,11 @@ def QualityOption(prompt: bool | str = False) -> OptionInfo:
     )
 
 
-def AxisOption(prompt: bool | str = False) -> OptionInfo:
+def AxisOption() -> OptionInfo:
     """--axis, -a"""
     return typer.Option(
         "--axis", "-a",
-        help=_("Mirror axis. Valid values are 'x' (mirror horizontally) or 'y' (flip vertically)."),
-        prompt=prompt,
-        callback=lambda x: check_valid_options(x, valid_options=['x', 'y']),
+        help=f"{_('Mirror axis (horizontal, vertical)')}.",
     )
 
 
@@ -98,6 +94,7 @@ def BrightnessOption(prompt: bool | str = False) -> OptionInfo:
         "--brightness", "-b",
         prompt=prompt,
         help=_("Adjust brightness. brightness = 1.00 means no change. brightness < 1.00 makes image black. brightness > 1.00 makes image lighter."),
+        min=0.0,
     )
 
 
@@ -107,6 +104,7 @@ def ContrastOption(prompt: bool | str = False) -> OptionInfo:
         "--contrast", "-ct",
         prompt=prompt,
         help=_("Adjust contrast. contrast = 1.00 means no change. contrast < 1.00 reduces contrast (grayish image). contrast > 1.00 increases contrast."),
+        min=0.0,
     )
 
 
@@ -116,6 +114,7 @@ def ColorOption(prompt: bool | str = False) -> OptionInfo:
         "--color", "-cl",
         prompt=prompt,
         help=_("Adjust color. color = 1.00 means no change. color < 1.00 reduces color saturation. color > 1.00 increases color saturation."),
+        min=0.0,
     )
 
 
@@ -125,6 +124,17 @@ def SharpnessOption(prompt: bool | str = False) -> OptionInfo:
         "--sharpness", "-s",
         prompt=prompt,
         help=_("Adjust sharpness. sharpness = 1.00 means no change. sharpness < 1.00 makes image more blurry. sharpness > 1.00 increases image crispness (and noise as well)."),
+        min=0.0,
+    )
+
+
+def GammaOption(prompt: bool | str = False) -> OptionInfo:
+    """--gamma, -g"""
+    return typer.Option(
+        "--gamma", "-g",
+        prompt=prompt,
+        help=f'{_("Adjust gamma")}. {_('gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma > 1.00 increases image lightenss')}.',
+        min=0.0,
     )
 
 
@@ -160,7 +170,7 @@ def TargetFileSizeOption(prompt: bool | str = False) -> OptionInfo:
         "--target-size", "-ts",
         help=f"{_("Target file size.")} {_('Format "size[K|M|G]". If 0, do not limit output file size (use encoding speed and quality options to calculate output file size).')}",
         prompt=prompt,
-        callback=lambda x: check_file_size_format(x),
+        callback=check_file_size_format,  # pyright: ignore[reportUnknownArgumentType]
     )
 
 
@@ -168,9 +178,9 @@ def AudioBitrateOption(prompt: bool | str = False) -> OptionInfo:
     """--audio-bitrate, -ab"""
     return typer.Option(
         "--audio-bitrate", "-ab",
-        help=f"{_("Audio bitrate in kbps.")} {_('If 0, let FFmpeg decide best bitrate.')}",
+        help=f"{_("Audio bitrate in kbps.")} {_('If -1, let FFmpeg decide best bitrate.')}",
         prompt=prompt,
-        callback=lambda x: check_positive_integer(x, allow_zero=True),
+        min=1,
     )
 
 
@@ -178,49 +188,54 @@ def VideoBitrateOption(prompt: bool | str = False) -> OptionInfo:
     """--video-bitrate, -vb"""
     return typer.Option(
         "--video-bitrate", "-vb",
-        help=f"{_("Video bitrate in kbps.")} {_('Overrides video quality setting (if set). If 0, use video quality setting to encode video using variable bitrate (CRF) encoding (if supported by codec, otherwise use default bitrate for codec/container)')}.",
+        help=f"{_("Video bitrate in kbps.")} {_('Overrides video quality setting (if set). If -1, use video quality setting to encode video using variable bitrate (CRF) encoding (if supported by codec, otherwise use default bitrate for codec/container)')}.",
         prompt=prompt,
-        callback=lambda x: check_positive_integer(x, allow_zero=True),
+        min=1,
     )
 
 
-def AudioCodecOption(available_options: Iterable[str], prompt: bool | str = False) -> OptionInfo:
+def AudioCodecOption(prompt: bool | str = False) -> OptionInfo:
     """--audio-codec, -ac"""
     return typer.Option(
         "--audio-codec", "-ac",
-        help=f'{_("Audio codec. Not all codecs are supported in a given format container (run `file_conversor video list-formats` for more information). Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        help=f'{_("Audio codec. Not all codecs are supported in a given format container (run `file_conversor video list-formats` for more information).")} {_('Defaults to "default" (use the default for the file container)')}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, available_options),
     )
 
 
-def VideoCodecOption(available_options: Iterable[str], prompt: bool | str = False) -> OptionInfo:
+def VideoCodecOption(prompt: bool | str = False) -> OptionInfo:
     """--video-codec, -vc"""
     return typer.Option(
         "--video-codec", "-vc",
-        help=f'{_("Video codec. Not all codecs are supported in a given format container (run `file_conversor video list-formats` for more information). Available options are:")} {", ".join(available_options)}. {_('Defaults to None (use the default for the file container)')}.',
+        help=f'{_("Video codec. Not all codecs are supported in a given format container (run `file_conversor video list-formats` for more information).")} {_('Defaults to "default" (use the default for the file container)')}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, available_options),
     )
 
 
-def VideoEncodingSpeedOption(options: list[str], prompt: bool | str = False) -> OptionInfo:
+def VideoProfileOption(prompt: bool | str = False) -> OptionInfo:
+    """--video-profile, -vp"""
+    return typer.Option(
+        "--video-profile", "-vp",
+        help=f'{_("Video profile.")} {_("Higher profiles result in higher compression, but require more decoding processing power")}.',
+        prompt=prompt,
+    )
+
+
+def VideoEncodingSpeedOption(prompt: bool | str = False) -> OptionInfo:
     """--video-encoding-speed, -ves"""
     return typer.Option(
         "--video-encoding-speed", "-ves",
-        help=f'{_("Video encoding speed/quality trade-off. Available options are:")} {", ".join(options)}. {_("Faster encoding speed usually results in lower video quality and larger file size")}. {_("Defaults to 'medium'")}.',
+        help=f'{_("Video encoding speed/quality trade-off.")} {_("Faster encoding speed usually results in lower video quality and larger file size")}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, options),
     )
 
 
-def VideoQualityOption(options: list[str], prompt: bool | str = False) -> OptionInfo:
+def VideoQualityOption(prompt: bool | str = False) -> OptionInfo:
     """--video-quality, -vq"""
     return typer.Option(
         "--video-quality", "-vq",
-        help=f'{_("Video quality preset. Available options are:")} {", ".join(options)}. {_("Higher quality usually results in larger file size. Video bitrate (if set) overrides this setting.")}. {_("Defaults to 'medium'")}.',
+        help=f'{_("Video quality preset.")} {_("Higher quality usually results in larger file size. Video bitrate (if set) overrides this setting.")}.',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, options),
     )
 
 
@@ -228,7 +243,7 @@ def ResolutionOption(prompt: bool | str = False) -> OptionInfo:
     """--resolution, -rs"""
     return typer.Option(
         "--resolution", "-rs",
-        help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to None (use same resolution as video source)")}',
+        help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to 0:0 (use same resolution as video source)")}',
         prompt=prompt,
         callback=check_video_resolution,
     )
@@ -248,18 +263,8 @@ def VideoRotationOption(prompt: bool | str = False) -> OptionInfo:
     """--rotation, -r"""
     return typer.Option(
         "--rotation", "-r",
-        help=f'{_("Rotate video (clockwise). Available options are:")} {", ".join(['-180', '-90', '90', '180'])}. Defaults to None (do not rotate).',
+        help=f'{_("Rotate video (clockwise).")} Defaults to None (do not rotate).',
         prompt=prompt,
-        callback=lambda x: check_valid_options(x, [-180, -90, 90, 180]),
-    )
-
-
-def GammaOption(prompt: bool | str = False) -> OptionInfo:
-    """--gamma, -g"""
-    return typer.Option(
-        "--gamma", "-g",
-        prompt=prompt,
-        help=f'{_("Adjust gamma")}. {_('gamma = 1.00 means no change. gamma < 1.00 makes image more darker. gamma > 1.00 increases image lightenss')}.',
     )
 
 

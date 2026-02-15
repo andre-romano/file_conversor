@@ -3,14 +3,14 @@
         "ms-python.autopep8",
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
         "redhat.vscode-yaml",
         "tamasfe.even-better-toml",
-        "GitHub.copilot",
         "GitHub.copilot-chat",
         "chouzz.vscode-innosetup",
         "yzhang.markdown-all-in-one",
         "bierner.markdown-preview-github-styles",
         "bierner.markdown-mermaid",
         "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
-    ]
+    ],
 }

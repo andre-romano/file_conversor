@@ -4,20 +4,19 @@
 This module provides functionalities for barch file processing using this app.
 """
 
-import shlex
 import os
-import subprocess
+import shlex
 
+from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Self
+from typing import Any, Callable
 
 from pydantic import BaseModel
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
+from file_conversor.config import Environment, Log, get_translation
 
-from file_conversor.config import Environment, Configuration, Log
-from file_conversor.config.locale import get_translation
 
 # get app config
 LOG = Log.get_instance()
@@ -51,11 +50,9 @@ class StageConfigDataModel(BaseModel):
         """ Get help template for stage creation """
 
         return f"""
-{_('Creates a pipeline stage.')}
-
 {_('Placeholders available for commands')}:
 
-- **{{in_file_path}}**: {_('Replaced by the first file path found in pipeline stage.')}
+- **{{in_file}}**: {_('Replaced by the first file path found in pipeline stage.')}
 
     - Ex: C:/Users/Alice/Desktop/pipeline_name/my_file.jpg
 
@@ -85,9 +82,9 @@ class StageConfigDataModel(BaseModel):
         :return: list of command arguments
         """
         cmd_list: list[str] = []
-        for cmd in shlex.split(f"{Environment.get_executable()} {self.command}"):
+        for cmd_orig in shlex.split(f"{Environment.get_executable()} {self.command}"):
             # replace placeholders
-            cmd = cmd.replace(f"{{in_file_path}}", f"{inputfile_path.resolve()}")
+            cmd = cmd_orig.replace(f"{{in_file}}", f"{inputfile_path.resolve()}")
             cmd = cmd.replace(f"{{in_file_name}}", f"{inputfile_path.with_suffix("").name}")
             cmd = cmd.replace(f"{{in_file_ext}}", f"{inputfile_path.suffix[1:].lower()}")
             cmd = cmd.replace(f"{{in_dir}}", f"{self.in_dir.resolve()}")
@@ -107,15 +104,13 @@ class StageConfigDataModel(BaseModel):
 
         :raises subprocess.CalledProcessError: if a stage failes
         """
+        import subprocess
+
         logger.info(f"{_('Executing batch stage')} '{self.out_dir}' ...")
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
         total_files = sum(1 for _ in self.in_dir.glob("*"))
-        for i, in_path in enumerate(self.in_dir.glob("*")):
-            # update progress
-            progress = float(i) / total_files * 100.0
-            progress_callback(progress)
-
+        for i, in_path in enumerate(self.in_dir.glob("*"), start=1):
             # ignore folders and config file
             if in_path.is_dir() or in_path.name == _PIPELINE_CONFIG_FILENAME:
                 continue
@@ -127,6 +122,10 @@ class StageConfigDataModel(BaseModel):
                 process = Environment.run(*cmd_list)
 
                 logger.debug(f"Processing file '{in_path}': [bold green]{_('SUCCESS')}[/] ({process.returncode})")
+
+                # update progress
+                progress = float(i) / total_files * 100.0
+                progress_callback(progress)
             except Exception as e:
                 logger.error(f"Processing file '{in_path}': [bold red]{_('FAILED')}[/]")
                 logger.error(f"{str(e)}")
@@ -165,8 +164,11 @@ class PipelineConfigDataModel(BaseModel):
 
 class BatchBackend(AbstractBackend):
     """Class to provide batch file processing, using pipelines"""
-    SUPPORTED_IN_FORMATS = {}
-    SUPPORTED_OUT_FORMATS = {}
+    class SupportedInFormats(Enum):
+        JSON = "json"
+
+    class SupportedOutFormats(Enum):
+        JSON = "json"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()
 

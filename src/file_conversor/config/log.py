@@ -1,35 +1,25 @@
 # src\file_conversor\config\log.py
 
-import re
 import logging
-import tempfile
 import shutil
-
-from rich import print
-
-from logging import Handler
-from concurrent_log_handler import ConcurrentTimedRotatingFileHandler
+import tempfile
 
 from enum import Enum
-from types import TracebackType
-from typing import Mapping, Self
-
+from logging import Handler, LogRecord
 from pathlib import Path
+from typing import Self, override
 
-# user-provided imports
-from file_conversor.config.abstract_singleton_thread_safe import AbstractSingletonThreadSafe
+from concurrent_log_handler import ConcurrentTimedRotatingFileHandler
+from rich import print
 
 
-class Log(AbstractSingletonThreadSafe):
+class Log:
     class CustomLogger:
         def __init__(self, name: str | None) -> None:
             super().__init__()
             self._name = name
             self._log_to_file = True
-
-        @property
-        def _logger(self):
-            return logging.getLogger(self._name)
+            self._logger = logging.getLogger(self._name)
 
         @property
         def level(self) -> int:
@@ -45,37 +35,85 @@ class Log(AbstractSingletonThreadSafe):
         def log_to_file(self, value: bool):
             self._log_to_file = value
 
-        def critical(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def critical(
+                self,
+                msg: object,
+                *args: object,
+                exc_info: None | bool = None,
+                stack_info: bool = False,
+                stacklevel: int = 1,
+                extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.critical(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.CRITICAL:
                 print(f"[bold reverse red][CRITICAL][/]: {msg}")
 
-        def fatal(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def fatal(
+            self,
+            msg: object,
+            *args: object,
+            exc_info: None | bool = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.fatal(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.FATAL:
                 print(f"[bold reverse red][FATAL][/]: {msg}")
 
-        def error(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def error(
+            self,
+            msg: object,
+            *args: object,
+            exc_info: None | bool = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.error(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.ERROR:
                 print(f"[bold red][ERROR][/]: {msg}")
 
-        def warning(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def warning(
+            self,
+            msg: object,
+            *args: object,
+            exc_info: None | bool = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.warning(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.WARNING:
                 print(f"[bold yellow][WARN][/]: {msg}")
 
-        def info(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def info(
+            self,
+            msg: object,
+            *args: object,
+            exc_info: None | bool = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.info(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.INFO:
                 print(f"[bold white][INFO][/]: {msg}")
 
-        def debug(self, msg: object, *args: object, exc_info: None | bool | tuple[type[BaseException], BaseException, TracebackType | None] | tuple[None, None, None] | BaseException = None, stack_info: bool = False, stacklevel: int = 1, extra: Mapping[str, object] | None = None) -> None:
+        def debug(
+            self,
+            msg: object,
+            *args: object,
+            exc_info: None | bool = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: dict[str, object] | None = None,
+        ) -> None:
             if self.log_to_file:
                 self._logger.debug(msg, *args, exc_info=exc_info, stack_info=stack_info, stacklevel=stacklevel, extra=extra)
             if self.level <= logging.DEBUG:
@@ -83,11 +121,12 @@ class Log(AbstractSingletonThreadSafe):
 
     class StripMarkupFormatter(logging.Formatter):
         # Use a custom formatter that strips Rich markup
-        TAG_RE = re.compile(r'\[/?[^\]]+\]')  # matches [tag] and [/tag]
-
-        def format(self, record):
+        @override
+        def format(self, record: LogRecord):
+            import re
+            TAG_RE = re.compile(r'\[/?[^\]]+\]')  # matches [tag] and [/tag]
             if isinstance(record.msg, str):
-                record.msg = self.TAG_RE.sub('', record.msg)
+                record.msg = TAG_RE.sub('', record.msg)
             return super().format(record)
 
     # most severe level, to least
@@ -131,6 +170,9 @@ class Log(AbstractSingletonThreadSafe):
     # logfile name
     FILENAME = f".file_conversor.log"
 
+    _instance: Self | None = None
+    _instance_lock = None
+
     @classmethod
     def get_instance(cls, dest_folder: str | Path | None = ".", level: Level = Level.INFO):
         """
@@ -139,7 +181,13 @@ class Log(AbstractSingletonThreadSafe):
         :param dest_folder: Destination folder to store log file. If None, do not log to file. Defaults to '.' (log to current working folder).
         :param level: Log level. Defaults to LEVEL_INFO.
         """
-        return super().get_instance(dest_folder=dest_folder, level=level)
+        import threading
+        if cls._instance_lock is None:
+            cls._instance_lock = threading.RLock()
+        with cls._instance_lock:
+            if not cls._instance:
+                cls._instance = cls(dest_folder=dest_folder, level=level)
+        return cls._instance
 
     def __init__(self, dest_folder: str | Path | None, level: Level) -> None:
         """
@@ -168,7 +216,7 @@ class Log(AbstractSingletonThreadSafe):
         except PermissionError:
             pass
 
-    def getLogger(self, name: str | None = None) -> CustomLogger:
+    def getLogger(self, name: str | None = None) -> CustomLogger:  # noqa: S100
         return Log.CustomLogger(name)
 
     def get_dest_folder(self) -> Path | None:

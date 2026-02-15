@@ -4,10 +4,9 @@ from enum import Enum
 
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperGroup
-
-from file_conversor.cli.doc.convert_cmd import DocConvertCommand
-
+from file_conversor.cli.doc.convert_cli import DocConvertCLI
 from file_conversor.config.locale import get_translation
+
 
 _ = get_translation()
 
@@ -29,7 +28,7 @@ class DocTyperGroup(AbstractTyperGroup):
 
         # add subcommands
         self.add(
-            DocConvertCommand(
+            DocConvertCLI(
                 group_name=group_name,
                 command_name=self.Commands.CONVERT.value,
                 rich_help_panel=self.Panels.NONE.value,
