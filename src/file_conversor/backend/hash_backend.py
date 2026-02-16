@@ -60,21 +60,21 @@ class HashBackend(AbstractBackend):
         def algorithm(self):
             match self:
                 case HashBackend.SupportedOutFormats.MD5:
-                    return hashlib.md5
+                    return hashlib.md5  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA1:
-                    return hashlib.sha1
+                    return hashlib.sha1  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA256:
-                    return hashlib.sha256
+                    return hashlib.sha256  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA384:
-                    return hashlib.sha384
+                    return hashlib.sha384  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA512:
-                    return hashlib.sha512
+                    return hashlib.sha512  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA3_256:
-                    return hashlib.sha3_256
+                    return hashlib.sha3_256  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA3_384:
-                    return hashlib.sha3_384
+                    return hashlib.sha3_384  # noqa: S4790
                 case HashBackend.SupportedOutFormats.SHA3_512:
-                    return hashlib.sha3_512
+                    return hashlib.sha3_512  # noqa: S4790
 
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
