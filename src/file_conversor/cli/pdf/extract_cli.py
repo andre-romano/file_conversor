@@ -23,6 +23,7 @@ from file_conversor.config import (
 )
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 from file_conversor.utils.formatters import parse_pdf_pages
+from file_conversor.utils.validators import prompt_retry_on_exception
 
 
 # get app config
@@ -82,7 +83,10 @@ class PdfExtractCLI(AbstractTyperCommand):
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         if not pages:
-            pages_str = str(typer.prompt(f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}"))
+            pages_str = prompt_retry_on_exception(
+                f"{_('Pages to extract [comma-separated list] (e.g., 1-3, 7-7)')}",
+                type=str,
+            )
             pages = [p.strip() for p in pages_str.split(",")]
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:

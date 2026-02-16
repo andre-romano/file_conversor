@@ -2,6 +2,7 @@
 
 from enum import Enum
 from pathlib import Path
+from subprocess import CompletedProcess
 from typing import Any
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -76,7 +77,7 @@ class CompressBackend(AbstractBackend):
         input_file: str | Path,
         output_file: str | Path,
         **kwargs: Any,
-    ):
+    ) -> CompletedProcess[Any]:
         """
         Execute the command to compress the input file.
 

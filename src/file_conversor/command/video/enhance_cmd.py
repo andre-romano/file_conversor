@@ -44,7 +44,8 @@ class VideoEnhanceCommand:
         video_profile: VideoProfile,
         video_encoding_speed: VideoEncoding,
         video_quality: VideoQuality,
-        resolution: tuple[int, int] | None,
+        width: int | None,
+        height: int | None,
         fps: int | None,
         brightness: float,
         contrast: float,
@@ -78,7 +79,7 @@ class VideoEnhanceCommand:
         ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=resolution,
+            resolution=(width, height) if width is not None and height is not None else None,
             fps=fps,
             brightness=brightness,
             contrast=contrast,

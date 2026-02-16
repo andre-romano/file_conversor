@@ -156,10 +156,10 @@ class Log:
             return self
 
         def is_critical(self) -> bool:
-            return self.value <= Log.Level.CRITICAL.value
+            return self.value >= Log.Level.CRITICAL.value
 
         def is_quiet(self) -> bool:
-            return self.value <= Log.Level.ERROR.value
+            return self.value >= Log.Level.ERROR.value
 
         def is_verbose(self) -> bool:
             return self.value <= Log.Level.INFO.value

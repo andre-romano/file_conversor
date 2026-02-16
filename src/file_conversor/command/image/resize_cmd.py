@@ -47,6 +47,13 @@ class ImageResizeCommand:
             out_stem="_resized",
         )
 
+        if scale is None and width is None:
+            raise ValueError(_("Need either scale or width to resize an image"))
+        if scale is not None and scale <= 0:
+            raise ValueError(_("Scale must be >0"))
+        if width is not None and width <= 0:
+            raise RuntimeError(_("Width must be >0"))
+
         def step_one(data: FileDataModel, get_progress: Callable[[float], float]):
             logger.info(f"Processing '{data.output_file}' ... ")
             pillow_backend.resize(

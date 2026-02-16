@@ -37,18 +37,17 @@ def is_zero(num: int | float) -> bool:
     return is_close(num, 0.0, rel_tol=1e-9, abs_tol=1e-9)
 
 
-def prompt_retry_on_exception(
+def prompt_retry_on_exception[T](
         text: str,
-        default: Any | None = None,
+        type: Callable[[Any], T],
+        default: T | None = None,
         hide_input: bool = False,
         confirmation_prompt: bool | str = False,
-        type: Any | None = None,
         show_choices: bool = True,
         show_default: bool = True,
-        check_callback: Callable[[Any], Any] | None = None,
-        retries: int | None = None,
-        **prompt_kwargs: Any,
-) -> Any:
+        callback: Callable[[T], bool] | None = None,
+        retries: int = int(sys.maxsize),
+) -> T:
     """
     Prompts the user for input, retrying on exception.
 
@@ -59,42 +58,41 @@ def prompt_retry_on_exception(
     :param type: The type of the input.
     :param show_choices: Whether to show choices (for Enum types).
     :param show_default: Whether to show the default value.
-    :param check_callback: A callback function to validate the input.
-    :param retries: The number of retries (None for infinite).
+    :param callback: A callback function to validate the input.
+    :param retries: The number of retries 
     :param prompt_kwargs: Additional keyword arguments for typer.prompt.
 
     :raises typer.Abort: If the user aborts the input or retries are exhausted.
     :return: The user input, validated by the callback if provided.
     """
-    for _ in range(retries or int(sys.maxsize)):
+    for _ in range(retries):
         try:
-            if type == bool:
-                res = typer.confirm(
-                    text=text,
-                    default=default if isinstance(default, bool) else False,
-                    show_default=show_default,
-                )
-            else:
-                res = typer.prompt(
+            res = typer.confirm(
+                text=text,
+                default=default if isinstance(default, bool) else False,  # noqa: S3358
+                show_default=show_default,
+            ) if type == bool else (
+                typer.prompt(
                     text=text,
                     default=default,
                     hide_input=hide_input,
                     confirmation_prompt=confirmation_prompt,
-                    type=type,
                     show_choices=show_choices,
                     show_default=show_default,
-                    **prompt_kwargs,
                 )
-            match check_callback(res) if check_callback else True:
+            )
+            if res is None:
+                return res
+            res = type(res)
+            match callback(res) if callback else True:
                 case False:
                     raise typer.BadParameter("Invalid input.")
-                case callback_res if isinstance(callback_res, Exception):
-                    raise callback_res
                 case _:
-                    """empty case for valid input"""
-            return res
+                    return res
+        except (KeyboardInterrupt, typer.Abort, typer.Exit):
+            raise
         except Exception as e:
-            print(f"[bold red][ERROR][/]: {e}")
+            print(f"ERROR: {e}")
     raise typer.Abort()
 
 
@@ -115,17 +113,6 @@ def check_file_size_format(data: str | None) -> str | None:
 
     if size_value < 0:
         raise exception
-    return data
-
-
-def check_video_resolution(data: str | None) -> str | None:
-    if not data:
-        return data
-    if ":" not in data:
-        raise typer.BadParameter(f"{_('Invalid format for video resolution')} '{data}'. {_('Valid format is WIDTH:HEIGHT')}.")
-    width_height = data.split(":")
-    if len(width_height) != 2:
-        raise typer.BadParameter(f"{_('Invalid format for video resolution')} '{data}'. {_('Valid format is WIDTH:HEIGHT')}.")
     return data
 
 
@@ -218,7 +205,6 @@ def check_valid_options(data: Any | None, valid_options: Iterable[Any]) -> Any |
 __all__ = [
     "prompt_retry_on_exception",
     "check_file_size_format",
-    "check_video_resolution",
     "check_path_exists",
     "check_file_exists",
     "check_dir_exists",

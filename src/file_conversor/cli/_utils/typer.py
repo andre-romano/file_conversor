@@ -12,7 +12,6 @@ from file_conversor.utils.validators import (
     check_dir_exists,
     check_file_format,
     check_file_size_format,
-    check_video_resolution,
 )
 
 
@@ -239,13 +238,23 @@ def VideoQualityOption(prompt: bool | str = False) -> OptionInfo:
     )
 
 
-def ResolutionOption(prompt: bool | str = False) -> OptionInfo:
-    """--resolution, -rs"""
+def WidthOption(prompt: bool | str = False) -> OptionInfo:
+    """--width, -w"""
     return typer.Option(
-        "--resolution", "-rs",
-        help=f'{_("Video target resolution. Format WIDTH:HEIGHT (in pixels). Defaults to 0:0 (use same resolution as video source)")}',
+        "--width", "-w",
+        help=f'{_("Video target width.")}',
         prompt=prompt,
-        callback=check_video_resolution,
+        min=1,
+    )
+
+
+def HeightOption(prompt: bool | str = False) -> OptionInfo:
+    """--height, -h"""
+    return typer.Option(
+        "--height", "-h",
+        help=f'{_("Video target height.")}',
+        prompt=prompt,
+        min=1,
     )
 
 
@@ -307,7 +316,8 @@ __all__ = [
     "VideoCodecOption",
     "VideoEncodingSpeedOption",
     "VideoQualityOption",
-    "ResolutionOption",
+    "WidthOption",
+    "HeightOption",
     "FPSOption",
     "VideoRotationOption",
     "GammaOption",

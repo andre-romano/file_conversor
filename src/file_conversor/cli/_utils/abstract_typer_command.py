@@ -36,7 +36,7 @@ class AbstractTyperCommand(RegisterCtxMenuProtocol):
         help: str | None = None,
         epilog: str | None = None,
         rich_help_panel: str | None = None,
-        no_args_is_help: bool = True,
+        no_args_is_help: bool = False,
         hidden: bool = False,
         deprecated: bool = False,
     ) -> None:

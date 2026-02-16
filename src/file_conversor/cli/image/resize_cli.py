@@ -22,7 +22,7 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
-from file_conversor.utils.validators import is_close
+from file_conversor.utils.validators import prompt_retry_on_exception
 
 
 # get app config
@@ -82,25 +82,29 @@ class ImageResizeCLI(AbstractTyperCommand):
     def resize(
         self,
         input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageResizeCommand.SupportedInFormats)],
-        scale: Annotated[float, typer.Option("--scale", "-s",
-                                             help=f"{_("Scale image proportion. Valid values start at 0.1. Defaults to")} 0 (use width to scale image).",
-                                             min=0.0,
-                                             )] = 0.0,
+        scale: Annotated[float | None, typer.Option("--scale", "-s",
+                                                    help=f"{_("Scale image proportion. Valid values start at 0.1.")}",
+                                                    min=0.1,
+                                                    )] = None,
 
-        width: Annotated[int, typer.Option("--width", "-w",
-                                           help=f"{_("Width in pixels (height is calculated based on width to keep image proportions). Defaults to")} 0 ({_('use scale to resize image')}).",
-                                           min=0,
-                                           )] = 0,
+        width: Annotated[int | None, typer.Option("--width", "-w",
+                                                  help=f"{_("Width in pixels (height is calculated based on width to keep image proportions).")}",
+                                                  min=1,
+                                                  )] = None,
 
         resampling: Annotated[ImageResizeCommand.ResamplingOption, typer.Option("--resampling", "-r",
                                                                                 help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in ImageResizeCommand.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}.',
                                                                                 )] = ImageResizeCommand.ResamplingOption(CONFIG.image_resampling),
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
-        if is_close(scale, 0.0) and width == 0:
+        if scale is None and width is None:
             if STATE.loglevel.get().is_quiet():
                 raise RuntimeError(f"{_('Scale and width not provided')}")
-            scale = float(typer.prompt(f"{_('Output image scale (e.g., 1.5)')}", type=float))
+            scale = prompt_retry_on_exception(
+                f"{_('Output image scale (e.g., 1.5)')}",
+                type=float,
+                callback=lambda x: x > 0.0
+            )
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))

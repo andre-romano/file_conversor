@@ -3,8 +3,6 @@
 from pathlib import Path
 from typing import Annotated, override
 
-import typer
-
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import (
@@ -24,7 +22,7 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
-from file_conversor.utils.validators import is_close
+from file_conversor.utils.validators import is_close, prompt_retry_on_exception
 
 
 # get app config
@@ -82,14 +80,27 @@ class ImageEnhanceCLI(AbstractTyperCommand):
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
-        if is_close(brightness, 1.00) and is_close(contrast, 1.00) and is_close(color, 1.00) and is_close(sharpness, 1.00):
-            brightness = typer.prompt("Brightness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
-            contrast = typer.prompt("Contrast factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
-            color = typer.prompt("Color factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
-            sharpness = typer.prompt("Sharpness factor (> 1.0 increases, < 1.0 decreases)", default=1.00)
-
-        if brightness < 0.0 or contrast < 0.0 or color < 0.0 or sharpness < 0.0:
-            raise ValueError(_("Enhancement factors must be greater than 0.0"))
+        if all(is_close(x, 1.00) for x in [brightness, contrast, color, sharpness]):
+            brightness = prompt_retry_on_exception(
+                "Brightness factor (> 1.0 increases, < 1.0 decreases)",
+                type=float, default=1.00,
+                callback=lambda x: x > 0.0,
+            )
+            contrast = prompt_retry_on_exception(
+                "Contrast factor (> 1.0 increases, < 1.0 decreases)",
+                type=float, default=1.00,
+                callback=lambda x: x > 0.0,
+            )
+            color = prompt_retry_on_exception(
+                "Color factor (> 1.0 increases, < 1.0 decreases)",
+                type=float, default=1.00,
+                callback=lambda x: x > 0.0,
+            )
+            sharpness = prompt_retry_on_exception(
+                "Sharpness factor (> 1.0 increases, < 1.0 decreases)",
+                type=float, default=1.00,
+                callback=lambda x: x > 0.0,
+            )
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))

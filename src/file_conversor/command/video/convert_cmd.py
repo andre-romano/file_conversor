@@ -46,7 +46,8 @@ class VideoConvertCommand:
         video_profile: VideoProfile,
         video_encoding_speed: VideoEncoding,
         video_quality: VideoQuality,
-        resolution: tuple[int, int] | None,
+        width: int | None,
+        height: int | None,
         fps: int | None,
         brightness: float,
         contrast: float,
@@ -82,7 +83,7 @@ class VideoConvertCommand:
         ffmpeg_cmd_helper.set_codecs(audio_codec=audio_codec, video_codec=video_codec)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=resolution,
+            resolution=(width, height) if width is not None and height is not None else None,
             fps=fps,
             brightness=brightness,
             contrast=contrast,

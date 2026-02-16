@@ -15,7 +15,6 @@ from file_conversor.utils.validators import (
     check_path_exists,
     check_positive_integer,
     check_valid_options,
-    check_video_resolution,
     prompt_retry_on_exception,
 )
 
@@ -29,16 +28,10 @@ class TestUtilsValidators:
 
         monkeypatch.setattr(typer, "prompt", mock_prompt)  # type: ignore
 
-        def check_callback(value: str):
-            ivalue = int(value)
-            if ivalue < 0 or ivalue > 100:
-                raise ValueError("Value must be between 0 and 100")
-            return ivalue
-
         result = prompt_retry_on_exception(
             text="Enter a number between 0 and 100:",
             type=int,
-            check_callback=check_callback,
+            callback=lambda x: 0 <= x <= 100,
             retries=2
         )
         assert int(result) == 42
@@ -53,18 +46,6 @@ class TestUtilsValidators:
             check_file_size_format("100XY")
         with pytest.raises(typer.BadParameter):
             check_file_size_format("K")
-
-    def test_check_video_resolution(self):
-        assert check_video_resolution("1920:1080") == "1920:1080"
-        assert check_video_resolution("1280:720") == "1280:720"
-        with pytest.raises(typer.BadParameter):
-            check_video_resolution("1920")
-        with pytest.raises(typer.BadParameter):
-            check_video_resolution("1920x1080")
-        with pytest.raises(typer.BadParameter):
-            check_video_resolution("1920-1080")
-        with pytest.raises(typer.BadParameter):
-            check_video_resolution("1920:1080:60")
 
     def test_check_path_exists(self, tmp_path: Path):
         existing_path = tmp_path

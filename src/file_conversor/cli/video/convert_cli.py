@@ -17,9 +17,9 @@ from file_conversor.cli._utils.typer import (
     FormatOption,
     FPSOption,
     GammaOption,
+    HeightOption,
     InputFilesArgument,
     OutputDirOption,
-    ResolutionOption,
     UnsharpOption,
     VideoBitrateOption,
     VideoCodecOption,
@@ -27,6 +27,7 @@ from file_conversor.cli._utils.typer import (
     VideoProfileOption,
     VideoQualityOption,
     VideoRotationOption,
+    WidthOption,
 )
 from file_conversor.command.video import VideoConvertCommand
 from file_conversor.config import (
@@ -37,7 +38,6 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win import WinContextCommand, WinContextMenu
-from file_conversor.utils.formatters import parse_ffmpeg_resolution
 
 
 # get app config
@@ -112,7 +112,8 @@ class VideoConvertCLI(AbstractTyperCommand):
         video_encoding_speed: Annotated[VideoConvertCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoConvertCommand.VideoEncoding(CONFIG.video_encoding_speed),
         video_quality: Annotated[VideoConvertCommand.VideoQuality, VideoQualityOption()] = VideoConvertCommand.VideoQuality(CONFIG.video_quality),
 
-        resolution: Annotated[str | None, ResolutionOption()] = None,
+        width: Annotated[int | None, WidthOption()] = None,
+        height: Annotated[int | None, HeightOption()] = None,
         fps: Annotated[int | None, FPSOption()] = None,
 
         brightness: Annotated[float, BrightnessOption()] = 1.0,
@@ -140,7 +141,8 @@ class VideoConvertCLI(AbstractTyperCommand):
                 video_profile=video_profile,
                 video_encoding_speed=video_encoding_speed,
                 video_quality=video_quality,
-                resolution=parse_ffmpeg_resolution(resolution),
+                width=width,
+                height=height,
                 fps=fps,
                 brightness=brightness,
                 contrast=contrast,

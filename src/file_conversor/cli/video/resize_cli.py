@@ -9,13 +9,14 @@ from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import (
     AudioBitrateOption,
     FormatOption,
+    HeightOption,
     InputFilesArgument,
     OutputDirOption,
-    ResolutionOption,
     VideoBitrateOption,
     VideoEncodingSpeedOption,
     VideoProfileOption,
     VideoQualityOption,
+    WidthOption,
 )
 from file_conversor.command.video import VideoResizeCommand
 from file_conversor.config import (
@@ -26,7 +27,6 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win import WinContextCommand, WinContextMenu
-from file_conversor.utils.formatters import parse_ffmpeg_resolution
 
 
 # get app config
@@ -77,7 +77,8 @@ class VideoResizeCLI(AbstractTyperCommand):
         self,
         input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoResizeCommand.SupportedInFormats)],
 
-        resolution: Annotated[str, ResolutionOption(prompt=f"{_('Enter target resolution (WIDTH:HEIGHT)')}")],
+        width: Annotated[int, WidthOption(prompt=f"{_('Enter target width [pixels]')}")],
+        height: Annotated[int, HeightOption(prompt=f"{_('Enter target height [pixels]')}")],
 
         file_format: Annotated[VideoResizeCommand.SupportedOutFormats, FormatOption()] = VideoResizeCommand.SupportedOutFormats(CONFIG.video_format),
 
@@ -94,7 +95,8 @@ class VideoResizeCLI(AbstractTyperCommand):
             task = progress_bar.add_task(_("Processing files:"))
             VideoResizeCommand.resize(
                 input_files=input_files,
-                resolution=parse_ffmpeg_resolution(resolution),
+                width=width,
+                height=height,
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
                 video_bitrate=video_bitrate,

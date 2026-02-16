@@ -18,6 +18,7 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.utils.validators import prompt_retry_on_exception
 
 
 # get app config
@@ -41,7 +42,7 @@ class PdfOcrCLI(AbstractTyperCommand):
                 WinContextCommand(
                     name="ocr",
                     description="OCR",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
+                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
                     icon=str(icons_folder_path / 'ocr.ico'),
                 ),
             ])
@@ -78,16 +79,23 @@ class PdfOcrCLI(AbstractTyperCommand):
 
     def ocr(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfOcrCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfOcrCommand.SupportedInFormats)],  # pyright: ignore[reportUnknownArgumentType]
 
-        languages: Annotated[list[str], typer.Option(
+        languages: Annotated[list[str] | None, typer.Option(
             "--languages", "-l",
-            help=f'{_("Languages to use for OCR (three character language codes). Format: LANG (e.g.,")} "eng", "por"). {_("Type")} "all" {_("to query all available languages.")}',
-        )],
+            help=f'{_("Languages to use for OCR (three character language codes, comma-separated) (e.g.,")} "eng", "por"). {_("Type")} "all" {_("to query all available languages.")}',
+        )] = None,
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
-        languages = [lang.lower() for lang in languages]
+        if not languages:
+            lang_str = prompt_retry_on_exception(
+                f'{_("Languages to use for OCR (three character language codes, comma-separated) (e.g.,")} "eng", "por") [all = {_("query all available languages")}]',
+                default="all",
+                type=str,
+            )
+            languages = lang_str.split(",")
+        languages = [lang.lower().strip() for lang in languages]
 
         ocr_cmd = PdfOcrCommand()
         if 'all' in languages:
@@ -107,13 +115,12 @@ class PdfOcrCLI(AbstractTyperCommand):
                 languages=languages,
                 progress_callback=task_install.update,
             )
+            task_install.visible = False
 
-            task = progress_bar.add_task(_("Processing files:"))
             ocr_cmd.ocr(
                 input_files=input_files,
                 languages=languages,
                 output_dir=output_dir,
-                progress_callback=task.update,
             )
 
 

@@ -33,7 +33,8 @@ class VideoResizeCommand:
     def resize(
         cls,
         input_files: list[Path],
-        resolution: tuple[int, int] | None,
+        width: int | None,
+        height: int | None,
         file_format: SupportedOutFormats,
         audio_bitrate: int | None,
         video_bitrate: int | None,
@@ -66,7 +67,7 @@ class VideoResizeCommand:
         ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=resolution,
+            resolution=(width, height) if width is not None and height is not None else None,
         )
 
         ffmpeg_cmd_helper.execute()

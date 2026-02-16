@@ -14,14 +14,15 @@ from file_conversor.cli._utils.typer import (
     FormatOption,
     FPSOption,
     GammaOption,
+    HeightOption,
     InputFilesArgument,
     OutputDirOption,
-    ResolutionOption,
     UnsharpOption,
     VideoBitrateOption,
     VideoEncodingSpeedOption,
     VideoProfileOption,
     VideoQualityOption,
+    WidthOption,
 )
 from file_conversor.command.video import VideoEnhanceCommand
 from file_conversor.config import (
@@ -32,9 +33,7 @@ from file_conversor.config import (
     get_translation,
 )
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
-from file_conversor.utils.formatters import parse_ffmpeg_resolution
 from file_conversor.utils.validators import (
-    check_video_resolution,
     is_close,
     prompt_retry_on_exception,
 )
@@ -98,7 +97,9 @@ class VideoEnhanceCLI(AbstractTyperCommand):
         video_encoding_speed: Annotated[VideoEnhanceCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoEnhanceCommand.VideoEncoding(CONFIG.video_encoding_speed),
         video_quality: Annotated[VideoEnhanceCommand.VideoQuality, VideoQualityOption()] = VideoEnhanceCommand.VideoQuality(CONFIG.video_quality),
 
-        resolution: Annotated[str | None, ResolutionOption()] = None,
+        width: Annotated[int | None, WidthOption()] = None,
+        height: Annotated[int | None, HeightOption()] = None,
+
         fps: Annotated[int | None, FPSOption()] = None,
 
         brightness: Annotated[float, BrightnessOption()] = 1.0,
@@ -112,41 +113,47 @@ class VideoEnhanceCLI(AbstractTyperCommand):
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         if (
-            all(x is None for x in (resolution, fps))
+            all(x is None for x in (fps, width, height))
             and all(is_close(x, 1.0) for x in (color, brightness, contrast, gamma))
             and all(x == False for x in (deshake, unsharp))
         ):
-            resolution = prompt_retry_on_exception(
-                text=f"{_("Target Resolution (width:height) [0:0 = do not change video resolution]")}",
-                default="0:0", type=str,
-                check_callback=check_video_resolution,
+            width = prompt_retry_on_exception(
+                text=f"{_("Target width [0 = do not change width]")}",
+                default=None, type=int,
+                callback=lambda x: x >= 0,
+            )
+
+            height = prompt_retry_on_exception(
+                text=f"{_("Target height [0 = do not change height]")}",
+                default=None, type=int,
+                callback=lambda x: x >= 0,
             )
 
             fps = prompt_retry_on_exception(
                 text=f"{_("Target FPS [0 = do not change FPS]")}",
                 default=0, type=int,
-                check_callback=lambda x: x >= 0,
+                callback=lambda x: x >= 0,
             )
 
             color = prompt_retry_on_exception(
                 text=f"{_("Color adjustment (> 1.0 increases color, < 1.0 decreases color)")}",
                 default=1.0, type=float,
-                check_callback=lambda x: x >= 0,
+                callback=lambda x: x >= 0,
             )
             brightness = prompt_retry_on_exception(
                 text=f"{_("Brightness adjustment (> 1.0 increases brightness, < 1.0 decreases brightness)")}",
                 default=1.0, type=float,
-                check_callback=lambda x: x >= 0,
+                callback=lambda x: x >= 0,
             )
             contrast = prompt_retry_on_exception(
                 text=f"{_("Contrast adjustment (> 1.0 increases contrast, < 1.0 decreases contrast)")}",
                 default=1.0, type=float,
-                check_callback=lambda x: x >= 0,
+                callback=lambda x: x >= 0,
             )
             gamma = prompt_retry_on_exception(
                 text=f"{_("Gamma adjustment (> 1.0 increases gamma, < 1.0 decreases gamma)")}",
                 default=1.0, type=float,
-                check_callback=lambda x: x >= 0,
+                callback=lambda x: x >= 0,
             )
 
             deshake = prompt_retry_on_exception(
@@ -167,7 +174,8 @@ class VideoEnhanceCLI(AbstractTyperCommand):
                 video_profile=video_profile,
                 video_encoding_speed=video_encoding_speed,
                 video_quality=video_quality,
-                resolution=parse_ffmpeg_resolution(resolution),
+                width=width,
+                height=height,
                 fps=fps,
                 brightness=brightness,
                 contrast=contrast,

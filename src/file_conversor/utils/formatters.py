@@ -92,21 +92,6 @@ def parse_js_to_py(value: str | None) -> Any:
     return value  # return as string
 
 
-def parse_ffmpeg_resolution(resolution: str | None) -> tuple[int, int] | None:
-    """
-    Parse FFmpeg resolution string to (width, height).
-
-    :param filter: FFmpeg resolution string.
-    :returns: (width, height)
-    """
-    if not resolution:
-        return None
-    splitted = tuple(int(dim) for dim in resolution.split(':'))
-    if len(splitted) != 2:
-        raise ValueError(f"{_('Invalid resolution format')} '{resolution}'. {_('Valid format is WIDTH:HEIGHT')}.")
-    return splitted
-
-
 def parse_ffmpeg_filter(filter: str | None) -> tuple[str, list[str], dict[str, str]]:
     """
     Parse FFmpeg filter string to name, args, kwargs.

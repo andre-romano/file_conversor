@@ -192,14 +192,11 @@ class PillowBackend(AbstractBackend):
         :param resampling: Resampling algorithm used.
         """
         with self._open(input_file) as img:
-            if scale:
-                if scale <= 0:
-                    raise RuntimeError(_("Scale must be >0"))
-                width = int(scale * img.width)
+            width = int(scale * img.width) if scale is not None else width
+
             if not width:
-                raise RuntimeError(_("Need either scale or width to resize an image"))
-            if width <= 0:
-                raise RuntimeError(_("Width must be > 0"))
+                raise ValueError(_("Cannot calculate width to resize the image"))
+
             height = int(width * float(img.height) / img.width)
 
             img_processed = img.resize(
