@@ -1,11 +1,13 @@
 /* src/file_conversor/.gui/sidebar.qss */
 
-SidebarFrame { 
+/* SIDE BAR CONTENTS */
+SidebarFrame QFrame { 
     background-color: #eae9e9;
     border-right: 1px solid #8c8c8c;
 }
 
-SidebarFrame SidebarButton:checked {
+/* SIDE BAR BUTTONS */
+SidebarFrame QFrame SidebarButton:checked {
     background: #3b82f6;
     color: white;
 }

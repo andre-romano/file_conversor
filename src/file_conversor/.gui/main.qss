@@ -1,0 +1,44 @@
+/* src/file_conversor/.gui/main.qss */
+
+
+/* main track of scrollbar (contains the handle) */
+QScrollBar:vertical, QScrollBar:horizontal {
+    border: none;                  
+    background-color: transparent; 
+    width: 8px;                    
+    margin: 0px;                   
+}
+
+/* handle of scrollbar */
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    opacity: 0.6;                 
+    background-color: #c0c0c0;   
+    min-height: 30px;              /* avoid handle from vanishing if too much content */
+    border-radius: 4px;            /* rounded corners */
+}
+
+/* hover effect (darker as mouses hovers through element) */
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
+    background-color: #a0a0a0; 
+}
+
+/* scrollbar arrows */
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical,
+QScrollBar::sub-line:horizontal, QScrollBar::add-line:horizontal
+{
+    border: none;
+    background: none;
+    height: 0px; 
+}
+
+/* scrollbar track empty space */
+QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical,
+QScrollBar::sub-page:horizontal, QScrollBar::add-page:horizontal
+{
+    background: none;
+}
+
+/* main app container */
+#main {
+    border-top: 1px solid #b4b4b4;
+}

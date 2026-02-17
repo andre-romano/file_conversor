@@ -3,9 +3,9 @@
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
+    QFrame,
     QHBoxLayout,
     QMainWindow,
-    QWidget,
 )
 
 # CORE
@@ -95,6 +95,9 @@ class MainWindowGUI(QMainWindow):
         icon_path = ICON_PATH / "icon.png"
         assert icon_path.exists(), f"{_('App icon file not found:')} {icon_path}"
 
+        qss_path = GUI_PATH / "main.qss"
+        assert qss_path.exists(), f"{_('App main QSS file not found:')} {qss_path}"
+
         self.setWindowTitle(f"File Conversor v{Environment.get_app_version()}")
         self.setWindowIcon(QIcon(str(icon_path)))
         self.resize(800, 540)
@@ -122,7 +125,9 @@ class MainWindowGUI(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Central Widget
-        central_widget = QWidget()
+        central_widget = QFrame()
+        central_widget.setObjectName("main")
+        central_widget.setStyleSheet(qss_path.read_text())
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 

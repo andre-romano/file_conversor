@@ -5,7 +5,7 @@ from typing import override
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QFrame, QToolButton, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QScrollArea, QToolButton, QVBoxLayout
 
 
 class SidebarButton(QToolButton):
@@ -34,13 +34,16 @@ class SidebarButton(QToolButton):
         self.setToolButtonStyle(style)
 
 
-class SidebarFrame(QFrame):
+class SidebarFrame(QScrollArea):
+    ScrollBarPolicy = Qt.ScrollBarPolicy
+
     def __init__(
             self,
             gui_path: Path,
             width: int,
             margins: tuple[int, int, int, int] = (0, 0, 0, 0),
             spacing: int = 0,
+            scroll_policy: tuple[Qt.ScrollBarPolicy, Qt.ScrollBarPolicy] = (ScrollBarPolicy.ScrollBarAlwaysOff, ScrollBarPolicy.ScrollBarAsNeeded),
     ) -> None:
         super().__init__()
         stylesheet_file = gui_path / "sidebar.qss"
@@ -49,9 +52,17 @@ class SidebarFrame(QFrame):
         self._layout.setContentsMargins(*margins)
         self._layout.setSpacing(spacing)
 
-        self.setFixedWidth(width)
+        frame = QFrame()
+        frame.setFixedWidth(width)
+        frame.setLayout(self._layout)
+
+        self.setWidgetResizable(True)
         self.setStyleSheet(stylesheet_file.read_text())
-        self.setLayout(self._layout)
+        self.setFixedWidth(width + 10)  # adjust for the width of scrollbar when it appears
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setHorizontalScrollBarPolicy(scroll_policy[0])
+        self.setVerticalScrollBarPolicy(scroll_policy[1])
+        self.setWidget(frame)
 
     @override
     def layout(self) -> QVBoxLayout:
