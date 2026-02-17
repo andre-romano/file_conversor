@@ -3,35 +3,8 @@
 from pathlib import Path
 from typing import override
 
-from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QFrame, QScrollArea, QToolButton, QVBoxLayout
-
-
-class SidebarButton(QToolButton):
-    Style = Qt.ToolButtonStyle
-
-    def __init__(
-            self,
-            icon_file: Path,
-            icon_width: int,
-            icon_height: int,
-            tooltip: str,
-            btn_width: int,
-            btn_height: int,
-            checkable: bool = True,
-            style: Qt.ToolButtonStyle = Qt.ToolButtonStyle.ToolButtonIconOnly,
-    ) -> None:
-        super().__init__(autoRaise=True)
-
-        assert icon_file.exists(), f"Icon file not found: {icon_file}"
-
-        self.setIcon(QIcon(str(icon_file)))
-        self.setIconSize(QSize(icon_width, icon_height))
-        self.setFixedSize(QSize(btn_width, btn_height))
-        self.setToolTip(tooltip)
-        self.setCheckable(checkable)
-        self.setToolButtonStyle(style)
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QFrame, QScrollArea, QVBoxLayout
 
 
 class SidebarFrame(QScrollArea):
@@ -70,6 +43,5 @@ class SidebarFrame(QScrollArea):
 
 
 __all__ = [
-    "SidebarButton",
     "SidebarFrame",
 ]

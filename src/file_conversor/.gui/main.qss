@@ -39,6 +39,6 @@ QScrollBar::sub-page:horizontal, QScrollBar::add-page:horizontal
 }
 
 /* main app container */
-#main {
+#main_window {
     border-top: 1px solid #b4b4b4;
 }

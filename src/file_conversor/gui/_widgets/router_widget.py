@@ -17,7 +17,7 @@ class RouterWidget(QStackedWidget):
         for idx, (page, button) in enumerate(pages):
             # add page to stack and connect button to show the page when clicked
             self.addWidget(page)
-            button.clicked.connect(lambda i=idx, btn=button: on_click(i, btn))
+            button.clicked.connect(lambda _checked=False, i=idx, btn=button: on_click(i, btn))
 
 
 __all__ = [

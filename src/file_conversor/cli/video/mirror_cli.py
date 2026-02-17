@@ -2,7 +2,7 @@
 # src\file_conversor\cli\video\mirror_cmd.py
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, override
 
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
@@ -40,6 +40,7 @@ logger = LOG.getLogger(__name__)
 class VideoMirrorCLI(AbstractTyperCommand):
     EXTERNAL_DEPENDENCIES = VideoMirrorCommand.EXTERNAL_DEPENDENCIES
 
+    @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         icons_folder_path = Environment.get_icons_folder()
         for mode in VideoMirrorCommand.SupportedInFormats:

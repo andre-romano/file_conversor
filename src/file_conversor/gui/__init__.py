@@ -15,8 +15,8 @@ from file_conversor.config import Environment, get_translation
 from file_conversor.gui._widgets import (
     HLineFrame,
     RouterWidget,
-    SidebarButton,
     SidebarFrame,
+    ToolButton,
 )
 from file_conversor.gui.audio import AudioFrame
 from file_conversor.gui.config import ConfigFrame
@@ -24,6 +24,7 @@ from file_conversor.gui.doc import DocFrame
 from file_conversor.gui.ebook import EbookFrame
 from file_conversor.gui.hash import HashFrame
 from file_conversor.gui.image import ImageFrame
+from file_conversor.gui.info_frame import InfoFrame
 from file_conversor.gui.pdf import PdfFrame
 from file_conversor.gui.ppt import PptFrame
 from file_conversor.gui.text import TextFrame
@@ -36,42 +37,31 @@ GUI_PATH = Environment.get_gui_folder()
 _ = get_translation()
 
 
-class MainSidebarButton(SidebarButton):
-    def __init__(self, tooltip: str, icon_file: str, icon_width: int, btn_width: int) -> None:
-        super().__init__(
-            tooltip=tooltip,
-            icon_file=ICON_PATH / icon_file,
-            icon_width=icon_width,
-            icon_height=icon_width,
-            btn_width=btn_width,
-            btn_height=btn_width,
-        )
-
-
 class MainSidebarFrame(SidebarFrame):
     def __init__(self) -> None:
-        icon_width = 28  # px
-        btn_width = 45  # px
+        icon_size = (28, 28)  # px
+        btn_size = (45, 45)  # px
 
         super().__init__(
             gui_path=GUI_PATH,
-            width=btn_width,
+            width=btn_size[0],
         )
 
-        self.btn_doc = MainSidebarButton(icon_file="docx.ico", tooltip=_("Word tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_xls = MainSidebarButton(icon_file="xls.ico", tooltip=_("Excel tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_ppt = MainSidebarButton(icon_file="ppt.ico", tooltip=_("PowerPoint tools"), btn_width=btn_width, icon_width=icon_width)
+        self.btn_doc = ToolButton(icon=(ICON_PATH / "docx.ico", *icon_size), tooltip=_("Word tools"), btn_size=btn_size)
+        self.btn_xls = ToolButton(icon=(ICON_PATH / "xls.ico", *icon_size), tooltip=_("Excel tools"), btn_size=btn_size)
+        self.btn_ppt = ToolButton(icon=(ICON_PATH / "ppt.ico", *icon_size), tooltip=_("PowerPoint tools"), btn_size=btn_size)
 
-        self.btn_audio = MainSidebarButton(icon_file="mp3.ico", tooltip=_("Audio tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_video = MainSidebarButton(icon_file="mp4.ico", tooltip=_("Video tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_image = MainSidebarButton(icon_file="jpg.ico", tooltip=_("Image tools"), btn_width=btn_width, icon_width=icon_width)
+        self.btn_audio = ToolButton(icon=(ICON_PATH / "mp3.ico", *icon_size), tooltip=_("Audio tools"), btn_size=btn_size)
+        self.btn_video = ToolButton(icon=(ICON_PATH / "mp4.ico", *icon_size), tooltip=_("Video tools"), btn_size=btn_size)
+        self.btn_image = ToolButton(icon=(ICON_PATH / "jpg.ico", *icon_size), tooltip=_("Image tools"), btn_size=btn_size)
 
-        self.btn_pdf = MainSidebarButton(icon_file="pdf.ico", tooltip=_("PDF tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_ebook = MainSidebarButton(icon_file="epub.ico", tooltip=_("Ebook tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_text = MainSidebarButton(icon_file="json.ico", tooltip=_("Text tools"), btn_width=btn_width, icon_width=icon_width)
-        self.btn_hash = MainSidebarButton(icon_file="sha256.ico", tooltip=_("Hash tools"), btn_width=btn_width, icon_width=icon_width)
+        self.btn_pdf = ToolButton(icon=(ICON_PATH / "pdf.ico", *icon_size), tooltip=_("PDF tools"), btn_size=btn_size)
+        self.btn_ebook = ToolButton(icon=(ICON_PATH / "epub.ico", *icon_size), tooltip=_("Ebook tools"), btn_size=btn_size)
+        self.btn_text = ToolButton(icon=(ICON_PATH / "json.ico", *icon_size), tooltip=_("Text tools"), btn_size=btn_size)
+        self.btn_hash = ToolButton(icon=(ICON_PATH / "sha256.ico", *icon_size), tooltip=_("Hash tools"), btn_size=btn_size)
 
-        self.btn_config = MainSidebarButton(icon_file="repair.ico", tooltip=_("Settings"), btn_width=btn_width, icon_width=icon_width)
+        self.btn_info = ToolButton(icon=(ICON_PATH / "info.ico", *icon_size), tooltip=_("Info"), btn_size=btn_size)
+        self.btn_config = ToolButton(icon=(ICON_PATH / "repair.ico", *icon_size), tooltip=_("Settings"), btn_size=btn_size)
 
         self.layout().addWidget(self.btn_doc)
         self.layout().addWidget(self.btn_xls)
@@ -86,6 +76,7 @@ class MainSidebarFrame(SidebarFrame):
         self.layout().addWidget(self.btn_text)
         self.layout().addWidget(self.btn_hash)
         self.layout().addStretch()
+        self.layout().addWidget(self.btn_info)
         self.layout().addWidget(self.btn_config)
 
 
@@ -94,9 +85,6 @@ class MainWindowGUI(QMainWindow):
         super().__init__()
         icon_path = ICON_PATH / "icon.png"
         assert icon_path.exists(), f"{_('App icon file not found:')} {icon_path}"
-
-        qss_path = GUI_PATH / "main.qss"
-        assert qss_path.exists(), f"{_('App main QSS file not found:')} {qss_path}"
 
         self.setWindowTitle(f"File Conversor v{Environment.get_app_version()}")
         self.setWindowIcon(QIcon(str(icon_path)))
@@ -115,6 +103,7 @@ class MainWindowGUI(QMainWindow):
             (EbookFrame(), sidebar_widget.btn_ebook),
             (TextFrame(), sidebar_widget.btn_text),
             (HashFrame(), sidebar_widget.btn_hash),
+            (InfoFrame(), sidebar_widget.btn_info),
             (ConfigFrame(), sidebar_widget.btn_config),
         ])
 
@@ -126,8 +115,7 @@ class MainWindowGUI(QMainWindow):
 
         # Central Widget
         central_widget = QFrame()
-        central_widget.setObjectName("main")
-        central_widget.setStyleSheet(qss_path.read_text())
+        central_widget.setObjectName("main_window")
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 

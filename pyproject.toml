@@ -165,14 +165,15 @@ reportUnreachable = "error"             # unreachable code
 reportUnnecessaryIsInstance = "none" # isinstance() call that can be simplified
 
 # TYPE ISSUES
-reportUnknownLambdaType = "none" # lambda functions with unknown types
 reportMissingReturnType = "warning" # Missing return types
 reportMissingParameterType = "warning" # Missing parameter types
+reportUnknownLambdaType = "none" # lambda functions with unknown types
 
 # CLASS ISSUES
 reportMissingSuperCall = "error"           # missing super() call in a constructor
 reportUninitializedInstanceVariable = "error"  # uninitialized instance variables
 reportPropertyTypeMismatch = "error" # Property type mismatch - type of property does not match type of getter/setter
+reportImplicitOverride="error" # method overrides a method in the base class but is not marked with @override
 
 # Exclude files from analysis
 ignore = [

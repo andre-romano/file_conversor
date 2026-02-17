@@ -4,7 +4,7 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 
-from file_conversor.gui import MainWindowGUI
+from file_conversor.gui import Environment, MainWindowGUI
 from file_conversor.main_helper import MainHelper
 
 
@@ -14,8 +14,11 @@ def main() -> None:
 
     def _start_gui() -> int:
         """ Starts the GUI application. """
+        qss_path = Environment.get_gui_folder() / "main.qss"
+
         app = QApplication(sys.argv)
         app.setStyle("Fusion")  # Apply the modern cross-platform style
+        app.setStyleSheet(qss_path.read_text())  # Load and apply the main stylesheet
         window = MainWindowGUI()
         window.show()
         return app.exec()
