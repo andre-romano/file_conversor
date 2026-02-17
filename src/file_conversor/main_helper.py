@@ -47,7 +47,7 @@ class MainHelper:
         cls.__cleanup_tasks.append(func)
 
     @classmethod
-    def run(cls, app_callback: Callable[[], Any]) -> None:
+    def run(cls, app_callback: Callable[[], int]) -> None:
         """ Run the main helper with the provided callback. """
         try:
             System.reload_user_path()
@@ -56,10 +56,7 @@ class MainHelper:
             cls._register_cleanup_tasks()
 
             # begin app
-            app_callback()
-
-            # terminate app
-            sys.exit(0)
+            sys.exit(app_callback())
         except Exception as e:
             import subprocess
 

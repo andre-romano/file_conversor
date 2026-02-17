@@ -1,0 +1,11 @@
+/* src/file_conversor/.gui/sidebar.qss */
+
+SidebarFrame { 
+    background-color: #eae9e9;
+    border-right: 1px solid #8c8c8c;
+}
+
+SidebarFrame SidebarButton:checked {
+    background: #3b82f6;
+    color: white;
+}

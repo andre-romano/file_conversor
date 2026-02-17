@@ -204,9 +204,9 @@ class Environment:
         return Path(str(files_obj)).resolve()
 
     @classmethod
-    def get_web_folder(cls) -> Path:
+    def get_gui_folder(cls) -> Path:
         # logger.debug(f"Web path: {web_path}")
-        return cls.get_resources_folder() / ".web"
+        return cls.get_resources_folder() / ".gui"
 
     @classmethod
     def get_icons_folder(cls) -> Path:

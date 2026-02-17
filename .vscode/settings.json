@@ -15,6 +15,13 @@
     "ruff.organizeImports": true,
     "python.analysis.autoFormatStrings": true,
     "python.analysis.userFileIndexingLimit": -1,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "PySide6",
+            "depth": 3,
+            "includeAllSymbols": true
+        }
+    ],
     "autopep8.args": [
         "--ignore=E501",
         "--exclude=__pycache__,*.egg-info,venv/,.venv/,*.pyc",

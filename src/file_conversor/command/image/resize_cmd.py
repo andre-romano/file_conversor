@@ -63,7 +63,7 @@ class ImageResizeCommand:
                 width=width,
                 resampling=resampling,
             )
-            progress_callback(get_progress(100.0))
+            progress_callback(get_progress(100.0))  # pyright: ignore[reportUnreachable]
 
         datamodel.execute(step_one)
         logger.info(f"{_('Image resize')}: [green][bold]{_('SUCCESS')}[/bold][/green]")

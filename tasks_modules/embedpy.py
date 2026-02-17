@@ -205,7 +205,7 @@ def create_shim(c: InvokeContext):
         raise RuntimeError(f"Failed to run CLI shim for '{PROJECT_NAME}': {result}")
 
     PORTABLE_SHIM_GUI_BAT.write_text(
-        get_shim_bat_contents(f"{PROJECT_NAME}_gui"),
+        get_shim_bat_contents(f"{PROJECT_NAME}.gui"),
         encoding="utf-8",
     )
     if not PORTABLE_SHIM_GUI_BAT.exists():
