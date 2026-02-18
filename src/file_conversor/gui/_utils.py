@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QHBoxLayout, QLayout, QVBoxLayout, QWidget
 
 
@@ -35,8 +36,14 @@ def get_vlayout(*items: QWidget | QLayout | Stretch, spacing: int | None = None)
     return get_layout(*items, layout=QVBoxLayout(), spacing=spacing)
 
 
+def get_qt_icon(name: str, color: str = 'black', color_active: str = 'gray') -> QIcon:
+    import qtawesome as qta  # pyright: ignore[reportMissingTypeStubs]
+    return qta.icon(name, color=color, color_active=color_active)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+
+
 __all__ = [
     "Stretch",
     "get_hlayout",
     "get_vlayout",
+    "get_qt_icon",
 ]

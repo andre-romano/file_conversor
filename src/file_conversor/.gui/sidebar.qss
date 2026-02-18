@@ -7,7 +7,7 @@ SidebarFrame QFrame {
 }
 
 /* SIDE BAR BUTTONS */
-SidebarFrame QFrame SidebarButton:checked {
+SidebarFrame QFrame QAbstractButton:checked {
     background: #3b82f6;
     color: white;
 }

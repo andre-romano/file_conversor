@@ -1,7 +1,7 @@
 
 from pathlib import Path
 
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import QLabel
 
 
@@ -12,22 +12,20 @@ class Label(QLabel):
         stylesheet: str = "",
         size: tuple[int, int] | None = None,
         line_width: int = 0,
+        word_wrap: bool = False,
         visible: bool = True,
     ) -> None:
         super().__init__(text=text)
-        if stylesheet:
-            self.setStyleSheet(stylesheet)
+        self.setStyleSheet(stylesheet) if stylesheet else None
         match size:
             case None:
                 """do nothing"""
-            case (int() as width, int() as height):
-                if width > 0:
-                    self.setFixedWidth(width)
-                if height > 0:
-                    self.setFixedHeight(height)
-        if line_width > 0:
-            self.setLineWidth(line_width)
-        self.setVisible(visible)
+            case (width, height):
+                self.setFixedWidth(width) if width > 0 else None
+                self.setFixedHeight(height) if height > 0 else None
+        self.setLineWidth(line_width) if line_width > 0 else None
+        self.setWordWrap(word_wrap)
+        self.hide() if not visible else None
 
 
 class LabelUrl(Label):
@@ -38,6 +36,7 @@ class LabelUrl(Label):
         stylesheet: str = "",
         size: tuple[int, int] | None = None,
         line_width: int = 0,
+        word_wrap: bool = False,
         visible: bool = True,
     ) -> None:
         if not text:
@@ -47,6 +46,7 @@ class LabelUrl(Label):
             stylesheet=stylesheet,
             size=size,
             line_width=line_width,
+            word_wrap=word_wrap,
             visible=visible,
         )
         self.setOpenExternalLinks(True)
@@ -55,20 +55,24 @@ class LabelUrl(Label):
 class LabelImage(Label):
     def __init__(
         self,
-        image_path: Path,
+        image: Path | QIcon,
         size: tuple[int, int],
         stylesheet: str = "",
         visible: bool = True,
     ):
-        assert image_path.exists(), f"Image file not found: {image_path}"
-
         super().__init__(
             stylesheet=stylesheet,
             size=size,
             visible=visible,
         )
 
-        self.setPixmap(QPixmap(str(image_path)))
+        match image:
+            case QIcon():
+                pixmap = image.pixmap(*size)
+            case Path():
+                assert image.exists(), f"Image file not found: {image}"
+                pixmap = QPixmap(str(image))
+        self.setPixmap(pixmap)
         self.setScaledContents(True)
 
 

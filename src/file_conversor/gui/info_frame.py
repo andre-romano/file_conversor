@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QFrame, QLayout, QVBoxLayout
 from file_conversor.config import Environment, get_translation
 
 # GUI
-from file_conversor.gui._utils import Stretch, get_hlayout
+from file_conversor.gui._utils import Stretch, get_hlayout, get_qt_icon
 from file_conversor.gui._widgets import Label, LabelImage, LabelUrl
 from file_conversor.system import System
 
@@ -33,15 +33,20 @@ class InfoFrame(QFrame):
             spacing=5,
         ))
         layout.addWidget(Label(f"{_('A simple file conversion utility.')}", "font-style: italic;"))
-        layout.addWidget(Label(f"Copyright by Andre Luiz Romano Madureira"))
         layout.addLayout(get_hlayout(
-            Label(_('License')),
+            LabelImage(get_qt_icon("mdi.copyright"), size=(16, 16)),  # copyright icon
+            Label(f"Andre Luiz Romano Madureira"),
+            Stretch(),
+            spacing=3,
+        ))
+        layout.addLayout(get_hlayout(
+            LabelImage(get_qt_icon("mdi.scale-balance"), size=(16, 16)),  # license icon
             LabelUrl("https://www.apache.org/licenses/LICENSE-2.0", "Apache-2.0 license"),
             Stretch(),
             spacing=3,
         ))
         layout.addLayout(get_hlayout(
-            Label(_('Homepage')),
+            LabelImage(get_qt_icon("mdi.home-circle-outline"), size=(16, 16)),  # home icon
             LabelUrl("https://github.com/andre-romano/file_conversor"),
             Stretch(),
             spacing=3,
@@ -63,8 +68,8 @@ class InfoFrame(QFrame):
         layout.addWidget(Label())  # add empty label as spacer
 
         layout.addWidget(Label(f"{_('Environment:')}", "font-weight: bold;"))
-        layout.addWidget(Label(f"{_('Resources Folder')}: {Environment.get_resources_folder()}"))
-        layout.addWidget(Label(f"{_('Data Folder')}: {Environment.get_data_folder()}"))
+        layout.addWidget(Label(f"{_('Resources Folder')}: {Environment.get_resources_folder()}", word_wrap=True))
+        layout.addWidget(Label(f"{_('Data Folder')}: {Environment.get_data_folder()}", word_wrap=True))
         layout.addWidget(Label(f"{_('Platform')}: {System.Platform.get()}"))
         layout.addWidget(Label(f"Python {Environment.get_python_version()}"))
 

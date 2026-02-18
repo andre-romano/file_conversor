@@ -51,6 +51,7 @@ file_conversor_gui = "file_conversor.gui.__main__:main"
 [project.optional-dependencies]
 gui = [
     "pyside6>=6.10.1",
+    "qtawesome>=1.4.1",
 ]
 
 [dependency-groups]
