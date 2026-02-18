@@ -6,12 +6,11 @@ import sys
 from typing import Any, Callable
 
 # user provided imports
-from file_conversor.config import Log, State, get_translation
+from file_conversor.config import Log, get_translation
 from file_conversor.system import System
 
 
 # Get app config
-STATE = State.get()
 LOG = Log.get_instance()
 
 _ = get_translation()
@@ -49,30 +48,13 @@ class MainHelper:
     @classmethod
     def run(cls, app_callback: Callable[[], int]) -> None:
         """ Run the main helper with the provided callback. """
-        try:
-            System.reload_user_path()
+        System.reload_user_path()
 
-            # register cleanup tasks
-            cls._register_cleanup_tasks()
+        # register cleanup tasks
+        cls._register_cleanup_tasks()
 
-            # begin app
-            sys.exit(app_callback())
-        except Exception as e:
-            import subprocess
-
-            debug_mode = STATE.loglevel.level.is_debug()
-            error_type = str(type(e))
-            error_type = error_type.split("'")[1]
-            logger.error(f"{error_type} ({e})", exc_info=True if debug_mode else None)
-
-            if isinstance(e, subprocess.CalledProcessError):
-                logger.error(f"CMD: {e.cmd} ({e.returncode})")
-                logger.error(f"STDERR: {e.stderr}")
-                logger.error(f"STDOUT: {e.stdout}")
-
-            if debug_mode:
-                raise
-            sys.exit(1)
+        # begin app
+        sys.exit(app_callback())
 
 
 __all__ = [
