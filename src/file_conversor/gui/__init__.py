@@ -23,7 +23,6 @@ from file_conversor.gui.config import ConfigFrame
 from file_conversor.gui.doc import DocFrame
 from file_conversor.gui.ebook import EbookFrame
 from file_conversor.gui.hash import HashFrame
-from file_conversor.gui.home_frame import HomeFrame
 from file_conversor.gui.image import ImageFrame
 from file_conversor.gui.info_frame import InfoFrame
 from file_conversor.gui.pdf import PdfFrame
@@ -47,9 +46,6 @@ class MainSidebarFrame(SidebarFrame):
             gui_path=GUI_PATH,
             width=btn_size[0],
         )
-
-        self.btn_home = ToolButton(icon=(ICON_PATH / "icon.ico", *icon_size), tooltip=_("Home"), btn_size=btn_size)
-
         self.btn_doc = ToolButton(icon=(ICON_PATH / "docx.ico", *icon_size), tooltip=_("Word tools"), btn_size=btn_size)
         self.btn_xls = ToolButton(icon=(ICON_PATH / "xls.ico", *icon_size), tooltip=_("Excel tools"), btn_size=btn_size)
         self.btn_ppt = ToolButton(icon=(ICON_PATH / "ppt.ico", *icon_size), tooltip=_("PowerPoint tools"), btn_size=btn_size)
@@ -66,7 +62,6 @@ class MainSidebarFrame(SidebarFrame):
         self.btn_info = ToolButton(icon=(ICON_PATH / "info.ico", *icon_size), tooltip=_("Info"), btn_size=btn_size)
         self.btn_config = ToolButton(icon=(ICON_PATH / "repair.ico", *icon_size), tooltip=_("Settings"), btn_size=btn_size)
 
-        self.layout().addWidget(self.btn_home)
         self.layout().addWidget(self.btn_doc)
         self.layout().addWidget(self.btn_xls)
         self.layout().addWidget(self.btn_ppt)
@@ -97,7 +92,6 @@ class MainWindowGUI(QMainWindow):
         # Sidebar, and Router
         sidebar_widget = MainSidebarFrame()
         stacked_widget = StackedRouter([
-            (HomeFrame, sidebar_widget.btn_home),
             (DocFrame, sidebar_widget.btn_doc),
             (XlsFrame, sidebar_widget.btn_xls),
             (PptFrame, sidebar_widget.btn_ppt),

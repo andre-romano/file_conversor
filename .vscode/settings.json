@@ -1,6 +1,6 @@
 {
     "git.ignoreLimitWarning": false,
-    "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
+    // "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8",
         "editor.formatOnSave": true,
