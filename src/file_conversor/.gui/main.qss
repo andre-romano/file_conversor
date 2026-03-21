@@ -5,7 +5,6 @@
 QScrollBar:vertical, QScrollBar:horizontal {
     border: none;                  
     background-color: transparent; 
-    width: 8px;                    
     margin: 0px;                   
 }
 

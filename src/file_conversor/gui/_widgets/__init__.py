@@ -2,6 +2,7 @@
 
 from file_conversor.gui._widgets.button import *
 from file_conversor.gui._widgets.card import *
+from file_conversor.gui._widgets.flow_frame import *
 from file_conversor.gui._widgets.grid_frame import *
 from file_conversor.gui._widgets.label import *
 from file_conversor.gui._widgets.line import *

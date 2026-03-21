@@ -1,4 +1,4 @@
-# src/file_conversor/gui/_widgets/sidebar_frame.py
+# src/file_conversor/gui/_widgets/grid_frame.py
 
 from pathlib import Path
 from typing import override
@@ -31,15 +31,31 @@ class GridFrame(ScrollArea):
 
         self.setWidget(frame)
 
-    def addItems(self, *items: QWidget | QLayout, alignment: Qt.AlignmentFlag = Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter) -> None:
-        for k, item in enumerate(items):
-            i, j = divmod(k, self._cols)  # columns
-            i += self._layout.rowCount()
-            j += self._layout.columnCount()
+    def _get_i_j_pos(self) -> tuple[int, int]:
+        k = self._layout.count()
+        i, j = divmod(k, self._cols)  # columns
+        return i, j
+
+    def addWidget(self, item: QWidget, alignment: Qt.AlignmentFlag | None = Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter) -> None:
+        i, j = self._get_i_j_pos()
+        if alignment is not None:
+            self._layout.addWidget(item, i, j, alignment=alignment)
+        else:
+            self._layout.addWidget(item, i, j)
+
+    def addLayout(self, item: QLayout, alignment: Qt.AlignmentFlag | None = Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter) -> None:
+        i, j = self._get_i_j_pos()
+        if alignment is not None:
+            self._layout.addLayout(item, i, j, alignment=alignment)
+        else:
+            self._layout.addLayout(item, i, j)
+
+    def addItems(self, *items: QWidget | QLayout, alignment: Qt.AlignmentFlag | None = Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignHCenter) -> None:
+        for item in items:
             if isinstance(item, QWidget):
-                self._layout.addWidget(item, i, j, alignment=alignment)
+                self.addWidget(item, alignment=alignment)
             else:
-                self._layout.addLayout(item, i, j, alignment=alignment)
+                self.addLayout(item, alignment=alignment)
 
     @override
     def layout(self) -> QGridLayout:

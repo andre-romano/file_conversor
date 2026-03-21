@@ -12,18 +12,16 @@ class SidebarFrame(ScrollArea):
     def __init__(
             self,
             gui_path: Path,
-            width: int,
-            margins: tuple[int, int, int, int] = (0, 0, 0, 0),
             spacing: int = 0,
+            margins: tuple[int, int, int, int] = (0, 0, 0, 0),
     ) -> None:
-        super().__init__(size=(width, None), stylesheet_file=gui_path / "sidebar.qss")
+        super().__init__(stylesheet_file=gui_path / "sidebar.qss")
 
         self._layout = QVBoxLayout()
         self._layout.setContentsMargins(*margins)
         self._layout.setSpacing(spacing)
 
         frame = QFrame()
-        frame.setFixedWidth(width)
         frame.setLayout(self._layout)
 
         self.setWidget(frame)

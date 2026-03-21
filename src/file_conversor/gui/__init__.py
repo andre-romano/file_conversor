@@ -44,7 +44,6 @@ class MainSidebarFrame(SidebarFrame):
 
         super().__init__(
             gui_path=GUI_PATH,
-            width=btn_size[0],
         )
         self.btn_doc = ToolButton(icon=(ICON_PATH / "docx.ico", *icon_size), tooltip=_("Word tools"), btn_size=btn_size)
         self.btn_xls = ToolButton(icon=(ICON_PATH / "xls.ico", *icon_size), tooltip=_("Excel tools"), btn_size=btn_size)
@@ -110,6 +109,7 @@ class MainWindowGUI(QMainWindow):
         main_layout = QHBoxLayout()
         main_layout.addWidget(sidebar_widget)
         main_layout.addWidget(stacked_widget, stretch=1)  # The router takes up remaining space
+        main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Central Widget
