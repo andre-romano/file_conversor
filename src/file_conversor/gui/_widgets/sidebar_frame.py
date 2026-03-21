@@ -15,7 +15,10 @@ class SidebarFrame(ScrollArea):
             spacing: int = 0,
             margins: tuple[int, int, int, int] = (0, 0, 0, 0),
     ) -> None:
-        super().__init__(stylesheet_file=gui_path / "sidebar.qss")
+        stylesheet_file = gui_path / "sidebar.qss"
+        assert stylesheet_file.exists(), f"Stylesheet file not found: {stylesheet_file}"
+
+        super().__init__(stylesheet=stylesheet_file.read_text(encoding="utf-8"))
 
         self._layout = QVBoxLayout()
         self._layout.setContentsMargins(*margins)

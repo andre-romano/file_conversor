@@ -1,6 +1,5 @@
 # src/file_conversor/gui/_widgets/grid_frame.py
 
-from pathlib import Path
 from typing import override
 
 from PySide6.QtCore import Qt
@@ -14,12 +13,12 @@ class GridFrame(ScrollArea):
 
     def __init__(
             self,
-            stylesheet_file: Path | None = None,
+            stylesheet: str = "",
             cols: int = 3,
             spacing: int = 10,
             margins: tuple[int, int, int, int] = (0, 0, 0, 0),
     ) -> None:
-        super().__init__(stylesheet_file=stylesheet_file)
+        super().__init__(stylesheet=stylesheet)
         self._cols = cols
 
         self._layout = QGridLayout()

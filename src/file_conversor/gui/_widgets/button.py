@@ -23,6 +23,7 @@ class PushButton(QPushButton):
             icon: tuple[Path, int, int] | tuple[QIcon, int, int] | None = None,
             tooltip: str = "",
             btn_size: tuple[int, int] | None = None,
+            stylesheet: str = "",
             checkable: bool = True,
     ) -> None:
         super().__init__()
@@ -33,6 +34,8 @@ class PushButton(QPushButton):
             self.setFixedSize(QSize(*btn_size))
         if tooltip:
             self.setToolTip(tooltip)
+        if stylesheet:
+            self.setStyleSheet(stylesheet)
         self.setCheckable(checkable)
 
 
@@ -44,6 +47,7 @@ class ToolButton(QToolButton):
             icon: tuple[Path, int, int] | tuple[QIcon, int, int] | None = None,
             tooltip: str = "",
             btn_size: tuple[int, int] | None = None,
+            stylesheet: str = "",
             checkable: bool = True,
             style: Qt.ToolButtonStyle = Qt.ToolButtonStyle.ToolButtonIconOnly,
     ) -> None:
@@ -55,6 +59,8 @@ class ToolButton(QToolButton):
             self.setFixedSize(QSize(*btn_size))
         if tooltip:
             self.setToolTip(tooltip)
+        if stylesheet:
+            self.setStyleSheet(stylesheet)
         self.setCheckable(checkable)
         self.setToolButtonStyle(style)
 

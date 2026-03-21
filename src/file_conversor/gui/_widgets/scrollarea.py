@@ -1,6 +1,5 @@
 # src/file_conversor/gui/_widgets/scrollarea.py
 
-from pathlib import Path
 from typing import override
 
 from PySide6.QtCore import Qt
@@ -12,7 +11,7 @@ class ScrollArea(QScrollArea):
 
     def __init__(
             self,
-            stylesheet_file: Path | None = None,
+            stylesheet: str = "",
             scrollbar_width: int = 8,
             scroll_policy: tuple[Qt.ScrollBarPolicy, Qt.ScrollBarPolicy] = (ScrollBarPolicy.ScrollBarAlwaysOff, ScrollBarPolicy.ScrollBarAsNeeded),
     ) -> None:
@@ -30,7 +29,7 @@ class ScrollArea(QScrollArea):
             QScrollBar:vertical, QScrollBar:horizontal {{
                 width: {self._scrollbar_width}px;                    
             }}
-            {stylesheet_file.read_text() if stylesheet_file else ""}
+            {stylesheet}
         """)
 
     def _get_scrollbar_margin(self, policy: ScrollBarPolicy) -> int:
