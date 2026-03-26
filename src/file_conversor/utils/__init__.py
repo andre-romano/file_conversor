@@ -6,6 +6,7 @@ This module initializes the utils package.
 It can contain utility functions or classes that are used across the application.
 """
 
+from file_conversor.utils.ema_eta import *
 from file_conversor.utils.formatters import *
 from file_conversor.utils.protocols import *
 from file_conversor.utils.validators import *

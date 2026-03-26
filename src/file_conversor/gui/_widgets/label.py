@@ -1,3 +1,4 @@
+# src/file_conversor/gui/_widgets/label.py
 
 from pathlib import Path
 from typing import override

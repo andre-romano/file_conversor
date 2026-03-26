@@ -1,3 +1,4 @@
+# src/file_conversor/gui/_widgets/line.py
 
 from PySide6.QtWidgets import QFrame
 

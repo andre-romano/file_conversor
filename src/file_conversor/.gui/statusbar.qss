@@ -1,0 +1,26 @@
+/* src/file_conversor/.gui/statusbar.qss */
+
+StatusBarFrame {
+    border-top: 1px solid #ffd4d3d3;
+}
+
+StatusBarFrame QProgressBar {
+    border: 1px solid #cac9c9;
+    border-radius: 8px; /* Rounded corners for the track */
+    background-color: #F5F5F5;
+    text-align: center; /* Keeps the '50%' text in the middle */
+    color: #333333;     /* Color of the text */
+    font-weight: bold;
+    font-size: 10px;
+}
+
+StatusBarFrame QProgressBar::chunk {
+    /* background-color: #0078D7;  */
+    /* A modern blue-to-cyan gradient */
+    background-color: qlineargradient(
+        x1: 0, y1: 0, x2: 1, y2: 0,
+        stop: 0 #005A9E, 
+        stop: 1 #00A1F1
+    );
+    border-radius: 7px; /* Slightly smaller than the track radius */
+}
