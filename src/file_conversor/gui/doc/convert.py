@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QLineEdit
 from file_conversor.config import Environment, get_translation
 from file_conversor.gui._frames import FormFrame
 from file_conversor.gui._utils import configure_qt_window
+from file_conversor.gui._widgets.output_dir import OutputDirWidget
 
 
 ICON_PATH = Environment.get_icons_folder()
@@ -27,7 +28,7 @@ class DocConvertWindow(FormFrame):
 
         self.addRow(f"{_('Input Files')}:", QLineEdit())
         self.addRow(f"{_('Format')}:", QLineEdit())
-        self.addRow(f"{_('Output directory')}:", QLineEdit())
+        self.addRow(f"{_('Output directory')}:", OutputDirWidget())
         self.addConfirmButton(_("Start"))
 
         self.status_bar.showMessage(_("Ready!"))

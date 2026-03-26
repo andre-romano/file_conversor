@@ -37,6 +37,17 @@ QScrollBar::sub-page:horizontal, QScrollBar::add-page:horizontal
     background: none;
 }
 
+QToolTip {
+    background-color: #3b3b3b;      /* Dark background */
+    color: #f0f0f0;                 /* Light gray text */
+    border: 1px solid #555555;      /* Subtle border */
+    border-radius: 0px;             /* Rounded corners */
+    padding: 3px;                   /* Breathing room */
+    font-family: "Segoe UI", Arial; /* Modern font */
+    font-size: 12px;
+    opacity: 220;                   /* Slight transparency (0-255) */
+}
+
 /* main app container */
 #main_window {
     border-top: 1px solid #b4b4b4;

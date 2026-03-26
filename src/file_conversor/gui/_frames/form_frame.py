@@ -50,6 +50,7 @@ class FormFrame(QFrame):
         layout = QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
+
         layout.addLayout(content_layout, stretch=1)
         layout.addWidget(self.status_bar)
 
