@@ -1,11 +1,11 @@
-# src/file_conversor/gui/_widgets/form_confirm_btn.py
+# src/file_conversor/gui/_widgets/form_confirm_btn_frame.py
 
 from PySide6.QtWidgets import QFrame, QHBoxLayout
 
 from file_conversor.gui._widgets.button import PushButton
 
 
-class FormConfirmFrame(QFrame):
+class FormConfirmBtnFrame(QFrame):
     def __init__(self) -> None:
         super().__init__()
         self.confirm_btn = PushButton(text="Start")
@@ -20,5 +20,5 @@ class FormConfirmFrame(QFrame):
 
 
 __all__ = [
-    "FormConfirmFrame",
+    "FormConfirmBtnFrame",
 ]

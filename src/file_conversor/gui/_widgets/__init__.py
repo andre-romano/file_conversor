@@ -2,7 +2,7 @@
 
 from file_conversor.gui._widgets.button import *
 from file_conversor.gui._widgets.card import *
-from file_conversor.gui._widgets.form_confirm_frame import *
+from file_conversor.gui._widgets.form_confirm_btn_frame import *
 from file_conversor.gui._widgets.label import *
 from file_conversor.gui._widgets.line import *
 from file_conversor.gui._widgets.scrollarea import *
