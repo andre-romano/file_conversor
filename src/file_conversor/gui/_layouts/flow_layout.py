@@ -21,14 +21,20 @@ class FlowLayout(QLayout):
         self,
         parent: QWidget | None = None,
         spacing: int = 10,
+        margins: tuple[int, int, int, int] = (0, 0, 0, 0),
     ):
         super().__init__(parent)
         self._item_list: list[QLayoutItem] = []
         self.setSpacing(spacing)
+        self.setContentsMargins(*margins)
 
     def __del__(self):
         while self.count() > 0:
             self.takeAt(0)
+
+    def addItems(self, *items: QWidget) -> None:
+        for item in items:
+            self.addWidget(item)
 
     @override
     def addItem(self, item: QLayoutItem) -> None:

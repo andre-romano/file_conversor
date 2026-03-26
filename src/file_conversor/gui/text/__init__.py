@@ -1,8 +1,11 @@
 # src/file_conversor/gui/text/__init__.py
 
 
+from PySide6.QtWidgets import QFrame
+
 from file_conversor.config import Environment, get_translation
-from file_conversor.gui._widgets import Card, FlowFrame
+from file_conversor.gui._layouts.flow_layout import FlowLayout
+from file_conversor.gui._widgets import Card, ScrollArea
 
 
 ICON_PATH = Environment.get_icons_folder()
@@ -10,11 +13,12 @@ GUI_PATH = Environment.get_gui_folder()
 _ = get_translation()
 
 
-class TextFrame(FlowFrame):
+class TextFrame(ScrollArea):
     def __init__(self) -> None:
         super().__init__()
 
-        self.addItems(
+        layout = FlowLayout()
+        layout.addItems(
             convert_card := Card(
                 icon=ICON_PATH / "convert.ico",
                 title=_("Convert"),
@@ -34,6 +38,12 @@ class TextFrame(FlowFrame):
                 gui_path=GUI_PATH,
             ),
         )
+
+        frame = QFrame()
+        frame.setLayout(layout)
+
+        self.setWidget(frame)
+
         convert_card.clicked.connect(self.on_convert_card_clicked)
         compress_card.clicked.connect(self.on_compress_card_clicked)
         check_card.clicked.connect(self.on_check_card_clicked)

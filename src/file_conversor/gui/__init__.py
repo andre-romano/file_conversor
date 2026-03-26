@@ -1,7 +1,6 @@
 # src/file_conversor/gui/__init__.py
 
 
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -12,6 +11,7 @@ from PySide6.QtWidgets import (
 from file_conversor.config import Environment, get_translation
 
 # GUI
+from file_conversor.gui._utils import configure_qt_window
 from file_conversor.gui._widgets import (
     HLineFrame,
     SidebarFrame,
@@ -40,12 +40,7 @@ _ = get_translation()
 class MainWindowGUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        icon_path = ICON_PATH / "icon.png"
-        assert icon_path.exists(), f"{_('App icon file not found:')} {icon_path}"
-
-        self.setWindowTitle(f"File Conversor v{Environment.get_app_version()}")
-        self.setWindowIcon(QIcon(str(icon_path)))
-        self.resize(800, 540)
+        configure_qt_window(self, icon_path=ICON_PATH)
 
         # Sidebar
         icon_size = (28, 28)  # px
@@ -53,21 +48,21 @@ class MainWindowGUI(QMainWindow):
 
         sidebar = SidebarFrame(gui_path=GUI_PATH)
         sidebar.addItems(
-            btn_doc := ToolButton(icon=(ICON_PATH / "docx.ico", *icon_size), tooltip=_("Word tools"), btn_size=btn_size),
-            btn_xls := ToolButton(icon=(ICON_PATH / "xls.ico", *icon_size), tooltip=_("Excel tools"), btn_size=btn_size),
-            btn_ppt := ToolButton(icon=(ICON_PATH / "ppt.ico", *icon_size), tooltip=_("PowerPoint tools"), btn_size=btn_size),
+            btn_doc := ToolButton(icon=(ICON_PATH / "docx.ico", *icon_size), tooltip=_("Word tools"), btn_size=btn_size, checkable=True),
+            btn_xls := ToolButton(icon=(ICON_PATH / "xls.ico", *icon_size), tooltip=_("Excel tools"), btn_size=btn_size, checkable=True),
+            btn_ppt := ToolButton(icon=(ICON_PATH / "ppt.ico", *icon_size), tooltip=_("PowerPoint tools"), btn_size=btn_size, checkable=True),
             HLineFrame(shadow=HLineFrame.Shadow.Sunken),  # separator
-            btn_audio := ToolButton(icon=(ICON_PATH / "mp3.ico", *icon_size), tooltip=_("Audio tools"), btn_size=btn_size),
-            btn_video := ToolButton(icon=(ICON_PATH / "mp4.ico", *icon_size), tooltip=_("Video tools"), btn_size=btn_size),
-            btn_image := ToolButton(icon=(ICON_PATH / "jpg.ico", *icon_size), tooltip=_("Image tools"), btn_size=btn_size),
+            btn_audio := ToolButton(icon=(ICON_PATH / "mp3.ico", *icon_size), tooltip=_("Audio tools"), btn_size=btn_size, checkable=True),
+            btn_video := ToolButton(icon=(ICON_PATH / "mp4.ico", *icon_size), tooltip=_("Video tools"), btn_size=btn_size, checkable=True),
+            btn_image := ToolButton(icon=(ICON_PATH / "jpg.ico", *icon_size), tooltip=_("Image tools"), btn_size=btn_size, checkable=True),
             HLineFrame(shadow=HLineFrame.Shadow.Sunken),  # separator
-            btn_pdf := ToolButton(icon=(ICON_PATH / "pdf.ico", *icon_size), tooltip=_("PDF tools"), btn_size=btn_size),
-            btn_ebook := ToolButton(icon=(ICON_PATH / "epub.ico", *icon_size), tooltip=_("Ebook tools"), btn_size=btn_size),
-            btn_text := ToolButton(icon=(ICON_PATH / "json.ico", *icon_size), tooltip=_("Text tools"), btn_size=btn_size),
-            btn_hash := ToolButton(icon=(ICON_PATH / "sha256.ico", *icon_size), tooltip=_("Hash tools"), btn_size=btn_size),
+            btn_pdf := ToolButton(icon=(ICON_PATH / "pdf.ico", *icon_size), tooltip=_("PDF tools"), btn_size=btn_size, checkable=True),
+            btn_ebook := ToolButton(icon=(ICON_PATH / "epub.ico", *icon_size), tooltip=_("Ebook tools"), btn_size=btn_size, checkable=True),
+            btn_text := ToolButton(icon=(ICON_PATH / "json.ico", *icon_size), tooltip=_("Text tools"), btn_size=btn_size, checkable=True),
+            btn_hash := ToolButton(icon=(ICON_PATH / "sha256.ico", *icon_size), tooltip=_("Hash tools"), btn_size=btn_size, checkable=True),
             sidebar.getStretch(),
-            btn_info := ToolButton(icon=(ICON_PATH / "info.ico", *icon_size), tooltip=_("Info"), btn_size=btn_size),
-            btn_config := ToolButton(icon=(ICON_PATH / "repair.ico", *icon_size), tooltip=_("Settings"), btn_size=btn_size),
+            btn_info := ToolButton(icon=(ICON_PATH / "info.ico", *icon_size), tooltip=_("Info"), btn_size=btn_size, checkable=True),
+            btn_config := ToolButton(icon=(ICON_PATH / "repair.ico", *icon_size), tooltip=_("Settings"), btn_size=btn_size, checkable=True),
         )
 
         # Router

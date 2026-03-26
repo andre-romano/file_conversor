@@ -1,6 +1,7 @@
 # src/file_conversor/gui/_widgets/utils.py
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QHBoxLayout, QLayout, QVBoxLayout, QWidget
@@ -41,9 +42,28 @@ def get_qt_icon(name: str, color: str = 'black', color_active: str = 'gray') -> 
     return qta.icon(name, color=color, color_active=color_active)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
 
 
+def get_app_icon(icon_path: Path) -> QIcon:
+    icon_path = icon_path / "icon.png"
+    assert icon_path.exists(), f"'App icon file not found:' {icon_path}"
+    return QIcon(str(icon_path))
+
+
+def configure_qt_window(
+        window: QWidget,
+        icon_path: Path,
+        title: str = "",
+        size: tuple[int, int] = (800, 540)
+) -> None:
+    window.setWindowTitle(f"{title} - File Conversor" if title else "File Conversor")
+    window.setWindowIcon(get_app_icon(icon_path))
+    window.resize(*size)
+
+
 __all__ = [
     "Stretch",
     "get_hlayout",
     "get_vlayout",
     "get_qt_icon",
+    "get_app_icon",
+    "configure_qt_window",
 ]
