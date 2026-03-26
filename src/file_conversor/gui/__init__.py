@@ -7,15 +7,14 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
-# CORE
 from file_conversor.config import Environment, get_translation
-
-# GUI
+from file_conversor.gui._frames import (
+    SidebarFrame,
+    StackedRouter,
+)
 from file_conversor.gui._utils import configure_qt_window
 from file_conversor.gui._widgets import (
     HLineFrame,
-    SidebarFrame,
-    StackedRouter,
     ToolButton,
 )
 from file_conversor.gui.audio import AudioFrame
@@ -40,7 +39,7 @@ _ = get_translation()
 class MainWindowGUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        configure_qt_window(self, icon_path=ICON_PATH)
+        configure_qt_window(self, icon_path=ICON_PATH, size=(800, 540))
 
         # Sidebar
         icon_size = (28, 28)  # px

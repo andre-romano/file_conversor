@@ -52,11 +52,18 @@ def configure_qt_window(
         window: QWidget,
         icon_path: Path,
         title: str = "",
-        size: tuple[int, int] = (800, 540)
+        min_size: tuple[int, int] = (400, 150),
+        max_size: tuple[int, int] | None = None,
+        size: tuple[int, int] | None = None,
 ) -> None:
     window.setWindowTitle(f"{title} - File Conversor" if title else "File Conversor")
     window.setWindowIcon(get_app_icon(icon_path))
-    window.resize(*size)
+
+    window.setMinimumSize(*min_size)
+    if max_size:
+        window.setMaximumSize(*max_size)
+    if size:
+        window.resize(*size)
 
 
 __all__ = [

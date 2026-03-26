@@ -6,7 +6,7 @@ from typing import override
 from PySide6.QtWidgets import QFrame, QLayout, QVBoxLayout, QWidget
 
 from file_conversor.gui._utils import Stretch
-from file_conversor.gui._widgets.scrollarea import ScrollArea
+from file_conversor.gui._widgets import ScrollArea
 
 
 class SidebarFrame(ScrollArea):
