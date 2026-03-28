@@ -8,17 +8,18 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLayout,
-    QLineEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from file_conversor.config import get_translation
 from file_conversor.gui._frames.statusbar_frame import StatusBarFrame
+from file_conversor.gui._model import FileFilters
 from file_conversor.gui._widgets import (
     InputFilesWidget,
     Label,
     OutputDirWidget,
+    OutputFormatWidget,
     PushButton,
     ScrollArea,
 )
@@ -74,16 +75,22 @@ class FormFrame(QFrame):
     def addRow(self, label: str | QWidget, widget: QWidget | QLayout) -> None:
         self._form_layout.addRow(label, widget)
 
-    def addInputFiles(self):
-        self.addRow(f"{_('Input Files')}:", input_files_widget := InputFilesWidget(gui_path=self._gui_path))
+    def addInputFiles(self, file_filters: FileFilters | None = None):
+        input_files_widget = InputFilesWidget(
+            gui_path=self._gui_path,
+            file_filters=file_filters,
+        )
+        self.addRow(f"{_('Input Files')}:", input_files_widget)
         return input_files_widget
 
-    def addOutputFormat(self):
-        self.addRow(f"{_('Output Format')}:", output_format_widget := QLineEdit())
+    def addOutputFormat(self, *extensions: str):
+        output_format_widget = OutputFormatWidget(*extensions)
+        self.addRow(f"{_('Output Format')}:", output_format_widget)
         return output_format_widget
 
     def addOutputDirectory(self):
-        self.addRow(f"{_('Output directory')}:", output_dir_widget := OutputDirWidget())
+        output_dir_widget = OutputDirWidget()
+        self.addRow(f"{_('Output directory')}:", output_dir_widget)
         return output_dir_widget
 
     def addConfirmButton(self):

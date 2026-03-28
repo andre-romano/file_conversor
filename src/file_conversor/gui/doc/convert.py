@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer
 
 from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._frames import FormFrame
+from file_conversor.gui._model import FileFilter, FileFilters
 from file_conversor.gui._utils import configure_qt_window
 
 
@@ -28,8 +29,12 @@ class DocConvertWindow(FormFrame):
             title=_("Document Convertion"),
         )
 
-        self.input_files_widget = self.addInputFiles()
-        self.output_format_widget = self.addOutputFormat()
+        self.input_files_widget = self.addInputFiles(FileFilters([
+            FileFilter(description=_("Word Documents"), extensions=[".doc", ".docx"]),
+            FileFilter(description=_("Rich Text Format"), extensions=[".rtf"]),
+            FileFilter(description=_("PDF"), extensions=[".pdf"]),
+        ]))
+        self.output_format_widget = self.addOutputFormat(".docx")
         self.output_dir_widget = self.addOutputDirectory()
         self.confirm_btn = self.addConfirmButton()
 
