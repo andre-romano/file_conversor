@@ -17,10 +17,10 @@ class OutputDirWidget(QFrame):
     ) -> None:
         super().__init__()
 
-        self.line_edit = QLineEdit()
-        self.open_dialog_btn = PushButton(
+        self._line_edit = QLineEdit()
+        self._open_dialog_btn = PushButton(
             btn_size=(24, 24),
-            icon=(get_qt_icon("mdi.folder-open-outline"), 18, 18),
+            icon=(get_qt_icon("folder-open-outline"), 18, 18),
             tooltip=_("Select output directory"),
         )
 
@@ -28,20 +28,20 @@ class OutputDirWidget(QFrame):
         layout.setSpacing(spacing)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        layout.addWidget(self.line_edit)
-        layout.addWidget(self.open_dialog_btn)
+        layout.addWidget(self._line_edit)
+        layout.addWidget(self._open_dialog_btn)
 
         self.setLayout(layout)
 
-        self.open_dialog_btn.clicked.connect(self.open_directory_dialog)
+        self._open_dialog_btn.clicked.connect(self._open_directory_dialog)
 
-    def open_directory_dialog(self):
+    def _open_directory_dialog(self):
         file_path = QFileDialog.getExistingDirectory(
             parent=self,
             caption=_("Select output directory"),
             dir="",  # Starting directory (empty means current or last used)
         )
-        self.line_edit.setText(file_path)
+        self._line_edit.setText(file_path)
 
 
 __all__ = [

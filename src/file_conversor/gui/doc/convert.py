@@ -4,17 +4,19 @@
 from typing import override
 
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QLineEdit
 
-from file_conversor.config import Environment, get_translation
+from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._frames import FormFrame
 from file_conversor.gui._utils import configure_qt_window
-from file_conversor.gui._widgets.output_dir import OutputDirWidget
 
+
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+_ = get_translation()
 
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()
-_ = get_translation()
 
 
 class DocConvertWindow(FormFrame):
@@ -26,15 +28,14 @@ class DocConvertWindow(FormFrame):
             title=_("Document Convertion"),
         )
 
-        self.addRow(f"{_('Input Files')}:", QLineEdit())
-        self.addRow(f"{_('Format')}:", QLineEdit())
-        self.addRow(f"{_('Output directory')}:", OutputDirWidget())
-        self.addConfirmButton(_("Start"))
-
-        self.status_bar.showMessage(_("Ready!"))
+        self.input_files_widget = self.addInputFiles()
+        self.output_format_widget = self.addOutputFormat()
+        self.output_dir_widget = self.addOutputDirectory()
+        self.confirm_btn = self.addConfirmButton()
 
     @override
     def on_confirm_clicked(self) -> None:
+        logger.debug("Confirm button clicked")
         self.status_bar.startTask(_("Processing files..."), _("Finished!"))
         for i in range(20, 101, 20):
             QTimer().singleShot(2000 * i // 20, lambda i=i: self.status_bar.setProgress(i))  # pyright: ignore[reportUnknownArgumentType]

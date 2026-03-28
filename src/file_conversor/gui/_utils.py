@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QHBoxLayout, QLayout, QVBoxLayout, QWidget
@@ -37,9 +38,14 @@ def get_vlayout(*items: QWidget | QLayout | Stretch, spacing: int | None = None)
     return get_layout(*items, layout=QVBoxLayout(), spacing=spacing)
 
 
-def get_qt_icon(name: str, color: str = 'black', color_active: str = 'gray') -> QIcon:
+def get_qt_icon(
+        name: str,
+        prefix: Literal["mdi", "mdi6", "fa5", "fa6", "ei", "ph", "ri", "msc"] = "mdi",
+        color: str = 'black',
+        color_active: str = 'gray',
+) -> QIcon:
     import qtawesome as qta  # pyright: ignore[reportMissingTypeStubs]
-    return qta.icon(name, color=color, color_active=color_active)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+    return qta.icon(f"{prefix}.{name}", color=color, color_active=color_active)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
 
 
 def get_app_icon(icon_path: Path) -> QIcon:

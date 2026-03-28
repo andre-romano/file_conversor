@@ -2,14 +2,18 @@
 
 from PySide6.QtWidgets import QFrame
 
-from file_conversor.config import Environment, get_translation
+from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._layouts import FlowLayout
 from file_conversor.gui._widgets import Card, ScrollArea
 
 
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+_ = get_translation()
+
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()
-_ = get_translation()
 
 
 class PdfFrame(ScrollArea):
@@ -104,37 +108,37 @@ class PdfFrame(ScrollArea):
         decrypt_card.clicked.connect(self.on_decrypt_card_clicked)
 
     def on_convert_card_clicked(self) -> None:
-        print("Convert card clicked!")
+        logger.debug("Convert card clicked!")
 
     def on_extract_img_card_clicked(self) -> None:
-        print("Extract Image card clicked!")
+        logger.debug("Extract Image card clicked!")
 
     def on_repair_card_clicked(self) -> None:
-        print("Repair card clicked!")
+        logger.debug("Repair card clicked!")
 
     def on_compress_card_clicked(self) -> None:
-        print("Compress card clicked!")
+        logger.debug("Compress card clicked!")
 
     def on_extract_card_clicked(self) -> None:
-        print("Extract card clicked!")
+        logger.debug("Extract card clicked!")
 
     def on_merge_card_clicked(self) -> None:
-        print("Merge card clicked!")
+        logger.debug("Merge card clicked!")
 
     def on_rotate_card_clicked(self) -> None:
-        print("Rotate card clicked!")
+        logger.debug("Rotate card clicked!")
 
     def on_split_card_clicked(self) -> None:
-        print("Split card clicked!")
+        logger.debug("Split card clicked!")
 
     def on_ocr_card_clicked(self) -> None:
-        print("OCR card clicked!")
+        logger.debug("OCR card clicked!")
 
     def on_encrypt_card_clicked(self) -> None:
-        print("Encrypt card clicked!")
+        logger.debug("Encrypt card clicked!")
 
     def on_decrypt_card_clicked(self) -> None:
-        print("Decrypt card clicked!")
+        logger.debug("Decrypt card clicked!")
 
 
 __all__ = [

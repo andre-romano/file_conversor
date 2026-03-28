@@ -3,6 +3,13 @@
 
 from PySide6.QtWidgets import QAbstractButton, QStackedWidget, QWidget
 
+from file_conversor.config.log import Log
+
+
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+
 
 class StackedRouter(QStackedWidget):
     def _fix_visual_glitches(self, widget: QWidget) -> None:
@@ -26,12 +33,14 @@ class StackedRouter(QStackedWidget):
                 self._pages[i] = widget
                 self.addWidget(widget)  # add page to stack
                 self._fix_visual_glitches(widget)
+                logger.debug(f"Add page {page_type.__name__} to stack")
             # show the page
             match self._pages[i]:
                 case None:
                     raise RuntimeError(f"Failed to create page widget for {page_type}.")
                 case w:
                     self.setCurrentWidget(w)  # show the page
+                    logger.debug(f"Show page {page_type.__name__}")
             # update button states (set clicked button as checked and others as unchecked)
             for _, button in pages:
                 button.setChecked(button is btn)

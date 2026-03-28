@@ -34,19 +34,19 @@ class InfoFrame(QFrame):
         ))
         layout.addWidget(Label(f"{_('A simple file conversion utility.')}", "font-style: italic;"))
         layout.addLayout(get_hlayout(
-            LabelImage(get_qt_icon("mdi.copyright"), size=(16, 16)),  # copyright icon
+            LabelImage(get_qt_icon("copyright"), size=(16, 16)),  # copyright icon
             Label(f"Andre Luiz Romano Madureira"),
             Stretch(),
             spacing=3,
         ))
         layout.addLayout(get_hlayout(
-            LabelImage(get_qt_icon("mdi.scale-balance"), size=(16, 16)),  # license icon
+            LabelImage(get_qt_icon("scale-balance"), size=(16, 16)),  # license icon
             LabelUrl("https://www.apache.org/licenses/LICENSE-2.0", "Apache-2.0 license"),
             Stretch(),
             spacing=3,
         ))
         layout.addLayout(get_hlayout(
-            LabelImage(get_qt_icon("mdi.home-circle-outline"), size=(16, 16)),  # home icon
+            LabelImage(get_qt_icon("home-circle-outline"), size=(16, 16)),  # home icon
             LabelUrl("https://github.com/andre-romano/file_conversor"),
             Stretch(),
             spacing=3,

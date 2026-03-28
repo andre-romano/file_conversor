@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
-from file_conversor.config import Environment, get_translation
+from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._frames import (
     SidebarFrame,
     StackedRouter,
@@ -31,9 +31,13 @@ from file_conversor.gui.video import VideoFrame
 from file_conversor.gui.xls import XlsFrame
 
 
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+_ = get_translation()
+
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()
-_ = get_translation()
 
 
 class MainWindowGUI(QMainWindow):
@@ -92,6 +96,8 @@ class MainWindowGUI(QMainWindow):
         central_widget.setObjectName("main_window")
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
+
+        logger.debug("MainWindow initialized")
 
 
 __all__ = [

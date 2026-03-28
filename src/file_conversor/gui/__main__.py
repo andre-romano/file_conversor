@@ -6,15 +6,16 @@ from types import TracebackType
 
 from PySide6.QtWidgets import QApplication
 
-from file_conversor.config import Log, get_translation
-from file_conversor.gui import Environment, MainWindowGUI
+from file_conversor.config import Environment, Log, State, get_translation
+from file_conversor.gui import MainWindowGUI
 from file_conversor.main_helper import MainHelper
 
 
 LOG = Log.get_instance()
+STATE = State.get()
 
+logger = LOG.getLogger()
 _ = get_translation()
-logger = LOG.getLogger(__name__)
 
 
 def _global_exception_handler(exc_type: type[BaseException], exc_value: BaseException, exc_traceback: TracebackType | None):
@@ -47,18 +48,38 @@ def _global_exception_handler(exc_type: type[BaseException], exc_value: BaseExce
     sys.exit(1)  # exit the app with an error code
 
 
+def _parse_arg(_idx: int, arg: str):
+    if arg in ("-h", "--help"):
+        print("Usage: file_conversor_gui [options]")
+        print("Options:")
+        print("  -h, --help    Show this help message and exit")
+        print("  -d, --debug   Enable debug mode (more verbose logging in CLI)")
+        raise KeyboardInterrupt()  # raise KeyboardInterrupt to exit the app gracefully after showing help
+
+    if arg in ("-d", "--debug"):
+        STATE.loglevel.level = Log.Level.DEBUG
+
+
 def _start_gui() -> int:
     """ Starts the GUI application. """
-    qss_path = Environment.get_gui_folder() / "main.qss"
+    try:
+        qss_path = Environment.get_gui_folder() / "main.qss"
+        assert qss_path.exists(), f"Stylesheet file not found: {qss_path}"
 
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")  # Apply the modern cross-platform style
-    app.setStyleSheet(qss_path.read_text())  # Load and apply the main stylesheet
-    # replace python default exception handler with our custom one to catch unhandled exceptions globally
-    sys.excepthook = _global_exception_handler
-    window = MainWindowGUI()
-    window.show()
-    return app.exec()
+        for idx, arg in enumerate(sys.argv):
+            _parse_arg(idx, arg)
+
+        app = QApplication(sys.argv)
+        app.setStyle("Fusion")  # Apply the modern cross-platform style
+        app.setStyleSheet(qss_path.read_text())  # Load and apply the main stylesheet
+        # replace python default exception handler with our custom one to catch unhandled exceptions globally
+        sys.excepthook = _global_exception_handler
+        window = MainWindowGUI()
+        window.show()
+        return app.exec()
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Application interrupted by user, exiting...")
+        return 0
 
 
 # Entry point of the app

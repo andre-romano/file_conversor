@@ -3,14 +3,18 @@
 
 from PySide6.QtWidgets import QFrame
 
-from file_conversor.config import Environment, get_translation
+from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._layouts import FlowLayout
 from file_conversor.gui._widgets import Card, ScrollArea
 
 
+LOG = Log.get_instance()
+
+logger = LOG.getLogger(__name__)
+_ = get_translation()
+
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()
-_ = get_translation()
 
 
 class ImageFrame(ScrollArea):
@@ -119,43 +123,43 @@ class ImageFrame(ScrollArea):
         info_card.clicked.connect(self.on_info_card_clicked)
 
     def on_convert_card_clicked(self) -> None:
-        print("Convert card clicked!")
+        logger.debug("Convert card clicked!")
 
     def on_render_card_clicked(self) -> None:
-        print("Render card clicked!")
+        logger.debug("Render card clicked!")
 
     def on_to_pdf_card_clicked(self) -> None:
-        print("To PDF card clicked!")
+        logger.debug("To PDF card clicked!")
 
     def on_compress_card_clicked(self) -> None:
-        print("Compress card clicked!")
+        logger.debug("Compress card clicked!")
 
     def on_mirror_card_clicked(self) -> None:
-        print("Mirror card clicked!")
+        logger.debug("Mirror card clicked!")
 
     def on_rotate_card_clicked(self) -> None:
-        print("Rotate card clicked!")
+        logger.debug("Rotate card clicked!")
 
     def on_resize_card_clicked(self) -> None:
-        print("Resize card clicked!")
+        logger.debug("Resize card clicked!")
 
     def on_antialias_card_clicked(self) -> None:
-        print("Antialias card clicked!")
+        logger.debug("Antialias card clicked!")
 
     def on_blur_card_clicked(self) -> None:
-        print("Blur card clicked!")
+        logger.debug("Blur card clicked!")
 
     def on_enhance_card_clicked(self) -> None:
-        print("Enhance card clicked!")
+        logger.debug("Enhance card clicked!")
 
     def on_filter_card_clicked(self) -> None:
-        print("Filter card clicked!")
+        logger.debug("Filter card clicked!")
 
     def on_unsharp_card_clicked(self) -> None:
-        print("Unsharp mask card clicked!")
+        logger.debug("Unsharp mask card clicked!")
 
     def on_info_card_clicked(self) -> None:
-        print("Info card clicked!")
+        logger.debug("Info card clicked!")
 
 
 __all__ = [

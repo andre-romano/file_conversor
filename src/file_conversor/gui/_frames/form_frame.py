@@ -8,12 +8,23 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLayout,
+    QLineEdit,
     QVBoxLayout,
     QWidget,
 )
 
+from file_conversor.config import get_translation
 from file_conversor.gui._frames.statusbar_frame import StatusBarFrame
-from file_conversor.gui._widgets import Label, PushButton, ScrollArea
+from file_conversor.gui._widgets import (
+    InputFilesWidget,
+    Label,
+    OutputDirWidget,
+    PushButton,
+    ScrollArea,
+)
+
+
+_ = get_translation()
 
 
 class FormFrame(QFrame):
@@ -56,21 +67,34 @@ class FormFrame(QFrame):
 
         self.setLayout(layout)
 
-        self._confirm_btn = PushButton()
-        self._confirm_btn.clicked.connect(self.on_confirm_clicked)
+        self.status_bar.showMessage(_("Ready!"))
 
     def addRow(self, label: str | QWidget, widget: QWidget | QLayout) -> None:
         self._form_layout.addRow(label, widget)
 
-    def addConfirmButton(self, text: str) -> None:
-        self._confirm_btn.setText(text)
+    def addInputFiles(self):
+        self.addRow(f"{_('Input Files')}:", input_files_widget := InputFilesWidget())
+        return input_files_widget
+
+    def addOutputFormat(self):
+        self.addRow(f"{_('Output Format')}:", output_format_widget := QLineEdit())
+        return output_format_widget
+
+    def addOutputDirectory(self):
+        self.addRow(f"{_('Output directory')}:", output_dir_widget := OutputDirWidget())
+        return output_dir_widget
+
+    def addConfirmButton(self):
+        confirm_btn = PushButton(text=_("Start"))
+        confirm_btn.clicked.connect(self.on_confirm_clicked)
 
         confirm_layout = QHBoxLayout()
         confirm_layout.setSpacing(0)
         confirm_layout.setContentsMargins(0, 0, 0, 0)
         confirm_layout.addStretch()
-        confirm_layout.addWidget(self._confirm_btn)
+        confirm_layout.addWidget(confirm_btn)
         self._form_layout.addRow(confirm_layout)
+        return confirm_btn
 
     def on_confirm_clicked(self) -> None:
         raise NotImplementedError("Subclasses must implement this method.")
