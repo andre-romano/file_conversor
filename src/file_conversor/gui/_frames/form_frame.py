@@ -37,6 +37,8 @@ class FormFrame(QFrame):
         margins: tuple[int, int, int, int] = (10, 10, 10, 10),
     ) -> None:
         super().__init__()
+        self._gui_path = gui_path
+
         title_label = Label(text=title, stylesheet=title_stylesheet)
 
         self._form_layout = QFormLayout()
@@ -73,7 +75,7 @@ class FormFrame(QFrame):
         self._form_layout.addRow(label, widget)
 
     def addInputFiles(self):
-        self.addRow(f"{_('Input Files')}:", input_files_widget := InputFilesWidget())
+        self.addRow(f"{_('Input Files')}:", input_files_widget := InputFilesWidget(gui_path=self._gui_path))
         return input_files_widget
 
     def addOutputFormat(self):

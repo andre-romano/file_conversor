@@ -1,10 +1,13 @@
 # src/file_conversor/gui/_widgets/input_files.py
 
-from PySide6.QtWidgets import QFileDialog, QFrame, QHBoxLayout, QListWidget, QVBoxLayout
+from pathlib import Path
+
+from PySide6.QtWidgets import QFileDialog, QFrame, QHBoxLayout, QVBoxLayout
 
 from file_conversor.config import get_translation
 from file_conversor.gui._utils import get_qt_icon
 from file_conversor.gui._widgets.button import PushButton
+from file_conversor.gui._widgets.drag_drop_list import DragDropListWidget
 
 
 _ = get_translation()
@@ -13,6 +16,7 @@ _ = get_translation()
 class InputFilesWidget(QFrame):
     def __init__(
         self,
+        gui_path: Path,
         spacing: int = 5,
         file_filters: str = "All Files (*.*)",
         btn_size: tuple[int, int] = (24, 24),
@@ -22,9 +26,11 @@ class InputFilesWidget(QFrame):
 
         self._file_filters = file_filters
 
-        self._list_widget = QListWidget()
-        self._list_widget.setToolTip(_("List of input files (drag and drop supported)"))
-        self._list_widget.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
+        self._list_widget = DragDropListWidget(
+            gui_path=gui_path,
+            tooltip=_("List of input files (drag and drop supported)"),
+            file_filters=file_filters,
+        )
 
         self._open_dialog_btn = PushButton(
             btn_size=btn_size,

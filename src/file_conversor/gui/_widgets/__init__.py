@@ -2,6 +2,7 @@
 
 from file_conversor.gui._widgets.button import *
 from file_conversor.gui._widgets.card import *
+from file_conversor.gui._widgets.drag_drop_list import *
 from file_conversor.gui._widgets.input_files import *
 from file_conversor.gui._widgets.label import *
 from file_conversor.gui._widgets.line import *

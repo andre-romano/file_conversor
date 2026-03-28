@@ -1,0 +1,9 @@
+/* src/file_conversor/.gui/drag_drop_list.qss */
+
+DragDropListWidget {
+    background-color: white;
+    border: 1px solid #b3b2b2;
+}
+DragDropListWidget:hover {
+    background-color: #f8f9fa;
+}

@@ -7,6 +7,12 @@ from typing import Literal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QHBoxLayout, QLayout, QVBoxLayout, QWidget
 
+from file_conversor.config import Log
+
+
+LOG = Log.get_instance()
+logger = LOG.getLogger(__name__)
+
 
 @dataclass
 class Stretch:
@@ -52,6 +58,32 @@ def get_app_icon(icon_path: Path) -> QIcon:
     icon_path = icon_path / "icon.png"
     assert icon_path.exists(), f"'App icon file not found:' {icon_path}"
     return QIcon(str(icon_path))
+
+
+def get_file_filter(*extensions: str, description: str) -> str:
+    ext_str = " ".join(f"*.{ext.lstrip(".").lower()}" for ext in extensions)
+    return f"{description} ({ext_str})"
+
+
+def get_file_extensions(file_filters: str) -> list[str]:
+    """ 
+    Extract file extensions from a filter string like "Text Files (*.txt);;Images (*.png *.jpg);;All Files (*.*)" 
+
+    :param file_filters: The filter string to parse
+    :return: A list of file extensions (e.g. [".txt", ".png", ".jpg", ".*"])
+    """
+    import re
+    extensions: list[str] = []
+    for filter in file_filters.split(";;"):
+        if not filter:
+            continue
+        match = re.match(r".+\((\*\..+)\)$", filter.strip())
+        if not match:
+            continue
+        exts = match.group(1).split()
+        extensions.extend(f".{re.sub(r"^\**\.*", "", ext).lower()}" for ext in exts)
+    logger.debug(f"get_file_extensions() = {extensions}")
+    return extensions
 
 
 def configure_qt_window(
