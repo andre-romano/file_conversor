@@ -106,6 +106,14 @@ class InputFilesWidget(QFrame):
         for index in self._list_widget.selectedIndexes():
             self._list_widget.takeItem(index.row())
 
+    def get_files(self) -> list[Path]:
+        input_files: list[Path] = []
+        for i in range(self._list_widget.count()):
+            input_file = Path(self._list_widget.item(i).text()).resolve()
+            assert input_file.exists() and input_file.is_file(), f"File not found: {input_file}"
+            input_files.append(input_file)
+        return input_files
+
 
 __all__ = [
     "InputFilesWidget",

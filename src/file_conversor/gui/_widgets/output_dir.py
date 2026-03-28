@@ -1,5 +1,7 @@
 # src/file_conversor/gui/_widgets/output_dir.py
 
+from pathlib import Path
+
 from PySide6.QtWidgets import QFileDialog, QFrame, QHBoxLayout, QLineEdit
 
 from file_conversor.config import get_translation
@@ -42,6 +44,11 @@ class OutputDirWidget(QFrame):
             dir="",  # Starting directory (empty means current or last used)
         )
         self._line_edit.setText(file_path)
+
+    def get_directory(self) -> Path:
+        folder = Path(self._line_edit.text()).resolve()
+        assert folder.exists() and folder.is_dir(), f"Directory not found: {folder}"
+        return folder
 
 
 __all__ = [

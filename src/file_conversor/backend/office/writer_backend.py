@@ -26,10 +26,10 @@ class LibreofficeWriterBackend(AbstractLibreofficeBackend):
         ODT = "odt"
 
     class SupportedOutFormats(Enum):
-        DOC = "doc"
-        DOCX = "docx"
-        ODT = "odt"
         PDF = "pdf"
+        DOCX = "docx"
+        DOC = "doc"
+        ODT = "odt"
         HTML = "html"
 
     def __init__(

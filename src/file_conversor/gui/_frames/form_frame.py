@@ -1,6 +1,7 @@
 # src/file_conversor/gui/_widgets/form_frame.py
 
 from pathlib import Path
+from typing import Iterable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -83,8 +84,8 @@ class FormFrame(QFrame):
         self.addRow(f"{_('Input Files')}:", input_files_widget)
         return input_files_widget
 
-    def addOutputFormat(self, *extensions: str):
-        output_format_widget = OutputFormatWidget(*extensions)
+    def addOutputFormat(self, extensions: Iterable[str]):
+        output_format_widget = OutputFormatWidget(extensions)
         self.addRow(f"{_('Output Format')}:", output_format_widget)
         return output_format_widget
 
@@ -95,7 +96,7 @@ class FormFrame(QFrame):
 
     def addConfirmButton(self):
         confirm_btn = PushButton(text=_("Start"))
-        confirm_btn.clicked.connect(self.on_confirm_clicked)
+        confirm_btn.clicked.connect(self.on_start_btn_clicked)
 
         confirm_layout = QHBoxLayout()
         confirm_layout.setSpacing(0)
@@ -105,7 +106,10 @@ class FormFrame(QFrame):
         self._form_layout.addRow(confirm_layout)
         return confirm_btn
 
-    def on_confirm_clicked(self) -> None:
+    def on_start_btn_clicked(self) -> None:
+        raise NotImplementedError("Subclasses must implement this method.")
+
+    def on_finished_task(self) -> None:
         raise NotImplementedError("Subclasses must implement this method.")
 
 

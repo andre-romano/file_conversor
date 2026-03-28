@@ -14,8 +14,13 @@ _ = get_translation()
 class OutputFormatWidget(QComboBox):
     def __init__(self, extensions: Iterable[str]) -> None:
         super().__init__()
-        for ext in extensions:
-            self.addItem(ext.lstrip(".").upper(), ext.lower())
+        for suffix in extensions:
+            ext = suffix.lstrip(".")
+            self.addItem(ext.upper(), ext.lower())
+        self.setCurrentIndex(0)
+
+    def get_format(self) -> str:
+        return self.currentData()
 
 
 __all__ = [
