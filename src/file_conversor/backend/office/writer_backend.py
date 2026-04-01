@@ -1,7 +1,7 @@
 # src\file_conversor\backend\office\writer_backend.py
 
 # user-provided imports
-from enum import Enum
+from enum import StrEnum
 
 from file_conversor.backend.office.abstract_libreoffice_backend import (
     AbstractLibreofficeBackend,
@@ -20,12 +20,12 @@ class LibreofficeWriterBackend(AbstractLibreofficeBackend):
     A class that provides an interface for handling doc files using ``writer`` (libreoffice).
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         DOC = "doc"
         DOCX = "docx"
         ODT = "odt"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
         DOCX = "docx"
         DOC = "doc"

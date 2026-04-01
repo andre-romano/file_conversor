@@ -2,7 +2,7 @@
 
 import hashlib
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable, Sequence, override
 
@@ -36,7 +36,7 @@ class HashCheckFailed(RuntimeError):
 
 
 class HashBackend(AbstractBackend):
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         MD5 = "md5"
         SHA1 = "sha1"
         SHA256 = "sha256"
@@ -46,7 +46,7 @@ class HashBackend(AbstractBackend):
         SHA3_384 = "sha3_384"
         SHA3_512 = "sha3_512"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         MD5 = "md5"
         SHA1 = "sha1"
         SHA256 = "sha256"

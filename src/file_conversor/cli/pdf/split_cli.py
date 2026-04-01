@@ -32,14 +32,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfSplitCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfSplitCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfSplitCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfSplitCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="split",
                     description="Split",
@@ -77,18 +74,19 @@ class PdfSplitCLI(AbstractTyperCommand):
 
     def split(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfSplitCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfSplitCommand.get_in_formats())],
         password: Annotated[str, PasswordOption()] = "",
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PdfSplitCommand.split(
+            command = PdfSplitCommand(
                 input_files=input_files,
                 password=password,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

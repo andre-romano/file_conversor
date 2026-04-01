@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfOcrCLI
+from file_conversor.cli.pdf.ocr_cli import PdfOcrCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfOcrCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfOcrCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfOcrCLI:
     def test_pdf_ocr_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

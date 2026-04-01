@@ -21,8 +21,6 @@ logger = LOG.getLogger(__name__)
 
 
 class WinRestartExplorerCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES: set[str] = set()
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # No context menu to register
@@ -45,7 +43,10 @@ class WinRestartExplorerCLI(AbstractTyperCommand):
     def restart_explorer(self):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Restarting explorer.exe:"))
-            WinRestartExplorerCommand.restart_explorer(task.update)
+            command = WinRestartExplorerCommand(
+                progress_callback=task.update,
+            )
+            command.execute()
 
 
 __all__ = [

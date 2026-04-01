@@ -2,9 +2,10 @@
 # src\file_conversor\command\video\compress_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel
 from file_conversor.command.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 from file_conversor.config import Configuration, Log, State, get_translation
@@ -18,35 +19,48 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+VideoCompressExternalDependencies = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
 
-class VideoCompressCommand:
-    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
+VideoCompressInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
+VideoCompressOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
 
-    SupportedInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
-    SupportedOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
+VideoCompressProfile = FFmpegCmdHelper.VideoProfile
+VideoCompressEncoding = FFmpegCmdHelper.VideoEncoding
+VideoCompressQuality = FFmpegCmdHelper.VideoQuality
 
-    VideoProfile = FFmpegCmdHelper.VideoProfile
-    VideoEncoding = FFmpegCmdHelper.VideoEncoding
-    VideoQuality = FFmpegCmdHelper.VideoQuality
+
+class VideoCompressCommand(AbstractCommand[VideoCompressInFormats, VideoCompressOutFormats]):
+    input_files: list[Path]
+    file_format: VideoCompressOutFormats
+    target_size: str
+    video_profile: VideoCompressProfile
+    video_encoding_speed: VideoCompressEncoding
+    video_quality: VideoCompressQuality
+    output_dir: Path
 
     @classmethod
-    def compress(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        target_size: str,
-        video_profile: VideoProfile,
-        video_encoding_speed: VideoEncoding,
-        video_quality: VideoQuality,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoCompressExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoCompressInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoCompressOutFormats
+
+    @override
+    def execute(self):
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             out_stem="_compressed",
-            out_suffix=file_format.value,
+            out_suffix=self.file_format.value,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -54,19 +68,25 @@ class VideoCompressCommand:
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
             datamodel=batch_datamodel,
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         ffmpeg_cmd_helper.set_video_settings(
-            profile=video_profile,
-            encoding_speed=video_encoding_speed,
-            quality=video_quality,
+            profile=self.video_profile,
+            encoding_speed=self.video_encoding_speed,
+            quality=self.video_quality,
         )
-        ffmpeg_cmd_helper.set_target_size(target_size)
+        ffmpeg_cmd_helper.set_target_size(self.target_size)
 
         ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
+    "VideoCompressExternalDependencies",
+    "VideoCompressInFormats",
+    "VideoCompressOutFormats",
+    "VideoCompressProfile",
+    "VideoCompressEncoding",
+    "VideoCompressQuality",
     "VideoCompressCommand",
 ]

@@ -2,11 +2,12 @@
 # src\file_conversor\command\ppt\convert_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.office import LibreofficeImpressBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -20,28 +21,42 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class PptConvertCommand:
-    EXTERNAL_DEPENDENCIES = LibreofficeImpressBackend.EXTERNAL_DEPENDENCIES
-    SupportedInFormats = LibreofficeImpressBackend.SupportedInFormats
-    SupportedOutFormats = LibreofficeImpressBackend.SupportedOutFormats
+PptConvertExternalDependencies = LibreofficeImpressBackend.EXTERNAL_DEPENDENCIES
+PptConvertInFormats = LibreofficeImpressBackend.SupportedInFormats
+PptConvertOutFormats = LibreofficeImpressBackend.SupportedOutFormats
+
+
+class PptConvertCommand(AbstractCommand[PptConvertInFormats, PptConvertOutFormats]):
+    input_files: list[Path]
+    file_format: PptConvertOutFormats
+    output_dir: Path
 
     @classmethod
-    def convert(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return PptConvertExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PptConvertInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PptConvertOutFormats
+
+    @override
+    def execute(self):
         backend = LibreofficeImpressBackend(
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
         )
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
-            out_suffix=file_format.value,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
+            out_suffix=self.file_format.value,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -52,12 +67,15 @@ class PptConvertCommand:
                 input_path=data.input_file,
                 output_path=data.output_file,
             )
-            progress_callback(get_progress(100.0))
+            self.progress_callback(get_progress(100.0))
 
         batch_datamodel.execute(step_one)
         logger.info(f"{_('File conversion')}: [green][bold]{_('SUCCESS')}[/bold][/green]")
 
 
 __all__ = [
+    "PptConvertExternalDependencies",
+    "PptConvertInFormats",
+    "PptConvertOutFormats",
     "PptConvertCommand",
 ]

@@ -3,7 +3,7 @@
 """
 This module provides functionalities for handling files using mozjpeg.
 """
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -25,11 +25,11 @@ class MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     Provides an interface for handling files using mozjpeg.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         JPG = "jpg"
         JPEG = "jpeg"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         JPG = "jpg"
 
     EXTERNAL_DEPENDENCIES: set[str] = {

@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageRenderCLI
+from file_conversor.cli.image.render_cli import ImageRenderCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageRenderCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageRenderCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageRenderCLI:
     def test_image_render_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

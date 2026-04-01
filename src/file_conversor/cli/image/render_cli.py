@@ -12,7 +12,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.image import ImageRenderCommand
+from file_conversor.command.image import ImageRenderCommand, ImageRenderOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -33,15 +33,11 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageRenderCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageRenderCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        # PyMuSVGBackend commands
-        for mode in ImageRenderCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageRenderCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="to_jpg",
                     description="To JPG",
@@ -73,20 +69,21 @@ class ImageRenderCLI(AbstractTyperCommand):
 
     def render(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageRenderCommand.SupportedInFormats)],
-        file_format: Annotated[ImageRenderCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageRenderCommand.get_in_formats())],
+        file_format: Annotated[ImageRenderOutFormats, FormatOption()],
         dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageRenderCommand.render(
+            command = ImageRenderCommand(
                 input_files=input_files,
                 file_format=file_format,
                 dpi=dpi,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

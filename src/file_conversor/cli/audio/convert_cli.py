@@ -12,7 +12,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command import AudioConvertCommand
+from file_conversor.command import AudioConvertCommand, AudioConvertOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -34,16 +34,12 @@ logger = LOG.getLogger(__name__)
 
 class AudioConvertCLI(AbstractTyperCommand):
     """Audio convert command class."""
-
-    EXTERNAL_DEPENDENCIES = AudioConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in AudioConvertCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in AudioConvertCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="to_m4a",
                     description="To M4A",
@@ -75,20 +71,21 @@ class AudioConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in AudioConvertCommand.SupportedInFormats)],
-        file_format: Annotated[AudioConvertCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(AudioConvertCommand.get_in_formats())],
+        file_format: Annotated[AudioConvertOutFormats, FormatOption()],
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            AudioConvertCommand.convert(
+            command = AudioConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

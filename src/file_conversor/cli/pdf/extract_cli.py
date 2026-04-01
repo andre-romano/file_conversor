@@ -36,14 +36,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfExtractCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfExtractCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfExtractCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfExtractCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="extract",
                     description="Extract",
@@ -75,7 +72,7 @@ class PdfExtractCLI(AbstractTyperCommand):
 
     def extract(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfExtractCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfExtractCommand.get_in_formats())],
         pages: Annotated[list[str] | None, typer.Option("--pages", "-pg",
                                                         help=_('Pages to extract (comma-separated list). Format "start-end".'),
                                                         )] = None,
@@ -91,13 +88,14 @@ class PdfExtractCLI(AbstractTyperCommand):
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PdfExtractCommand.extract(
+            command = PdfExtractCommand(
                 input_files=input_files,
                 pages=parse_pdf_pages(pages),
                 password=password,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

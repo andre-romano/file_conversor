@@ -26,15 +26,12 @@ logger = LOG.getLogger(__name__)
 
 
 class AudioInfoCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = AudioInfoCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in AudioInfoCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in AudioInfoCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="info",
                     description="Get Info",
@@ -72,9 +69,15 @@ class AudioInfoCLI(AbstractTyperCommand):
 
     def info(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in AudioInfoCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(AudioInfoCommand.get_in_formats())],
     ):
-        VideoInfoCLI("", "", None).info(input_files)  # reuse video info logic
+        VideoInfoCLI(
+            group_name=self.GROUP_NAME,
+            command_name=self.COMMAND_NAME,
+            rich_help_panel=None,
+        ).info(
+            input_files=input_files,
+        )
 
 
 __all__ = [

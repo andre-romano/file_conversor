@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageEnhanceCLI
+from file_conversor.cli.image.enhance_cli import ImageEnhanceCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageEnhanceCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageEnhanceCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageEnhanceCLI:
     def test_image_enhance_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

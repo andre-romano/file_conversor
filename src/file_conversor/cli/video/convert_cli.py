@@ -29,7 +29,17 @@ from file_conversor.cli._utils.typer import (
     VideoRotationOption,
     WidthOption,
 )
-from file_conversor.command.video import VideoConvertCommand
+from file_conversor.command.video import (
+    VideoConvertAudioCodecs,
+    VideoConvertCommand,
+    VideoConvertEncoding,
+    VideoConvertMirrorAxis,
+    VideoConvertOutFormats,
+    VideoConvertProfile,
+    VideoConvertQuality,
+    VideoConvertRotation,
+    VideoConvertVideoCodecs,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -50,15 +60,12 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoConvertCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoConvertCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoConvertCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="to_mkv",
                     description="To MKV",
@@ -98,19 +105,19 @@ class VideoConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoConvertCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoConvertCommand.get_in_formats())],
 
-        file_format: Annotated[VideoConvertCommand.SupportedOutFormats, FormatOption()] = VideoConvertCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoConvertOutFormats, FormatOption()] = VideoConvertOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        audio_codec: Annotated[VideoConvertCommand.AudioCodecs | None, AudioCodecOption()] = None,
-        video_codec: Annotated[VideoConvertCommand.VideoCodecs | None, VideoCodecOption()] = None,
+        audio_codec: Annotated[VideoConvertAudioCodecs | None, AudioCodecOption()] = None,
+        video_codec: Annotated[VideoConvertVideoCodecs | None, VideoCodecOption()] = None,
 
-        video_profile: Annotated[VideoConvertCommand.VideoProfile, VideoProfileOption()] = VideoConvertCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoConvertCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoConvertCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoConvertCommand.VideoQuality, VideoQualityOption()] = VideoConvertCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoConvertProfile, VideoProfileOption()] = VideoConvertProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoConvertEncoding, VideoEncodingSpeedOption()] = VideoConvertEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoConvertQuality, VideoQualityOption()] = VideoConvertQuality(CONFIG.video_quality),
 
         width: Annotated[int | None, WidthOption()] = None,
         height: Annotated[int | None, HeightOption()] = None,
@@ -121,8 +128,8 @@ class VideoConvertCLI(AbstractTyperCommand):
         color: Annotated[float, ColorOption()] = 1.0,
         gamma: Annotated[float, GammaOption()] = 1.0,
 
-        rotation: Annotated[VideoConvertCommand.Rotation | None, VideoRotationOption()] = None,
-        mirror_axis: Annotated[VideoConvertCommand.MirrorAxis | None, AxisOption()] = None,
+        rotation: Annotated[VideoConvertRotation | None, VideoRotationOption()] = None,
+        mirror_axis: Annotated[VideoConvertMirrorAxis | None, AxisOption()] = None,
 
         deshake: Annotated[bool, DeshakeOption()] = False,
         unsharp: Annotated[bool, UnsharpOption()] = False,
@@ -131,7 +138,7 @@ class VideoConvertCLI(AbstractTyperCommand):
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoConvertCommand.convert(
+            command = VideoConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
@@ -155,6 +162,7 @@ class VideoConvertCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

@@ -32,15 +32,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageInfoCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageInfoCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # Pillow commands
-        for mode in ImageInfoCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageInfoCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="info",
                     description="Get Info",
@@ -70,10 +67,12 @@ class ImageInfoCLI(AbstractTyperCommand):
 
     def info(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageInfoCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageInfoCommand.get_in_formats())],
     ):
-        for input_file, metadata in ImageInfoCommand.info(input_files).items():
+        command = ImageInfoCommand(input_files=input_files)
+        command.execute()
 
+        for input_file, metadata in command.output.items():
             # 📁 Informações gerais do arquivo
             input_name = input_file.name
             in_ext = input_file.suffix.upper()[1:]
@@ -83,8 +82,7 @@ class ImageInfoCLI(AbstractTyperCommand):
                 f"  - {_('Name')}: {input_name}",
                 f"  - {_('Format')}: {in_ext}",
             ]
-            for tag, value in metadata.items():
-                tag_name = ImageInfoCommand.ExifTags.get(tag, f"{tag}")
+            for tag_name, value in metadata.items():
                 formatted.append(f"  - {tag_name}: {value}")
 
             # Agrupar e exibir tudo com Rich

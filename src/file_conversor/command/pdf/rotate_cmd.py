@@ -2,11 +2,12 @@
 # src\file_conversor\command\pdf\rotate_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.pdf import PyPDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,29 +20,41 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+PdfRotateExternalDependencies = PyPDFBackend.EXTERNAL_DEPENDENCIES
+PdfRotateInFormats = PyPDFBackend.SupportedInFormats
+PdfRotateOutFormats = PyPDFBackend.SupportedOutFormats
 
-class PdfRotateCommand:
-    EXTERNAL_DEPENDENCIES: set[str] = PyPDFBackend.EXTERNAL_DEPENDENCIES
+PdfRotateRotation = PyPDFBackend.Rotation
 
-    SupportedInFormats = PyPDFBackend.SupportedInFormats
-    SupportedOutFormats = PyPDFBackend.SupportedOutFormats
+
+class PdfRotateCommand(AbstractCommand[PdfRotateInFormats, PdfRotateOutFormats]):
+    input_files: list[Path]
+    rotation: dict[int, PdfRotateRotation]
+    password: str
+    output_dir: Path
+
+    @classmethod
+    @override
+    def _external_dependencies(cls):
+        return PdfRotateExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PdfRotateInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PdfRotateOutFormats
 
     @classmethod
     def len(cls, input_file: Path) -> int:
         backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
         return backend.len(input_file)
 
-    Rotation = PyPDFBackend.Rotation
-
-    @classmethod
-    def rotate(
-        cls,
-        input_files: list[Path],
-        rotation: dict[int, Rotation],
-        password: str,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def execute(self):
         """
         Rotate PDF pages.
 
@@ -54,8 +67,8 @@ class PdfRotateCommand:
         backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
             out_stem="_rotated",
         )
@@ -65,9 +78,9 @@ class PdfRotateCommand:
             backend.rotate(
                 input_file=data.input_file,
                 output_file=data.output_file,
-                decrypt_password=password,
-                rotations=rotation,
-                progress_callback=lambda p: progress_callback(get_progress(p)),
+                decrypt_password=self.password,
+                rotations=self.rotation,
+                progress_callback=lambda p: self.progress_callback(get_progress(p)),
             )
 
         batch_datamodel.execute(step_one)
@@ -75,5 +88,9 @@ class PdfRotateCommand:
 
 
 __all__ = [
+    "PdfRotateExternalDependencies",
+    "PdfRotateInFormats",
+    "PdfRotateOutFormats",
+    "PdfRotateRotation",
     "PdfRotateCommand",
 ]

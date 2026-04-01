@@ -2,11 +2,12 @@
 # src\file_conversor\command\video\check_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.audio_video import FFprobeBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -20,17 +21,31 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class VideoCheckCommand:
-    EXTERNAL_DEPENDENCIES = FFprobeBackend.EXTERNAL_DEPENDENCIES
+VideoCheckExternalDependencies = FFprobeBackend.EXTERNAL_DEPENDENCIES
+VideoCheckInFormats = FFprobeBackend.SupportedInVideoFormats
+VideoCheckOutFormats = FFprobeBackend.SupportedOutVideoFormats
 
-    SupportedInFormats = FFprobeBackend.SupportedInVideoFormats
+
+class VideoCheckCommand(AbstractCommand[VideoCheckInFormats, VideoCheckOutFormats]):
+    input_files: list[Path]
 
     @classmethod
-    def check(
-        cls,
-        input_files: list[Path],
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoCheckExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoCheckInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoCheckOutFormats
+
+    @override
+    def execute(self):
 
         backend = FFprobeBackend(
             install_deps=CONFIG.install_deps,
@@ -38,7 +53,7 @@ class VideoCheckCommand:
         )
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
+            input_files=self.input_files,
             output_dir=Path(),
             out_stem="_",
             overwrite_output=STATE.overwrite_output.enabled,
@@ -51,12 +66,15 @@ class VideoCheckCommand:
                 backend.info(data.input_file)
             except Exception as e:
                 logger.error(f"{_('Error checking file')} '{data.input_file}': {e}")
-            progress_callback(get_progress(100.0))
+            self.progress_callback(get_progress(100.0))
 
         batch_datamodel.execute(step_one)
         logger.info(f"{_('File check')}: [bold green]{_('SUCCESS')}[/].")
 
 
 __all__ = [
+    "VideoCheckExternalDependencies",
+    "VideoCheckInFormats",
+    "VideoCheckOutFormats",
     "VideoCheckCommand",
 ]

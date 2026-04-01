@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfMergeCLI
+from file_conversor.cli.pdf.merge_cli import PdfMergeCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfMergeCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfMergeCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfMergeCLI:
     def test_pdf_merge_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

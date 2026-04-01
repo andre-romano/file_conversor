@@ -1,12 +1,14 @@
 
 # src/file_conversor/backend/office/convert_protocol.py
 
+from abc import abstractmethod
 from pathlib import Path
 from typing import Protocol
 
 
 class ConvertProtocol(Protocol):
 
+    @abstractmethod
     def convert(
         self,
         input_path: Path,

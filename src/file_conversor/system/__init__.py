@@ -14,4 +14,4 @@ elif AbstractSystem.Platform.get() == AbstractSystem.Platform.MACOS:
 elif AbstractSystem.Platform.get() == AbstractSystem.Platform.LINUX:
     System = LinuxSystem()
 else:
-    raise NotImplementedError(f"System platform {AbstractSystem.Platform.get()} is not supported.")
+    raise RuntimeError(f"System platform {AbstractSystem.Platform.get()} is not supported.")

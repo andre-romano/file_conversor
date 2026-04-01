@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageCompressCLI
+from file_conversor.cli.image.compress_cli import ImageCompressCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageCompressCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageCompressCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageCompressCLI:
     def test_image_compress_cases(self, tmp_path: Path):
         in_path = DATA_PATH / "test.png"

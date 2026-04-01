@@ -4,7 +4,7 @@
 This module provides functionalities for handling PDF files using ``pypdf`` backend.
 """
 
-from enum import Enum
+from enum import Enum, IntEnum, StrEnum
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
@@ -27,17 +27,17 @@ class PyPDFBackend(AbstractBackend):
     """
     A class that provides an interface for handling PDF files using ``pypdf``.
     """
-    class Rotation(Enum):
+    class Rotation(IntEnum):
         """Rotation degrees for PDF page rotation."""
         DEG_0 = 0
         DEG_90 = 90
         DEG_180 = 180
         DEG_270 = 270
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()

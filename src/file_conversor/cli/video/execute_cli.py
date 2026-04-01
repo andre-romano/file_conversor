@@ -16,7 +16,12 @@ from file_conversor.cli._utils.typer import (
     VideoBitrateOption,
     VideoCodecOption,
 )
-from file_conversor.command.video import VideoExecuteCommand
+from file_conversor.command.video import (
+    VideoExecuteAudioCodecs,
+    VideoExecuteCommand,
+    VideoExecuteOutFormats,
+    VideoExecuteVideoCodecs,
+)
 from file_conversor.config import Configuration, Log, State, get_translation
 from file_conversor.system.win.ctx_menu import WinContextMenu
 
@@ -31,8 +36,6 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoExecuteCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoExecuteCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # no context menu for this command
@@ -56,14 +59,14 @@ class VideoExecuteCLI(AbstractTyperCommand):
 
     def execute(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoExecuteCommand.SupportedInFormats)],
-        file_format: Annotated[VideoExecuteCommand.SupportedOutFormats, FormatOption()] = VideoExecuteCommand.SupportedOutFormats(CONFIG.video_format),
+        input_files: Annotated[list[Path], InputFilesArgument(VideoExecuteCommand.get_in_formats())],
+        file_format: Annotated[VideoExecuteOutFormats, FormatOption()] = VideoExecuteOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        audio_codec: Annotated[VideoExecuteCommand.AudioCodecs | None, AudioCodecOption()] = None,
-        video_codec: Annotated[VideoExecuteCommand.VideoCodecs | None, VideoCodecOption()] = None,
+        audio_codec: Annotated[VideoExecuteAudioCodecs | None, AudioCodecOption()] = None,
+        video_codec: Annotated[VideoExecuteVideoCodecs | None, VideoCodecOption()] = None,
 
         audio_filters: Annotated[list[str], typer.Option("--audio-filter", "-af",
                                                          help=f'{_("Apply a custom FFmpeg audio filter")} {_("(advanced option, use with caution). Uses the same format as FFmpeg filters (e.g., filter=option1=value1:option2=value2:...). Filters are applied in the order they appear in the command.")}. {_('Defaults to None (do not apply custom filters)')}.',
@@ -80,7 +83,7 @@ class VideoExecuteCLI(AbstractTyperCommand):
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoExecuteCommand.execute(
+            command = VideoExecuteCommand(
                 input_files=input_files,
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
@@ -93,6 +96,7 @@ class VideoExecuteCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

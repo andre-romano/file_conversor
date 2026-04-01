@@ -11,7 +11,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.image import ImageMirrorCommand
+from file_conversor.command.image import ImageMirrorAxis, ImageMirrorCommand
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -32,15 +32,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageMirrorCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageMirrorCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # Pillow commands
-        for mode in ImageMirrorCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageMirrorCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="mirror_x",
                     description="Mirror X axis",
@@ -76,18 +73,19 @@ class ImageMirrorCLI(AbstractTyperCommand):
 
     def mirror(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageMirrorCommand.SupportedInFormats)],
-        axis: Annotated[ImageMirrorCommand.MirrorAxis, AxisOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageMirrorCommand.get_in_formats())],
+        axis: Annotated[ImageMirrorAxis, AxisOption()],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageMirrorCommand.mirror(
+            command = ImageMirrorCommand(
                 input_files=input_files,
                 axis=axis,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

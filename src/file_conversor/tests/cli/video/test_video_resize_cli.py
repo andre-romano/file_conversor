@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoResizeCLI
+from file_conversor.cli.video.resize_cli import VideoResizeCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoResizeCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoResizeCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoResizeCLI:
     def test_video_resize(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [
@@ -22,7 +22,8 @@ class TestVideoResizeCLI:
             result = TestTyper.invoke(
                 AppTyperGroup.Commands.VIDEO.value, VideoTyperGroup.Commands.RESIZE.value,
                 str(in_path),
-                "-rs", "1024:768",
+                "-w", "1024",
+                "-h", "768",
                 *TestTyper.get_out_dir_params(out_path),
             )
             assert result.exit_code == 0

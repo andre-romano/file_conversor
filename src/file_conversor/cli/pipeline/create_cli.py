@@ -23,8 +23,6 @@ logger = LOG.getLogger(__name__)
 
 
 class PipelineCreateCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PipelineCreateCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         return  # No context menu for pipeline commands
@@ -59,11 +57,12 @@ class PipelineCreateCLI(AbstractTyperCommand):
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PipelineCreateCommand.create(
+            command = PipelineCreateCommand(
                 pipeline_dir=pipeline_dir,
                 stages=stages,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

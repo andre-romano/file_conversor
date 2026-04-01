@@ -29,15 +29,12 @@ logger = LOG.getLogger(__name__)
 
 class AudioCheckCLI(AbstractTyperCommand):
     """Audio check command class."""
-    EXTERNAL_DEPENDENCIES = AudioCheckCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in AudioCheckCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in AudioCheckCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="check",
                     description="Check",
@@ -62,14 +59,15 @@ class AudioCheckCLI(AbstractTyperCommand):
 
     def check(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in AudioCheckCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(AudioCheckCommand.get_in_formats())],
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            AudioCheckCommand.check(
+            command = AudioCheckCommand(
                 input_files=input_files,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

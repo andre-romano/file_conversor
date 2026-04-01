@@ -24,8 +24,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ConfigShowCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ConfigShowCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # no context menu for this command
@@ -45,7 +43,7 @@ class ConfigShowCLI(AbstractTyperCommand):
     """)
 
     def show(self):
-        ConfigShowCommand.show()
+        ConfigShowCommand().execute()
         print(f"{_('Configuration')}:", Pretty(CONFIG.to_dict(), expand_all=True))
 
 

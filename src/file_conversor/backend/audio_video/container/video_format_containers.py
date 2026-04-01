@@ -1,7 +1,7 @@
 # src\file_conversor\backend\audio_video\container\video_format_container.py
 
-from enum import Enum
-from typing import Any, Self
+from enum import StrEnum
+from typing import Any, Self, override
 
 from file_conversor.backend.audio_video.codec import (
     FFmpegAudioCodecs,
@@ -21,7 +21,7 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class VideoFormatContainers(Enum):
+class VideoFormatContainers(StrEnum):
     NULL = "null"
     MP4 = "mp4"
     AVI = "avi"
@@ -88,6 +88,7 @@ class VideoFormatContainers(Enum):
                                            FFmpegVideoCodecs.AV1_NVENC,
                                        })
 
+    @override
     def __contains__(self, value: str | Self | Any) -> bool:
         if isinstance(value, str):
             return value.lower() == self.value

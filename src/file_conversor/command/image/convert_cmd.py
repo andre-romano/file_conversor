@@ -2,11 +2,12 @@
 # src\file_conversor\command\image\convert_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.image import PillowBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -20,28 +21,41 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class ImageConvertCommand:
-    EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
+ImageConvertExternalDependencies = PillowBackend.EXTERNAL_DEPENDENCIES
+ImageConvertInFormats = PillowBackend.SupportedInFormats
+ImageConvertOutFormats = PillowBackend.SupportedOutFormats
 
-    SupportedInFormats = PillowBackend.SupportedInFormats
-    SupportedOutFormats = PillowBackend.SupportedOutFormats
+
+class ImageConvertCommand(AbstractCommand[ImageConvertInFormats, ImageConvertOutFormats]):
+    input_files: list[Path]
+    file_format: ImageConvertOutFormats
+    quality: int
+    output_dir: Path
 
     @classmethod
-    def convert(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        quality: int,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return ImageConvertExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return ImageConvertInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return ImageConvertOutFormats
+
+    @override
+    def execute(self):
         pillow_backend = PillowBackend(verbose=STATE.loglevel.get().is_verbose())
 
         datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
-            out_suffix=file_format.value,
+            out_suffix=self.file_format.value,
         )
 
         def step_one(data: FileDataModel, get_progress: Callable[[float], float]):
@@ -49,9 +63,9 @@ class ImageConvertCommand:
             pillow_backend.convert(
                 input_file=data.input_file,
                 output_file=data.output_file,
-                quality=quality,
+                quality=self.quality,
             )
-            progress_callback(get_progress(100.0))
+            self.progress_callback(get_progress(100.0))
 
         datamodel.execute(step_one)
 
@@ -59,5 +73,8 @@ class ImageConvertCommand:
 
 
 __all__ = [
+    "ImageConvertExternalDependencies",
+    "ImageConvertInFormats",
+    "ImageConvertOutFormats",
     "ImageConvertCommand",
 ]

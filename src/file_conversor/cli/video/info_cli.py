@@ -12,7 +12,11 @@ from rich.text import Text
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument
-from file_conversor.command.video import VideoInfoCommand
+from file_conversor.command.video import (
+    VideoInfoChapter,
+    VideoInfoCommand,
+    VideoInfoStream,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -33,15 +37,12 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoInfoCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoInfoCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoInfoCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoInfoCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="info",
                     description="Get Info",
@@ -77,15 +78,17 @@ class VideoInfoCLI(AbstractTyperCommand):
 
     def info(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoInfoCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoInfoCommand.get_in_formats())],
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            list_data = VideoInfoCommand.info(
+            command = VideoInfoCommand(
                 input_files=input_files,
                 progress_callback=task.update,
             )
-            for data in list_data:
+            command.execute()
+
+            for data in command.output:
                 group = Group(
                     Text(f"📁 {_('File Information')}:", style="bold cyan"),
                     f"  - {_('Name')}: {data.filename.name}",
@@ -102,7 +105,7 @@ class VideoInfoCLI(AbstractTyperCommand):
                 )
                 print(Panel(group, title=f"🧾 {_('File Analysis')}", border_style="blue"))
 
-    def _get_stream_info(self, streams: list[VideoInfoCommand.StreamInfo]) -> list[RenderableType]:
+    def _get_stream_info(self, streams: list[VideoInfoStream]) -> list[RenderableType]:
         output_text: list[RenderableType] = []
         for idx, stream in enumerate(streams):
             output_text.extend([
@@ -115,7 +118,7 @@ class VideoInfoCLI(AbstractTyperCommand):
             ])
         return output_text
 
-    def _get_chapters_info(self, chapters: list[VideoInfoCommand.ChapterInfo]) -> list[RenderableType]:
+    def _get_chapters_info(self, chapters: list[VideoInfoChapter]) -> list[RenderableType]:
         output_text: list[RenderableType] = []
         for chapter in chapters:
             output_text.extend([

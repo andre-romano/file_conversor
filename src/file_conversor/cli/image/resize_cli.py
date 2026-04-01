@@ -11,9 +11,7 @@ from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
 
 # COMMAND
-from file_conversor.command.image import ImageResizeCommand
-
-# CORE
+from file_conversor.command.image import ImageResizeCommand, ImageResizeResamplingOption
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -35,15 +33,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageResizeCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageResizeCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # Pillow commands
-        for mode in ImageResizeCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageResizeCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="resize",
                     description="Resize",
@@ -81,7 +76,7 @@ class ImageResizeCLI(AbstractTyperCommand):
 
     def resize(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageResizeCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageResizeCommand.get_in_formats())],
         scale: Annotated[float | None, typer.Option("--scale", "-s",
                                                     help=f"{_("Scale image proportion. Valid values start at 0.1.")}",
                                                     min=0.1,
@@ -92,9 +87,9 @@ class ImageResizeCLI(AbstractTyperCommand):
                                                   min=1,
                                                   )] = None,
 
-        resampling: Annotated[ImageResizeCommand.ResamplingOption, typer.Option("--resampling", "-r",
-                                                                                help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in ImageResizeCommand.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}.',
-                                                                                )] = ImageResizeCommand.ResamplingOption(CONFIG.image_resampling),
+        resampling: Annotated[ImageResizeResamplingOption, typer.Option("--resampling", "-r",
+                                                                        help=f'{_("Resampling algorithm.")}',
+                                                                        )] = ImageResizeResamplingOption(CONFIG.image_resampling),
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         if scale is None and width is None:
@@ -108,7 +103,7 @@ class ImageResizeCLI(AbstractTyperCommand):
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageResizeCommand.resize(
+            command = ImageResizeCommand(
                 input_files=input_files,
                 scale=scale,
                 width=width,
@@ -116,6 +111,7 @@ class ImageResizeCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

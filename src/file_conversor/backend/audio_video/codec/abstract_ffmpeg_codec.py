@@ -1,6 +1,7 @@
 # src\file_conversor\backend\audio_video\codec.py
 
-from typing import Any, Protocol, override
+from abc import abstractmethod
+from typing import Any, override
 
 from file_conversor.backend.audio_video.filter.ffmpeg_filter import FFmpegFilter
 from file_conversor.config import Log, get_translation
@@ -12,20 +13,7 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class SetBitrateProtocol(Protocol):
-    def set_bitrate(self, bitrate: int):
-        """Set bitrate for the codec."""
-        ...
-
-
-class SetFiltersProtocol(Protocol):
-
-    def set_filters(self, *filters: FFmpegFilter):
-        """Set filters for the codec."""
-        ...
-
-
-class AbstractFFmpegCodec(SetBitrateProtocol, SetFiltersProtocol):
+class AbstractFFmpegCodec:
     def __init__(
         self,
         invalid_prefix: str,
@@ -49,6 +37,16 @@ class AbstractFFmpegCodec(SetBitrateProtocol, SetFiltersProtocol):
     @property
     def bitrate(self) -> int:
         return self._bitrate
+
+    @abstractmethod
+    def set_bitrate(self, bitrate: int):
+        """Set bitrate for the codec."""
+        ...
+
+    @abstractmethod
+    def set_filters(self, *filters: FFmpegFilter):
+        """Set filters for the codec."""
+        ...
 
     def _set_bitrate(self, option: str, value: int):
         if value < 0:

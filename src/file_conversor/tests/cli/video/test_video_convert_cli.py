@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoConvertCLI
+from file_conversor.cli.video.convert_cli import VideoConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoConvertCLI:
     def test_video_convert(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

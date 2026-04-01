@@ -2,9 +2,10 @@
 # src\file_conversor\command\video\resize_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel
 from file_conversor.command.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 from file_conversor.config import Configuration, Log, State, get_translation
@@ -19,36 +20,49 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class VideoResizeCommand:
-    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
+VideoResizeExternalDependencies = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
-    SupportedOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
+VideoResizeInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
+VideoResizeOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
 
-    VideoProfile = FFmpegCmdHelper.VideoProfile
-    VideoEncoding = FFmpegCmdHelper.VideoEncoding
-    VideoQuality = FFmpegCmdHelper.VideoQuality
+VideoResizeProfile = FFmpegCmdHelper.VideoProfile
+VideoResizeEncoding = FFmpegCmdHelper.VideoEncoding
+VideoResizeQuality = FFmpegCmdHelper.VideoQuality
+
+
+class VideoResizeCommand(AbstractCommand[VideoResizeInFormats, VideoResizeOutFormats]):
+    input_files: list[Path]
+    resolution: tuple[int, int] | None
+    file_format: VideoResizeOutFormats
+    audio_bitrate: int | None
+    video_bitrate: int | None
+    video_profile: VideoResizeProfile
+    video_encoding_speed: VideoResizeEncoding
+    video_quality: VideoResizeQuality
+    output_dir: Path
 
     @classmethod
-    def resize(
-        cls,
-        input_files: list[Path],
-        width: int | None,
-        height: int | None,
-        file_format: SupportedOutFormats,
-        audio_bitrate: int | None,
-        video_bitrate: int | None,
-        video_profile: VideoProfile,
-        video_encoding_speed: VideoEncoding,
-        video_quality: VideoQuality,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoResizeExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoResizeInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoResizeOutFormats
+
+    @override
+    def execute(self):
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             out_stem="_resized",
-            out_suffix=file_format.value,
+            out_suffix=self.file_format.value,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -56,23 +70,32 @@ class VideoResizeCommand:
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
             datamodel=batch_datamodel,
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         ffmpeg_cmd_helper.set_video_settings(
-            profile=video_profile,
-            encoding_speed=video_encoding_speed,
-            quality=video_quality,
+            profile=self.video_profile,
+            encoding_speed=self.video_encoding_speed,
+            quality=self.video_quality,
         )
-        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=self.audio_bitrate, video_bitrate=self.video_bitrate)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=(width, height) if width is not None and height is not None else None,
+            resolution=self.resolution if self.resolution is not None else None,
         )
 
         ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
+    "VideoResizeExternalDependencies",
+
+    "VideoResizeInFormats",
+    "VideoResizeOutFormats",
+
+    "VideoResizeProfile",
+    "VideoResizeEncoding",
+    "VideoResizeQuality",
+
     "VideoResizeCommand",
 ]

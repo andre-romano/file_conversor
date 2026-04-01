@@ -17,7 +17,14 @@ from file_conversor.cli._utils.typer import (
     VideoQualityOption,
     VideoRotationOption,
 )
-from file_conversor.command.video import VideoRotateCommand
+from file_conversor.command.video import (
+    VideoRotateCommand,
+    VideoRotateEncoding,
+    VideoRotateOutFormats,
+    VideoRotateProfile,
+    VideoRotateQuality,
+    VideoRotateRotation,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -38,15 +45,12 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoRotateCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoRotateCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoRotateCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoRotateCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="rotate_anticlock_90",
                     description="Rotate Left",
@@ -82,24 +86,24 @@ class VideoRotateCLI(AbstractTyperCommand):
 
     def rotate(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoRotateCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoRotateCommand.get_in_formats())],
 
-        rotation: Annotated[VideoRotateCommand.Rotation, VideoRotationOption()],
+        rotation: Annotated[VideoRotateRotation, VideoRotationOption()],
 
-        file_format: Annotated[VideoRotateCommand.SupportedOutFormats, FormatOption()] = VideoRotateCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoRotateOutFormats, FormatOption()] = VideoRotateOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        video_profile: Annotated[VideoRotateCommand.VideoProfile, VideoProfileOption()] = VideoRotateCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoRotateCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoRotateCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoRotateCommand.VideoQuality, VideoQualityOption()] = VideoRotateCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoRotateProfile, VideoProfileOption()] = VideoRotateProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoRotateEncoding, VideoEncodingSpeedOption()] = VideoRotateEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoRotateQuality, VideoQualityOption()] = VideoRotateQuality(CONFIG.video_quality),
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoRotateCommand.rotate(
+            command = VideoRotateCommand(
                 input_files=input_files,
                 rotation=rotation,
                 file_format=file_format,
@@ -111,6 +115,7 @@ class VideoRotateCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

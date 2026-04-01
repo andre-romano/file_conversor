@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfRotateCLI
+from file_conversor.cli.pdf.rotate_cli import PdfRotateCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfRotateCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfRotateCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfRotateCLI:
     def test_pdf_rotate_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

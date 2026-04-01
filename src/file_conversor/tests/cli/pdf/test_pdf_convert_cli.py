@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfConvertCLI
+from file_conversor.cli.pdf.convert_cli import PdfConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfConvertCLI:
     def test_pdf_convert_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

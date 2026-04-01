@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageResizeCLI
+from file_conversor.cli.image.resize_cli import ImageResizeCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageResizeCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageResizeCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageResizeCLI:
     def test_image_resize_scale(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.png"
@@ -38,5 +38,5 @@ class TestImageResizeCLI:
         assert result.exit_code == 0
         assert out_path.exists()
 
-    def test_image(self,):
+    def test_image_resize_help(self,):
         TestTyper.invoke_test_help(AppTyperGroup.Commands.IMAGE.value, ImageTyperGroup.Commands.RESIZE.value)

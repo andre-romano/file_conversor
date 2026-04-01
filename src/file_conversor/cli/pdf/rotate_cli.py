@@ -14,6 +14,7 @@ from file_conversor.cli._utils.typer import (
     PasswordOption,
 )
 from file_conversor.command.pdf import PdfRotateCommand
+from file_conversor.command.pdf.rotate_cmd import PdfRotateRotation
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -35,14 +36,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfRotateCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfRotateCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfRotateCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfRotateCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="rotate_anticlock_90",
                     description="Rotate Left",
@@ -86,7 +84,7 @@ class PdfRotateCLI(AbstractTyperCommand):
 
     def rotate(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfRotateCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfRotateCommand.get_in_formats())],
         rotation: Annotated[list[str], typer.Option("--rotation", "-r",
                                                     help=f'{_("List of pages to rotate. Format")} ``\"page:rotation\"`` {_("or")} ``\"start-end:rotation\"`` {_("or")} ``\"start-:rotation\"``. {_("Rotation can only be multiples of 90 degrees (e.g., -90, 0, 90, 180, 270).")}',
                                                     )],
@@ -96,20 +94,21 @@ class PdfRotateCLI(AbstractTyperCommand):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
             try:
-                PdfRotateCommand.rotate(
+                command = PdfRotateCommand(
                     input_files=input_files,
                     rotation={
-                        page: PdfRotateCommand.Rotation(normalize_degree(rotation_int))
+                        page: PdfRotateRotation(normalize_degree(rotation_int))
                         for page, rotation_int in parse_pdf_rotation(rotation, PdfRotateCommand.len(input_files[0])).items()
                     },
                     password=password,
                     output_dir=output_dir,
                     progress_callback=task.update,
                 )
+                command.execute()
             except ValueError as e:
                 raise ValueError(
                     f"{_('Rotation values must be multiples of 90 degrees')}: {
-                        ", ".join(str(mode.value) for mode in PdfRotateCommand.Rotation)
+                        ", ".join(str(mode.value) for mode in PdfRotateRotation)
                     }."
                 ) from e
 

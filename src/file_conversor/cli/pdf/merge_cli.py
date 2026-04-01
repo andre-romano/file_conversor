@@ -26,8 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfMergeCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfMergeCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # no context menu for this command
@@ -61,18 +59,19 @@ class PdfMergeCLI(AbstractTyperCommand):
 
     def merge(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfMergeCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfMergeCommand.get_in_formats())],
         password: Annotated[str, PasswordOption()] = "",
-        output_file: Annotated[Path | None, OutputFileOption(mode.value for mode in PdfMergeCommand.SupportedOutFormats)] = None,
+        output_file: Annotated[Path | None, OutputFileOption(PdfMergeCommand.get_out_formats())] = None,
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PdfMergeCommand.merge(
+            command = PdfMergeCommand(
                 input_files=input_files,
                 password=password,
                 output_file=output_file,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

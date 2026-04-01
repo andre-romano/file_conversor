@@ -4,7 +4,7 @@
 This module provides functionalities for handling image files using ``pillow`` backend.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -28,7 +28,7 @@ class PillowBackend(AbstractBackend):
     """
     A class that provides an interface for handling image files using ``pillow``.
     """
-    class AntialiasAlgorithm(Enum):
+    class AntialiasAlgorithm(StrEnum):
         MEDIAN = "median"
         MODE = "mode"
 
@@ -39,7 +39,7 @@ class PillowBackend(AbstractBackend):
                 case PillowBackend.AntialiasAlgorithm.MODE:
                     return ImageFilter.ModeFilter
 
-    class PillowFilter(Enum):
+    class PillowFilter(StrEnum):
         BLUR = "blur"
         SMOOTH = "smooth"
         SMOOTH_MORE = "smooth_more"
@@ -79,7 +79,7 @@ class PillowBackend(AbstractBackend):
                 case PillowBackend.PillowFilter.EMBOSS_EDGE:
                     return ImageFilter.CONTOUR
 
-    class ResamplingOption(Enum):
+    class ResamplingOption(StrEnum):
         BICUBIC = "bicubic"
         BILINEAR = "bilinear"
         LANCZOS = "lanczos"
@@ -96,7 +96,7 @@ class PillowBackend(AbstractBackend):
                 case PillowBackend.ResamplingOption.NEAREST:
                     return Image.Resampling.NEAREST
 
-    class MirrorAxis(Enum):
+    class MirrorAxis(StrEnum):
         X = "x"
         Y = "y"
 
@@ -107,10 +107,7 @@ class PillowBackend(AbstractBackend):
                 case PillowBackend.MirrorAxis.Y:
                     return ImageOps.flip
 
-    Exif = Image.Exif
-    Exif_TAGS = TAGS
-
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         BMP = "bmp"
         GIF = "gif"
         ICO = "ico"
@@ -124,7 +121,7 @@ class PillowBackend(AbstractBackend):
         TIFF = "tiff"
         WEBP = "webp"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         BMP = "bmp"
         GIF = "gif"
         ICO = "ico"
@@ -135,8 +132,7 @@ class PillowBackend(AbstractBackend):
         TIF = "tif"
         WEBP = "webp"
 
-        @property
-        def format(self) -> str:
+        def get(self) -> str:
             match self:
                 case PillowBackend.SupportedOutFormats.BMP:
                     return "BMP"
@@ -155,6 +151,8 @@ class PillowBackend(AbstractBackend):
                 case PillowBackend.SupportedOutFormats.WEBP:
                     return "WEBP"
 
+    ExifParsed = dict[str, Any]
+
     EXTERNAL_DEPENDENCIES: set[str] = set()
 
     def __init__(self, verbose: bool = False,):
@@ -166,14 +164,19 @@ class PillowBackend(AbstractBackend):
         super().__init__()
         self._verbose = verbose
 
-    def info(self, input_file: Path) -> Exif:
+    def info(self, input_file: Path):
         """
         Get EXIF info from input file.
 
         :param input_file: Input image file.
         """
+        res: PillowBackend.ExifParsed = {}
         img = self._open(input_file)
-        return img.getexif()
+        exif = img.getexif()
+        for tag_id, value in exif.items():
+            tag_name = TAGS.get(tag_id, f"{tag_id}")
+            res[tag_name] = value
+        return res
 
     def resize(self,
                output_file: Path,
@@ -454,7 +457,7 @@ class PillowBackend(AbstractBackend):
         output_file = output_file.with_suffix(output_file.suffix.lower())
 
         out_ext = output_file.suffix[1:]
-        file_format = self.SupportedOutFormats(out_ext).format
+        file_format = self.SupportedOutFormats(out_ext).get()
 
         # save parameters
         params: dict[str, Any] = {

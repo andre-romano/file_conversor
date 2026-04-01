@@ -9,7 +9,7 @@ import typer
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
-from file_conversor.command.image import ImageRotateCommand
+from file_conversor.command.image import ImageRotateCommand, ImageRotateResamplingOption
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -31,15 +31,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageRotateCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageRotateCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # Pillow commands
-        for mode in ImageRotateCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageRotateCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="rotate_anticlock_90",
                     description="Rotate Left",
@@ -75,28 +72,29 @@ class ImageRotateCLI(AbstractTyperCommand):
 
     def rotate(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageRotateCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageRotateCommand.get_in_formats())],
         rotation: Annotated[int, typer.Option("--rotation", "-r",
                                               help=_("Rotation in degrees. Valid values are between -360 (anti-clockwise rotation) and 360 (clockwise rotation)."),
                                               min=-360, max=360,
                                               )],
 
-        resampling: Annotated[ImageRotateCommand.ResamplingOption, typer.Option("--resampling", "-re",
-                                                                                help=f'{_("Resampling algorithm. Valid values are")} {", ".join(mode.value for mode in ImageRotateCommand.ResamplingOption)}. {_("Defaults to")} {CONFIG.image_resampling}.',
-                                                                                )] = ImageRotateCommand.ResamplingOption(CONFIG.image_resampling),
+        resampling: Annotated[ImageRotateResamplingOption, typer.Option("--resampling", "-re",
+                                                                        help=f'{_("Resampling algorithm.")}.',
+                                                                        )] = ImageRotateResamplingOption(CONFIG.image_resampling),
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageRotateCommand.rotate(
+            command = ImageRotateCommand(
                 input_files=input_files,
                 rotation=normalize_degree(rotation),
                 resampling=resampling,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

@@ -11,7 +11,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.ppt import PptConvertCommand
+from file_conversor.command.ppt import PptConvertCommand, PptConvertOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -32,22 +32,19 @@ logger = LOG.getLogger(__name__)
 
 
 class PptConvertCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PptConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # WordBackend commands
-        for mode in PptConvertCommand.SupportedInFormats:
-            ext_in = mode.value
+        for ext_in in PptConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
-                    name=f"to_{mode.value}",
-                    description=f"To {mode.value.upper()}",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f "{mode.value}" "%1""',
-                    icon=str(icons_folder_path / f"{mode.value}.ico"),
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f "{ext_out}" "%1""',
+                    icon=str(icons_folder_path / f"{ext_out}.ico"),
                 )
-                for mode in PptConvertCommand.SupportedOutFormats
+                for ext_out in PptConvertCommand.get_out_formats()
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
@@ -69,18 +66,19 @@ class PptConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PptConvertCommand.SupportedInFormats)],
-        file_format: Annotated[PptConvertCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(PptConvertCommand.get_in_formats())],
+        file_format: Annotated[PptConvertOutFormats, FormatOption()],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PptConvertCommand.convert(
+            command = PptConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

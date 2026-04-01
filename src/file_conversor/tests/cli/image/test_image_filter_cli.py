@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageFilterCLI
+from file_conversor.cli.image.filter_cli import ImageFilterCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageFilterCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageFilterCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageFilterCLI:
     def test_image_filter_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

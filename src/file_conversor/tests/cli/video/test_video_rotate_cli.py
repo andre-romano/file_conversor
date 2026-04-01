@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoRotateCLI
+from file_conversor.cli.video.rotate_cli import VideoRotateCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoRotateCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoRotateCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoRotateCLI:
     def test_video_rotate(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

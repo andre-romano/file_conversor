@@ -1,6 +1,6 @@
 # src\file_conversor\backend\audio_video\abstract_ffmpeg_backend.py
 
-from enum import Enum
+from enum import StrEnum
 from typing import cast
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -24,7 +24,7 @@ class AbstractFFmpegBackend(AbstractBackend):
     AbstractFFmpegBackend is a class that provides an interface for handling audio and video files using FFmpeg.
     """
 
-    class SupportedInAudioFormats(Enum):
+    class SupportedInAudioFormats(StrEnum):
         AAC = "aac"
         AC3 = "ac3"
         FLAC = "flac"
@@ -35,7 +35,7 @@ class AbstractFFmpegBackend(AbstractBackend):
         WAV = "wav"
         WMA = "wma"
 
-    class SupportedInVideoFormats(Enum):
+    class SupportedInVideoFormats(StrEnum):
         _3GP = "3gp"
         ASF = "asf"
         AVI = "avi"
@@ -51,14 +51,14 @@ class AbstractFFmpegBackend(AbstractBackend):
         WEBM = "webm"
         WMV = "wmv"
 
-    SupportedInFormats = cast(type[Enum], Enum("SupportedInFormats", {
+    SupportedInFormats = cast(type[StrEnum], StrEnum("SupportedInFormats", {
         **{fmt.name: fmt.value for fmt in SupportedInAudioFormats},
         **{fmt.name: fmt.value for fmt in SupportedInVideoFormats},
     }))
 
     SupportedOutAudioFormats = AudioFormatContainers
     SupportedOutVideoFormats = VideoFormatContainers
-    SupportedOutFormats = cast(type[Enum], Enum("SupportedOutFormats", {
+    SupportedOutFormats = cast(type[StrEnum], StrEnum("SupportedOutFormats", {
         **{fmt.name: fmt.value for fmt in SupportedOutAudioFormats},
         **{fmt.name: fmt.value for fmt in SupportedOutVideoFormats},
     }))

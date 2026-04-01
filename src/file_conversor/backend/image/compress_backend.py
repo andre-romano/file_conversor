@@ -1,6 +1,6 @@
 # src\file_conversor\backend\compress_backend.py
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Any
@@ -25,7 +25,7 @@ class CompressBackend(AbstractBackend):
     Provides an interface for handling image file compression using multiple backends.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         GIF = GifSicleBackend.SupportedInFormats.GIF.value
         JPG = MozJPEGBackend.SupportedInFormats.JPG.value
         JPEG = MozJPEGBackend.SupportedInFormats.JPEG.value

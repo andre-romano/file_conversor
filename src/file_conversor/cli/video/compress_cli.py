@@ -15,9 +15,20 @@ from file_conversor.cli._utils.typer import (
     VideoProfileOption,
     VideoQualityOption,
 )
-from file_conversor.command.video import VideoCompressCommand
-from file_conversor.config import Configuration, Environment, Log, State
-from file_conversor.config.locale import get_translation
+from file_conversor.command.video import (
+    VideoCompressCommand,
+    VideoCompressEncoding,
+    VideoCompressOutFormats,
+    VideoCompressProfile,
+    VideoCompressQuality,
+)
+from file_conversor.config import (
+    Configuration,
+    Environment,
+    Log,
+    State,
+    get_translation,
+)
 from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
 
 
@@ -31,14 +42,11 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoCompressCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoCompressCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoCompressCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoCompressCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="compress",
                     description="Compress",
@@ -68,21 +76,21 @@ class VideoCompressCLI(AbstractTyperCommand):
 
     def compress(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoCompressCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoCompressCommand.get_in_formats())],
 
         target_size: Annotated[str, TargetFileSizeOption(prompt=f"{_("Target file size (size[K|M|G]) [0 = do not limit output file size]")}")],
 
-        file_format: Annotated[VideoCompressCommand.SupportedOutFormats, FormatOption()] = VideoCompressCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoCompressOutFormats, FormatOption()] = VideoCompressOutFormats(CONFIG.video_format),
 
-        video_profile: Annotated[VideoCompressCommand.VideoProfile, VideoProfileOption()] = VideoCompressCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoCompressCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoCompressCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoCompressCommand.VideoQuality, VideoQualityOption()] = VideoCompressCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoCompressProfile, VideoProfileOption()] = VideoCompressProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoCompressEncoding, VideoEncodingSpeedOption()] = VideoCompressEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoCompressQuality, VideoQualityOption()] = VideoCompressQuality(CONFIG.video_quality),
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoCompressCommand.compress(
+            command = VideoCompressCommand(
                 input_files=input_files,
                 target_size=target_size,
                 video_profile=video_profile,
@@ -92,6 +100,7 @@ class VideoCompressCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

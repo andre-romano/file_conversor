@@ -24,7 +24,13 @@ from file_conversor.cli._utils.typer import (
     VideoQualityOption,
     WidthOption,
 )
-from file_conversor.command.video import VideoEnhanceCommand
+from file_conversor.command.video import (
+    VideoEnhanceCommand,
+    VideoEnhanceEncoding,
+    VideoEnhanceOutFormats,
+    VideoEnhanceProfile,
+    VideoEnhanceQuality,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -49,14 +55,11 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoEnhanceCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoEnhanceCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoEnhanceCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoEnhanceCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="enhance",
                     description="Enhance",
@@ -86,16 +89,16 @@ class VideoEnhanceCLI(AbstractTyperCommand):
 
     def enhance(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoEnhanceCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoEnhanceCommand.get_in_formats())],
 
-        file_format: Annotated[VideoEnhanceCommand.SupportedOutFormats, FormatOption()] = VideoEnhanceCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoEnhanceOutFormats, FormatOption()] = VideoEnhanceOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        video_profile: Annotated[VideoEnhanceCommand.VideoProfile, VideoProfileOption()] = VideoEnhanceCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoEnhanceCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoEnhanceCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoEnhanceCommand.VideoQuality, VideoQualityOption()] = VideoEnhanceCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoEnhanceProfile, VideoProfileOption()] = VideoEnhanceProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoEnhanceEncoding, VideoEncodingSpeedOption()] = VideoEnhanceEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoEnhanceQuality, VideoQualityOption()] = VideoEnhanceQuality(CONFIG.video_quality),
 
         width: Annotated[int | None, WidthOption()] = None,
         height: Annotated[int | None, HeightOption()] = None,
@@ -166,7 +169,7 @@ class VideoEnhanceCLI(AbstractTyperCommand):
             )
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoEnhanceCommand.enhance(
+            command = VideoEnhanceCommand(
                 input_files=input_files,
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
@@ -186,6 +189,7 @@ class VideoEnhanceCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

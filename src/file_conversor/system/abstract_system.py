@@ -1,8 +1,9 @@
 # src/file_conversor\system\abstract_system.py
 
 
+from abc import abstractmethod
 from enum import Enum
-from typing import Protocol, override
+from typing import override
 
 # user-provided imports
 from file_conversor.config import Log
@@ -13,19 +14,7 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class SystemProtocol(Protocol):
-    @classmethod
-    def is_admin(cls) -> bool:
-        """True if app running with admin priviledges, False otherwise."""
-        ...
-
-    @classmethod
-    def reload_user_path(cls):
-        """Reload user PATH in current process."""
-        ...
-
-
-class AbstractSystem(SystemProtocol):
+class AbstractSystem:
     class Platform(Enum):
         MACOS = "Darwin"
         LINUX = "Linux"
@@ -38,7 +27,7 @@ class AbstractSystem(SystemProtocol):
                 return cls(platform.system())
             except ValueError as e:
                 logger.warning(f"Unknown platform: {platform.system()}")
-                raise NotImplementedError(f"Platform {platform.system()} is not supported.") from e
+                raise RuntimeError(f"Platform {platform.system()} is not supported.") from e
 
         @override
         def __str__(self) -> str:
@@ -58,6 +47,16 @@ class AbstractSystem(SystemProtocol):
         def get_processor(self):
             import platform
             return platform.processor()
+
+    @classmethod
+    @abstractmethod
+    def is_admin(cls) -> bool:
+        """True if app running with admin priviledges, False otherwise."""
+
+    @classmethod
+    @abstractmethod
+    def reload_user_path(cls):
+        """Reload user PATH in current process."""
 
 
 __all__ = [

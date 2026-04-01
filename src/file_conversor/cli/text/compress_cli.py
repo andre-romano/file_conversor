@@ -28,14 +28,11 @@ logger = LOG.getLogger(__name__)
 
 
 class TextCompressCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = TextCompressCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in TextCompressCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in TextCompressCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="compress",
                     description="Compress",
@@ -63,16 +60,17 @@ class TextCompressCLI(AbstractTyperCommand):
 
     def compress(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in TextCompressCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(TextCompressCommand.get_in_formats())],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            TextCompressCommand.compress(
+            command = TextCompressCommand(
                 input_files=input_files,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

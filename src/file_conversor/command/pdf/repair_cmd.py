@@ -2,11 +2,12 @@
 # src\file_conversor\command\pdf\repair_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.pdf import PikePDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,26 +20,38 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+PdfRepairExternalDependencies: set[str] = PikePDFBackend.EXTERNAL_DEPENDENCIES
+PdfRepairInFormats = PikePDFBackend.SupportedInFormats
+PdfRepairOutFormats = PikePDFBackend.SupportedOutFormats
 
-class PdfRepairCommand:
-    EXTERNAL_DEPENDENCIES: set[str] = PikePDFBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = PikePDFBackend.SupportedInFormats
-    SupportedOutFormats = PikePDFBackend.SupportedOutFormats
+class PdfRepairCommand(AbstractCommand[PdfRepairInFormats, PdfRepairOutFormats]):
+    input_files: list[Path]
+    password: str
+    output_dir: Path
 
     @classmethod
-    def repair(
-        cls,
-        input_files: list[Path],
-        password: str,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return PdfRepairExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PdfRepairInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PdfRepairOutFormats
+
+    @override
+    def execute(self):
         pikepdf_backend = PikePDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
             out_stem="_repaired",
         )
@@ -51,8 +64,8 @@ class PdfRepairCommand:
                 output_file=data.output_file,
 
                 # options
-                decrypt_password=password,
-                progress_callback=lambda p: progress_callback(get_progress(p)),
+                decrypt_password=self.password,
+                progress_callback=lambda p: self.progress_callback(get_progress(p)),
             )
 
         batch_datamodel.execute(step_one)
@@ -60,5 +73,8 @@ class PdfRepairCommand:
 
 
 __all__ = [
+    "PdfRepairExternalDependencies",
+    "PdfRepairInFormats",
+    "PdfRepairOutFormats",
     "PdfRepairCommand",
 ]

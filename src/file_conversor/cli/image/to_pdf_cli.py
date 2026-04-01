@@ -13,7 +13,11 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputFileOption,
 )
-from file_conversor.command.image import ImageToPdfCommand
+from file_conversor.command.image import (
+    ImageToPdfCommand,
+    ImageToPdfFitMode,
+    ImageToPdfPageLayout,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -36,15 +40,11 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageToPdfCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageToPdfCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        # IMG2PDF commands
-        for mode in ImageToPdfCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageToPdfCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="to_pdf",
                     description="To PDF",
@@ -80,21 +80,21 @@ class ImageToPdfCLI(AbstractTyperCommand):
 
     def to_pdf(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageToPdfCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageToPdfCommand.get_in_formats())],
         dpi: Annotated[int, DPIOption()] = CONFIG.image_dpi,
-        fit: Annotated[ImageToPdfCommand.FitMode, typer.Option("--fit", "-f",
-                                                               help=f"{_("Image fit. Valid only if")} --page-size {_("is defined.")} {_("Defaults to")} {CONFIG.image_fit}",
-                                                               )] = ImageToPdfCommand.FitMode(CONFIG.image_fit),
-        page_size: Annotated[ImageToPdfCommand.PageLayout, typer.Option("--page-size", "-ps",
-                                                                        help=f"{_("Page size.")} {_("Defaults to")} None ({_("PDF size = image size")}).",
-                                                                        )] = ImageToPdfCommand.PageLayout(CONFIG.image_page_size),
+        fit: Annotated[ImageToPdfFitMode, typer.Option("--fit", "-f",
+                                                       help=f"{_("Image fit. Valid only if")} --page-size {_("is defined.")}",
+                                                       )] = ImageToPdfFitMode(CONFIG.image_fit),
+        page_size: Annotated[ImageToPdfPageLayout, typer.Option("--page-size", "-ps",
+                                                                help=f"{_("Page size.")} {_("Defaults to")} None ({_("PDF size = image size")}).",
+                                                                )] = ImageToPdfPageLayout(CONFIG.image_page_size),
         set_metadata: Annotated[bool, typer.Option("--set-metadata", "-sm",
                                                    help=_("Set PDF metadata. Defaults to False (do not set creator, producer, modification date, etc)."),
                                                    callback=check_is_bool_or_none,
                                                    is_flag=True,
                                                    )] = False,
 
-        output_file: Annotated[Path | None, OutputFileOption(mode.value for mode in ImageToPdfCommand.SupportedOutFormats)] = None,
+        output_file: Annotated[Path | None, OutputFileOption(ImageToPdfCommand.get_out_formats())] = None,
     ):
         if not output_file:
             output_file = get_output_file(
@@ -104,7 +104,7 @@ class ImageToPdfCLI(AbstractTyperCommand):
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageToPdfCommand.to_pdf(
+            command = ImageToPdfCommand(
                 input_files=input_files,
                 dpi=dpi,
                 fit=fit,
@@ -113,6 +113,7 @@ class ImageToPdfCLI(AbstractTyperCommand):
                 output_file=output_file,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

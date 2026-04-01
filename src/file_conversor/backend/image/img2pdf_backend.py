@@ -5,7 +5,7 @@ This module provides functionalities for handling PDF files using ``img2pdf`` ba
 """
 
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -81,7 +81,7 @@ class Img2PDFBackend(AbstractBackend):
                 case Img2PDFBackend.PageLayout.LETTER_LANDSCAPE:
                     return (27.94, 21.59)  # Letter Landscape in cm
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         JPEG = "jpeg"
         JPG = "jpg"
         PNG = "png"
@@ -90,7 +90,7 @@ class Img2PDFBackend(AbstractBackend):
         BMP = "bmp"
         GIF = "gif"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()

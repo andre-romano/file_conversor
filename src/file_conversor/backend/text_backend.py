@@ -1,8 +1,9 @@
 # src\file_conversor\backend\text_backend.py
 
-from enum import Enum
+from abc import abstractmethod
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Protocol, cast, override
+from typing import Any, cast, override
 
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -18,24 +19,25 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class TextFileProtocol(Protocol):
+class AbstractTextFile:
+    def __init__(self, filename: str | Path) -> None:
+        super().__init__()
+        self._filepath = Path(filename)
+
+    @abstractmethod
     def read(self) -> Any:
         """ Read the data from file. """
         ...
 
+    @abstractmethod
     def write(self, data: Any):
         """ Write the data to file. """
         ...
 
+    @abstractmethod
     def minify(self, data: Any):
         """ Minify the data and write to file. """
         ...
-
-
-class AbstractTextFile(TextFileProtocol):
-    def __init__(self, filename: str | Path) -> None:
-        super().__init__()
-        self._filepath = Path(filename)
 
 
 class XMLTextFile(AbstractTextFile):
@@ -147,7 +149,7 @@ class INITextFile(AbstractTextFile):
 
 
 class TextBackend(AbstractBackend):
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         JSON = "json"
         XML = "xml"
         YAML = "yaml"

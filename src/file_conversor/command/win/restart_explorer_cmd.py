@@ -1,10 +1,11 @@
 
 # src\file_conversor\command\win\restart_explorer_cmd.py
 
-from enum import Enum
-from typing import Any, Callable
+from enum import StrEnum
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.config import Configuration, Log, State, get_translation
 from file_conversor.system import System, WindowsSystem
 
@@ -18,25 +19,45 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class WinRestartExplorerCommand:
-    EXTERNAL_DEPENDENCIES: set[str] = set()
+WinRestartExplorerExternalDependencies: set[str] = set()
 
-    class SupportedInFormats(Enum):
-        """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
-    class SupportedOutFormats(Enum):
-        """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+
+class WinRestartExplorerInFormats(StrEnum):
+    """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+
+
+class WinRestartExplorerOutFormats(StrEnum):
+    """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+
+
+class WinRestartExplorerCommand(AbstractCommand[WinRestartExplorerInFormats, WinRestartExplorerOutFormats]):
+    @classmethod
+    @override
+    def _external_dependencies(cls):
+        return WinRestartExplorerExternalDependencies
 
     @classmethod
-    def restart_explorer(
-        cls,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
-        if isinstance(System, WindowsSystem):
-            logger.info(f"{_('Restarting explorer.exe')} ...")
-            System.restart_explorer()
-            progress_callback(100.0)
+    @override
+    def _supported_in_formats(cls):
+        return WinRestartExplorerInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return WinRestartExplorerOutFormats
+
+    @override
+    def execute(self):
+        if not isinstance(System, WindowsSystem):
+            raise RuntimeError(_("Restart Explorer command can only be executed on Windows systems"))
+        logger.info(f"{_('Restarting explorer.exe')} ...")
+        System.restart_explorer()
+        self.progress_callback(100.0)
 
 
 __all__ = [
+    "WinRestartExplorerExternalDependencies",
+    "WinRestartExplorerInFormats",
+    "WinRestartExplorerOutFormats",
     "WinRestartExplorerCommand",
 ]

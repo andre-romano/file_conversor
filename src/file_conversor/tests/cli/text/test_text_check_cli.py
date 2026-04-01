@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, TextTyperGroup
-from file_conversor.cli.text import TextCheckCLI
+from file_conversor.cli.text.check_cli import TextCheckCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(TextCheckCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not TextCheckCommand.check_dependencies(), reason="External dependencies not installed")
 class TestTextCheckCLI:
     def test_text_check_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

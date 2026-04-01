@@ -6,7 +6,7 @@ This module provides functionalities for handling files using oxipng.
 
 import shutil
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -27,7 +27,7 @@ class OxiPNGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     Provides an interface for handling files using oxipng.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PNG = "png"
 
     SupportedOutFormats = SupportedInFormats

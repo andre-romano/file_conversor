@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfSplitCLI
+from file_conversor.cli.pdf.split_cli import PdfSplitCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfSplitCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfSplitCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfSplitCLI:
     def test_pdf_split_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

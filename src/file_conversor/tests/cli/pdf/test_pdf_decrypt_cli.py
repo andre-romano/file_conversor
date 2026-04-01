@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfDecryptCLI
+from file_conversor.cli.pdf.decrypt_cli import PdfDecryptCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfDecryptCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfDecryptCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfDecryptCLI:
     def test_pdf_decrypt_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

@@ -28,8 +28,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageUnsharpCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageUnsharpCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # No context menu for this command
@@ -53,7 +51,7 @@ class ImageUnsharpCLI(AbstractTyperCommand):
 
     def unsharp(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageUnsharpCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageUnsharpCommand.get_in_formats())],
 
         radius: Annotated[int, RadiusOption()] = 2,
 
@@ -71,7 +69,7 @@ class ImageUnsharpCLI(AbstractTyperCommand):
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageUnsharpCommand.unsharp(
+            command = ImageUnsharpCommand(
                 input_files=input_files,
                 radius=radius,
                 strength=strength,
@@ -79,6 +77,7 @@ class ImageUnsharpCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

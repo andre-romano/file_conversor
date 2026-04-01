@@ -11,6 +11,7 @@ from file_conversor.cli._utils.typer import FormatOption
 from file_conversor.command.video import VideoListFormatsCommand
 
 # CORE
+from file_conversor.command.video.list_formats_cmd import VideoListFormatsOutFormats
 from file_conversor.config import Configuration, Log, State, get_translation
 from file_conversor.system.win.ctx_menu import WinContextMenu
 
@@ -25,8 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoListFormatsCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoListFormatsCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # no context menu for this command
@@ -52,15 +51,16 @@ class VideoListFormatsCLI(AbstractTyperCommand):
 
     def list_formats(
         self,
-        file_format: Annotated[VideoListFormatsCommand.SupportedOutFormats | None, FormatOption()] = None,
+        file_format: Annotated[VideoListFormatsOutFormats | None, FormatOption()] = None,
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            data_list = VideoListFormatsCommand.list_formats(
+            command = VideoListFormatsCommand(
                 desired_format=file_format,
                 progress_callback=task.update,
             )
-            for data in data_list:
+            command.execute()
+            for data in command.output:
                 logger.info(f"[bold]Format:[/bold] {data.file_format.upper()}")
                 logger.info(f"  - {_('Audio codecs')}: {', '.join(data.audio_codecs)}")
                 logger.info(f"  - {_('Video codecs')}: {', '.join(data.video_codecs)}")

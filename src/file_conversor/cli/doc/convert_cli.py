@@ -11,7 +11,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.doc import DocConvertCommand
+from file_conversor.command.doc import DocConvertCommand, DocConvertOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -32,22 +32,19 @@ logger = LOG.getLogger(__name__)
 
 
 class DocConvertCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = DocConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # WordBackend commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in DocConvertCommand.SupportedInFormats:
-            ext_in = mode.value
+        for ext_in in DocConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
-                    name=f"to_{mode.value}",
-                    description=f"To {mode.value.upper()}",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "{mode.value}""',
-                    icon=str(icons_folder_path / f"{mode.value}.ico"),
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "{ext_out}""',
+                    icon=str(icons_folder_path / f"{ext_out}.ico"),
                 )
-                for mode in DocConvertCommand.SupportedOutFormats
+                for ext_out in DocConvertCommand.get_out_formats()
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
@@ -70,19 +67,20 @@ class DocConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in DocConvertCommand.SupportedInFormats)],
-        file_format: Annotated[DocConvertCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(DocConvertCommand.get_in_formats())],
+        file_format: Annotated[DocConvertOutFormats, FormatOption()],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         """Convert document files into other formats."""
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            DocConvertCommand.convert(
+            command = DocConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

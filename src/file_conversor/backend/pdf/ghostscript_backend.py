@@ -3,7 +3,7 @@
 """
 This module provides functionalities for handling files using ``ghostscript`` backend.
 """
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 from typing import Any, Callable
 
@@ -171,10 +171,10 @@ class GhostscriptBackend(AbstractBackend):
                 f"-dJPEGQ={self._get_opt()}",
             ]
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
 
     EXTERNAL_DEPENDENCIES = {

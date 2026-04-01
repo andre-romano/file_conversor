@@ -1,7 +1,7 @@
 # src\file_conversor\backend\audio_video\container\audio_format_container.py
 
-from enum import Enum
-from typing import Any, Self
+from enum import StrEnum
+from typing import Any, Self, override
 
 from file_conversor.backend.audio_video.codec import FFmpegAudioCodecs
 from file_conversor.backend.audio_video.container.format_container import (
@@ -18,7 +18,7 @@ LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 
-class AudioFormatContainers(Enum):
+class AudioFormatContainers(StrEnum):
     NULL = "null"
     MP3 = "mp3"
     M4A = "m4a"
@@ -42,6 +42,7 @@ class AudioFormatContainers(Enum):
             case self.FLAC:
                 return FormatContainer("flac", audio_codec=FFmpegAudioCodecs.FLAC_LIB)
 
+    @override
     def __contains__(self, value: str | Self | Any) -> bool:
         if isinstance(value, str):
             return value.lower() == self.value

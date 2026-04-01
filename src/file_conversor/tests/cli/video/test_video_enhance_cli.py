@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoEnhanceCLI
+from file_conversor.cli.video.enhance_cli import VideoEnhanceCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoEnhanceCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoEnhanceCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoEnhanceCLI:
     def test_video_enhance(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

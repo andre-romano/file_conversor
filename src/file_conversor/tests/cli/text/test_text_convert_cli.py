@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, TextTyperGroup
-from file_conversor.cli.text import TextConvertCLI
+from file_conversor.cli.text.convert_cli import TextConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(TextConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not TextConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestTextConvertCLI:
     def test_text_convert_cases(self, tmp_path: Path):
         test_cases = [

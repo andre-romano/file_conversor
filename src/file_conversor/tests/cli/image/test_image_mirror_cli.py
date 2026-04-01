@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageMirrorCLI
+from file_conversor.cli.image.mirror_cli import ImageMirrorCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageMirrorCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageMirrorCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageMirrorCLI:
     def test_image_mirror_x(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.png"

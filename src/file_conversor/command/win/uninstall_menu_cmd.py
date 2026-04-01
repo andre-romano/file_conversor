@@ -1,11 +1,12 @@
 
 # src\file_conversor\command\win\uninstall_menu_cmd.py
 
-from enum import Enum
-from typing import Any, Callable
+from enum import StrEnum
+from typing import override
 
 # user-provided modules
 from file_conversor.backend.win_reg_backend import WinRegBackend
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -24,32 +25,50 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+WinUninstallMenuExternalDependencies = WinRegBackend.EXTERNAL_DEPENDENCIES
 
-class WinUninstallMenuCommand:
-    EXTERNAL_DEPENDENCIES = WinRegBackend.EXTERNAL_DEPENDENCIES
 
-    class SupportedInFormats(Enum):
-        """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
-    class SupportedOutFormats(Enum):
-        """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+class WinUninstallMenuInFormats(StrEnum):
+    """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+
+
+class WinUninstallMenuOutFormats(StrEnum):
+    """ empty enum since this command does not process files, but is just a system command to restart explorer.exe """
+
+
+class WinUninstallMenuCommand(AbstractCommand[WinUninstallMenuInFormats, WinUninstallMenuOutFormats]):
+    @classmethod
+    @override
+    def _external_dependencies(cls):
+        return WinUninstallMenuExternalDependencies
 
     @classmethod
-    def uninstall_menu(
-        cls,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _supported_in_formats(cls):
+        return WinUninstallMenuInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return WinUninstallMenuOutFormats
+
+    @override
+    def execute(self):
         winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
         ctx_menu = WinContextMenu.get_instance(icons_folder=Environment.get_icons_folder())
 
         logger.info(f"{_('Removing app context menu from Windows Explorer')} ...")
         winreg_backend.delete_keys(
             ctx_menu.get_reg_file(),
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         logger.info(f"{_('Context Menu Uninstall')}: [bold green]{_('SUCCESS')}[/].")
 
 
 __all__ = [
+    "WinUninstallMenuExternalDependencies",
+    "WinUninstallMenuInFormats",
+    "WinUninstallMenuOutFormats",
     "WinUninstallMenuCommand",
 ]

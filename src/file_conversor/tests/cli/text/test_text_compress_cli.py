@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, TextTyperGroup
-from file_conversor.cli.text import TextCompressCLI
+from file_conversor.cli.text.compress_cli import TextCompressCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(TextCompressCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not TextCompressCommand.check_dependencies(), reason="External dependencies not installed")
 class TestTextCompressCLI:
     def test_text_compress_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

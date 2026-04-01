@@ -1,7 +1,7 @@
 # src\file_conversor\backend\office\impress_backend.py
 
 # user-provided imports
-from enum import Enum
+from enum import StrEnum
 
 from file_conversor.backend.office.abstract_libreoffice_backend import (
     AbstractLibreofficeBackend,
@@ -20,12 +20,12 @@ class LibreofficeImpressBackend(AbstractLibreofficeBackend):
     A class that provides an interface for handling doc files using ``impress`` (libreoffice).
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PPT = "ppt"
         PPTX = "pptx"
         ODP = "odp"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PPT = "ppt"
         PPTX = "pptx"
         ODP = "odp"

@@ -5,11 +5,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, ImageTyperGroup
-from file_conversor.cli.image import ImageAntialiasCLI
+from file_conversor.cli.image.antialias_cli import ImageAntialiasCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(ImageAntialiasCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not ImageAntialiasCommand.check_dependencies(), reason="External dependencies not installed")
 class TestImageAntialiasCLI:
     def test_image_antialias_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoCompressCLI
+from file_conversor.cli.video.compress_cli import VideoCompressCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoCompressCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoCompressCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoCompressCLI:
     def test_video_compress(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

@@ -7,7 +7,7 @@ This module provides functionalities for barch file processing using this app.
 import os
 import shlex
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable
 
@@ -164,10 +164,10 @@ class PipelineConfigDataModel(BaseModel):
 
 class BatchBackend(AbstractBackend):
     """Class to provide batch file processing, using pipelines"""
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         JSON = "json"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         JSON = "json"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()

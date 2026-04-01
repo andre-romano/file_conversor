@@ -28,14 +28,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfExtractImgCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfExtractImgCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfExtractImgCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfExtractImgCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="extract_img",
                     description="Extract IMG",
@@ -63,16 +60,17 @@ class PdfExtractImgCLI(AbstractTyperCommand):
 
     def extract_img(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfExtractImgCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfExtractImgCommand.get_in_formats())],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PdfExtractImgCommand.extract_img(
+            command = PdfExtractImgCommand(
                 input_files=input_files,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

@@ -2,9 +2,10 @@
 # src\file_conversor\command\video\convert_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel
 from file_conversor.command.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 from file_conversor.config import Configuration, Log, State, get_translation
@@ -19,51 +20,65 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class VideoConvertCommand:
-    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
-    SupportedInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
-    SupportedOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
+VideoConvertExternalDependencies = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
+VideoConvertInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
+VideoConvertOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
 
-    AudioCodecs = FFmpegCmdHelper.AudioCodecs
-    VideoCodecs = FFmpegCmdHelper.VideoCodecs
+VideoConvertAudioCodecs = FFmpegCmdHelper.AudioCodecs
+VideoConvertVideoCodecs = FFmpegCmdHelper.VideoCodecs
 
-    VideoProfile = FFmpegCmdHelper.VideoProfile
-    VideoEncoding = FFmpegCmdHelper.VideoEncoding
-    VideoQuality = FFmpegCmdHelper.VideoQuality
+VideoConvertProfile = FFmpegCmdHelper.VideoProfile
+VideoConvertEncoding = FFmpegCmdHelper.VideoEncoding
+VideoConvertQuality = FFmpegCmdHelper.VideoQuality
 
-    MirrorAxis = FFmpegCmdHelper.MirrorAxis
-    Rotation = FFmpegCmdHelper.Rotation
+VideoConvertMirrorAxis = FFmpegCmdHelper.MirrorAxis
+VideoConvertRotation = FFmpegCmdHelper.Rotation
+
+
+class VideoConvertCommand(AbstractCommand[VideoConvertInFormats, VideoConvertOutFormats]):
+    input_files: list[Path]
+    file_format: VideoConvertOutFormats
+    audio_bitrate: int | None
+    video_bitrate: int | None
+    audio_codec: VideoConvertAudioCodecs | None
+    video_codec: VideoConvertVideoCodecs | None
+    video_profile: VideoConvertProfile
+    video_encoding_speed: VideoConvertEncoding
+    video_quality: VideoConvertQuality
+    width: int | None
+    height: int | None
+    fps: int | None
+    brightness: float
+    contrast: float
+    color: float
+    gamma: float
+    rotation: VideoConvertRotation | None
+    mirror_axis: VideoConvertMirrorAxis | None
+    deshake: bool
+    unsharp: bool
+    output_dir: Path
 
     @classmethod
-    def convert(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        audio_bitrate: int | None,
-        video_bitrate: int | None,
-        audio_codec: AudioCodecs | None,
-        video_codec: VideoCodecs | None,
-        video_profile: VideoProfile,
-        video_encoding_speed: VideoEncoding,
-        video_quality: VideoQuality,
-        width: int | None,
-        height: int | None,
-        fps: int | None,
-        brightness: float,
-        contrast: float,
-        color: float,
-        gamma: float,
-        rotation: Rotation | None,
-        mirror_axis: MirrorAxis | None,
-        deshake: bool,
-        unsharp: bool,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoConvertExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoConvertInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoConvertOutFormats
+
+    @override
+    def execute(self):
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
-            out_suffix=file_format.value,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
+            out_suffix=self.file_format.value,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -71,33 +86,47 @@ class VideoConvertCommand:
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
             datamodel=batch_datamodel,
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         ffmpeg_cmd_helper.set_video_settings(
-            profile=video_profile,
-            encoding_speed=video_encoding_speed,
-            quality=video_quality,
+            profile=self.video_profile,
+            encoding_speed=self.video_encoding_speed,
+            quality=self.video_quality,
         )
-        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
-        ffmpeg_cmd_helper.set_codecs(audio_codec=audio_codec, video_codec=video_codec)
+        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=self.audio_bitrate, video_bitrate=self.video_bitrate)
+        ffmpeg_cmd_helper.set_codecs(audio_codec=self.audio_codec, video_codec=self.video_codec)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=(width, height) if width is not None and height is not None else None,
-            fps=fps,
-            brightness=brightness,
-            contrast=contrast,
-            color=color,
-            gamma=gamma,
-            rotation=rotation,
-            mirror_axis=mirror_axis,
-            deshake=deshake,
-            unsharp=unsharp,
+            resolution=(self.width, self.height) if self.width is not None and self.height is not None else None,
+            fps=self.fps,
+            brightness=self.brightness,
+            contrast=self.contrast,
+            color=self.color,
+            gamma=self.gamma,
+            rotation=self.rotation,
+            mirror_axis=self.mirror_axis,
+            deshake=self.deshake,
+            unsharp=self.unsharp,
         )
 
         ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
+    "VideoConvertExternalDependencies",
+    "VideoConvertInFormats",
+    "VideoConvertOutFormats",
+
+    "VideoConvertAudioCodecs",
+    "VideoConvertVideoCodecs",
+
+    "VideoConvertProfile",
+    "VideoConvertEncoding",
+    "VideoConvertQuality",
+
+    "VideoConvertMirrorAxis",
+    "VideoConvertRotation",
+
     "VideoConvertCommand",
 ]

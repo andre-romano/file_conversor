@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, PdfTyperGroup
-from file_conversor.cli.pdf import PdfExtractImgCLI
+from file_conversor.cli.pdf.extract_img_cli import PdfExtractImgCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(PdfExtractImgCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not PdfExtractImgCommand.check_dependencies(), reason="External dependencies not installed")
 class TestPdfExtractImgCLI:
     def test_pdf_extract_img_cases(self, tmp_path: Path):
         in_path: Path = DATA_PATH / "test.pdf"

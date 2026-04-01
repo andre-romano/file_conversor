@@ -27,8 +27,6 @@ logger = LOG.getLogger(__name__)
 
 
 class WinInstallMenuCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = WinInstallMenuCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # No context menu to register
@@ -57,10 +55,11 @@ class WinInstallMenuCLI(AbstractTyperCommand):
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Installing context menu:"))
-            WinInstallMenuCommand.install_menu(
+            command = WinInstallMenuCommand(
                 reboot_explorer=reboot_explorer,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

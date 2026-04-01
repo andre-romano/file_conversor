@@ -17,8 +17,6 @@ class ConfigurationData(BaseModel):
     """http cache enabled"""
     cache_expire_after: int = int(30 * 24 * 60 * 60)  # HTTP cache expiration time in seconds (30 days)
     """http cache expiration time in seconds"""
-    api_port: int = 5000              # Default port (flask app)
-    """Default port (flask app)"""
     language: str
     """Default: system language or "en_US" """
     install_deps: bool | None = True      # Default: ask user to confirm dependency installation
@@ -49,10 +47,6 @@ class ConfigurationData(BaseModel):
     """Default image resampling algorithm"""
     pdf_compression: str = "medium"  # Default PDF compression level
     """Default PDF compression level"""
-    gui_zoom: int = 100            # Default GUI zoom level
-    """Default GUI zoom level"""
-    gui_output_dir: str = str(Environment.UserFolder.downloads())  # Default output directory
-    """Default output directory"""
 
     def to_dict(self) -> dict[str, Any]:
         """Convert configuration to dictionary."""

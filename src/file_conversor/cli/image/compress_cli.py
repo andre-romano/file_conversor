@@ -32,15 +32,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageCompressCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageCompressCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # compress commands
-        for mode in ImageCompressCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageCompressCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="compress",
                     description="Compress",
@@ -71,18 +68,19 @@ class ImageCompressCLI(AbstractTyperCommand):
 
     def compress(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageCompressCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageCompressCommand.get_in_formats())],
         quality: Annotated[int, QualityOption()] = CONFIG.image_quality,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageCompressCommand.compress(
+            command = ImageCompressCommand(
                 input_files=input_files,
                 quality=quality,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
         logger.info(f"{_('Image compression')}: [green bold]{_('SUCCESS')}[/]")
 

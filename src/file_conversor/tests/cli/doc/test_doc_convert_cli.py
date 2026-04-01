@@ -5,11 +5,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, DocTyperGroup
-from file_conversor.cli.doc import DocConvertCLI
+from file_conversor.cli.doc.convert_cli import DocConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(DocConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not DocConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestDocConvertCLI:
     def test_doc_convert_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

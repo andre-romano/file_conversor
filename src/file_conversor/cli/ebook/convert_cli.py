@@ -11,7 +11,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.ebook import EbookConvertCommand
+from file_conversor.command.ebook import EbookConvertCommand, EbookConvertOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -32,22 +32,19 @@ logger = LOG.getLogger(__name__)
 
 
 class EbookConvertCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = EbookConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         # FFMPEG commands
         icons_folder_path = Environment.get_icons_folder()
-        for mode in EbookConvertCommand.SupportedInFormats:
-            ext_in = mode.value
+        for ext_in in EbookConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
-                    name=f"to_{mode.value}",
-                    description=f"To {mode.value.upper()}",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "{mode.value}""',
-                    icon=str(icons_folder_path / f"{mode.value}.ico"),
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "{ext_out}""',
+                    icon=str(icons_folder_path / f"{ext_out}.ico"),
                 )
-                for mode in EbookConvertCommand.SupportedOutFormats
+                for ext_out in EbookConvertCommand.get_out_formats()
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
@@ -67,19 +64,20 @@ class EbookConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in EbookConvertCommand.SupportedInFormats)],
-        file_format: Annotated[EbookConvertCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(EbookConvertCommand.get_in_formats())],
+        file_format: Annotated[EbookConvertOutFormats, FormatOption()],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         """Execute ebook conversion command."""
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            EbookConvertCommand.convert(
+            command = EbookConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

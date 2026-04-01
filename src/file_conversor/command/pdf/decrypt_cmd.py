@@ -2,11 +2,12 @@
 # src\file_conversor\command\pdf\decrypt_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.pdf import PyPDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,25 +20,38 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+PdfDecryptExternalDependencies = PyPDFBackend.EXTERNAL_DEPENDENCIES
+PdfDecryptInFormats = PyPDFBackend.SupportedInFormats
+PdfDecryptOutFormats = PyPDFBackend.SupportedOutFormats
 
-class PdfDecryptCommand:
-    EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = PyPDFBackend.SupportedInFormats
+class PdfDecryptCommand(AbstractCommand[PdfDecryptInFormats, PdfDecryptOutFormats]):
+    input_files: list[Path]
+    password: str
+    output_dir: Path
 
     @classmethod
-    def decrypt(
-        cls,
-        input_files: list[Path],
-        password: str,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return PdfDecryptExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PdfDecryptInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PdfDecryptOutFormats
+
+    @override
+    def execute(self):
         pypdf_backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
             out_stem="_decrypted",
         )
@@ -47,8 +61,8 @@ class PdfDecryptCommand:
             pypdf_backend.decrypt(
                 input_file=data.input_file,
                 output_file=data.output_file,
-                password=password,
-                progress_callback=lambda p: progress_callback(get_progress(p))
+                password=self.password,
+                progress_callback=lambda p: self.progress_callback(get_progress(p))
             )
 
         batch_datamodel.execute(step_one)
@@ -56,5 +70,8 @@ class PdfDecryptCommand:
 
 
 __all__ = [
+    "PdfDecryptExternalDependencies",
+    "PdfDecryptInFormats",
+    "PdfDecryptOutFormats",
     "PdfDecryptCommand",
 ]

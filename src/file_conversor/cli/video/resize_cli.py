@@ -19,6 +19,12 @@ from file_conversor.cli._utils.typer import (
     WidthOption,
 )
 from file_conversor.command.video import VideoResizeCommand
+from file_conversor.command.video.resize_cmd import (
+    VideoResizeEncoding,
+    VideoResizeOutFormats,
+    VideoResizeProfile,
+    VideoResizeQuality,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -39,14 +45,11 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoResizeCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoResizeCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoResizeCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoResizeCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="resize",
                     description="Resize",
@@ -76,28 +79,27 @@ class VideoResizeCLI(AbstractTyperCommand):
 
     def resize(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoResizeCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoResizeCommand.get_in_formats())],
 
         width: Annotated[int, WidthOption(prompt=f"{_('Enter target width [pixels]')}")],
         height: Annotated[int, HeightOption(prompt=f"{_('Enter target height [pixels]')}")],
 
-        file_format: Annotated[VideoResizeCommand.SupportedOutFormats, FormatOption()] = VideoResizeCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoResizeOutFormats, FormatOption()] = VideoResizeOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        video_profile: Annotated[VideoResizeCommand.VideoProfile, VideoProfileOption()] = VideoResizeCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoResizeCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoResizeCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoResizeCommand.VideoQuality, VideoQualityOption()] = VideoResizeCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoResizeProfile, VideoProfileOption()] = VideoResizeProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoResizeEncoding, VideoEncodingSpeedOption()] = VideoResizeEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoResizeQuality, VideoQualityOption()] = VideoResizeQuality(CONFIG.video_quality),
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoResizeCommand.resize(
+            command = VideoResizeCommand(
                 input_files=input_files,
-                width=width,
-                height=height,
+                resolution=(width, height),
                 file_format=file_format,
                 audio_bitrate=audio_bitrate,
                 video_bitrate=video_bitrate,
@@ -107,6 +109,7 @@ class VideoResizeCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

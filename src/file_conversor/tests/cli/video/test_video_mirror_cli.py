@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoMirrorCLI
+from file_conversor.cli.video.mirror_cli import VideoMirrorCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoMirrorCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoMirrorCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoMirrorCLI:
     def test_video_mirror(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

@@ -1,6 +1,6 @@
 # src\file_conversor\backend\ocrmypdf_backend.py
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable
 
@@ -26,10 +26,10 @@ class OcrMyPDFBackend(AbstractBackend):
         branch="main",
     )
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
 
     EXTERNAL_DEPENDENCIES = {
@@ -117,13 +117,14 @@ class OcrMyPDFBackend(AbstractBackend):
             return tessdata_path
         raise FileNotFoundError(_("Tessdata directory not found."))
 
-    def get_available_remote_languages(self) -> set[str]:
+    @classmethod
+    def get_available_remote_languages(cls) -> set[str]:
         """
         Get available remote languages for OCR.
         """
         remote_langs: set[str] = set()
         for file_info in GitBackend.get_info_api(
-            repository=self.TESSDATA_REPOSITORY,
+            repository=cls.TESSDATA_REPOSITORY,
         ):
             if not file_info.get("name", "").endswith(".traineddata"):
                 continue

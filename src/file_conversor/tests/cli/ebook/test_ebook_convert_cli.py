@@ -5,11 +5,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, EbookTyperGroup
-from file_conversor.cli.ebook import EbookConvertCLI
+from file_conversor.cli.ebook.convert_cli import EbookConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(EbookConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not EbookConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestEbookConvertCLI:
     def test_ebook_convert_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

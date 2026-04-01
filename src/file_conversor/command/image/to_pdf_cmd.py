@@ -2,11 +2,12 @@
 # src\file_conversor\command\image\to_pdf_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.image import Img2PDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import FilesDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -20,31 +21,45 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class ImageToPdfCommand:
-    EXTERNAL_DEPENDENCIES = Img2PDFBackend.EXTERNAL_DEPENDENCIES
+ImageToPdfExternalDependencies = Img2PDFBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = Img2PDFBackend.SupportedInFormats
-    SupportedOutFormats = Img2PDFBackend.SupportedOutFormats
+ImageToPdfInFormats = Img2PDFBackend.SupportedInFormats
+ImageToPdfOutFormats = Img2PDFBackend.SupportedOutFormats
 
-    FitMode = Img2PDFBackend.FitMode
-    PageLayout = Img2PDFBackend.PageLayout
+ImageToPdfFitMode = Img2PDFBackend.FitMode
+ImageToPdfPageLayout = Img2PDFBackend.PageLayout
+
+
+class ImageToPdfCommand(AbstractCommand[ImageToPdfInFormats, ImageToPdfOutFormats]):
+    input_files: list[Path]
+    dpi: int
+    fit: ImageToPdfFitMode
+    page_size: ImageToPdfPageLayout
+    set_metadata: bool
+    output_file: Path
 
     @classmethod
-    def to_pdf(
-        cls,
-        input_files: list[Path],
-        dpi: int,
-        fit: FitMode,
-        page_size: PageLayout,
-        set_metadata: bool,
-        output_file: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return ImageToPdfExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return ImageToPdfInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return ImageToPdfOutFormats
+
+    @override
+    def execute(self):
         img2pdf_backend = Img2PDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         datamodel = FilesDataModel(
-            input_files=input_files,
-            output_file=output_file,
+            input_files=self.input_files,
+            output_file=self.output_file,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -53,17 +68,22 @@ class ImageToPdfCommand:
             img2pdf_backend.to_pdf(
                 input_files=data.input_files,
                 output_file=data.output_file,
-                dpi=dpi,
-                image_fit=fit,
-                page_size=page_size,
-                include_metadata=set_metadata,
+                dpi=self.dpi,
+                image_fit=self.fit,
+                page_size=self.page_size,
+                include_metadata=self.set_metadata,
             )
-            progress_callback(get_progress(100.0))
+            self.progress_callback(get_progress(100.0))
 
         datamodel.execute(step_one)
         logger.info(f"{_('PDF generation')}: [green bold]{_('SUCCESS')}[/]")
 
 
 __all__ = [
+    "ImageToPdfExternalDependencies",
+    "ImageToPdfInFormats",
+    "ImageToPdfOutFormats",
+    "ImageToPdfFitMode",
+    "ImageToPdfPageLayout",
     "ImageToPdfCommand",
 ]

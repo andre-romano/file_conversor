@@ -2,9 +2,10 @@
 # src\file_conversor\command\video\rotate_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel
 from file_conversor.command.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 from file_conversor.config import Configuration, Log, State, get_translation
@@ -19,37 +20,51 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class VideoRotateCommand:
-    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
+VideoRotateExternalDependencies = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
-    SupportedOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
+VideoRotateInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
+VideoRotateOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
 
-    VideoProfile = FFmpegCmdHelper.VideoProfile
-    VideoEncoding = FFmpegCmdHelper.VideoEncoding
-    VideoQuality = FFmpegCmdHelper.VideoQuality
+VideoRotateProfile = FFmpegCmdHelper.VideoProfile
+VideoRotateEncoding = FFmpegCmdHelper.VideoEncoding
+VideoRotateQuality = FFmpegCmdHelper.VideoQuality
 
-    Rotation = FFmpegCmdHelper.Rotation
+VideoRotateRotation = FFmpegCmdHelper.Rotation
+
+
+class VideoRotateCommand(AbstractCommand[VideoRotateInFormats, VideoRotateOutFormats]):
+    input_files: list[Path]
+    rotation: VideoRotateRotation | None
+    file_format: VideoRotateOutFormats
+    audio_bitrate: int | None
+    video_bitrate: int | None
+    video_profile: VideoRotateProfile
+    video_encoding_speed: VideoRotateEncoding
+    video_quality: VideoRotateQuality
+    output_dir: Path
 
     @classmethod
-    def rotate(
-        cls,
-        input_files: list[Path],
-        rotation: Rotation | None,
-        file_format: SupportedOutFormats,
-        audio_bitrate: int | None,
-        video_bitrate: int | None,
-        video_profile: VideoProfile,
-        video_encoding_speed: VideoEncoding,
-        video_quality: VideoQuality,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoRotateExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoRotateInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoRotateOutFormats
+
+    @override
+    def execute(self):
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             out_stem="_rotated",
-            out_suffix=file_format.value,
+            out_suffix=self.file_format.value,
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -57,23 +72,33 @@ class VideoRotateCommand:
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
             datamodel=batch_datamodel,
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         ffmpeg_cmd_helper.set_video_settings(
-            profile=video_profile,
-            encoding_speed=video_encoding_speed,
-            quality=video_quality,
+            profile=self.video_profile,
+            encoding_speed=self.video_encoding_speed,
+            quality=self.video_quality,
         )
-        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=self.audio_bitrate, video_bitrate=self.video_bitrate)
 
         ffmpeg_cmd_helper.set_video_filters(
-            rotation=rotation,
+            rotation=self.rotation,
         )
 
         ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
+    "VideoRotateExternalDependencies",
+
+    "VideoRotateInFormats",
+    "VideoRotateOutFormats",
+
+    "VideoRotateProfile",
+    "VideoRotateEncoding",
+    "VideoRotateQuality",
+
+    "VideoRotateRotation",
     "VideoRotateCommand",
 ]

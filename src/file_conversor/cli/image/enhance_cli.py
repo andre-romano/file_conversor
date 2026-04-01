@@ -35,14 +35,11 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageEnhanceCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageEnhanceCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in ImageEnhanceCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageEnhanceCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="enhance",
                     description="Enhance",
@@ -71,7 +68,7 @@ class ImageEnhanceCLI(AbstractTyperCommand):
 
     def enhance(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageEnhanceCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageEnhanceCommand.get_in_formats())],
 
         brightness: Annotated[float, BrightnessOption()] = 1.00,
         contrast: Annotated[float, ContrastOption()] = 1.00,
@@ -104,7 +101,7 @@ class ImageEnhanceCLI(AbstractTyperCommand):
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageEnhanceCommand.enhance(
+            command = ImageEnhanceCommand(
                 input_files=input_files,
                 brightness=brightness,
                 contrast=contrast,
@@ -113,6 +110,7 @@ class ImageEnhanceCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

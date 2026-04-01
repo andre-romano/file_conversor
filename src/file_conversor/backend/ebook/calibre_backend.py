@@ -4,7 +4,7 @@
 This module provides functionalities for handling ebook files using Calibre.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -23,7 +23,7 @@ class CalibreBackend(AbstractBackend):
     CalibreBackend is a class that provides an interface for handling ebook files using Calibre.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         AZW = "azw"
         AZW3 = "azw3"
         AZW4 = "azw4"
@@ -33,7 +33,7 @@ class CalibreBackend(AbstractBackend):
         FB2 = "fb2"
         MOBI = "mobi"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         AZW3 = "azw3"
         DOCX = "docx"
         EPUB = "epub"

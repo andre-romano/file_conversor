@@ -6,11 +6,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, XlsTyperGroup
-from file_conversor.cli.xls import XlsConvertCLI
+from file_conversor.cli.xls.convert_cli import XlsConvertCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(XlsConvertCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not XlsConvertCommand.check_dependencies(), reason="External dependencies not installed")
 class TestXlsConvertCLI:
     def test_xls_convert_cases(self, tmp_path: Path):
         test_cases: list[tuple[Path, Path]] = [

@@ -17,7 +17,14 @@ from file_conversor.cli._utils.typer import (
     VideoProfileOption,
     VideoQualityOption,
 )
-from file_conversor.command.video import VideoMirrorCommand
+from file_conversor.command.video import (
+    VideoMirrorAxis,
+    VideoMirrorCommand,
+    VideoMirrorEncoding,
+    VideoMirrorOutFormats,
+    VideoMirrorProfile,
+    VideoMirrorQuality,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -38,14 +45,11 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoMirrorCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = VideoMirrorCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         icons_folder_path = Environment.get_icons_folder()
-        for mode in VideoMirrorCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in VideoMirrorCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="mirror_x",
                     description="Mirror X axis",
@@ -81,24 +85,24 @@ class VideoMirrorCLI(AbstractTyperCommand):
 
     def mirror(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in VideoMirrorCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(VideoMirrorCommand.get_in_formats())],
 
-        mirror_axis: Annotated[VideoMirrorCommand.MirrorAxis, AxisOption()],
+        mirror_axis: Annotated[VideoMirrorAxis, AxisOption()],
 
-        file_format: Annotated[VideoMirrorCommand.SupportedOutFormats, FormatOption()] = VideoMirrorCommand.SupportedOutFormats(CONFIG.video_format),
+        file_format: Annotated[VideoMirrorOutFormats, FormatOption()] = VideoMirrorOutFormats(CONFIG.video_format),
 
         audio_bitrate: Annotated[int | None, AudioBitrateOption()] = CONFIG.audio_bitrate,
         video_bitrate: Annotated[int | None, VideoBitrateOption()] = CONFIG.video_bitrate,
 
-        video_profile: Annotated[VideoMirrorCommand.VideoProfile, VideoProfileOption()] = VideoMirrorCommand.VideoProfile(CONFIG.video_profile),
-        video_encoding_speed: Annotated[VideoMirrorCommand.VideoEncoding, VideoEncodingSpeedOption()] = VideoMirrorCommand.VideoEncoding(CONFIG.video_encoding_speed),
-        video_quality: Annotated[VideoMirrorCommand.VideoQuality, VideoQualityOption()] = VideoMirrorCommand.VideoQuality(CONFIG.video_quality),
+        video_profile: Annotated[VideoMirrorProfile, VideoProfileOption()] = VideoMirrorProfile(CONFIG.video_profile),
+        video_encoding_speed: Annotated[VideoMirrorEncoding, VideoEncodingSpeedOption()] = VideoMirrorEncoding(CONFIG.video_encoding_speed),
+        video_quality: Annotated[VideoMirrorQuality, VideoQualityOption()] = VideoMirrorQuality(CONFIG.video_quality),
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            VideoMirrorCommand.mirror(
+            command = VideoMirrorCommand(
                 input_files=input_files,
                 mirror_axis=mirror_axis,
                 file_format=file_format,
@@ -110,6 +114,7 @@ class VideoMirrorCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

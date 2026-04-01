@@ -8,7 +8,7 @@ import typer
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
-from file_conversor.command.image import ImageFilterCommand
+from file_conversor.command.image import ImageFilterCommand, ImageFilterFilters
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -29,15 +29,11 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageFilterCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageFilterCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        # IMG2PDF commands
-        for mode in ImageFilterCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageFilterCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="blur",
                     description="Blur",
@@ -66,20 +62,21 @@ class ImageFilterCLI(AbstractTyperCommand):
 
     def filter(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageFilterCommand.SupportedInFormats)],
-        filters: Annotated[list[ImageFilterCommand.PillowFilter], typer.Option("--filter", "-f",
-                                                                               help=f'{_("Filter to apply. Available filters:")} {", ".join(mode.value for mode in ImageFilterCommand.PillowFilter)}',
-                                                                               )],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageFilterCommand.get_in_formats())],
+        filters: Annotated[list[ImageFilterFilters], typer.Option("--filter", "-f",
+                                                                  help=f'{_("Filter to apply.")}',
+                                                                  )],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageFilterCommand.filter(
+            command = ImageFilterCommand(
                 input_files=input_files,
                 filters=filters,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

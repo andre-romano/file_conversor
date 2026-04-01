@@ -7,11 +7,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, HashTyperGroup
-from file_conversor.cli.hash import HashCheckCLI
+from file_conversor.cli.hash.check_cli import HashCheckCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(HashCheckCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not HashCheckCommand.check_dependencies(), reason="External dependencies not installed")
 class TestHashCheckCLI:
     def test_hash_check(self, tmp_path: Path):
         in_paths: list[Path] = [

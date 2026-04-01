@@ -9,7 +9,11 @@ import typer
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
-from file_conversor.command.pdf import PdfEncryptCommand
+from file_conversor.command.pdf import (
+    PdfEncryptAlgorithm,
+    PdfEncryptCommand,
+    PdfEncryptPermission,
+)
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -30,14 +34,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfEncryptCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfEncryptCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfEncryptCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfEncryptCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="encrypt",
                     description="Encrypt",
@@ -67,16 +68,16 @@ class PdfEncryptCLI(AbstractTyperCommand):
 
     def encrypt(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfEncryptCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(PdfEncryptCommand.get_in_formats())],
         owner_password: Annotated[str, typer.Option("--owner-password", "-op",
                                                     help=_("Owner password for encryption. Owner has ALL PERMISSIONS in the output PDF file."),
                                                     prompt=f"{_('Owner password for encryption (password will not be displayed, for your safety)')}",
                                                     hide_input=True,
                                                     )],
 
-        permissions: Annotated[list[PdfEncryptCommand.EncryptionPermission], typer.Option("--permission", "-p",
+        permissions: Annotated[list[PdfEncryptPermission], typer.Option("--permission", "-p",
                                                                                           help=_("User permissions for the encrypted PDF file. Can be used multiple times to add multiple permissions. If no permissions are specified, the user will have no permissions (read-only)."),
-                                                                                          )] = [PdfEncryptCommand.EncryptionPermission.NONE],  # noqa: B006
+                                                                                          )] = [PdfEncryptPermission.NONE],  # noqa: B006
 
         user_password: Annotated[str, typer.Option("--user-password", "-up",
                                                           help=f'{_("User password for encryption. User has ONLY THE PERMISSIONS specified in the arguments. Defaults to")} None {_("(user and owner password are the same).")}',
@@ -86,15 +87,15 @@ class PdfEncryptCLI(AbstractTyperCommand):
                                                              help=f'{_("Decrypt password used to open protected file. Defaults to")} None {_("(do not decrypt).")}',
                                                              )] = "",
 
-        algorithm: Annotated[PdfEncryptCommand.EncryptionAlgorithm, typer.Option("--algorithm", "-a",
-                                                                                 help=f'{_("Encryption algorithm used. ")} {_(f"Defaults to")} {PdfEncryptCommand.EncryptionAlgorithm.AES_256.value}.',
-                                                                                 )] = PdfEncryptCommand.EncryptionAlgorithm.AES_256,
+        algorithm: Annotated[PdfEncryptAlgorithm, typer.Option("--algorithm", "-a",
+                                                                                 help=f'{_("Encryption algorithm used. ")}.',
+                                                                                 )] = PdfEncryptAlgorithm.AES_256,
 
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            PdfEncryptCommand.encrypt(
+            command = PdfEncryptCommand(
                 input_files=input_files,
                 owner_password=owner_password,
                 user_password=user_password,
@@ -104,6 +105,7 @@ class PdfEncryptCLI(AbstractTyperCommand):
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

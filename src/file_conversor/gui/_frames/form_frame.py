@@ -48,25 +48,35 @@ class FormFrame(QFrame):
         self._form_layout.setVerticalSpacing(spacing[1])
         self._form_layout.setContentsMargins(0, 0, 0, 0)
 
-        form_frame = QFrame()
-        form_frame.setLayout(self._form_layout)
-
-        scrollarea = ScrollArea()
-        scrollarea.setWidget(form_frame)
+        self._start_btn = PushButton(text=_("Start"))
+        self._start_btn.clicked.connect(self.on_start_btn_clicked)
 
         self.status_bar = StatusBarFrame(gui_path=gui_path)
+
+        start_btn_layout = QHBoxLayout()
+        start_btn_layout.setSpacing(0)
+        start_btn_layout.setContentsMargins(0, 0, 0, 0)
+        start_btn_layout.addStretch()
+        start_btn_layout.addWidget(self._start_btn)
 
         content_layout = QVBoxLayout()
         content_layout.setSpacing(spacing[1])
         content_layout.setContentsMargins(*margins)
         content_layout.addWidget(title_label, alignment=Qt.AlignmentFlag.AlignHCenter)
-        content_layout.addWidget(scrollarea, stretch=1)
+        content_layout.addLayout(self._form_layout, stretch=1)
+        content_layout.addLayout(start_btn_layout)
+
+        form_frame = QFrame()
+        form_frame.setLayout(content_layout)
+
+        scrollarea = ScrollArea()
+        scrollarea.setWidget(form_frame)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        layout.addLayout(content_layout, stretch=1)
+        layout.addWidget(scrollarea, stretch=1)
         layout.addWidget(self.status_bar)
 
         self.setLayout(layout)
@@ -94,23 +104,13 @@ class FormFrame(QFrame):
         self.addRow(f"{_('Output directory')}:", output_dir_widget)
         return output_dir_widget
 
-    def addConfirmButton(self):
-        confirm_btn = PushButton(text=_("Start"))
-        confirm_btn.clicked.connect(self.on_start_btn_clicked)
-
-        confirm_layout = QHBoxLayout()
-        confirm_layout.setSpacing(0)
-        confirm_layout.setContentsMargins(0, 0, 0, 0)
-        confirm_layout.addStretch()
-        confirm_layout.addWidget(confirm_btn)
-        self._form_layout.addRow(confirm_layout)
-        return confirm_btn
-
     def on_start_btn_clicked(self) -> None:
-        raise NotImplementedError("Subclasses must implement this method.")
+        """ Override this method to implement the logic when the start button is clicked."""
+        self._start_btn.setEnabled(False)
 
     def on_finished_task(self) -> None:
-        raise NotImplementedError("Subclasses must implement this method.")
+        self.status_bar.setProgress(100)
+        self._start_btn.setEnabled(True)
 
 
 __all__ = [

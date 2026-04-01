@@ -11,7 +11,7 @@ from file_conversor.cli._utils.typer import (
     InputFilesArgument,
     OutputDirOption,
 )
-from file_conversor.command.hash import HashCreateCommand
+from file_conversor.command.hash import HashCreateCommand, HashCreateOutFormats
 from file_conversor.config import Configuration, Log, State, get_translation
 from file_conversor.system.win.ctx_menu import WinContextMenu
 
@@ -26,8 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class HashCreateCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = HashCreateCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # no context menu for create command
@@ -51,17 +49,18 @@ class HashCreateCLI(AbstractTyperCommand):
     def create(
         self,
         input_files: Annotated[list[Path], InputFilesArgument()],
-        file_format: Annotated[HashCreateCommand.SupportedOutFormats, FormatOption()],
+        file_format: Annotated[HashCreateOutFormats, FormatOption()],
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            HashCreateCommand.create(
+            command = HashCreateCommand(
                 input_files=input_files,
                 file_format=file_format,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

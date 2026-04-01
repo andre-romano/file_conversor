@@ -4,7 +4,7 @@
 This module provides functionalities for handling files using ``pdf2docx`` backend.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from file_conversor.backend.abstract_backend import AbstractBackend
@@ -24,10 +24,10 @@ class PDF2DOCXBackend(AbstractBackend):
     A class that provides an interface for handling files using ``pdf2docx``.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         DOCX = "docx"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()

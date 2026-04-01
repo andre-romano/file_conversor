@@ -4,7 +4,7 @@
 This module provides functionalities for handling PDF files using ``pikepdf`` backend (qpdf python wrapper).
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable
 
@@ -24,10 +24,10 @@ class PikePDFBackend(AbstractBackend):
     A class that provides an interface for handling PDF files using ``pikepdf`` (qpdf python wrapper).
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PDF = "pdf"
 
     EXTERNAL_DEPENDENCIES: set[str] = set()

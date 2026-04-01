@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, AudioTyperGroup
-from file_conversor.cli.audio import AudioInfoCLI
+from file_conversor.cli.audio.info_cli import AudioInfoCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(AudioInfoCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not AudioInfoCommand.check_dependencies(), reason="External dependencies not installed")
 class TestAudioInfoCLI:
     def test_audio_info(self):
         test_cases: list[Path] = [

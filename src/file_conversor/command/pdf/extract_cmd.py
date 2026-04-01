@@ -2,11 +2,12 @@
 # src\file_conversor\command\pdf\extract_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.pdf import PyPDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,21 +20,35 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+PdfExtractExternalDependencies = PyPDFBackend.EXTERNAL_DEPENDENCIES
 
-class PdfExtractCommand:
-    EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
+PdfExtractInFormats = PyPDFBackend.SupportedInFormats
+PdfExtractOutFormats = PyPDFBackend.SupportedOutFormats
 
-    SupportedInFormats = PyPDFBackend.SupportedInFormats
+
+class PdfExtractCommand(AbstractCommand[PdfExtractInFormats, PdfExtractOutFormats]):
+    input_files: list[Path]
+    pages: list[int]
+    password: str
+    output_dir: Path
 
     @classmethod
-    def extract(
-        cls,
-        input_files: list[Path],
-        pages: list[int],
-        password: str,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return PdfExtractExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PdfExtractInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PdfExtractOutFormats
+
+    @override
+    def execute(self):
         """ 
         Extract specific pages from PDF files. 
 
@@ -46,8 +61,8 @@ class PdfExtractCommand:
         backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
             out_stem="_extracted",
         )
@@ -57,9 +72,9 @@ class PdfExtractCommand:
             backend.extract(
                 input_file=data.input_file,
                 output_file=data.output_file,
-                password=password,
-                pages=pages,
-                progress_callback=lambda p: progress_callback(get_progress(p)),
+                password=self.password,
+                pages=self.pages,
+                progress_callback=lambda p: self.progress_callback(get_progress(p)),
             )
 
         batch_datamodel.execute(step_one)
@@ -67,5 +82,8 @@ class PdfExtractCommand:
 
 
 __all__ = [
+    "PdfExtractExternalDependencies",
+    "PdfExtractInFormats",
+    "PdfExtractOutFormats",
     "PdfExtractCommand",
 ]

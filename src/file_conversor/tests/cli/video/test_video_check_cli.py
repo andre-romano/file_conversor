@@ -7,11 +7,11 @@ import pytest
 
 # user-provided imports
 from file_conversor.cli import AppTyperGroup, VideoTyperGroup
-from file_conversor.cli.video import VideoCheckCLI
+from file_conversor.cli.video.check_cli import VideoCheckCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(VideoCheckCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not VideoCheckCommand.check_dependencies(), reason="External dependencies not installed")
 class TestVideoCheckCLI:
     def test_video_check(self):
         test_cases: list[Path] = [

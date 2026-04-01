@@ -2,11 +2,12 @@
 # src\file_conversor\command\pdf\split_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.pdf import PyPDFBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,26 +20,38 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+PdfSplitExternalDependencies = PyPDFBackend.EXTERNAL_DEPENDENCIES
+PdfSplitInFormats = PyPDFBackend.SupportedInFormats
+PdfSplitOutFormats = PyPDFBackend.SupportedOutFormats
 
-class PdfSplitCommand:
-    EXTERNAL_DEPENDENCIES = PyPDFBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = PyPDFBackend.SupportedInFormats
-    SupportedOutFormats = PyPDFBackend.SupportedOutFormats
+class PdfSplitCommand(AbstractCommand[PdfSplitInFormats, PdfSplitOutFormats]):
+    input_files: list[Path]
+    password: str
+    output_dir: Path
 
     @classmethod
-    def split(
-        cls,
-        input_files: list[Path],
-        password: str,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return PdfSplitExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return PdfSplitInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return PdfSplitOutFormats
+
+    @override
+    def execute(self):
         pypdf_backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             out_stem="_",
             overwrite_output=STATE.overwrite_output.enabled,
         )
@@ -48,9 +61,9 @@ class PdfSplitCommand:
             pypdf_backend.split(
                 overwrite_output=data.overwrite_output,
                 input_file=data.input_file,
-                password=password,
+                password=self.password,
                 out_dir=data.output_file.parent,
-                progress_callback=lambda p: progress_callback(get_progress(p)),
+                progress_callback=lambda p: self.progress_callback(get_progress(p)),
             )
 
         batch_datamodel.execute(step_one)
@@ -58,5 +71,8 @@ class PdfSplitCommand:
 
 
 __all__ = [
+    "PdfSplitExternalDependencies",
+    "PdfSplitInFormats",
+    "PdfSplitOutFormats",
     "PdfSplitCommand",
 ]

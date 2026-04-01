@@ -4,7 +4,7 @@
 This module provides functionalities for handling files using gifsicle.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -26,10 +26,10 @@ class GifSicleBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
     Provides an interface for handling files using gifsicle.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         GIF = "gif"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         GIF = "gif"
 
     EXTERNAL_DEPENDENCIES: set[str] = {

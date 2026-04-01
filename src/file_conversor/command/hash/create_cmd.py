@@ -2,11 +2,12 @@
 # src\file_conversor\command\hash\create_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.hash_backend import HashBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import FilesDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -19,24 +20,36 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+HashCreateExternalDependencies = HashBackend.EXTERNAL_DEPENDENCIES
+HashCreateInFormats = HashBackend.SupportedInFormats
+HashCreateOutFormats = HashBackend.SupportedOutFormats
 
-class HashCreateCommand:
-    EXTERNAL_DEPENDENCIES = HashBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = HashBackend.SupportedInFormats
-    SupportedOutFormats = HashBackend.SupportedOutFormats
+class HashCreateCommand(AbstractCommand[HashCreateInFormats, HashCreateOutFormats]):
+    input_files: list[Path]
+    file_format: HashCreateOutFormats
+    output_dir: Path
 
     @classmethod
-    def create(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return HashCreateExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return HashCreateInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return HashCreateOutFormats
+
+    @override
+    def execute(self):
         datamodel = FilesDataModel(
-            input_files=input_files,
-            output_file=output_dir / f"CHECKSUM.{file_format.value}",
+            input_files=self.input_files,
+            output_file=self.output_dir / f"CHECKSUM.{self.file_format.value}",
             overwrite_output=STATE.overwrite_output.enabled,
         )
 
@@ -48,7 +61,7 @@ class HashCreateCommand:
             hash_backend.generate(
                 input_files=data.input_files,
                 output_file=data.output_file,
-                progress_callback=lambda p: progress_callback(get_progress(p)),
+                progress_callback=lambda p: self.progress_callback(get_progress(p)),
             )
 
         datamodel.execute(step_one)
@@ -57,5 +70,8 @@ class HashCreateCommand:
 
 
 __all__ = [
+    "HashCreateExternalDependencies",
+    "HashCreateInFormats",
+    "HashCreateOutFormats",
     "HashCreateCommand",
 ]

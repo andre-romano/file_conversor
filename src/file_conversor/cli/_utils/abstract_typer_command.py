@@ -1,6 +1,7 @@
 # src/file_conversor/cli/_utils/abstract_typer_command.py
 
-from typing import Any, Callable, Protocol
+from abc import abstractmethod
+from typing import Any, Callable
 
 import typer
 
@@ -9,23 +10,22 @@ from file_conversor.config.environment import Environment
 from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
-class RegisterCtxMenuProtocol(Protocol):
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        ...
-
-
-class AbstractTyperCommand(RegisterCtxMenuProtocol):
+class AbstractTyperCommand:
     @property
-    def COMMAND_NAME(self) -> str:
+    def COMMAND_NAME(self) -> str:  # noqa: S100
         return self._COMMAND_NAME
 
     @property
-    def GROUP_NAME(self) -> str:
+    def GROUP_NAME(self) -> str:  # noqa: S100
         return self._GROUP_NAME
 
     @property
-    def RICH_HELP_PANEL(self) -> str:
+    def RICH_HELP_PANEL(self) -> str:  # noqa: S100
         return self._typer_cmd.info.rich_help_panel or ""
+
+    @abstractmethod
+    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
+        ...
 
     def __init__(
         self,
@@ -64,6 +64,5 @@ class AbstractTyperCommand(RegisterCtxMenuProtocol):
 
 
 __all__ = [
-    "RegisterCtxMenuProtocol",
     "AbstractTyperCommand",
 ]

@@ -5,11 +5,11 @@ from pathlib import Path
 import pytest
 
 from file_conversor.cli import AppTyperGroup, HashTyperGroup
-from file_conversor.cli.hash import HashCreateCLI
+from file_conversor.cli.hash.create_cli import HashCreateCommand
 from file_conversor.tests.utils import DATA_PATH, TestTyper
 
 
-@pytest.mark.skipif(not TestTyper.dependencies_installed(HashCreateCLI.EXTERNAL_DEPENDENCIES), reason="External dependencies not installed")
+@pytest.mark.skipif(not HashCreateCommand.check_dependencies(), reason="External dependencies not installed")
 class TestHashCreateCLI:
     def test_hash_create_cases(self, tmp_path: Path):
         in_paths: list[Path] = [

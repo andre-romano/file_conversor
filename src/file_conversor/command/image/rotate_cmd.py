@@ -2,11 +2,12 @@
 # src\file_conversor\command\image\rotate_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable, override
 
 from file_conversor.backend.image import PillowBackend
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
 from file_conversor.config import Configuration, Log, State, get_translation
 
@@ -20,23 +21,37 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class ImageRotateCommand:
-    EXTERNAL_DEPENDENCIES = PillowBackend.EXTERNAL_DEPENDENCIES
+ImageRotateExternalDependencies = PillowBackend.EXTERNAL_DEPENDENCIES
 
-    SupportedInFormats = PillowBackend.SupportedInFormats
-    SupportedOutFormats = PillowBackend.SupportedOutFormats
+ImageRotateInFormats = PillowBackend.SupportedInFormats
+ImageRotateOutFormats = PillowBackend.SupportedOutFormats
 
-    ResamplingOption = PillowBackend.ResamplingOption
+ImageRotateResamplingOption = PillowBackend.ResamplingOption
+
+
+class ImageRotateCommand(AbstractCommand[ImageRotateInFormats, ImageRotateOutFormats]):
+    input_files: list[Path]
+    rotation: int
+    resampling: ImageRotateResamplingOption
+    output_dir: Path
 
     @classmethod
-    def rotate(
-        cls,
-        input_files: list[Path],
-        rotation: int,
-        resampling: ResamplingOption,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return ImageRotateExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return ImageRotateInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return ImageRotateOutFormats
+
+    @override
+    def execute(self):
         """
         Rotate image files.
 
@@ -50,8 +65,8 @@ class ImageRotateCommand:
         pillow_backend = PillowBackend(verbose=STATE.loglevel.get().is_verbose())
 
         datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
             overwrite_output=STATE.overwrite_output.enabled,
             out_stem="_rotated",
         )
@@ -61,15 +76,19 @@ class ImageRotateCommand:
             pillow_backend.rotate(
                 input_file=data.input_file,
                 output_file=data.output_file,
-                rotate=rotation,
-                resampling=resampling,
+                rotate=self.rotation,
+                resampling=self.resampling,
             )
-            progress_callback(get_progress(100.0))
+            self.progress_callback(get_progress(100.0))
 
         datamodel.execute(step_one)
         logger.info(f"{_('Image rotation')}: [green bold]{_('SUCCESS')}[/]")
 
 
 __all__ = [
+    "ImageRotateExternalDependencies",
+    "ImageRotateInFormats",
+    "ImageRotateOutFormats",
+    "ImageRotateResamplingOption",
     "ImageRotateCommand",
 ]

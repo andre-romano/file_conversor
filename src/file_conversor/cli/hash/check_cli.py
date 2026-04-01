@@ -28,14 +28,11 @@ logger = LOG.getLogger(__name__)
 
 
 class HashCheckCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = HashCheckCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in HashCheckCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in HashCheckCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="check",
                     description="Check",
@@ -61,14 +58,15 @@ class HashCheckCLI(AbstractTyperCommand):
 
     def check(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in HashCheckCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(HashCheckCommand.get_in_formats())],
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            HashCheckCommand.check(
+            command = HashCheckCommand(
                 input_files=input_files,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

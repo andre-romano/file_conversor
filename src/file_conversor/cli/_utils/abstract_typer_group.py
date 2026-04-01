@@ -2,24 +2,23 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, Protocol, override
+from typing import Any, Callable, Protocol
 
 import typer
 import typer.core
 
 
 class GetTyperProtocol(Protocol):
-    def get_typer(self) -> "typer.Typer":
-        ...
+    def get_typer(self) -> typer.Typer: ...
 
 
-class AbstractTyperGroup(GetTyperProtocol):
+class AbstractTyperGroup:
     @property
-    def GROUP_NAME(self) -> str:
+    def GROUP_NAME(self) -> str:  # noqa: S100
         return self._typer_cmd.info.name or ""
 
     @property
-    def RICH_HELP_PANEL(self) -> str:
+    def RICH_HELP_PANEL(self) -> str:  # noqa: S100
         return self._typer_cmd.info.rich_help_panel or ""
 
     class MarkupMode(Enum):
@@ -82,7 +81,6 @@ class AbstractTyperGroup(GetTyperProtocol):
         for obj in objs:
             self._typer_cmd.add_typer(obj.get_typer())
 
-    @override
     def get_typer(self) -> typer.Typer:
         return self._typer_cmd
 

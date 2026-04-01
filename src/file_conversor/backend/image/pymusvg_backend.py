@@ -4,7 +4,7 @@
 This module provides functionalities for handling SVG files using ``pymupdf`` backend.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 # user-provided imports
@@ -16,10 +16,10 @@ class PyMuSVGBackend(AbstractBackend):
     A class that provides an interface for handling SVG files using ``pymupdf``.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         SVG = "svg"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PNG = "png"
         JPG = "jpg"
 

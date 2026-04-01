@@ -26,8 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageBlurCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageBlurCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         return
@@ -50,18 +48,19 @@ class ImageBlurCLI(AbstractTyperCommand):
 
     def blur(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageBlurCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageBlurCommand.get_in_formats())],
         radius: Annotated[int, RadiusOption()] = 3,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageBlurCommand.blur(
+            command = ImageBlurCommand(
                 input_files=input_files,
                 radius=radius,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

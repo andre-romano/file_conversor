@@ -6,8 +6,9 @@ This module provides functionalities for handling external backends.
 
 import shutil
 
+from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Callable, Iterable, Protocol
+from typing import Any, Callable, Iterable
 
 from file_conversor.config import Environment, Log, get_translation
 from file_conversor.system.abstract_system import AbstractSystem
@@ -19,29 +20,7 @@ _ = get_translation()
 logger = LOG.getLogger(__name__)
 
 
-class PackageManagerProtocol(Protocol):
-    def _get_pkg_manager_installed(self) -> str | None:
-        """ Returns package manager path, if already installed in system. """
-        ...
-
-    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
-        """ Returns the package manager supported OSes. """
-        ...
-
-    def _get_cmd_install_pkg_manager(self) -> list[str]:
-        """ Returns the command to install the package manager in the system. """
-        ...
-
-    def _post_install_pkg_manager(self) -> None:
-        """ Post installation steps after installing the package manager. """
-        ...
-
-    def _get_cmd_install_dep(self, dependency: str) -> list[str]:
-        """ Returns the command to install a dependency with the package manager. """
-        ...
-
-
-class AbstractPackageManager(PackageManagerProtocol):
+class AbstractPackageManager:
     def __init__(self,
                  dependencies: dict[str, str],
                  env: list[str | Path] | None = None,
@@ -56,6 +35,26 @@ class AbstractPackageManager(PackageManagerProtocol):
         self._pre_install_dep_callbacks: list[Callable[[], Any]] = []
         self._post_install_dep_callbacks: list[Callable[[], Any]] = []
         self._set_env_path(env or [])
+
+    @abstractmethod
+    def _get_pkg_manager_installed(self) -> str | None:
+        """ Returns package manager path, if already installed in system. """
+
+    @abstractmethod
+    def _get_supported_oses(self) -> set[AbstractSystem.Platform]:
+        """ Returns the package manager supported OSes. """
+
+    @abstractmethod
+    def _get_cmd_install_pkg_manager(self) -> list[str]:
+        """ Returns the command to install the package manager in the system. """
+
+    @abstractmethod
+    def _post_install_pkg_manager(self) -> None:
+        """ Post installation steps after installing the package manager. """
+
+    @abstractmethod
+    def _get_cmd_install_dep(self, dependency: str) -> list[str]:
+        """ Returns the command to install a dependency with the package manager. """
 
     def get_missing_dependencies(self) -> set[str]:
         """

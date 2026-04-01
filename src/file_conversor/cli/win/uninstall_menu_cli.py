@@ -26,8 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class WinUninstallMenuCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = WinUninstallMenuCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
         return  # No context menu to register
@@ -50,9 +48,10 @@ class WinUninstallMenuCLI(AbstractTyperCommand):
     def uninstall_menu(self):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Uninstalling context menu:"))
-            WinUninstallMenuCommand.uninstall_menu(
+            command = WinUninstallMenuCommand(
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

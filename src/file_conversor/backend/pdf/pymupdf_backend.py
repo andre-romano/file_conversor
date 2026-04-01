@@ -4,7 +4,7 @@
 This module provides functionalities for handling files using ``pymupdf`` backend.
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Callable, Iterable, cast
 
@@ -25,10 +25,10 @@ class PyMuPDFBackend(AbstractBackend):
     A class that provides an interface for handling files using ``pymupdf``.
     """
 
-    class SupportedInFormats(Enum):
+    class SupportedInFormats(StrEnum):
         PDF = "pdf"
 
-    class SupportedOutFormats(Enum):
+    class SupportedOutFormats(StrEnum):
         PNG = "png"
         JPG = "jpg"
 

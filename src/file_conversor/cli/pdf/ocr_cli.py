@@ -10,6 +10,7 @@ import typer
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
 from file_conversor.command.pdf import PdfOcrCommand
+from file_conversor.command.pdf.ocr_cmd import PdfOcrLanguageModel
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -31,14 +32,11 @@ logger = LOG.getLogger(__name__)
 
 
 class PdfOcrCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = PdfOcrCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
-        for mode in PdfOcrCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in PdfOcrCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="ocr",
                     description="OCR",
@@ -70,7 +68,7 @@ class PdfOcrCLI(AbstractTyperCommand):
     - `file_conversor {group_name} {command_name} input_file.pdf input_file2.pdf -l eng -od "D:\\Downloads"`
 """)
 
-    def _print_languages(self, title: str, languages: Iterable[PdfOcrCommand.LanguageModel]):
+    def _print_languages(self, title: str, languages: Iterable[PdfOcrLanguageModel]):
         languages_list = sorted(languages, key=lambda l: l.code)
         logger.info(f"{title}:\n{'\n'.join(
             f"{lang.code} - {lang.name}"
@@ -79,7 +77,7 @@ class PdfOcrCLI(AbstractTyperCommand):
 
     def ocr(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in PdfOcrCommand.SupportedInFormats)],  # pyright: ignore[reportUnknownArgumentType]
+        input_files: Annotated[list[Path], InputFilesArgument(PdfOcrCommand.get_in_formats())],
 
         languages: Annotated[list[str] | None, typer.Option(
             "--languages", "-l",
@@ -97,31 +95,22 @@ class PdfOcrCLI(AbstractTyperCommand):
             languages = lang_str.split(",")
         languages = [lang.lower().strip() for lang in languages]
 
-        ocr_cmd = PdfOcrCommand()
         if 'all' in languages:
             self._print_languages(
-                title=f"[bold blue]{_('Installed languages')}[/]",
-                languages=ocr_cmd.get_installed_languages(),
-            )
-            self._print_languages(
-                title=f"[bold blue]{_('Available remote languages')}[/]",
-                languages=ocr_cmd.get_available_remote_languages(),
+                title=f"[bold blue]{_('Available languages')}[/]",
+                languages=PdfOcrCommand.get_available_remote_languages(),
             )
             return
 
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
-            task_install = progress_bar.add_task(_("Installing languages:"))
-            ocr_cmd.install_languages(
-                languages=languages,
-                progress_callback=task_install.update,
-            )
-            task_install.visible = False
-
-            ocr_cmd.ocr(
+            task_install = progress_bar.add_task(_("Processing files:"))
+            command = PdfOcrCommand(
                 input_files=input_files,
                 languages=languages,
                 output_dir=output_dir,
+                progress_callback=task_install.update,
             )
+            command.execute()
 
 
 __all__ = [

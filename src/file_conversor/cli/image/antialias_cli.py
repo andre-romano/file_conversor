@@ -13,7 +13,7 @@ from file_conversor.cli._utils.typer import (
     OutputDirOption,
     RadiusOption,
 )
-from file_conversor.command.image import ImageAntialiasCommand
+from file_conversor.command.image import ImageAntialiasAlgorithm, ImageAntialiasCommand
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -34,15 +34,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageAntialiasCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageAntialiasCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # IMG2PDF commands
-        for mode in ImageAntialiasCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageAntialiasCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="antialias",
                     description="Antialias",
@@ -69,23 +66,24 @@ class ImageAntialiasCLI(AbstractTyperCommand):
 
     def antialias(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageAntialiasCommand.SupportedInFormats)],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageAntialiasCommand.get_in_formats())],
         radius: Annotated[int, RadiusOption()] = 3,
-        algorithm: Annotated[ImageAntialiasCommand.AntialiasAlgorithm,
+        algorithm: Annotated[ImageAntialiasAlgorithm,
                              typer.Option("--algorithm", "-a",
-                                          help=f'{_("Algorithm to use. Available algorihtms:")} {", ".join(mode.value for mode in ImageAntialiasCommand.AntialiasAlgorithm)}.',
-                                          )] = ImageAntialiasCommand.AntialiasAlgorithm.MEDIAN,
+                                          help=f'{_("Algorithm to use.")}',
+                                          )] = ImageAntialiasAlgorithm.MEDIAN,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageAntialiasCommand.antialias(
+            command = ImageAntialiasCommand(
                 input_files=input_files,
                 radius=radius,
                 algorithm=algorithm,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

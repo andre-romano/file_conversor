@@ -12,7 +12,7 @@ from file_conversor.cli._utils.typer import (
     OutputDirOption,
     QualityOption,
 )
-from file_conversor.command.image import ImageConvertCommand
+from file_conversor.command.image import ImageConvertCommand, ImageConvertOutFormats
 from file_conversor.config import (
     Configuration,
     Environment,
@@ -33,15 +33,12 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageConvertCLI(AbstractTyperCommand):
-    EXTERNAL_DEPENDENCIES = ImageConvertCommand.EXTERNAL_DEPENDENCIES
-
     @override
     def register_ctx_menu(self, ctx_menu: WinContextMenu):
         icons_folder_path = Environment.get_icons_folder()
         # Pillow commands
-        for mode in ImageConvertCommand.SupportedInFormats:
-            ext = mode.value
-            ctx_menu.add_extension(f".{ext}", [
+        for ext_in in ImageConvertCommand.get_in_formats():
+            ctx_menu.add_extension(f".{ext_in}", [
                 WinContextCommand(
                     name="to_jpg",
                     description="To JPG",
@@ -74,20 +71,21 @@ class ImageConvertCLI(AbstractTyperCommand):
 
     def convert(
         self,
-        input_files: Annotated[list[Path], InputFilesArgument(mode.value for mode in ImageConvertCommand.SupportedInFormats)],
-        file_format: Annotated[ImageConvertCommand.SupportedOutFormats, FormatOption()],
+        input_files: Annotated[list[Path], InputFilesArgument(ImageConvertCommand.get_in_formats())],
+        file_format: Annotated[ImageConvertOutFormats, FormatOption()],
         quality: Annotated[int, QualityOption()] = CONFIG.image_quality,
         output_dir: Annotated[Path, OutputDirOption()] = Path(),
     ):
         with RichProgressBar(STATE.progress.enabled) as progress_bar:
             task = progress_bar.add_task(_("Processing files:"))
-            ImageConvertCommand.convert(
+            command = ImageConvertCommand(
                 input_files=input_files,
                 file_format=file_format,
                 quality=quality,
                 output_dir=output_dir,
                 progress_callback=task.update,
             )
+            command.execute()
 
 
 __all__ = [

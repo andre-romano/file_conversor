@@ -2,9 +2,10 @@
 # src\file_conversor\command\video\enhance_cmd.py
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import override
 
 # user-provided modules
+from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel
 from file_conversor.command.video._ffmpeg_cmd_helper import FFmpegCmdHelper
 from file_conversor.config import Configuration, Log, State, get_translation
@@ -18,48 +19,61 @@ LOG = Log.get_instance()
 _ = get_translation()
 logger = LOG.getLogger(__name__)
 
+VideoEnhanceExternalDependencies = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
+VideoEnhanceInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
+VideoEnhanceOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
 
-class VideoEnhanceCommand:
-    EXTERNAL_DEPENDENCIES = FFmpegCmdHelper.BACKEND.EXTERNAL_DEPENDENCIES
-    SupportedInFormats = FFmpegCmdHelper.BACKEND.SupportedInVideoFormats
-    SupportedOutFormats = FFmpegCmdHelper.BACKEND.SupportedOutVideoFormats
+VideoEnhanceAudioCodecs = FFmpegCmdHelper.AudioCodecs
+VideoEnhanceVideoCodecs = FFmpegCmdHelper.VideoCodecs
 
-    AudioCodecs = FFmpegCmdHelper.AudioCodecs
-    VideoCodecs = FFmpegCmdHelper.VideoCodecs
+VideoEnhanceProfile = FFmpegCmdHelper.VideoProfile
+VideoEnhanceEncoding = FFmpegCmdHelper.VideoEncoding
+VideoEnhanceQuality = FFmpegCmdHelper.VideoQuality
 
-    VideoProfile = FFmpegCmdHelper.VideoProfile
-    VideoEncoding = FFmpegCmdHelper.VideoEncoding
-    VideoQuality = FFmpegCmdHelper.VideoQuality
+VideoEnhanceMirrorAxis = FFmpegCmdHelper.MirrorAxis
+VideoEnhanceRotation = FFmpegCmdHelper.Rotation
 
-    MirrorAxis = FFmpegCmdHelper.MirrorAxis
-    Rotation = FFmpegCmdHelper.Rotation
+
+class VideoEnhanceCommand(AbstractCommand[VideoEnhanceInFormats, VideoEnhanceOutFormats]):
+    input_files: list[Path]
+    file_format: VideoEnhanceOutFormats
+    audio_bitrate: int | None
+    video_bitrate: int | None
+    video_profile: VideoEnhanceProfile
+    video_encoding_speed: VideoEnhanceEncoding
+    video_quality: VideoEnhanceQuality
+    width: int | None
+    height: int | None
+    fps: int | None
+    brightness: float
+    contrast: float
+    color: float
+    gamma: float
+    deshake: bool
+    unsharp: bool
+    output_dir: Path
 
     @classmethod
-    def enhance(
-        cls,
-        input_files: list[Path],
-        file_format: SupportedOutFormats,
-        audio_bitrate: int | None,
-        video_bitrate: int | None,
-        video_profile: VideoProfile,
-        video_encoding_speed: VideoEncoding,
-        video_quality: VideoQuality,
-        width: int | None,
-        height: int | None,
-        fps: int | None,
-        brightness: float,
-        contrast: float,
-        color: float,
-        gamma: float,
-        deshake: bool,
-        unsharp: bool,
-        output_dir: Path,
-        progress_callback: Callable[[float], Any] = lambda p: p,
-    ):
+    @override
+    def _external_dependencies(cls):
+        return VideoEnhanceExternalDependencies
+
+    @classmethod
+    @override
+    def _supported_in_formats(cls):
+        return VideoEnhanceInFormats
+
+    @classmethod
+    @override
+    def _supported_out_formats(cls):
+        return VideoEnhanceOutFormats
+
+    @override
+    def execute(self):
         batch_datamodel = BatchFilesDataModel(
-            input_files=input_files,
-            output_dir=output_dir,
-            out_suffix=file_format.value,
+            input_files=self.input_files,
+            output_dir=self.output_dir,
+            out_suffix=self.file_format.value,
             out_stem="_enhanced",
             overwrite_output=STATE.overwrite_output.enabled,
         )
@@ -68,30 +82,44 @@ class VideoEnhanceCommand:
             install_deps=CONFIG.install_deps,
             verbose=STATE.loglevel.get().is_verbose(),
             datamodel=batch_datamodel,
-            progress_callback=progress_callback,
+            progress_callback=self.progress_callback,
         )
 
         ffmpeg_cmd_helper.set_video_settings(
-            profile=video_profile,
-            encoding_speed=video_encoding_speed,
-            quality=video_quality,
+            profile=self.video_profile,
+            encoding_speed=self.video_encoding_speed,
+            quality=self.video_quality,
         )
-        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=audio_bitrate, video_bitrate=video_bitrate)
+        ffmpeg_cmd_helper.set_bitrate(audio_bitrate=self.audio_bitrate, video_bitrate=self.video_bitrate)
 
         ffmpeg_cmd_helper.set_video_filters(
-            resolution=(width, height) if width is not None and height is not None else None,
-            fps=fps,
-            brightness=brightness,
-            contrast=contrast,
-            color=color,
-            gamma=gamma,
-            deshake=deshake,
-            unsharp=unsharp,
+            resolution=(self.width, self.height) if self.width is not None and self.height is not None else None,
+            fps=self.fps,
+            brightness=self.brightness,
+            contrast=self.contrast,
+            color=self.color,
+            gamma=self.gamma,
+            deshake=self.deshake,
+            unsharp=self.unsharp,
         )
 
         ffmpeg_cmd_helper.execute()
 
 
 __all__ = [
+    "VideoEnhanceExternalDependencies",
+    "VideoEnhanceInFormats",
+    "VideoEnhanceOutFormats",
+
+    "VideoEnhanceAudioCodecs",
+    "VideoEnhanceVideoCodecs",
+
+    "VideoEnhanceProfile",
+    "VideoEnhanceEncoding",
+    "VideoEnhanceQuality",
+
+    "VideoEnhanceMirrorAxis",
+    "VideoEnhanceRotation",
+
     "VideoEnhanceCommand",
 ]
