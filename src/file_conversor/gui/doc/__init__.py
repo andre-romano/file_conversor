@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QFrame, QWidget
 from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._layouts import FlowLayout
 from file_conversor.gui._widgets import Card, ScrollArea
-from file_conversor.gui.doc.convert import DocConvertWindow
+from file_conversor.gui.doc.convert_gui import DocConvertWindow
 
 
 LOG = Log.get_instance()
