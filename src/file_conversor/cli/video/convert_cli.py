@@ -65,23 +65,12 @@ class VideoConvertCLI(AbstractTyperCommand):
         for ext_in in VideoConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
                 ContextMenuItem(
-                    name="to_mkv",
-                    description="To MKV",
-                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "mkv"],
-                    icon=icons_folder / 'mkv.ico',
-                ),
-                ContextMenuItem(
-                    name="to_mp4",
-                    description="To MP4",
-                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "mp4"],
-                    icon=icons_folder / 'mp4.ico',
-                ),
-                ContextMenuItem(
-                    name="to_webm",
-                    description="To WEBM",
-                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "webm"],
-                    icon=icons_folder / 'webm.ico',
-                ),
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", ext_out],
+                    icon=icons_folder / f"{ext_out}.ico",
+                )
+                for ext_out in ["mkv", "mp4", "webm"]
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
@@ -98,7 +87,7 @@ class VideoConvertCLI(AbstractTyperCommand):
 
     - `file_conversor {group_name} {command_name} input_file.mp4 -f avi -r 90`
 
-    - `file_conversor {group_name} {command_name} input_file.avi -f mp4 -rs 1280:720`
+    - `file_conversor {group_name} {command_name} input_file.avi -f mp4 -w 1280 -h 720`
 """)
 
     def convert(

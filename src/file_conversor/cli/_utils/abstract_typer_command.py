@@ -18,8 +18,20 @@ from file_conversor.system import (
 )
 
 
+def _get_ctx_menu() -> ContextMenu:
+    match System:
+        case WindowsSystem():
+            return WinContextMenu.get_instance()
+        case LinuxSystem():
+            return LinuxContextMenu.get_instance()
+        case MacSystem():
+            return MacContextMenu.get_instance()
+        case _:
+            raise ValueError(f"Unsupported system: {System}")
+
+
 class AbstractTyperCommand:
-    _ctx_menu: ContextMenu | None = None
+    _CTX_MENU: ContextMenu = _get_ctx_menu()
 
     @property
     def COMMAND_NAME(self) -> str:  # noqa: S100
@@ -65,17 +77,7 @@ class AbstractTyperCommand:
             deprecated=deprecated,
         )(function)
 
-        if self._ctx_menu is None:
-            match System:
-                case WindowsSystem():
-                    self._ctx_menu = WinContextMenu.get_instance()
-                case LinuxSystem():
-                    self._ctx_menu = LinuxContextMenu.get_instance()
-                case MacSystem():
-                    self._ctx_menu = MacContextMenu.get_instance()
-                case _:
-                    raise ValueError(f"Unsupported system: {System}")
-        self._ctx_menu.register_callback(self.register_ctx_menu)
+        self._CTX_MENU.register_callback(self.register_ctx_menu)
 
     def get_typer(self) -> typer.Typer:
         return self._typer_cmd
