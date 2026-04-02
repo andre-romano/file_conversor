@@ -27,12 +27,11 @@ from file_conversor.command.video import (
 )
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -46,22 +45,21 @@ logger = LOG.getLogger(__name__)
 
 class VideoRotateCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path) -> None:
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in VideoRotateCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="rotate_anticlock_90",
                     description="Rotate Left",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r -90"',
-                    icon=str(icons_folder_path / "rotate_left.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-r", "-90"],
+                    icon=icons_folder / "rotate_left.ico",
                 ),
-                WinContextCommand(
+                ContextMenuItem(
                     name="rotate_clock_90",
                     description="Rotate Right",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r 90"',
-                    icon=str(icons_folder_path / "rotate_right.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-r", "90"],
+                    icon=icons_folder / "rotate_right.ico",
                 ),
             ])
 

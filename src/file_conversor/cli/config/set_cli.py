@@ -1,7 +1,7 @@
 
 # src\file_conversor\cli\config\set_cli.py
 
-from typing import Annotated, override
+from typing import Annotated
 
 import typer
 
@@ -28,7 +28,6 @@ from file_conversor.config import (
     get_translation,
     locale,
 )
-from file_conversor.system.win.ctx_menu import WinContextMenu
 from file_conversor.utils.validators import (
     check_is_bool_or_none,
     check_valid_options,
@@ -44,10 +43,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ConfigSetCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # no context menu for this command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         """Config set command class."""
         super().__init__(

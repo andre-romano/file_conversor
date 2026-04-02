@@ -14,12 +14,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command.image import ImageMirrorAxis, ImageMirrorCommand
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -33,22 +32,21 @@ logger = LOG.getLogger(__name__)
 
 class ImageMirrorCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # Pillow commands
         for ext_in in ImageMirrorCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="mirror_x",
                     description="Mirror X axis",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -a x"',
-                    icon=str(icons_folder_path / "left_right.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-a", "x"],
+                    icon=icons_folder / "left_right.ico",
                 ),
-                WinContextCommand(
+                ContextMenuItem(
                     name="mirror_y",
                     description="Mirror Y axis",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -a y"',
-                    icon=str(icons_folder_path / "up_down.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-a", "y"],
+                    icon=icons_folder / "up_down.ico",
                 ),
             ])
 

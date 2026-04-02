@@ -42,12 +42,11 @@ from file_conversor.command.video import (
 )
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -61,28 +60,27 @@ logger = LOG.getLogger(__name__)
 
 class VideoConvertCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in VideoConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="to_mkv",
                     description="To MKV",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f mkv "%1""',
-                    icon=str(icons_folder_path / 'mkv.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "mkv"],
+                    icon=icons_folder / 'mkv.ico',
                 ),
-                WinContextCommand(
+                ContextMenuItem(
                     name="to_mp4",
                     description="To MP4",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f mp4 "%1""',
-                    icon=str(icons_folder_path / 'mp4.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "mp4"],
+                    icon=icons_folder / 'mp4.ico',
                 ),
-                WinContextCommand(
+                ContextMenuItem(
                     name="to_webm",
                     description="To WEBM",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f webm "%1""',
-                    icon=str(icons_folder_path / 'webm.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", "webm"],
+                    icon=icons_folder / 'webm.ico',
                 ),
             ])
 

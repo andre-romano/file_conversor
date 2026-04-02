@@ -9,7 +9,6 @@ from file_conversor.backend.win_reg_backend import WinRegBackend
 from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
@@ -61,7 +60,7 @@ class WinInstallMenuCommand(AbstractCommand[WinInstallMenuInFormats, WinInstallM
 
         winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
 
-        ctx_menu = WinContextMenu.get_instance(icons_folder=Environment.get_icons_folder())
+        ctx_menu = WinContextMenu.get_instance()
         reg_file = ctx_menu.get_reg_file()
 
         logger.info(f"{_('Uninstalling app context menu in Windows Explorer')} ...")

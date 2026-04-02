@@ -1,7 +1,7 @@
 
 # src\file_conversor\cli\win\inst_menu_cmd.py
 
-from typing import Annotated, override
+from typing import Annotated
 
 import typer
 
@@ -14,7 +14,6 @@ from file_conversor.config import (
     State,
     get_translation,
 )
-from file_conversor.system import WinContextMenu
 
 
 # get app config
@@ -27,10 +26,6 @@ logger = LOG.getLogger(__name__)
 
 
 class WinInstallMenuCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # No context menu to register
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

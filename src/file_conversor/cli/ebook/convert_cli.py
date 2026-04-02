@@ -14,12 +14,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command.ebook import EbookConvertCommand, EbookConvertOutFormats
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -33,16 +32,15 @@ logger = LOG.getLogger(__name__)
 
 class EbookConvertCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in EbookConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name=f"to_{ext_out}",
                     description=f"To {ext_out.upper()}",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "{ext_out}""',
-                    icon=str(icons_folder_path / f"{ext_out}.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", ext_out],
+                    icon=icons_folder / f"{ext_out}.ico",
                 )
                 for ext_out in EbookConvertCommand.get_out_formats()
             ])

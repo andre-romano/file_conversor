@@ -1,7 +1,6 @@
 
 # src\file_conversor\cli\config\show_cli.py
 
-from typing import override
 
 from rich import print
 from rich.pretty import Pretty
@@ -10,7 +9,6 @@ from rich.pretty import Pretty
 from file_conversor.cli._utils import AbstractTyperCommand
 from file_conversor.command.config import ConfigShowCommand
 from file_conversor.config import Configuration, Log, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # app configuration
@@ -24,10 +22,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ConfigShowCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # no context menu for this command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         """Config show command class."""
         super().__init__(

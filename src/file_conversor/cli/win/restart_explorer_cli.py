@@ -3,12 +3,10 @@
 
 
 # user-provided modules
-from typing import override
 
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.command.win import WinRestartExplorerCommand
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system import WinContextMenu
 
 
 # get app config
@@ -21,10 +19,6 @@ logger = LOG.getLogger(__name__)
 
 
 class WinRestartExplorerCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # No context menu to register
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

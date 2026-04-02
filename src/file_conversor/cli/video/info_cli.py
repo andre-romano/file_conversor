@@ -19,12 +19,11 @@ from file_conversor.command.video import (
 )
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -38,16 +37,15 @@ logger = LOG.getLogger(__name__)
 
 class VideoInfoCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in VideoInfoCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="info",
                     description="Get Info",
-                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / 'info.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / 'info.ico',
                 ),
             ])
 

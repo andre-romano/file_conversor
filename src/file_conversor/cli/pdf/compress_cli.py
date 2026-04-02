@@ -12,12 +12,11 @@ from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
 from file_conversor.command.pdf import PdfCompressCommand, PdfCompressCompression
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -31,15 +30,14 @@ logger = LOG.getLogger(__name__)
 
 class PdfCompressCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in PdfCompressCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="compress",
                     description="Compress",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / 'compress.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / 'compress.ico',
                 ),
             ])
 

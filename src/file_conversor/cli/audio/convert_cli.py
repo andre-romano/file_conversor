@@ -15,12 +15,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command import AudioConvertCommand, AudioConvertOutFormats
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -35,23 +34,17 @@ logger = LOG.getLogger(__name__)
 class AudioConvertCLI(AbstractTyperCommand):
     """Audio convert command class."""
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in AudioConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
-                    name="to_m4a",
-                    description="To M4A",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f m4a "%1""',
-                    icon=str(icons_folder_path / 'm4a.ico'),
-                ),
-                WinContextCommand(
-                    name="to_mp3",
-                    description="To MP3",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f mp3 "%1""',
-                    icon=str(icons_folder_path / 'mp3.ico'),
-                ),
+                ContextMenuItem(
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", ext_out],
+                    icon=icons_folder / f'{ext_out}.ico',
+                )
+                for ext_out in ["mp3", "m4a"]
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:

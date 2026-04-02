@@ -16,12 +16,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command.image import ImageEnhanceCommand
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 from file_conversor.utils.validators import is_close, prompt_retry_on_exception
 
 
@@ -36,15 +35,14 @@ logger = LOG.getLogger(__name__)
 
 class ImageEnhanceCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in ImageEnhanceCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="enhance",
                     description="Enhance",
-                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / "color.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / "color.ico",
                 ),
             ])
 

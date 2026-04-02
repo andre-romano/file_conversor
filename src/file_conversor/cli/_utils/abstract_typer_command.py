@@ -1,16 +1,26 @@
 # src/file_conversor/cli/_utils/abstract_typer_command.py
 
-from abc import abstractmethod
+from pathlib import Path
 from typing import Any, Callable
 
 import typer
 
 # user-provided modules
-from file_conversor.config.environment import Environment
-from file_conversor.system.win.ctx_menu import WinContextMenu
+from file_conversor.system import (
+    ContextMenu,
+    LinuxContextMenu,
+    LinuxSystem,
+    MacContextMenu,
+    MacSystem,
+    System,
+    WinContextMenu,
+    WindowsSystem,
+)
 
 
 class AbstractTyperCommand:
+    _ctx_menu: ContextMenu | None = None
+
     @property
     def COMMAND_NAME(self) -> str:  # noqa: S100
         return self._COMMAND_NAME
@@ -23,9 +33,8 @@ class AbstractTyperCommand:
     def RICH_HELP_PANEL(self) -> str:  # noqa: S100
         return self._typer_cmd.info.rich_help_panel or ""
 
-    @abstractmethod
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        ...
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path) -> None:
+        """ Override this method to register context menu items for this command. By default, it does nothing. """
 
     def __init__(
         self,
@@ -56,8 +65,17 @@ class AbstractTyperCommand:
             deprecated=deprecated,
         )(function)
 
-        ctx_menu = WinContextMenu.get_instance(icons_folder=Environment.get_icons_folder())
-        ctx_menu.register_callback(self.register_ctx_menu)
+        if self._ctx_menu is None:
+            match System:
+                case WindowsSystem():
+                    self._ctx_menu = WinContextMenu.get_instance()
+                case LinuxSystem():
+                    self._ctx_menu = LinuxContextMenu.get_instance()
+                case MacSystem():
+                    self._ctx_menu = MacContextMenu.get_instance()
+                case _:
+                    raise ValueError(f"Unsupported system: {System}")
+        self._ctx_menu.register_callback(self.register_ctx_menu)
 
     def get_typer(self) -> typer.Typer:
         return self._typer_cmd

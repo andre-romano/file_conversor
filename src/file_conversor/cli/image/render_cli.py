@@ -15,12 +15,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command.image import ImageRenderCommand, ImageRenderOutFormats
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -34,22 +33,16 @@ logger = LOG.getLogger(__name__)
 
 class ImageRenderCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in ImageRenderCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
-                    name="to_jpg",
-                    description="To JPG",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "jpg""',
-                    icon=str(icons_folder_path / 'jpg.ico'),
-                ),
-                WinContextCommand(
-                    name="to_png",
-                    description="To PNG",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -f "png""',
-                    icon=str(icons_folder_path / 'png.ico'),
-                ),
+                ContextMenuItem(
+                    name=f"to_{ext_out}",
+                    description=f"To {ext_out.upper()}",
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", ext_out],
+                    icon=icons_folder / f'{ext_out}.ico',
+                )
+                for ext_out in ["jpg", "png"]
             ])
 
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:

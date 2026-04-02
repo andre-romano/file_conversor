@@ -11,12 +11,11 @@ from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
 from file_conversor.command.image import ImageFilterCommand, ImageFilterFilters
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -30,15 +29,14 @@ logger = LOG.getLogger(__name__)
 
 class ImageFilterCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in ImageFilterCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="blur",
                     description="Blur",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" --filter blur"',
-                    icon=str(icons_folder_path / "blur.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "--filter", "blur"],
+                    icon=icons_folder / "blur.ico",
                 ),
             ])
 

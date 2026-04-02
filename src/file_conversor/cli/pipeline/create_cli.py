@@ -2,7 +2,7 @@
 # src\file_conversor\cli\pipeline\create_cmd.py
 
 from pathlib import Path
-from typing import Annotated, override
+from typing import Annotated
 
 import typer
 
@@ -10,7 +10,6 @@ import typer
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.command.pipeline import PipelineCreateCommand
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # get app config
@@ -23,10 +22,6 @@ logger = LOG.getLogger(__name__)
 
 
 class PipelineCreateCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        return  # No context menu for pipeline commands
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

@@ -2,7 +2,7 @@
 # src\file_conversor\cli\hash\create_cli.py
 
 from pathlib import Path
-from typing import Annotated, override
+from typing import Annotated
 
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
@@ -13,7 +13,6 @@ from file_conversor.cli._utils.typer import (
 )
 from file_conversor.command.hash import HashCreateCommand, HashCreateOutFormats
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # get app config
@@ -26,10 +25,6 @@ logger = LOG.getLogger(__name__)
 
 
 class HashCreateCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # no context menu for create command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         """Config set command class."""
         super().__init__(

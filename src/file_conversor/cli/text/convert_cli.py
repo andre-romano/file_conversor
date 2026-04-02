@@ -14,12 +14,11 @@ from file_conversor.cli._utils.typer import (
 from file_conversor.command.text import TextConvertCommand, TextConvertOutFormats
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -33,15 +32,14 @@ logger = LOG.getLogger(__name__)
 
 class TextConvertCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in TextConvertCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name=f"to_{ext_out}",
                     description=f"To {ext_out.upper()}",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" -f "{ext_out}" "%1""',
-                    icon=str(icons_folder_path / f'{ext_out}.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-f", ext_out],
+                    icon=icons_folder / f"{ext_out}.ico",
                 )
                 for ext_out in TextConvertCommand.get_out_formats()
             ])

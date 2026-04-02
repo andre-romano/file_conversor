@@ -9,7 +9,6 @@ from file_conversor.backend.win_reg_backend import WinRegBackend
 from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
@@ -55,7 +54,7 @@ class WinUninstallMenuCommand(AbstractCommand[WinUninstallMenuInFormats, WinUnin
     @override
     def execute(self):
         winreg_backend = WinRegBackend(verbose=STATE.loglevel.get().is_verbose())
-        ctx_menu = WinContextMenu.get_instance(icons_folder=Environment.get_icons_folder())
+        ctx_menu = WinContextMenu.get_instance()
 
         logger.info(f"{_('Removing app context menu from Windows Explorer')} ...")
         winreg_backend.delete_keys(

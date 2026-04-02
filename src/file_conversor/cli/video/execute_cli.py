@@ -1,7 +1,7 @@
 
 # src\file_conversor\cli\video\execute_cmd.py
 from pathlib import Path
-from typing import Annotated, override
+from typing import Annotated
 
 import typer
 
@@ -23,7 +23,6 @@ from file_conversor.command.video import (
     VideoExecuteVideoCodecs,
 )
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # get app config
@@ -36,10 +35,6 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoExecuteCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # no context menu for this command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

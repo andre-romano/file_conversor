@@ -13,12 +13,11 @@ from file_conversor.command.pdf import PdfOcrCommand
 from file_conversor.command.pdf.ocr_cmd import PdfOcrLanguageModel
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 from file_conversor.utils.validators import prompt_retry_on_exception
 
 
@@ -33,15 +32,14 @@ logger = LOG.getLogger(__name__)
 
 class PdfOcrCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in PdfOcrCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="ocr",
                     description="OCR",
-                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / 'ocr.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / 'ocr.ico',
                 ),
             ])
 

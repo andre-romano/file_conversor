@@ -1,7 +1,7 @@
 
 # src\file_conversor\cli\video\list_formats_cmd.py
 
-from typing import Annotated, override
+from typing import Annotated
 
 # CLI
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
@@ -13,7 +13,6 @@ from file_conversor.command.video import VideoListFormatsCommand
 # CORE
 from file_conversor.command.video.list_formats_cmd import VideoListFormatsOutFormats
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # get app config
@@ -26,10 +25,6 @@ logger = LOG.getLogger(__name__)
 
 
 class VideoListFormatsCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # no context menu for this command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

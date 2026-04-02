@@ -10,12 +10,11 @@ from file_conversor.cli._utils.typer import InputFilesArgument
 from file_conversor.command.audio import AudioCheckCommand
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system.context_menu import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -30,16 +29,16 @@ logger = LOG.getLogger(__name__)
 class AudioCheckCLI(AbstractTyperCommand):
     """Audio check command class."""
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         # FFMPEG commands
-        icons_folder_path = Environment.get_icons_folder()
         for ext_in in AudioCheckCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="check",
                     description="Check",
-                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / 'check.ico'),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / 'check.ico',
+                    keep_terminal_open=True,
                 ),
             ])
 

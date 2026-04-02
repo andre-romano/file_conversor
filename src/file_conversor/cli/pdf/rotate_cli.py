@@ -17,12 +17,11 @@ from file_conversor.command.pdf import PdfRotateCommand
 from file_conversor.command.pdf.rotate_cmd import PdfRotateRotation
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win.ctx_menu import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 from file_conversor.utils.formatters import normalize_degree, parse_pdf_rotation
 
 
@@ -37,21 +36,20 @@ logger = LOG.getLogger(__name__)
 
 class PdfRotateCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu):
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path):
         for ext_in in PdfRotateCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="rotate_anticlock_90",
                     description="Rotate Left",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r "1-:-90""',
-                    icon=str(icons_folder_path / "rotate_left.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-r", "1-:-90"],
+                    icon=icons_folder / "rotate_left.ico",
                 ),
-                WinContextCommand(
+                ContextMenuItem(
                     name="rotate_clock_90",
                     description="Rotate Right",
-                    command=f'cmd.exe /c "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1" -r "1-:90""',
-                    icon=str(icons_folder_path / "rotate_right.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME, "-r", "1-:90"],
+                    icon=icons_folder / "rotate_right.ico",
                 ),
             ])
 

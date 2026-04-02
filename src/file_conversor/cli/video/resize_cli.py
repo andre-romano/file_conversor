@@ -27,12 +27,11 @@ from file_conversor.command.video.resize_cmd import (
 )
 from file_conversor.config import (
     Configuration,
-    Environment,
     Log,
     State,
     get_translation,
 )
-from file_conversor.system.win import WinContextCommand, WinContextMenu
+from file_conversor.system import ContextMenu, ContextMenuItem
 
 
 # get app config
@@ -46,15 +45,14 @@ logger = LOG.getLogger(__name__)
 
 class VideoResizeCLI(AbstractTyperCommand):
     @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        icons_folder_path = Environment.get_icons_folder()
+    def register_ctx_menu(self, ctx_menu: ContextMenu, icons_folder: Path) -> None:
         for ext_in in VideoResizeCommand.get_in_formats():
             ctx_menu.add_extension(f".{ext_in}", [
-                WinContextCommand(
+                ContextMenuItem(
                     name="resize",
                     description="Resize",
-                    command=f'cmd.exe /k "{Environment.get_executable()} "{self.GROUP_NAME}" "{self.COMMAND_NAME}" "%1""',
-                    icon=str(icons_folder_path / "resize.ico"),
+                    args=[self.GROUP_NAME, self.COMMAND_NAME],
+                    icon=icons_folder / "resize.ico",
                 ),
             ])
 
@@ -72,9 +70,9 @@ class VideoResizeCLI(AbstractTyperCommand):
             epilog=f"""
     **{_('Examples')}:** 
 
-    - `file_conversor {group_name} {command_name} input_file.webm -rs 1024:768 -od output_dir/ -f mp4 --audio-bitrate 192`
+    - `file_conversor {group_name} {command_name} input_file.webm -w 1024 -h 768 -od output_dir/ -f mp4 --audio-bitrate 192`
 
-    - `file_conversor {group_name} {command_name} input_file.mp4 -rs 1280:720`
+    - `file_conversor {group_name} {command_name} input_file.mp4 -w 1280 -h 720`
 """)
 
     def resize(

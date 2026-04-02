@@ -2,7 +2,7 @@
 # src\file_conversor\cli\multimedia\unsharp_cmd.py
 
 from pathlib import Path
-from typing import Annotated, override
+from typing import Annotated
 
 import typer
 
@@ -15,7 +15,6 @@ from file_conversor.cli._utils.typer import (
 )
 from file_conversor.command import ImageUnsharpCommand
 from file_conversor.config import Configuration, Log, State, get_translation
-from file_conversor.system.win.ctx_menu import WinContextMenu
 
 
 # get app config
@@ -28,10 +27,6 @@ logger = LOG.getLogger(__name__)
 
 
 class ImageUnsharpCLI(AbstractTyperCommand):
-    @override
-    def register_ctx_menu(self, ctx_menu: WinContextMenu) -> None:
-        return  # No context menu for this command
-
     def __init__(self, group_name: str, command_name: str, rich_help_panel: str | None) -> None:
         super().__init__(
             rich_help_panel=rich_help_panel,

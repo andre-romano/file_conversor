@@ -1,6 +1,7 @@
 # src\file_conversor\system\__init__.py
 
 from file_conversor.system.abstract_system import *
+from file_conversor.system.context_menu import *
 from file_conversor.system.lin import *
 from file_conversor.system.mac import *
 from file_conversor.system.win import *
