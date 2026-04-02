@@ -100,7 +100,7 @@ class PdfOcrCommand(AbstractCommand[PdfOcrInFormats, PdfOcrOutFormats]):
 
         def step_one(data: FileDataModel, get_progress: Callable[[float], float]):
             # avoid assert errors for step two by copying input to output
-            data.output_file.write_bytes(data.input_file.read_bytes())
+            data.output_file.write_bytes(data.input_file.read_bytes())  # noqa: S2083
             if self._install_step_completed:
                 return
 
