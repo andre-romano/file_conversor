@@ -6,7 +6,7 @@ from invoke.tasks import task  # type: ignore
 
 # user provided
 from tasks_modules import _config, base, pypi
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
 
 BUILD_DIR = Path("build") / PROJECT_NAME
@@ -20,6 +20,8 @@ PORTABLE_SHIM_CLI_BAT = BUILD_DIR / f"{PROJECT_NAME}.bat"
 
 PORTABLE_SHIM_GUI_BAT = BUILD_DIR / f"{PROJECT_NAME}_gui.bat"
 PORTABLE_SHIM_GUI_VBS = BUILD_DIR / f"{PROJECT_NAME}_gui.vbs"
+
+EMBEDPY_URL = f"https://www.python.org/ftp/python/{PYTHON_VERSION}/python-{PYTHON_VERSION}-embed-amd64.zip"
 
 
 def get_pip_install_cmd(*modules: str):
@@ -237,7 +239,8 @@ def build(c: InvokeContext):
 @task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
     print("[bold] Checking shim ... [/]")
-    result = c.run(f'"{PORTABLE_SHIM_CLI_BAT.resolve()}" --version')
-    if (result is None) or (result.return_code != 0):
-        raise RuntimeError(f"Failed to run shim for '{PROJECT_NAME}': {result}")
+    for shim in [PORTABLE_SHIM_CLI_BAT, PORTABLE_SHIM_GUI_BAT]:
+        assert shim.exists(), f"'{shim}' not found"
+        result = c.run(f'"{shim.resolve()}" --version')
+        assert (result is not None) and (result.return_code == 0), f"Failed to run shim for '{shim.name}': {result}"
     print("[bold] Checking shim ... [/][bold green]OK[/]")

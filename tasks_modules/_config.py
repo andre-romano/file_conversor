@@ -9,6 +9,7 @@ import tomllib
 import zipfile
 
 from email.utils import formatdate
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -47,6 +48,32 @@ I18N_PATH = Path(PYPROJECT["tool"]["myproject"]["locales_path"])
 ICON_APP = Path(rf"{ICONS_PATH}/icon.ico")
 I18N_TEMPLATE = Path(rf"{I18N_PATH}/messages.pot")
 
+
+class InnoTypes(StrEnum):
+    FULL = "full"
+    COMPACT = "compact"
+    CUSTOM = "custom"
+
+
+class InnoComponents(StrEnum):
+    CLI = "cli"
+    GUI = "gui"
+
+    def get_space(self) -> int:
+        match self:
+            case InnoComponents.CLI:
+                return round(452 * 1024 * 1024)  # 452 MB
+            case InnoComponents.GUI:
+                return round(1 * 1024 * 1024 * 1024)  # 1.0 GB
+
+
+class InnoTasks(StrEnum):
+    DESKTOP_ICON = "desktop_icon"
+    START_MENU_ICON = "start_menu_icon"
+    CTX_MENU = "ctx_menu"
+    BOOTSTRAP = "bootstrap"
+
+
 LICENSE_PATH = Path("LICENSE")
 NOTICE_PATH = Path("NOTICE")
 THIRD_PARTY_LICENSES_PATH = Path("THIRD_PARTY_LICENSES.md")
@@ -70,9 +97,9 @@ DOCKERFILE_PATH = Path(f"./dist/Dockerfile")
 
 UNINSTALL_APP_WIN = Path("unins000.exe")
 
-INSTALL_APP_WIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64.zip")
-INSTALL_APP_LIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Lin_x64.zip")
-INSTALL_APP_MAC = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Mac_x64.zip")
+ZIPPED_APP_WIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64.zip")
+ZIPPED_APP_LIN = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Lin_x64.zip")
+ZIPPED_APP_MAC = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Mac_x64.zip")
 
 INSTALL_APP_WIN_EXE = Path(f"./dist/{PROJECT_NAME}-{GIT_RELEASE}-Win_x64-Installer.exe")
 INSTALL_APP_WIN_EXE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/releases/download/{GIT_RELEASE}/{INSTALL_APP_WIN_EXE.name}"
@@ -91,7 +118,6 @@ ICON_URL = f"http://rawcdn.githack.com/andre-romano/{PROJECT_NAME}/master/{str(I
 LICENSE_URL = f"https://github.com/andre-romano/{PROJECT_NAME}/blob/{GIT_RELEASE}/{LICENSE_PATH.relative_to(Path())}"
 
 PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-EMBEDPY_URL = f"https://www.python.org/ftp/python/{PYTHON_VERSION}/python-{PYTHON_VERSION}-embed-amd64.zip"
 
 
 def move(src: Path, dst: Path):
@@ -193,16 +219,17 @@ def get_url(url: str, cache: bool = True, **kwargs: Any) -> tuple[bytes, Path | 
 
     if not response.ok:
         raise RuntimeError(f"Cannot access url '{url}': {response.status_code} - {response.content}")
+
     if cache_file and response.status_code == 304:
         print("Cached version is up-to-date.")
         return (cache_file.read_bytes(), cache_file)
-    else:
-        print("A newer version is available.")
-        if cache_file:
-            cache_file.parent.mkdir(parents=True, exist_ok=True)
-            cache_file.write_bytes(response.content)
-            print(f"Updated {cache_file}")
-        return (response.content, cache_file if cache_file else None)
+
+    print("A newer version is available.")
+    if cache_file:
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        cache_file.write_bytes(response.content)
+        print(f"Updated {cache_file}")
+    return (response.content, cache_file if cache_file else None)
 
 
 def get_hash(data: bytes | str | Path) -> str:
@@ -254,25 +281,24 @@ def parse_manifest_includes() -> list[str]:
         match = re.match(r"^[\s]*recursive-include[\s]+([^\s]+)", line)
         if match:
             add_data_list.append(match.group(1).strip())
-            continue
     return add_data_list
 
 
 def append_to_PATH(paths: str | Path | list[str | Path]):
-    path_list = [Path(paths)] if isinstance(paths, (str, Path)) else [Path(p) for p in paths]
+    paths = [Path(paths)] if isinstance(paths, (str, Path)) else paths
+    path_list = [Path(p).resolve() for p in paths]
     env_paths = os.environ["PATH"].split(os.pathsep)
     for path in path_list:
-        path = path.resolve()
         if str(path) not in env_paths:
             env_paths.append(str(path))
     os.environ["PATH"] = os.pathsep.join(env_paths)
 
 
 def remove_from_PATH(paths: str | Path | list[str | Path]):
-    path_list = [Path(paths)] if isinstance(paths, (str, Path)) else [Path(p) for p in paths]
+    paths = [Path(paths)] if isinstance(paths, (str, Path)) else paths
+    path_list = [Path(p).resolve() for p in paths]
     env_paths = os.environ["PATH"].split(os.pathsep)
     for path in path_list:
-        path = path.resolve()
         if str(path) in env_paths:
             env_paths.remove(str(path))
     os.environ["PATH"] = os.pathsep.join(env_paths)

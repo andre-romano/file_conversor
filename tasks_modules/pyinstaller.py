@@ -6,7 +6,7 @@ from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
 from tasks_modules import _config, base, locales
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
 
 APP_FOLDER = Path(f"dist/{PROJECT_NAME}")

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication
 from file_conversor.config import Environment, Log, State, get_translation
 from file_conversor.gui import MainWindowGUI
 from file_conversor.main_helper import MainHelper
+from file_conversor.system import System
 
 
 LOG = Log.get_instance()
@@ -54,10 +55,16 @@ def _parse_arg(_idx: int, arg: str):
         print("Options:")
         print("  -h, --help    Show this help message and exit")
         print("  -d, --debug   Enable debug mode (more verbose logging in CLI)")
-        raise KeyboardInterrupt()  # raise KeyboardInterrupt to exit the app gracefully after showing help
+        raise KeyboardInterrupt()  # terminate app
 
     if arg in ("-d", "--debug"):
         STATE.loglevel.level = Log.Level.DEBUG
+
+    if arg in ("-V", "--version"):
+        logger.info(f"File Conversor {Environment.get_app_version()}")
+        logger.info(f"Python {Environment.get_python_version()} ({sys.executable})")
+        logger.info(f"System: {System.Platform.get()}")
+        raise KeyboardInterrupt()  # terminate app
 
 
 def _start_gui() -> int:

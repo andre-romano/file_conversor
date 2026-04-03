@@ -7,7 +7,7 @@ from invoke.tasks import task  # type: ignore
 from tasks_modules import _config, base, locales, pypi
 
 # user provided
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
 
 @task

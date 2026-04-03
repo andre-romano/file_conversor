@@ -6,7 +6,7 @@ from deep_translator import GoogleTranslator  # pyright: ignore[reportMissingTyp
 from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
 
 def _translate_locale(c: InvokeContext, path: Path):

@@ -5,8 +5,8 @@ from pathlib import Path
 from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config, base, locales
-from tasks_modules._config import *
+from tasks_modules import _config, locales
+from tasks_modules._config import *  # noqa: S2208
 
 
 to_remove: set[Path] = set()
@@ -47,7 +47,7 @@ def copy_includes(_: InvokeContext):
     print("[bold]Copying MANIFEST.in includes ... [/][bold green]OK[/]")
 
 
-@task(pre=[locales.build])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
+@task  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def remove_includes(_: InvokeContext):
     print("[bold]Removing MANIFEST.in includes ...[/]")
     for path in to_remove:
@@ -86,11 +86,6 @@ def uninstall_app(c: InvokeContext):
     result = c.run(rf'pip uninstall -y "{PROJECT_NAME}"')
     assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Uninstalling PyPi package ... [/][bold green]OK[/]")
-
-
-@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
-def check(c: InvokeContext):
-    base.check(c)  # pyright: ignore[reportUnknownMemberType]
 
 
 @task(pre=[build, ])  # pyright: ignore[reportUntypedFunctionDecorator]

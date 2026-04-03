@@ -53,6 +53,14 @@ def _get_lang_name_pycountry(lang_code: str) -> str:
     """
     import pycountry
 
+    from pycountry.db import Data
+
+    def _get_lang(base_code: str) -> Data | None:
+        lang: Data | None = pycountry.languages.get(alpha_3=base_code)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+        if not lang:
+            lang = pycountry.languages.get(alpha_2=base_code)  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+        return lang  # pyright: ignore[reportUnknownVariableType]
+
     CUSTOM_LANG_ALIASES = {
         "chi_sim": "Chinese (Simplified)",
         "chi_tra": "Chinese (Traditional)",
@@ -63,9 +71,7 @@ def _get_lang_name_pycountry(lang_code: str) -> str:
     }
 
     base_code = lang_code.split('_')[0]  # remove region part like en_US → en
-    lang = pycountry.languages.get(alpha_3=base_code)
-    if not lang:
-        lang = pycountry.languages.get(alpha_2=base_code)
+    lang = _get_lang(base_code)
     if lang and hasattr(lang, 'name'):
         return str(lang.name)
     if lang_code in CUSTOM_LANG_ALIASES:

@@ -7,14 +7,15 @@ from pathlib import Path
 from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config, base, zip
-from tasks_modules._config import *
+from tasks_modules import _config, zip
+from tasks_modules._config import *  # noqa: S2208
 
 
 SCOOP_PATH = Path("bucket")
 SCOOP_JSON = SCOOP_PATH / f"{PROJECT_NAME}.json"
 
-SCOOP_APP_EXE = zip.APP_EXE.relative_to(zip.BUILD_DIR)
+SCOOP_APP_CLI_EXE = zip.APP_EXE.relative_to(zip.BUILD_DIR)
+SCOOP_APP_GUI_EXE = zip.APP_GUI_EXE.relative_to(zip.BUILD_DIR)
 
 SCOOP_DEPS: dict[str, str] = {
 }
@@ -44,7 +45,7 @@ def manifest(_: InvokeContext):
         INSTALL_APP_WIN_EXE.name, INSTALL_APP_HASH.name
     ).replace(PROJECT_VERSION, "$version")
 
-    # bucket/file_conersor.json
+    # bucket/file_conversor.json
     json_obj: dict[str, Any] = {
         "version": PROJECT_VERSION,
         "description": PROJECT_DESCRIPTION,
@@ -52,17 +53,19 @@ def manifest(_: InvokeContext):
         "license": "Apache-2.0",
         "url": INSTALL_APP_WIN_EXE_URL,
         "hash": f"{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}",
-        "bin": f"{SCOOP_APP_EXE}",
+        "bin": f"{SCOOP_APP_CLI_EXE}",
         "pre_install": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter *-Installer.exe  | Select-Object -ExpandProperty FullName',
-            rf'Start-Process -FilePath "$exePath" -ArgumentList "/DIR=$dir", "/CURRENTUSER", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
-            rf'if (!(Test-Path "$dir\{SCOOP_APP_EXE}")) {{throw "Install failed: executable {SCOOP_APP_EXE} not found"}}',
+            rf'Start-Process -FilePath "$exePath" -ArgumentList "/TYPE=${InnoTypes.FULL}", "/DIR=$dir", "/CURRENTUSER", "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
+            rf'if (!(Test-Path "$dir\{SCOOP_APP_CLI_EXE}")) {{throw "Install failed: executable {SCOOP_APP_CLI_EXE} not found"}}',
+            rf'if (!(Test-Path "$dir\{SCOOP_APP_GUI_EXE}")) {{throw "Install failed: executable {SCOOP_APP_GUI_EXE} not found"}}',
             rf'Remove-Item -Path "$exePath"',
         ],
         "pre_uninstall": [
             rf'$exePath = Get-ChildItem -Path "$dir" -Filter {UNINSTALL_APP_WIN.name}  | Select-Object -ExpandProperty FullName',
             rf'Start-Process -FilePath "$exePath" -ArgumentList "/SUPPRESSMSGBOXES", "/VERYSILENT", "/NORESTART", "/SP-" -Wait',
-            rf'if (Test-Path "$dir\{SCOOP_APP_EXE}") {{throw "Uninstall failed: executable still exists"}}',
+            rf'if (Test-Path "$dir\{SCOOP_APP_CLI_EXE}") {{throw "Uninstall failed: executable still exists"}}',
+            rf'if (Test-Path "$dir\{SCOOP_APP_GUI_EXE}") {{throw "Uninstall failed: executable still exists"}}',
         ],
         "checkver": {
             "github": PROJECT_HOMEPAGE,
@@ -87,12 +90,12 @@ def manifest(_: InvokeContext):
 
 @task
 def install(c: InvokeContext):
-    if shutil.which("scoop"):
+    if shutil.which(cmd="scoop"):
         return
     print("[bold] Installing Scoop ... [/]")
     assert INSTALL_SCOOP.exists()
     c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_SCOOP}"')
-    if not shutil.which("scoop"):
+    if not shutil.which(cmd="scoop"):
         raise RuntimeError("'scoop' not found in PATH")
 
 
@@ -115,11 +118,6 @@ def uninstall_app(c: InvokeContext):
     result = c.run(rf'scoop uninstall "{PROJECT_NAME}"')
     assert (result is not None) and (result.return_code == 0)
     print(f"[bold] Uninstalling scoop package ... [/][bold green]OK[/]")
-
-
-@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
-def check(c: InvokeContext):
-    base.check(c)  # pyright: ignore[reportUnknownMemberType]
 
 
 @task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]

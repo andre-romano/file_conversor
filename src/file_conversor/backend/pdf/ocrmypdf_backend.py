@@ -176,7 +176,7 @@ class OcrMyPDFBackend(AbstractBackend):
         num_processes = num_processes if num_processes > 0 else max(1, os.cpu_count() or 1)
 
         ocrmypdf.ocr(  # pyright: ignore[reportUnknownMemberType]
-            input_file=input_file.resolve(),
+            input_file_or_options=input_file.resolve(),
             output_file=output_file.resolve(),
             language=languages,
             jobs=num_processes,

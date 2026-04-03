@@ -7,10 +7,8 @@ from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
 from tasks_modules import _config, base, zip
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
-
-VAGRANT_PATH = Path(f"vagrant")
 
 CHOCO_PATH = str("choco")
 CHOCO_NUSPEC = Path(f"{CHOCO_PATH}/{PROJECT_NAME}.nuspec")
@@ -158,7 +156,7 @@ $checksum    = "{_config.get_remote_hash(INSTALL_APP_WIN_EXE_URL)}"  # SHA256
 Write-Output "Installing app ..."
 Install-ChocolateyPackage -PackageName $packageName `
     -FileType "exe" `
-    -SilentArgs "/DIR=`"$dir`" /ALLUSERS /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
+    -SilentArgs "/TYPE=${InnoTypes.FULL} /DIR=`"$dir`" /ALLUSERS /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
     -Url $url `
     -Checksum $checksum `
     -ChecksumType "sha256"
@@ -249,13 +247,13 @@ elseif ($key.Count -gt 1) {{
 
 @task
 def install(c: InvokeContext):
-    if shutil.which("choco"):
+    if shutil.which(cmd="choco"):
         return
     print("[bold] Installing Chocolatey ... [/]")
     if not INSTALL_CHOCO.exists():
         raise RuntimeError(f"Install Choco - Script {INSTALL_CHOCO} does not exist")
     c.run(f'powershell.exe -ExecutionPolicy Bypass -File "{INSTALL_CHOCO}"')
-    if not shutil.which("choco"):
+    if not shutil.which(cmd="choco"):
         raise RuntimeError("'choco' not found in PATH")
 
 
@@ -287,11 +285,6 @@ def uninstall_app(c: InvokeContext):
     result = c.run(rf'choco uninstall -y "{PROJECT_NAME}"')
     assert (result is not None) and (result.return_code == 0)
     print(rf'[bold] Uninstalling choco package ... [/][bold green]OK[/]')
-
-
-@task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
-def check(c: InvokeContext):
-    base.check(c)   # pyright: ignore[reportUnknownMemberType]
 
 
 @task(pre=[build,])  # pyright: ignore[reportUntypedFunctionDecorator]

@@ -3,21 +3,22 @@
 from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config, base, embedpy
-from tasks_modules._config import *
+from tasks_modules import _config, base, pyapp
+from tasks_modules._config import *  # noqa: S2208
 
 
-BUILD_DIR = embedpy.BUILD_DIR
+BUILD_DIR = pyapp.BUILD_DIR
 
-APP_EXE = embedpy.PORTABLE_SHIM_CLI_BAT
-APP_GUI_EXE = embedpy.PORTABLE_SHIM_GUI_VBS
+APP_EXE = pyapp.PORTABLE_EXE
+APP_GUI_EXE = pyapp.PORTABLE_GUI_EXE
+build_app = pyapp.check
 
 if base.WINDOWS:
-    INSTALL_APP_CURR = INSTALL_APP_WIN
+    ZIPPED_APP_CURR = ZIPPED_APP_WIN
 elif base.LINUX:
-    INSTALL_APP_CURR = INSTALL_APP_LIN  # pyright: ignore[reportConstantRedefinition]
+    ZIPPED_APP_CURR = ZIPPED_APP_LIN  # pyright: ignore[reportConstantRedefinition]
 else:
-    INSTALL_APP_CURR = INSTALL_APP_MAC  # pyright: ignore[reportConstantRedefinition]
+    ZIPPED_APP_CURR = ZIPPED_APP_MAC  # pyright: ignore[reportConstantRedefinition]
 
 
 @task
@@ -29,41 +30,39 @@ def mkdirs(_: InvokeContext):
 
 
 @task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
-def clean_build(_: InvokeContext):
-    remove_path_pattern(f"build/*")
-
-
-@task(pre=[mkdirs])  # pyright: ignore[reportUntypedFunctionDecorator]
 def clean_zip(_: InvokeContext):
-    _config.remove_path_pattern(f"{INSTALL_APP_WIN}")
-    _config.remove_path_pattern(f"{INSTALL_APP_LIN}")
-    _config.remove_path_pattern(f"{INSTALL_APP_MAC}")
+    _config.remove_path_pattern(f"{ZIPPED_APP_WIN}")
+    _config.remove_path_pattern(f"{ZIPPED_APP_LIN}")
+    _config.remove_path_pattern(f"{ZIPPED_APP_MAC}")
 
 
-@task(pre=[clean_zip, embedpy.check],)  # pyright: ignore[reportUntypedFunctionDecorator]
+@task(pre=[clean_zip, build_app])  # pyright: ignore[reportUntypedFunctionDecorator]
 def build(_: InvokeContext):
-    print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/]")
+    print(f"[bold] Building archive '{ZIPPED_APP_CURR}' ... [/]")
 
     human_size, size_bytes_orig = get_dir_size(BUILD_DIR)
     print(f"Size BEFORE compression: {human_size} ({BUILD_DIR})")
 
-    _config.compress(src=BUILD_DIR, dst=INSTALL_APP_CURR)
-    if not INSTALL_APP_CURR.exists():
-        raise RuntimeError(f"'{INSTALL_APP_CURR}' not found")
+    _config.compress(src=BUILD_DIR, dst=ZIPPED_APP_CURR)
+    if not ZIPPED_APP_CURR.exists():
+        raise RuntimeError(f"'{ZIPPED_APP_CURR}' not found")
 
-    human_size, size_bytes_final = get_dir_size(INSTALL_APP_CURR)
+    human_size, size_bytes_final = get_dir_size(ZIPPED_APP_CURR)
     print(f"Size AFTER compression: {human_size} (-{100 - (size_bytes_final / size_bytes_orig * 100):.2f}%)")
-    print(f"[bold] Building archive '{INSTALL_APP_CURR}' ... [/][bold green]OK[/]")
+    print(f"[bold] Building archive '{ZIPPED_APP_CURR}' ... [/][bold green]OK[/]")
 
 
 @task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def extract_app(_: InvokeContext):
-    print(rf'[bold] Extracting {INSTALL_APP_CURR} ... [/]')
+    print(rf'[bold] Extracting {ZIPPED_APP_CURR} ... [/]')
     _config.remove_path_pattern(str(BUILD_DIR))
-    _config.extract(src=INSTALL_APP_CURR, dst=BUILD_DIR.parent)
-    if not BUILD_DIR.exists():
-        raise RuntimeError(f"'{BUILD_DIR}' not found")
-    print(rf'[bold] Extracting {INSTALL_APP_CURR} ... [/][bold green]OK[/]')
+    assert not APP_EXE.exists(), f"'{APP_EXE}' found"
+    assert not APP_GUI_EXE.exists(), f"'{APP_GUI_EXE}' found"
+
+    _config.extract(src=ZIPPED_APP_CURR, dst=BUILD_DIR.parent)
+    assert APP_EXE.exists(), f"'{APP_EXE}' not found"
+    assert APP_GUI_EXE.exists(), f"'{APP_GUI_EXE}' not found"
+    print(rf'[bold] Extracting {ZIPPED_APP_CURR} ... [/][bold green]OK[/]')
 
 
 @task(pre=[extract_app,])  # pyright: ignore[reportUntypedFunctionDecorator]

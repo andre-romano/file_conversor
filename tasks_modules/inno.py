@@ -6,17 +6,19 @@ from pathlib import Path
 from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
-from tasks_modules import _config, base, choco, zip
-from tasks_modules._config import *
+from tasks_modules import _config, base, choco, pyapp
+from tasks_modules._config import *  # noqa: S2208
 
 
 INNO_PATH = Path("inno")
-INNO_ISS = INNO_PATH / "setup.iss"
+INNO_ISS = (INNO_PATH / "setup.iss").resolve()
 
-INSTALL_PATH = Path("build") / PROJECT_NAME
+INSTALL_PATH = (Path("build") / PROJECT_NAME).resolve()
 
-INNO_APP_EXE = Path(zip.APP_EXE.name)
-INNO_APP_GUI_EXE = Path(zip.APP_GUI_EXE.name)
+INNO_APP_EXE = pyapp.PORTABLE_EXE
+INNO_APP_GUI_EXE = pyapp.PORTABLE_GUI_EXE
+
+build_exe = pyapp.check
 
 
 @task
@@ -37,22 +39,16 @@ def clean_exe(_: InvokeContext):
     _config.remove_path_pattern(f"{INSTALL_APP_WIN_EXE}")
 
 
-@task(pre=[clean_inno, zip.check])  # pyright: ignore[reportUntypedFunctionDecorator]
+@task(pre=[clean_inno, build_exe])  # pyright: ignore[reportUntypedFunctionDecorator]
 def create_manifest(_: InvokeContext):
     """Update inno files, based on pyproject.toml"""
 
     print("[bold] Updating InnoSetup .ISS files ... [/]", end="")
 
-    if not zip.BUILD_DIR.exists():
-        raise RuntimeError(f"Path {zip.BUILD_DIR} does not exist")
-
-    LIB_INSTALL_DIR = rf"{{app}}\python\Lib\site-packages"
-
-    APP_ICON_RELATIVE_DIR = rf"{LIB_INSTALL_DIR}\{ICON_APP.relative_to(PROJECT_SRC_DIR)}"
+    APP_ICON_RELATIVE_DIR = rf"{{app}}\{ICON_APP.name}"
 
     # setup.iss
-    setup_iss_path = Path(f"{INNO_ISS}")
-    setup_iss_path.write_text(rf'''
+    INNO_ISS.write_text(rf'''
 ; Copywright(c) -- Andre Luiz Romano Madureira
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
@@ -73,7 +69,6 @@ UninstallDisplayIcon={APP_ICON_RELATIVE_DIR}
 SourceDir={Path(".").resolve()}
 OutputDir={INSTALL_APP_WIN_EXE.parent.resolve()}
 OutputBaseFilename={INSTALL_APP_WIN_EXE.with_suffix("").name}
-AlwaysRestart=yes
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -82,11 +77,30 @@ Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
 Name: "pt"; MessagesFile: "compiler:Languages\Portuguese.isl"
 
+[Types]
+Name: "{InnoTypes.FULL}"; Description: "Full installation"
+Name: "{InnoTypes.COMPACT}"; Description: "Compact installation"
+Name: "{InnoTypes.CUSTOM}"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: {InnoComponents.CLI}; Description: Command-line interface (CLI); Types: {InnoTypes.FULL} {InnoTypes.COMPACT}; ExtraDiskSpaceRequired: {InnoComponents.CLI.get_space()}
+Name: {InnoComponents.GUI}; Description: Graphical user interface (GUI); Types: {InnoTypes.FULL}; ExtraDiskSpaceRequired: {InnoComponents.GUI.get_space()}
+
+[Tasks]
+Name: {InnoTasks.DESKTOP_ICON}; Description: Create desktop icon; Components: {InnoComponents.GUI}
+Name: {InnoTasks.START_MENU_ICON}; Description: Create start menu icon; Components: {InnoComponents.GUI}
+Name: {InnoTasks.CTX_MENU}; Description: Install context menu entries; Components: {InnoComponents.CLI}; Flags: restart
+
+[Dirs]
+Name: "{{app}}"; Permissions: everyone-full
+
 [Files]
-Source: "{zip.BUILD_DIR.resolve()}\*"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
-Source: "{LICENSE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
-Source: "{NOTICE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
-Source: "{THIRD_PARTY_LICENSES_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion createallsubdirs recursesubdirs allowunsafefiles
+Source: "{INNO_APP_EXE.resolve()}"; DestDir: "{{app}}"; Components: {InnoComponents.CLI}; Flags: ignoreversion allowunsafefiles
+Source: "{INNO_APP_GUI_EXE.resolve()}"; DestDir: "{{app}}"; Components: {InnoComponents.GUI}; Flags: ignoreversion allowunsafefiles
+Source: "{LICENSE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion allowunsafefiles
+Source: "{NOTICE_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion allowunsafefiles
+Source: "{THIRD_PARTY_LICENSES_PATH.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion allowunsafefiles
+Source: "{ICON_APP.resolve()}"; DestDir: "{{app}}"; Flags: ignoreversion allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -96,34 +110,36 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{{olddata}};{{app}}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Icons]
-Name: "{{group}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"
-Name: "{{autodesktop}}\File Conversor"; Filename: "wscript.exe"; Parameters: """{{app}}\{INNO_APP_GUI_EXE}"""; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"
+Name: "{{group}}\File Conversor"; Filename: "{{app}}\{INNO_APP_GUI_EXE.name}"; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"; Tasks: {InnoTasks.START_MENU_ICON}
+Name: "{{autodesktop}}\File Conversor"; Filename: "{{app}}\{INNO_APP_GUI_EXE.name}"; WorkingDir: "{{app}}"; IconFilename: "{APP_ICON_RELATIVE_DIR}"; Tasks: {InnoTasks.DESKTOP_ICON}
 
 [Run]
-StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win install-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated
-StatusMsg: "Setting permissions to all users ..."; Filename: "icacls.exe"; Parameters: """{{app}}"" /grant *S-1-5-32-545:(OI)(CI)F /T"; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated; Check: IsAdmin()
-
+StatusMsg: "Installing Python dependencies using CLI (this might take a while) ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE.name}"" -V"""; WorkingDir: "{{app}}"; Components: {InnoComponents.CLI}; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing Python dependencies using GUI (this might take a while) ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_GUI_EXE.name}"" -V"""; WorkingDir: "{{app}}"; Components: {InnoComponents.GUI}; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE.name}"" win install-menu"""; WorkingDir: "{{app}}"; Tasks: {InnoTasks.CTX_MENU}; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE}"" win uninstall-menu"""; WorkingDir: "{{app}}"; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
+StatusMsg: "Uninstalling {PROJECT_NAME} context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE.name}"" win uninstall-menu"""; WorkingDir: "{{app}}"; Tasks: {InnoTasks.CTX_MENU}; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
+StatusMsg: "Uninstalling {PROJECT_NAME} dependencies for CLI ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_EXE.name}"" self remove"""; WorkingDir: "{{app}}"; Components: {InnoComponents.CLI}; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "cli_dependencies_cleanup"
+StatusMsg: "Uninstalling {PROJECT_NAME} dependencies for GUI ..."; Filename: "cmd.exe"; Parameters: "/C """"{{app}}\{INNO_APP_GUI_EXE.name}"" self remove"""; WorkingDir: "{{app}}"; Components: {InnoComponents.GUI}; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "gui_dependencies_cleanup"
 StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{{app}}"""; Flags: runhidden runascurrentuser; RunOnceId: "cleanup_files"
 
 ''', encoding="utf-8")
-    assert setup_iss_path.exists()
+    assert INNO_ISS.exists()
     print("[bold green]OK[/]")
 
-    print(f"{setup_iss_path}:")
-    print(setup_iss_path.read_text())
+    print(f"{INNO_ISS}:")
+    print(INNO_ISS.read_text())
 
 
 @task(pre=[choco.install])  # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
 def install(c: InvokeContext):
-    if shutil.which("iscc"):
+    if shutil.which(cmd="iscc"):
         return
     print("[bold] Installing InnoSetup ... [/]")
     result = c.run(f'powershell.exe -ExecutionPolicy Bypass -Command "choco install -y innosetup"')
     assert (result is not None) and (result.return_code == 0)
-    if not shutil.which("iscc"):
+    if not shutil.which(cmd="iscc"):
         raise RuntimeError("'iscc' not found in PATH")
 
 
@@ -140,10 +156,11 @@ def build(c: InvokeContext):
 @task(pre=[build,],)  # pyright: ignore[reportUntypedFunctionDecorator]
 def install_app(c: InvokeContext):
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/]')
-    _config.remove_path_pattern(f"{INSTALL_PATH.relative_to(Path())}/*")
+    _config.remove_path_pattern(str(INSTALL_PATH))
     INSTALL_PATH.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         rf'"{INSTALL_APP_WIN_EXE}"',
+        rf"/TYPE=${InnoTypes.FULL}",
         rf'/DIR="{INSTALL_PATH}"',
         "/CURRENTUSER",
         "/SUPPRESSMSGBOXES",
@@ -153,6 +170,8 @@ def install_app(c: InvokeContext):
     ]
     result = c.run(" ".join(cmd))
     assert (result is not None) and (result.return_code == 0)
+    assert (INSTALL_PATH / INNO_APP_EXE.name).exists(), f"'{INSTALL_PATH / INNO_APP_EXE.name}' not found after installation"
+    assert (INSTALL_PATH / INNO_APP_GUI_EXE.name).exists(), f"'{INSTALL_PATH / INNO_APP_GUI_EXE.name}' not found after installation"
     print(rf'[bold] Installing {PROJECT_NAME} via Inno .EXE ... [/][bold green]OK[/]')
 
 
@@ -177,4 +196,5 @@ def uninstall_app(c: InvokeContext):
 
 @task(pre=[install_app,], post=[uninstall_app,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def check(c: InvokeContext):
-    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_EXE}")  # pyright: ignore[reportUnknownMemberType]
+    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_EXE.name}")  # pyright: ignore[reportUnknownMemberType]
+    base.check(c, exe=INSTALL_PATH / f"{INNO_APP_GUI_EXE.name}")  # pyright: ignore[reportUnknownMemberType]

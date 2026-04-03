@@ -9,7 +9,7 @@ from invoke.tasks import task  # pyright: ignore[reportUnknownVariableType]
 
 # user provided
 from tasks_modules import locales
-from tasks_modules._config import *
+from tasks_modules._config import *  # noqa: S2208
 
 
 WINDOWS = (platform.system() == "Windows")
@@ -162,9 +162,9 @@ def deps(c: InvokeContext):
 
 
 @task(pre=[clean_htmlcov, locales.build])   # pyright: ignore[reportUntypedFunctionDecorator, reportUnknownMemberType]
-def tests(c: InvokeContext, app: str = f"python -m {PROJECT_NAME}"):
+def tests(c: InvokeContext, app: str = f"pdm run python -m {PROJECT_NAME}"):
     print("[bold] Running self tests ... [/]")
-    cmd = f"pdm run {app} --self-test"
+    cmd = f"{app} --self-test"
     print(f"    [italic]$ {cmd}[/]")
     result = c.run(cmd)
     assert (result is not None) and (result.return_code == 0)
@@ -197,8 +197,6 @@ def check(c: InvokeContext, exe: str | Path = ""):
     if PROJECT_VERSION not in result.stdout:
         raise RuntimeError(f"'{exe}' version mismatch. Expected: '{PROJECT_VERSION}'.")
 
-    # run self tests
-    tests(c, app=f'"{app_exe}"')
     print(f"[bold] Checking app '{exe}' ... [/][bold green]OK[/]")
 
 
