@@ -26,10 +26,10 @@ class LibreofficeImpressBackend(AbstractLibreofficeBackend):
         ODP = "odp"
 
     class SupportedOutFormats(StrEnum):
+        PDF = "pdf"
         PPT = "ppt"
         PPTX = "pptx"
         ODP = "odp"
-        PDF = "pdf"
 
     def __init__(
         self,

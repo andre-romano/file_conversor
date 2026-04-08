@@ -1,7 +1,7 @@
 # src/file_conversor/gui/doc/__init__.py
 
 
-from PySide6.QtWidgets import QFrame, QWidget
+from PySide6.QtWidgets import QFrame
 
 # GUI
 from file_conversor.config import Environment, Log, get_translation
@@ -23,8 +23,6 @@ GUI_PATH = Environment.get_gui_folder()
 class DocFrame(ScrollArea):
     def __init__(self) -> None:
         super().__init__()
-        self.convert_window: QWidget | None = None
-
         layout = FlowLayout()
         layout.addItems(
             convert_card := Card(
@@ -36,7 +34,7 @@ class DocFrame(ScrollArea):
         )
         self.window_handlers = [
             WindowHandler(
-                clicked=convert_card.clicked,
+                show_window=convert_card.clicked,
                 window_cls=DocConvertWindow,
             ),
         ]

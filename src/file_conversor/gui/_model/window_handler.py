@@ -18,9 +18,9 @@ GUI_PATH = Environment.get_gui_folder()
 
 
 class WindowHandler:
-    def __init__(self, clicked: SignalInstance, window_cls: type[QWidget]) -> None:
+    def __init__(self, show_window: SignalInstance, window_cls: type[QWidget]) -> None:
         super().__init__()
-        self._clicked = clicked
+        self._clicked = show_window
         self._window_cls = window_cls
         self._window: QWidget | None = None
 

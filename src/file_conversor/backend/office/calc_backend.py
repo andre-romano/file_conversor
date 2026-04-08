@@ -26,11 +26,11 @@ class LibreofficeCalcBackend(AbstractLibreofficeBackend):
         ODS = "ods"
 
     class SupportedOutFormats(StrEnum):
+        PDF = "pdf"
         XLS = "xls"
         XLSX = "xlsx"
         ODS = "ods"
         CSV = "csv"
-        PDF = "pdf"
         HTML = "html"
 
     def __init__(

@@ -4,7 +4,9 @@ from PySide6.QtWidgets import QFrame
 
 from file_conversor.config import Environment, Log, get_translation
 from file_conversor.gui._layouts import FlowLayout
+from file_conversor.gui._model.window_handler import WindowHandler
 from file_conversor.gui._widgets import Card, ScrollArea
+from file_conversor.gui.xls.convert_gui import XlsConvertWindow
 
 
 LOG = Log.get_instance()
@@ -29,16 +31,17 @@ class XlsFrame(ScrollArea):
                 gui_path=GUI_PATH,
             ),
         )
+        self.window_handler = [
+            WindowHandler(
+                show_window=convert_card.clicked,
+                window_cls=XlsConvertWindow,
+            ),
+        ]
 
         frame = QFrame()
         frame.setLayout(layout)
 
         self.setWidget(frame)
-
-        convert_card.clicked.connect(self.on_convert_card_clicked)
-
-    def on_convert_card_clicked(self) -> None:
-        logger.debug("Convert card clicked!")
 
 
 __all__ = [
