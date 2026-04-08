@@ -7,19 +7,9 @@ from typing import override
 # user-provided modules
 from file_conversor.backend.win_reg_backend import WinRegBackend
 from file_conversor.command.abstract_cmd import AbstractCommand
-from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
-    get_translation,
-)
+from file_conversor.config import LOG, STATE, get_translation
 from file_conversor.system.win import WinContextMenu
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

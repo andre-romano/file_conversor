@@ -10,10 +10,8 @@ from file_conversor.backend.office.abstract_msoffice_backend import (
 )
 
 # user-provided imports
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

@@ -22,13 +22,8 @@ from file_conversor.command.video import (
     VideoExecuteOutFormats,
     VideoExecuteVideoCodecs,
 )
-from file_conversor.config import Configuration, Log, State, get_translation
+from file_conversor.config import CONFIG, LOG, STATE, get_translation
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

@@ -25,14 +25,10 @@ from file_conversor.backend.audio_video.filter import (
     FFmpegFilterVflip,
 )
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
-from file_conversor.config import Log, State, get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.utils.formatters import format_bytes, parse_bytes
 from file_conversor.utils.validators import is_close
 
-
-# get app config
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

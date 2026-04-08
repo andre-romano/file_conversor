@@ -15,18 +15,12 @@ from file_conversor.cli._utils.typer import (
 )
 from file_conversor.command.image import ImageAntialiasAlgorithm, ImageAntialiasCommand
 from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
+    LOG,
+    STATE,
     get_translation,
 )
 from file_conversor.system import ContextMenu, ContextMenuItem
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

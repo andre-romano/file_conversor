@@ -31,23 +31,13 @@ from file_conversor.command.video import (
     VideoEnhanceProfile,
     VideoEnhanceQuality,
 )
-from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
-    get_translation,
-)
+from file_conversor.config import CONFIG, LOG, STATE, get_translation
 from file_conversor.system import ContextMenu, ContextMenuItem
 from file_conversor.utils.validators import (
     is_close,
     prompt_retry_on_exception,
 )
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

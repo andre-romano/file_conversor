@@ -14,18 +14,13 @@ from file_conversor.cli._utils.typer import (
 )
 from file_conversor.command import AudioConvertCommand, AudioConvertOutFormats
 from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
+    CONFIG,
+    LOG,
+    STATE,
     get_translation,
 )
 from file_conversor.system import ContextMenu, ContextMenuItem
 
-
-# get app config
-STATE = State.get()
-CONFIG = Configuration.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

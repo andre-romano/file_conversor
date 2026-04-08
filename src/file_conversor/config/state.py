@@ -4,11 +4,8 @@
 from dataclasses import dataclass
 
 # user provided imports
-from file_conversor.config.log import Log
+from file_conversor.config.log import LOG, Log
 
-
-# Get app config
-LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 
@@ -87,22 +84,13 @@ class StatesDataModel:
 
 
 # STATE controller dict class
-class State:
-    """Application state manager."""
-    __states: StatesDataModel = StatesDataModel(
-        progress=StateProgressBar(),
-        overwrite_output=StateOverwriteOutput(),
-        loglevel=StateLogLevel(),
-        logfile=StateLogfile(),
-    )
-
-    @classmethod
-    def get(cls) -> StatesDataModel:
-        """Get application states data."""
-        return cls.__states
-
+STATE = StatesDataModel(
+    progress=StateProgressBar(),
+    overwrite_output=StateOverwriteOutput(),
+    loglevel=StateLogLevel(),
+    logfile=StateLogfile(),
+)
 
 __all__ = [
-    "State",
-    "StatesDataModel",
+    "STATE",
 ]

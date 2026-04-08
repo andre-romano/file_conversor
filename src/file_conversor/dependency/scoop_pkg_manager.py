@@ -7,14 +7,12 @@ import shutil
 from pathlib import Path
 from typing import override
 
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.dependency.abstract_pkg_manager import AbstractPackageManager
 from file_conversor.system import AbstractSystem, System
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

@@ -4,17 +4,15 @@
 from PySide6.QtWidgets import QFrame
 
 # GUI
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.gui._layouts import FlowLayout
 from file_conversor.gui._model import WindowHandler
 from file_conversor.gui._widgets import Card, ScrollArea
 from file_conversor.gui.doc.convert_gui import DocConvertWindow
 
 
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()

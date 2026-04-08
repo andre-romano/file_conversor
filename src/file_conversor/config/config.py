@@ -109,7 +109,10 @@ class Configuration:
         cls.__data = cls.__reset()
 
 
+CONFIG = Configuration.get()
+
 __all__ = [
     "Configuration",
     "ConfigurationData",
+    "CONFIG",
 ]

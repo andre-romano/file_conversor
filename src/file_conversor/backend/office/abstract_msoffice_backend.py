@@ -6,10 +6,8 @@ from typing import Any
 
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.office._convert_protocol import ConvertProtocol
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

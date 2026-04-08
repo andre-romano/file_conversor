@@ -10,11 +10,9 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.system.abstract_system import AbstractSystem
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

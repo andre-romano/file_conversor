@@ -9,14 +9,12 @@ from file_conversor.backend.git_backend import GitBackend
 from file_conversor.backend.http_backend import HttpBackend
 
 # user-provided imports
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
 
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class OcrMyPDFBackend(AbstractBackend):

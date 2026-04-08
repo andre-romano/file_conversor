@@ -2,12 +2,9 @@
 # src\file_conversor\cli\__main__.py
 
 # user provided imports
-from file_conversor.cli import AppTyperGroup, Log, State, get_translation
+from file_conversor.cli import LOG, STATE, AppTyperGroup, get_translation
 from file_conversor.main_helper import MainHelper
 
-
-LOG = Log.get_instance()
-STATE = State.get()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

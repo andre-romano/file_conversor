@@ -3,14 +3,11 @@
 
 from typing import override
 
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.utils.formatters import parse_ffmpeg_filter
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

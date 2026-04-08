@@ -8,14 +8,11 @@ from file_conversor.backend.audio_video.container import (
     AudioFormatContainers,
     VideoFormatContainers,
 )
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

@@ -11,15 +11,14 @@ from typing import Any, Callable
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.config import (
+    LOG,
     Configuration,
     Environment,
-    Log,
     get_translation,
 )
 
 
 _ = get_translation()
-LOG = Log.get_instance()
 CONFIG = Configuration.get()
 
 logger = LOG.getLogger(__name__)

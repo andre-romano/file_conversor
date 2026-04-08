@@ -9,13 +9,8 @@ import typer
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.command.pipeline import PipelineCreateCommand
-from file_conversor.config import Configuration, Log, State, get_translation
+from file_conversor.config import LOG, STATE, get_translation
 
-
-# get app config
-STATE = State.get()
-CONFIG = Configuration.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

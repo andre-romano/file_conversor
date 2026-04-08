@@ -10,19 +10,9 @@ import typer
 from file_conversor.cli._utils import AbstractTyperCommand, RichProgressBar
 from file_conversor.cli._utils.typer import InputFilesArgument, OutputDirOption
 from file_conversor.command.pdf import PdfDecryptCommand
-from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
-    get_translation,
-)
+from file_conversor.config import LOG, STATE, get_translation
 from file_conversor.system import ContextMenu, ContextMenuItem
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

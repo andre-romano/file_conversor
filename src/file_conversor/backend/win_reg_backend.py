@@ -11,11 +11,9 @@ from typing import Any, Callable
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
-from file_conversor.config import Environment, Log
+from file_conversor.config import LOG, Environment
 from file_conversor.system.win import WinRegFile
 
-
-LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 

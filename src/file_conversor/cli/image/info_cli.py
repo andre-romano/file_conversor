@@ -12,19 +12,9 @@ from rich.panel import Panel
 from file_conversor.cli._utils import AbstractTyperCommand
 from file_conversor.cli._utils.typer import InputFilesArgument
 from file_conversor.command.image import ImageInfoCommand
-from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
-    get_translation,
-)
+from file_conversor.config import LOG, get_translation
 from file_conversor.system import ContextMenu, ContextMenuItem
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

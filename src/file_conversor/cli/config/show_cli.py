@@ -8,12 +8,8 @@ from rich.pretty import Pretty
 # user-provided modules
 from file_conversor.cli._utils import AbstractTyperCommand
 from file_conversor.command.config import ConfigShowCommand
-from file_conversor.config import Configuration, Log, get_translation
+from file_conversor.config import CONFIG, LOG, get_translation
 
-
-# app configuration
-CONFIG = Configuration.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

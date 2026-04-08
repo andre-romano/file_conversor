@@ -6,11 +6,8 @@ from pathlib import Path
 
 from file_conversor.config.environment import Environment
 from file_conversor.config.locale import get_translation
-from file_conversor.config.log import Log
+from file_conversor.config.log import LOG
 
-
-# Get app config
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)
@@ -26,6 +23,7 @@ class SelfTests:
         "concurrent-log-handler": "concurrent_log_handler",
         "requests-cache": "requests_cache",
         "pywin32": "win32api",
+        "pyside6": "PySide6",
     }
 
     @classmethod

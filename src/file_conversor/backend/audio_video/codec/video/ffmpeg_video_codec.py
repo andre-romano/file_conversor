@@ -7,12 +7,10 @@ from file_conversor.backend.audio_video.codec.abstract_ffmpeg_codec import (
     AbstractFFmpegCodec,
 )
 from file_conversor.backend.audio_video.filter.ffmpeg_filter import FFmpegFilter
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

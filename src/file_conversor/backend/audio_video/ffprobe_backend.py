@@ -13,13 +13,10 @@ from typing import Any
 from file_conversor.backend.audio_video.abstract_ffmpeg_backend import (
     AbstractFFmpegBackend,
 )
-from file_conversor.config import Environment, Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import LOG, Environment, get_translation
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

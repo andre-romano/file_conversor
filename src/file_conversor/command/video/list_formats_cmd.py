@@ -6,13 +6,8 @@ from typing import Iterable, override
 
 from file_conversor.backend.audio_video import FFmpegBackend
 from file_conversor.command.abstract_cmd import AbstractCommand
-from file_conversor.config import Configuration, Log, State, get_translation
+from file_conversor.config import LOG, get_translation
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

@@ -7,11 +7,9 @@ from pydantic import BaseModel, model_validator
 
 # user-provided modules
 from file_conversor.command.progress_manager import ProgressManager
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.utils.formatters import get_output_file
 
-
-LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 _ = get_translation()

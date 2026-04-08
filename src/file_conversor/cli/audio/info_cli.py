@@ -13,13 +13,9 @@ from file_conversor.cli.video.info_cli import VideoInfoCLI
 from file_conversor.command.audio import AudioInfoCommand
 
 # CORE
-from file_conversor.config import Log, State, get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.system import ContextMenu, ContextMenuItem
 
-
-# get app config
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

@@ -3,10 +3,8 @@
 
 from PySide6.QtWidgets import QAbstractButton, QStackedWidget, QWidget
 
-from file_conversor.config.log import Log
+from file_conversor.config import LOG
 
-
-LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 

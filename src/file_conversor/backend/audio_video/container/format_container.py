@@ -8,12 +8,10 @@ from file_conversor.backend.audio_video.codec import (
     FFmpegVideoCodec,
     FFmpegVideoCodecs,
 )
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

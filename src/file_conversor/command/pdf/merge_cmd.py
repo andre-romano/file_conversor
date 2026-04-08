@@ -9,14 +9,9 @@ from file_conversor.backend.pdf import PyPDFBackend
 # user-provided modules
 from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import FilesDataModel
-from file_conversor.config import Configuration, Log, State, get_translation
+from file_conversor.config import LOG, STATE, get_translation
 from file_conversor.utils.formatters import get_output_file
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

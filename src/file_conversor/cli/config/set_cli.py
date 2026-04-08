@@ -23,8 +23,8 @@ from file_conversor.command.config.set_cmd import (
 )
 from file_conversor.config import (
     AVAILABLE_LANGUAGES,
-    Configuration,
-    Log,
+    CONFIG,
+    LOG,
     get_translation,
     locale,
 )
@@ -33,10 +33,6 @@ from file_conversor.utils.validators import (
     check_valid_options,
 )
 
-
-# app configuration
-CONFIG = Configuration.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

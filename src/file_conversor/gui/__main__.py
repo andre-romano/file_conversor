@@ -6,17 +6,15 @@ from types import TracebackType
 
 from PySide6.QtWidgets import QApplication
 
-from file_conversor.config import Environment, Log, State, get_translation
+from file_conversor.config import LOG, STATE, Environment, get_translation
+from file_conversor.config.log import Log
 from file_conversor.gui import MainWindowGUI
 from file_conversor.main_helper import MainHelper
 from file_conversor.system import System
 
 
-LOG = Log.get_instance()
-STATE = State.get()
-
-logger = LOG.getLogger()
 _ = get_translation()
+logger = LOG.getLogger()
 
 
 def _global_exception_handler(exc_type: type[BaseException], exc_value: BaseException, exc_traceback: TracebackType | None):

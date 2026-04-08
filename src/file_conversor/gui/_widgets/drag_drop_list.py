@@ -7,13 +7,12 @@ from natsort import natsorted, ns
 from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PySide6.QtWidgets import QListWidget
 
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.gui._model.file_filter import FileFilters
 
 
-LOG = Log.get_instance()
-logger = LOG.getLogger(__name__)
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class DragDropListWidget(QListWidget):

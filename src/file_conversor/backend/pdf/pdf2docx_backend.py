@@ -10,13 +10,11 @@ from pathlib import Path
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
 
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class PDF2DOCXBackend(AbstractBackend):

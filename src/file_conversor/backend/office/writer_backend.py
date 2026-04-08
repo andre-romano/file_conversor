@@ -6,10 +6,8 @@ from enum import StrEnum
 from file_conversor.backend.office.abstract_libreoffice_backend import (
     AbstractLibreofficeBackend,
 )
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

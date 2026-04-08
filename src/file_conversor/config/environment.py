@@ -9,11 +9,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from file_conversor.config.log import Log
+from file_conversor.config.log import LOG
 
 
 # Get app config
-logger = Log.get_instance().getLogger(__name__)
+logger = LOG.getLogger(__name__)
 
 
 class Environment:

@@ -14,12 +14,10 @@ from pypdf.constants import UserAccessPermissions
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

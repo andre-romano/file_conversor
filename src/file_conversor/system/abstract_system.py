@@ -6,10 +6,8 @@ from enum import Enum
 from typing import override
 
 # user-provided imports
-from file_conversor.config import Log
+from file_conversor.config import LOG
 
-
-LOG = Log.get_instance()
 
 logger = LOG.getLogger(__name__)
 

@@ -5,11 +5,9 @@ from typing import override
 from PySide6.QtCore import QObject, QThread, Signal
 from PySide6.QtWidgets import QMessageBox
 
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 from file_conversor.utils.protocols import CommandProtocol
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

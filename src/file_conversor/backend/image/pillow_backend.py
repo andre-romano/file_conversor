@@ -14,11 +14,8 @@ from PIL.ExifTags import TAGS
 from file_conversor.backend.abstract_backend import AbstractBackend
 
 # user-provided imports
-from file_conversor.config import Log
-from file_conversor.config.locale import get_translation
+from file_conversor.config import LOG, get_translation
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

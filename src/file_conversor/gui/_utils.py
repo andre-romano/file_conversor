@@ -7,10 +7,9 @@ from typing import Literal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QHBoxLayout, QLayout, QVBoxLayout, QWidget
 
-from file_conversor.config import Log
+from file_conversor.config import LOG
 
 
-LOG = Log.get_instance()
 logger = LOG.getLogger(__name__)
 
 

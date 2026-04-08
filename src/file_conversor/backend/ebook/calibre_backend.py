@@ -8,13 +8,11 @@ from enum import StrEnum
 from pathlib import Path
 
 from file_conversor.backend.abstract_backend import AbstractBackend
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

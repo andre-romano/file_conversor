@@ -12,14 +12,12 @@ from typing import Iterable
 
 import typer
 
-from file_conversor.config import Log, get_translation
+from file_conversor.config import LOG, get_translation
 
 # user-provided imports
 from file_conversor.dependency import AbstractPackageManager
 from file_conversor.system import AbstractSystem
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

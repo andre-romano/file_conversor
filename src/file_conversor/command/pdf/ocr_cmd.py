@@ -10,19 +10,8 @@ from file_conversor.backend.pdf import OcrMyPDFBackend
 # user-provided modules
 from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.command.data_models import BatchFilesDataModel, FileDataModel
-from file_conversor.config import (
-    Configuration,
-    Log,
-    State,
-    get_language_name,
-    get_translation,
-)
+from file_conversor.config import CONFIG, LOG, STATE, get_language_name, get_translation
 
-
-# get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

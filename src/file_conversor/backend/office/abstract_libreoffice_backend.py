@@ -7,11 +7,9 @@ from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.backend.office._convert_protocol import ConvertProtocol
 
 # user-provided imports
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
 
-
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

@@ -28,19 +28,18 @@ from file_conversor.cli.win import WinTyperGroup
 from file_conversor.cli.xls import XlsTyperGroup
 
 # CORE
-from file_conversor.config import Configuration, Environment, Log, State
-from file_conversor.config.locale import (
+from file_conversor.config import (
     AVAILABLE_LANGUAGES,
+    CONFIG,
+    LOG,
+    STATE,
+    Environment,
     get_system_locale,
     get_translation,
 )
+from file_conversor.config.log import Log
 from file_conversor.system import System
 
-
-# Get app config
-CONFIG = Configuration.get()
-STATE = State.get()
-LOG = Log.get_instance()
 
 _ = get_translation()
 logger = LOG.getLogger(__name__)

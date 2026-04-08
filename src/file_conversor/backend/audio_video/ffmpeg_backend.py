@@ -23,14 +23,12 @@ from file_conversor.backend.audio_video.container.format_container import (
 )
 from file_conversor.backend.audio_video.ffprobe_backend import FFprobeBackend
 from file_conversor.backend.audio_video.filter.ffmpeg_filter import FFmpegFilter
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.system import System
 from file_conversor.utils.formatters import get_output_file
 
 
 _ = get_translation()
-LOG = Log.get_instance()
-
 logger = LOG.getLogger(__name__)
 
 

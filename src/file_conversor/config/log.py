@@ -170,26 +170,7 @@ class Log:
     # logfile name
     FILENAME = f".file_conversor.log"
 
-    _instance: Self | None = None
-    _instance_lock = None
-
-    @classmethod
-    def get_instance(cls, dest_folder: str | Path | None = ".", level: Level = Level.INFO):
-        """
-        Initialize logfile instance
-
-        :param dest_folder: Destination folder to store log file. If None, do not log to file. Defaults to '.' (log to current working folder).
-        :param level: Log level. Defaults to LEVEL_INFO.
-        """
-        import threading
-        if cls._instance_lock is None:
-            cls._instance_lock = threading.RLock()
-        with cls._instance_lock:
-            if not cls._instance:
-                cls._instance = cls(dest_folder=dest_folder, level=level)
-        return cls._instance
-
-    def __init__(self, dest_folder: str | Path | None, level: Level) -> None:
+    def __init__(self, dest_folder: str | Path | None = ".", level: Level = Level.INFO) -> None:
         """
         Initialize logfile, inside a dest_folder with a log_level
         """
@@ -252,6 +233,8 @@ class Log:
         logging.getLogger().addHandler(handler)
 
 
+LOG = Log()
+
 __all__ = [
-    "Log",
+    "LOG",
 ]

@@ -4,16 +4,14 @@
 from typing import override
 
 from file_conversor.command.xls import XlsConvertCommand, XlsConvertOutFormats
-from file_conversor.config import Environment, Log, get_translation
+from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.gui._frames import FormFrame
 from file_conversor.gui._model import FileFilter, FileFilters
 from file_conversor.gui._utils import configure_qt_window
 
 
-LOG = Log.get_instance()
-
-logger = LOG.getLogger(__name__)
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 ICON_PATH = Environment.get_icons_folder()
 GUI_PATH = Environment.get_gui_folder()
