@@ -34,7 +34,6 @@ class AudioInfoWindow(FormFrame):
             FileFilter(description=_("Audio files"), extensions=AudioInfoCommand.get_in_formats()),
         ]))
         self.output_info_widget = self.addOutputInfo()
-        # xTODO add output readonly text area to show the information of the file
 
     @override
     def on_start_btn_clicked(self) -> None:
