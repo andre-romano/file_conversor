@@ -4,7 +4,11 @@ from PySide6.QtWidgets import QFrame
 
 from file_conversor.config import LOG, Environment, get_translation
 from file_conversor.gui._layouts import FlowLayout
+from file_conversor.gui._model import WindowHandler
 from file_conversor.gui._widgets import Card, ScrollArea
+from file_conversor.gui.audio.check_gui import AudioCheckWindow
+from file_conversor.gui.audio.convert_gui import AudioConvertWindow
+from file_conversor.gui.audio.info_gui import AudioInfoWindow
 
 
 _ = get_translation()
@@ -39,24 +43,25 @@ class AudioFrame(ScrollArea):
                 gui_path=GUI_PATH,
             ),
         )
+        self.window_handler = [
+            WindowHandler(
+                show_window=convert_card.clicked,
+                window_cls=AudioConvertWindow,
+            ),
+            WindowHandler(
+                show_window=info_card.clicked,
+                window_cls=AudioInfoWindow,
+            ),
+            WindowHandler(
+                show_window=check_card.clicked,
+                window_cls=AudioCheckWindow,
+            )
+        ]
 
         frame = QFrame()
         frame.setLayout(layout)
 
         self.setWidget(frame)
-
-        convert_card.clicked.connect(self.on_convert_card_clicked)
-        info_card.clicked.connect(self.on_info_card_clicked)
-        check_card.clicked.connect(self.on_check_card_clicked)
-
-    def on_convert_card_clicked(self) -> None:
-        logger.debug("Convert card clicked!")
-
-    def on_info_card_clicked(self) -> None:
-        logger.debug("Info card clicked!")
-
-    def on_check_card_clicked(self) -> None:
-        logger.debug("Check card clicked!")
 
 
 __all__ = [

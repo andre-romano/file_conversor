@@ -48,6 +48,10 @@ QToolTip {
     opacity: 220;                   /* Slight transparency (0-255) */
 }
 
+QTextEdit {
+    border: 1px solid #b3b2b2;
+}
+
 /* main app container */
 #main_window {
     border-top: 1px solid #b4b4b4;

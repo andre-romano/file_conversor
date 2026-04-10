@@ -1,5 +1,6 @@
 # src/file_conversor/gui/_widgets/__init__.py
 
+from file_conversor.gui._widgets.bitrate import *
 from file_conversor.gui._widgets.button import *
 from file_conversor.gui._widgets.card import *
 from file_conversor.gui._widgets.drag_drop_list import *

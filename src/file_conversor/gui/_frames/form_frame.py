@@ -9,12 +9,13 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLayout,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
 # CORE
-from file_conversor.config import get_translation
+from file_conversor.config import CONFIG, LOG, get_translation
 
 # GUI
 from file_conversor.gui._frames.statusbar_frame import StatusBarFrame
@@ -27,9 +28,11 @@ from file_conversor.gui._widgets import (
     PushButton,
     ScrollArea,
 )
+from file_conversor.gui._widgets.bitrate import BitrateWidget
 
 
 _ = get_translation()
+logger = LOG.getLogger(__name__)
 
 
 class FormFrame(QFrame):
@@ -43,6 +46,7 @@ class FormFrame(QFrame):
     ) -> None:
         super().__init__()
         self._gui_path = gui_path
+        self.err_msg = ""
 
         title_label = Label(text=title, stylesheet=title_stylesheet)
 
@@ -101,6 +105,24 @@ class FormFrame(QFrame):
         self.addRow(f"{_('Input Files')}:", input_files_widget)
         return input_files_widget
 
+    def addAudioBitrate(self):
+        bitrate_widget = BitrateWidget(CONFIG.audio_bitrate)
+        self.addRow(f"{_('Audio Bitrate')}:", bitrate_widget)
+        return bitrate_widget
+
+    def addVideoBitrate(self):
+        bitrate_widget = BitrateWidget(CONFIG.video_bitrate)
+        self.addRow(f"{_('Video Bitrate')}:", bitrate_widget)
+        return bitrate_widget
+
+    def addOutputInfo(self, readonly: bool = True):
+        output_text_widget = QTextEdit(
+            readOnly=readonly,
+            placeholderText=_("Output information will be shown here ...")
+        )
+        self.addRow(f"{_('Output Text')}:", output_text_widget)
+        return output_text_widget
+
     def addOutputFormat(self, extensions: Iterable[str]):
         output_format_widget = OutputFormatWidget(extensions)
         self.addRow(f"{_('Output Format')}:", output_format_widget)
@@ -125,10 +147,12 @@ class FormFrame(QFrame):
             self.on_sucessful_task()
 
     def on_error_task(self) -> None:
-        msg = self.cmd_thread_handler.error_msg
-        self.status_bar.showMessage(f"{_('Error:')} {msg}")
+        logger.debug(f"on_error_task: {self.cmd_thread_handler.error_msg}")
+        self.err_msg = self.cmd_thread_handler.error_msg
+        self.status_bar.showMessage(f"{_('Error:')} {self.err_msg}")
 
     def on_sucessful_task(self) -> None:
+        logger.debug(f"on_sucessful_task")
         self.status_bar.setProgress(100)
 
 

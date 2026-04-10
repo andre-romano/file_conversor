@@ -115,6 +115,52 @@ class VideoInfoDataModel:
     chapters: list[VideoInfoChapter]
 
 
+@dataclass
+class VideoInfoMarkdownStrategy:
+    output: list[VideoInfoDataModel]
+
+    def _get_stream_info(self, streams: list[VideoInfoStream]) -> list[str]:
+        output_text: list[str] = []
+        for idx, stream in enumerate(streams):
+            output_text.extend([
+                f"- {_('Stream')} #{idx} ({stream.type}):",
+                f"  - {_('Codec')}: {stream.codec}",
+                f"  - {_('Bitrate')}: {stream.bitrate}",
+                f"  - {_('Resolution')}: {stream.resolution}" if stream.resolution else "",
+                f"  - {_('Sampling rate')}: {stream.sample_rate}" if stream.sample_rate else "",
+                f"  - {_('Channels')}: {stream.channels}" if stream.channels else "",
+            ])
+        return output_text
+
+    def _get_chapters_info(self, chapters: list[VideoInfoChapter]) -> list[str]:
+        output_text: list[str] = []
+        for chapter in chapters:
+            output_text.extend([
+                f"- {chapter.title} ({_('Time')}: {chapter.start_time})",
+            ])
+        return output_text
+
+    def get_output_markdown(self) -> str:
+        markdown_str = ""
+        for data in self.output:
+            markdown_str += "\n".join([
+                f"## {_('File Information')}:",
+                f"- {_('Name')}: {data.filename.name}",
+                f"- {_('Format')}: {data.format_info.file_format}",
+                f"- {_('Duration')}: {data.format_info.duration}",
+                f"- {_('Size')}: {data.format_info.size}",
+                f"- {_('Bitrate')}: {data.format_info.bitrate}",
+                f"\n",
+                f"### {_("Media Streams")}:",
+                *self._get_stream_info(data.streams),
+                f"\n",
+                f"### {_('Chapters')}:",
+                *self._get_chapters_info(data.chapters),
+            ])
+            markdown_str += f"\n---\n"
+        return markdown_str
+
+
 class VideoInfoCommand(AbstractCommand[VideoInfoInFormats, VideoInfoOutFormats]):
     input_files: list[Path]
     output: list[VideoInfoDataModel] = []
@@ -183,5 +229,6 @@ __all__ = [
     "VideoInfoStream",
     "VideoInfoChapter",
     "VideoInfoDataModel",
+    "VideoInfoMarkdownStrategy",
     "VideoInfoCommand",
 ]
