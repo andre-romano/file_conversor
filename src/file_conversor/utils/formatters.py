@@ -60,7 +60,7 @@ def parse_traceback_list(_: Exception) -> list[str]:
     """
     Parse traceback to get specific frame.
 
-    :param exc: Exception object.
+    :param _: Exception object.
 
     :return: List of str.
     """

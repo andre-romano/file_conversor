@@ -41,8 +41,9 @@ class GitBackend(AbstractBackend):
         "git",
     }
 
-    @staticmethod
+    @classmethod
     def get_download_url(
+        cls,
         repository: RepositoryDataModel,
         file_path: Path,
     ):
@@ -54,8 +55,9 @@ class GitBackend(AbstractBackend):
         request_url = f"https://raw.githubusercontent.com/{repository.user_name}/{repository.repo_name}/{repository.branch}/{file_path.as_posix()}"
         return request_url
 
-    @staticmethod
+    @classmethod
     def get_info_api(
+        cls,
         repository: RepositoryDataModel,
         path: Path = Path(),
     ) -> list[dict[str, Any]]:
@@ -93,8 +95,8 @@ class GitBackend(AbstractBackend):
             return res  # pyright: ignore[reportUnknownVariableType]
         raise NetworkError(f"{_('Failed to retrieve info from GitHub API')}: {type(res)}")
 
-    @staticmethod
-    def check_repository(path: Path) -> Path:
+    @classmethod
+    def check_repository(cls, path: Path) -> Path:
         """
         Check if a given path is a Git repository.
 

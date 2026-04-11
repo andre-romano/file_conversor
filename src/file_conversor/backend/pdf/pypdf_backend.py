@@ -120,8 +120,8 @@ class PyPDFBackend(AbstractBackend):
                 case PyPDFBackend.EncryptionAlgorithm.RC4_40:
                     return "RC4-40"
 
-    @staticmethod
-    def len(input_file: Path) -> int:
+    @classmethod
+    def len(cls, input_file: Path) -> int:
         """
         Get number of pages of input file.
 
@@ -195,19 +195,21 @@ class PyPDFBackend(AbstractBackend):
             writer.write(output_file)
             progress_callback(100.0)
 
-    def split(self,
-              input_file: Path,
-              overwrite_output: bool,
-              password: str = "",
-              out_dir: Path = Path(),
-              progress_callback: Callable[[float], Any] = lambda p: p,
-              ):
+    def split(
+        self,
+        input_file: Path,
+        overwrite_output: bool,
+        password: str = "",
+        out_dir: Path = Path(),
+        progress_callback: Callable[[float], Any] = lambda p: p,
+    ):
         """
         Split input files into 1-page PDF output files.
 
         :param input_file: Input PDF file (Output PDF file = input + ``_X.pdf`` where ``X`` is the page number)
         :param overwrite_output: Whether to overwrite existing output files.
         :param password: Decryption password. Defaults to "".
+        :param out_dir: Output directory. Defaults to current directory.
         :param progress_callback: Progress callback (0-100). Defaults to a no-op.
 
         :raises FileNotFoundError: if input file not found

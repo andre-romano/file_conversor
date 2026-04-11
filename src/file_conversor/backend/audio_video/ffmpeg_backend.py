@@ -45,8 +45,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
     VideoQuality = FFmpegVideoCodec.QualitySetting
     VideoEncoding = FFmpegVideoCodec.EncodingSetting
 
-    @staticmethod
-    def _clean_two_pass_log_file(logfile: Path | None):
+    @classmethod
+    def _clean_two_pass_log_file(cls, logfile: Path | None):
         if logfile is None:
             return
         for filepath in logfile.parent.glob(logfile.name + "-0.log*"):
@@ -57,8 +57,8 @@ class FFmpegBackend(AbstractFFmpegBackend):
             except Exception as e:
                 logger.warning(f"Failed to remove log file '{filepath}': {e}")
 
-    @staticmethod
-    def build_filter(name: str) -> FFmpegFilter:
+    @classmethod
+    def build_filter(cls, name: str) -> FFmpegFilter:
         """ Build FFmpegFilter from string name. """
         return FFmpegFilter.from_str(name)
 
@@ -242,9 +242,10 @@ class FFmpegBackend(AbstractFFmpegBackend):
         """
         Seet video codec and bitrate
 
+        :param filters: Filters to use. Defaults to None (do not use any filter).      
         :param codec: Codec to use. Defaults to None (use container default codec).      
         :param bitrate: Bitrate to use (in kbps). Defaults to -1 (use FFmpeg defaults).      
-        :param filters: Filters to use. Defaults to None (do not use any filter).      
+        :param profile_setting: Profile setting to use. Defaults to None (use codec default profile).
         :param encoding_speed: Encoding speed to use. Defaults to None (use codec default speed).      
         :param quality_setting: Quality setting to use. Defaults to None (use codec default quality).
 
@@ -330,6 +331,7 @@ class FFmpegBackend(AbstractFFmpegBackend):
         """
         Execute the FFmpeg command to convert the input file to the output file.
 
+        :param progress_callback: Callback function to report progress (0.0 to 100.0). Defaults to None (do not report progress).
         :param pass_num: Pass number for multi-pass encoding (0 for single pass, 1 for first pass, 2 for second pass). Defaults to 0.
         :param out_opts: FFmpeg custom out options. Defaults to None.
 

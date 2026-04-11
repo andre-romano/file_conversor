@@ -49,12 +49,6 @@ class ImageRotateCommand(AbstractCommand[ImageRotateInFormats, ImageRotateOutFor
     def execute(self):
         """
         Rotate image files.
-
-        :param input_files: List of input image files to rotate.
-        :param rotation: Rotation in degrees. Valid values are between 0 and 360 (clockwise rotation).
-        :param resampling: Resampling method to use when rotating the image.
-        :param output_dir: Directory where the rotated image files will be saved.
-        :param progress_callback: Optional callback function to report progress. It receives a float between 0 and 100.
         """
 
         pillow_backend = PillowBackend(verbose=STATE.loglevel.get().is_verbose())

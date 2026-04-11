@@ -31,25 +31,25 @@ class TestTyper:
         assert expected in result.output
         assert result.exit_code == 0
 
-    @staticmethod
-    def get_format_params(out_path: Path):
+    @classmethod
+    def get_format_params(cls, out_path: Path):
         return ["-f", str(out_path.suffix[1:])]
 
-    @staticmethod
-    def get_out_dir_params(out_path: Path):
+    @classmethod
+    def get_out_dir_params(cls, out_path: Path):
         return ["-od", str(out_path.parent)]
 
-    @staticmethod
-    def get_out_file_params(out_path: Path):
+    @classmethod
+    def get_out_file_params(cls, out_path: Path):
         return ["-of", str(out_path)]
 
-    @staticmethod
-    def invoke(*cmd_list: str):
+    @classmethod
+    def invoke(cls, *cmd_list: str):
         print(f"Args: {' '.join([f'"{c}"' for c in cmd_list])}")
         return TestTyper.RUNNER.invoke(app_cmd, cmd_list)
 
-    @staticmethod
-    def run(*cmd_list: str):
+    @classmethod
+    def run(cls, *cmd_list: str):
         import shlex
         import subprocess
         import sys

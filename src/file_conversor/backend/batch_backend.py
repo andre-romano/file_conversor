@@ -42,8 +42,8 @@ class StageConfigDataModel(BaseModel):
     out_dir: Path
     command: str
 
-    @staticmethod
-    def help_template():
+    @classmethod
+    def help_template(cls):
         """ Get help template for stage creation """
 
         return f"""

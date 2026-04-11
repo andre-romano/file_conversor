@@ -165,6 +165,7 @@ class FFmpegCmdHelper:
         """
         Set video encoding settings.
 
+        :param profile: Video encoding profile.
         :param encoding_speed: Video encoding speed preset.
         :param quality: Video quality setting.
         """
@@ -215,7 +216,7 @@ class FFmpegCmdHelper:
         """
         Set custom audio filters.
 
-        :param filters: Custom audio filters as strings.
+        :param custom_filters: Custom audio filters as strings.
         :return: Self instance.
         """
         self._audio_filters.extend(FFmpegBackend.build_filter(f) for f in custom_filters or [])
@@ -280,7 +281,7 @@ class FFmpegCmdHelper:
         """
         Set custom FFmpeg arguments.
 
-        :param args: Custom FFmpeg arguments.
+        :param arg: Custom FFmpeg arguments.
         :return: Self instance.
         """
         self._ffmpeg_args = shlex.split(arg)

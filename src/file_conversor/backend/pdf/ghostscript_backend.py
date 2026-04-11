@@ -266,22 +266,23 @@ class GhostscriptBackend(AbstractBackend):
         progress = 100.0 * (float(pages) / num_pages)
         return progress
 
-    def compress(self,
-                 output_file: str | Path,
-                 input_file: str | Path,
-                 compression_level: Compression,
-                 compatibility_preset: CompatibilityPreset = CompatibilityPreset.PRESET_1_5,
-                 downsampling_type: Downsampling = Downsampling.HIGH,
-                 image_compression: ImageCompression = ImageCompression.JPG,
-                 progress_callback: Callable[[float], Any] | None = None,
-                 ):
+    def compress(
+        self,
+        output_file: str | Path,
+        input_file: str | Path,
+        compression_level: Compression,
+        compatibility_preset: CompatibilityPreset = CompatibilityPreset.PRESET_1_5,
+        downsampling_type: Downsampling = Downsampling.HIGH,
+        image_compression: ImageCompression = ImageCompression.JPG,
+        progress_callback: Callable[[float], Any] | None = None,
+    ):
         """
         Compress input PDF files.
 
         :param output_file: Output file
         :param input_file: Input file.         
         :param compression_level: Compression level.
-        :param compatibility_level: PDF compatibility level (1.3 - 1.7). Defaults to ``CompatibilityPreset.PRESET_1_5`` (good compatibility / stream compression support).
+        :param compatibility_preset: PDF compatibility level (1.3 - 1.7). Defaults to ``CompatibilityPreset.PRESET_1_5`` (good compatibility / stream compression support).
         :param downsampling_type: Image downsampling type. Defaults to ``Downsampling.HIGH`` (best image quality / slower processing).
         :param image_compression: Image compression format. Defaults to `ImageCompression.JPG` (great compatibility / good compression).
         :param progress_callback: Progress callback (0-100). Defaults to None.

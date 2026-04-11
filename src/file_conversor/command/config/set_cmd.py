@@ -5,12 +5,9 @@ from enum import StrEnum
 from typing import override
 
 # user-provided modules
-from file_conversor.backend import (
-    FFmpegBackend,
-    GhostscriptBackend,
-    Img2PDFBackend,
-    PillowBackend,
-)
+from file_conversor.backend.audio_video import FFmpegBackend
+from file_conversor.backend.image import Img2PDFBackend, PillowBackend
+from file_conversor.backend.pdf import GhostscriptBackend
 from file_conversor.command.abstract_cmd import AbstractCommand
 from file_conversor.config import LOG, Configuration, ConfigurationData, get_translation
 

@@ -46,12 +46,6 @@ class PdfExtractCommand(AbstractCommand[PdfExtractInFormats, PdfExtractOutFormat
     def execute(self):
         """ 
         Extract specific pages from PDF files. 
-
-        :param input_files: List of input PDF files.
-        :param pages: List of pages to extract
-        :param password: Password for encrypted PDF files.
-        :param output_dir: Output directory.
-        :param progress_callback: Callback function for progress reporting.
         """
         backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 

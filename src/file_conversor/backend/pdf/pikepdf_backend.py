@@ -1,7 +1,8 @@
 # src\file_conversor\backend\pikepdf_backend.py
 
 """
-This module provides functionalities for handling PDF files using ``pikepdf`` backend (qpdf python wrapper).
+This module provides functionalities for handling PDF
+files using ``pikepdf`` backend (qpdf python wrapper).
 """
 
 from enum import StrEnum
@@ -42,8 +43,8 @@ class PikePDFBackend(AbstractBackend):
         super().__init__()
         self._verbose = verbose
 
-    @staticmethod
-    def is_encrypted(file_path: str | Path) -> bool:
+    @classmethod
+    def is_encrypted(cls, file_path: str | Path) -> bool:
         """Checks if PDF file is encrypted"""
         import pikepdf
         try:
@@ -63,10 +64,10 @@ class PikePDFBackend(AbstractBackend):
         """
         Compress input PDF file.
 
-        :param input_files: Input PDF file. 
-        :param output_files: Output PDF file.
+        :param input_file: Input PDF file.
+        :param output_file: Output PDF file.
         :param linearize: Linearize PDF file structures (speed up web render). Defaults to True.
-        :param decryption_password: Decryption password for input PDF file. Defaults to "" (do not decrypt).
+        :param decrypt_password: Decryption password for input PDF file. Defaults to "" (do not decrypt).
         :param progress_callback: Progress callback executed as PDF is processed. Format callback(0-100). Defaults to None (no progress callback).
 
         :raises FileNotFoundError: if input file not found.

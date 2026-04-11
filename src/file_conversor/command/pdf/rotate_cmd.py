@@ -52,12 +52,6 @@ class PdfRotateCommand(AbstractCommand[PdfRotateInFormats, PdfRotateOutFormats])
     def execute(self):
         """
         Rotate PDF pages.
-
-        :param input_files: List of input PDF files.
-        :param rotation: List of rotation instructions, format "page:rotation" or "start-end:rotation" or "start-:rotation".
-        :param password: Password to decrypt the PDF if it is encrypted.
-        :param output_dir: Directory to save the rotated PDF files.
-        :param progress_callback: Callback function to report progress.
         """
         backend = PyPDFBackend(verbose=STATE.loglevel.get().is_verbose())
 

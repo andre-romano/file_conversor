@@ -3,6 +3,7 @@
         "ms-python.autopep8",
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "ms-python.pylint",
         "charliermarsh.ruff",
         "redhat.vscode-yaml",
         "tamasfe.even-better-toml",

@@ -16,6 +16,8 @@ WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
 MACOS = (platform.system() == "Darwin")
 
+LINT_MODULES = ["src", "tasks_modules"]
+
 
 @task
 def mkdirs(_: InvokeContext):
@@ -201,25 +203,37 @@ def check(c: InvokeContext, exe: str | Path = ""):
 
 
 @task
+def pyright(c: InvokeContext):
+    print("[bold] Running pyright ... [/]")
+    result = c.run(" ".join([
+        "pdm",
+        "run",
+        "pyright",
+        "--threads", "0",
+        "-p", "./pyproject.toml",
+        *LINT_MODULES,
+    ]))
+    assert (result is not None) and (result.return_code == 0)
+    print("[bold] Running pyright ... [/][bold green]OK[/]")
+
+
+@task
 def pylint(c: InvokeContext):
     print("[bold] Running pylint ... [/]")
-    for module in ["src", "tests", "tasks_modules"]:
-        print(f"    Running pylint for module '{module}' ...")
-        result = c.run(" ".join([
-            "pdm",
-            "run",
-            "pylint",
-            "-j", "0",
-            module,
-        ]))
-        assert (result is not None) and (result.return_code == 0)
-        print(f"    Running pylint for module '{module}' ... [/][bold green]OK[/]")
+    result = c.run(" ".join([
+        "pdm",
+        "run",
+        "pylint",
+        "-j", "0",
+        *LINT_MODULES,
+    ]))
+    assert (result is not None) and (result.return_code == 0)
     print("[bold] Running pylint ... [/][bold green]OK[/]")
 
 
 @task
 def ruff(c: InvokeContext):
-    print("[bold] Running linter ... [/]")
+    print("[bold] Running ruff ... [/]")
     result = c.run(" ".join([
         "pdm",
         "run",
@@ -227,15 +241,13 @@ def ruff(c: InvokeContext):
         "check",
         "--no-fix",
         "--config", "./pyproject.toml",
-        "src",
-        "tests",
-        "tasks_modules",
+        *LINT_MODULES,
     ]))
     assert (result is not None) and (result.return_code == 0)
-    print("[bold] Running linter ... [/][bold green]OK[/]")
+    print("[bold] Running ruff ... [/][bold green]OK[/]")
 
 
-@task(pre=[ruff, pylint])  # pyright: ignore[reportUntypedFunctionDecorator]
+@task(pre=[ruff, pyright, pylint,])  # pyright: ignore[reportUntypedFunctionDecorator]
 def lint(c: InvokeContext):
     """Run all linters and code quality checks."""
 

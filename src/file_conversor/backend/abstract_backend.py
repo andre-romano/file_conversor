@@ -27,8 +27,9 @@ class AbstractBackend:
     """
     Class that provides an interface for handling internal/external backends.
     """
-    @staticmethod
-    def find_in_path(name: str | Path) -> Path:
+
+    @classmethod
+    def find_in_path(cls, name: str | Path) -> Path:
         """
         Finds name path in PATH env
 
@@ -43,8 +44,8 @@ class AbstractBackend:
         logger.info(f"'{name}' {_('found')}: {path}")
         return path
 
-    @staticmethod
-    def check_file_exists(filename: str | Path):
+    @classmethod
+    def check_file_exists(cls, filename: str | Path):
         """
         Check if `filename` exists
 

@@ -54,6 +54,7 @@ def create(c: InvokeContext, locale: str):
     """
     Create a locale (e.g., en_US, pt_BR, etc) translation using Babel.
 
+    :param c: Invoke context
     :param locale: Locale code (e.g., en_US, pt_BR, etc)
     """
     print(f"[bold] Creating new locale '{locale}' ... [/]")

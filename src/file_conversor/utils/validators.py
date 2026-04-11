@@ -52,15 +52,14 @@ def prompt_retry_on_exception[T](
     Prompts the user for input, retrying on exception.
 
     :param text: The prompt text.
+    :param type: The type of the input.
     :param default: The default value.
     :param hide_input: Whether to hide the input (for passwords).
     :param confirmation_prompt: Whether to ask for confirmation.
-    :param type: The type of the input.
     :param show_choices: Whether to show choices (for Enum types).
     :param show_default: Whether to show the default value.
     :param callback: A callback function to validate the input.
     :param retries: The number of retries 
-    :param prompt_kwargs: Additional keyword arguments for typer.prompt.
 
     :raises typer.Abort: If the user aborts the input or retries are exhausted.
     :return: The user input, validated by the callback if provided.

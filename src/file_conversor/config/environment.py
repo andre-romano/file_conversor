@@ -284,9 +284,9 @@ class Environment:
         :param encoding: Text encoding. Defaults to None (use system locale).
         :param env: Environment (variables, PATH, etc). Defaults to None (same as the current python process).
         :param cwd: Current working directory. Defaults to None (same as the current python process).
-        :param stdint: Pass to stdin, or not. Defaults to ``None``.
         :param stdout: Capture stdout, or not. Defaults to ``subprocess.PIPE``.
         :param stderr: Capture stderr, or not. Defaults to ``subprocess.STDOUT``.
+        :param kwargs: Additional keyword arguments for subprocess.Popen.
         """
         logger.debug(f"Starting process ...")
         logger.debug(f"{" ".join(cmd)}")
@@ -328,6 +328,7 @@ class Environment:
         :param cwd: Current working directory. Defaults to None (same as the current python process).
         :param stdout: Capture stdout, or not. Defaults to ``subprocess.PIPE``.
         :param stderr: Capture stderr, or not. Defaults to ``subprocess.STDOUT``.
+        :param kwargs: Additional keyword arguments for subprocess.Popen.
 
         :raises subprocess.CalledProcessError: if command failed (needs `wait` to work)
         :raises Exception: if communicate() failed (needs `wait` to work)

@@ -99,9 +99,33 @@ filterwarnings = [
     "ignore:builtin type SwigPyObject has no __module__ attribute",
 ]
 
+# --- PYLINT CONFIGURATION ---
+[tool.pylint.main]
+load-plugins = [
+    "pylint.extensions.bad_builtin",
+    "pylint.extensions.docparams",
+    ]
+
+[tool.pylint.messages_control]
+disable = ["all"]
+enable = [
+    "bad-builtin", # map, filter, reduce, etc are not recommended
+
+    "missing-param-doc", # missing parameter documentation in docstrings
+    "differing-param-doc", # parameter documentation in docstrings does not match function signature
+    "differing-type-doc", # missing type documentation in docstrings
+
+    "modified-iterating-dict", # iterating over while modifying it
+    "modified-iterating-list", # iterating over while modifying it
+    "modified-iterating-set", # iterating over while modifying it
+    
+    "abstract-method", # abstract method not implemented in subclass
+    "method-hidden", # method hides a method in the base class
+]
+
 [tool.ruff]
 # controls which rules are reported (warnings)
-select = [
+lint.select = [
     "I", # Import-order rules
     "B", # flake8-bugbear rules (code quality and likely bugs)
     "F", # Pyflakes rules (logical errors)
@@ -118,7 +142,7 @@ select = [
     "C4", # McCabe complexity (complexity for list and dict comprehensions)
 ]
 # controls which rule warnings are ignored (not reported) - might still be fixed by the --fix option, or VSCode's Ruff extension
-ignore = [
+lint.ignore = [
     "I001", # Unsorted imports diagnostic (no warning - fixer will still sort them)
     "B008", # do not perform function calls in argument defaults
     "B017", # assert ExceptionType is not specific enough
@@ -161,6 +185,11 @@ autoSearchPaths = true          # Automatically adds paths to the environment
 indexing = true                 # Enable indexing for better suggestions
 useLibraryCodeForTypes = true   # Use type stubs from libraries for better error detection
 
+# Disable Pyright checks that Ruff's "F" (Pyflakes) already handles
+reportUnusedImport = "none"
+reportUnusedVariable = "none"
+reportDuplicateImport = "none"
+
 # CODE ISSUES
 reportImportCycles = "error"      # Importacao circular - importacoes que criam ciclos entre modulos
 reportUnreachable = "error"             # unreachable code
@@ -198,10 +227,12 @@ ignore = [
 
 exclude = [
     "**/__pycache__/**",
+    "**/node_modules/**",
     "**/build/**",
     "**/dist/**",
     "**/docs/**",
     "**/venv/**",
+    "**/.*/**",
     "**/.venv/**",    
     "**/.tox/**",
     "**/.nox/**",

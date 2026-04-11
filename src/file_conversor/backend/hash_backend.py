@@ -120,14 +120,14 @@ class HashBackend(AbstractBackend):
         output_file.write_text(res, encoding="utf-8")
 
     def check(
-            self,
-            input_file: Path,
-            progress_callback: Callable[[float], Any] = lambda p: p,
+        self,
+        input_file: Path,
+        progress_callback: Callable[[float], Any] = lambda p: p,
     ):
         """
         Checks file hash
 
-        :param input_files: Input files
+        :param input_file: Input files
         :param progress_callback: Progress callback (0-100). Defaults to None.
 
         :raises HashCheckFailed: if hash is not correct
