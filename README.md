@@ -1,6 +1,4 @@
 
-[![PyPI](https://img.shields.io/pypi/v/file_conversor.svg)](https://pypi.org/project/file_conversor/)
-[![Downloads](https://static.pepy.tech/badge/file-conversor)](https://pepy.tech/project/file-conversor)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=andre-romano_file_conversor&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=andre-romano_file_conversor)
@@ -9,7 +7,7 @@
 
 
 # File Conversor
-A powerful Python-based CLI and GUI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
+A powerful plugin-based CLI and GUI tool for converting, compressing, and manipulating audio, video, text, document, and image files.
 
 **Summary**:
 - [File Conversor](#file-conversor)
@@ -30,13 +28,13 @@ A powerful Python-based CLI and GUI tool for converting, compressing, and manipu
 
 ### CLI - Command line interface
 
-<img src="./assets/cli_demo.gif" >
+<img src="./.readme_assets/cli_demo.gif" >
 
 Run ``file_conversor -h`` to explore all available commands and options.
 
 ### GUI - Graphical user interface
 
-<img src="./assets/gui.jpg" >
+<img src="./.readme_assets/gui.jpg" >
 
 Run ``file_conversor_gui`` to launch the GUI application or double click the Windows Shortcut.
 
@@ -45,7 +43,7 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 1. Right click a file in Windows Explorer
 2. Choose an action from "File Conversor" menu
   
-<img src="./assets/ctx_menu.jpg" width="600px">
+<img src="./.readme_assets/ctx_menu.jpg" width="600px">
 
 ## Why use File Conversor?
 
@@ -88,20 +86,23 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 
 This project has external dependencies. By installing and using this software, you agree to comply with the licenses of these third-party tools. 
 
-In prompts will assist you in downloading missing dependencies when required, using package managers installed in your system (e.g., `apt`, `brew`, `scoop`). 
+In prompts will assist you in downloading missing dependencies when required, using package managers installed in your system (e.g., `apt`, `brew`, `scoop`, `choco`). 
 
 ## Installing
 
+- Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/)) page.
+- Follow the instructions below for your operating system and preferred installation method.
+
 ### For Windows
 
-- **Option 1. Installer (EXE)**:
-  - Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/) pages)
-  - Execute installer (.exe file)
+- **Option 1. Portable Zip Files**:
+  - Extract the ``.zip`` file.
+  - Run the application (CLI or GUI).
 
 - **Option 2. Scoop Package Manager**
 ```bash
 scoop install git
-scoop bucket add file_conversor https://github.com/andre-romano/file_conversor
+scoop bucket add file_conversor https://github.com/andre-romano/file_conversor_scoop_bucket
 scoop install file_conversor
 ```
 
@@ -110,24 +111,34 @@ scoop install file_conversor
 choco install file_conversor -y
 ```
 
-- **Option 4. PyPi**
-
-```bash
-pip install file_conversor
-```
-
 ### For Linux / MacOS
 
-- **Option 1. Docker (recommended)**
+- **Option 1. AppImage**:
+```bash
+tar -xvf file_conversor*.tar.gz
+chmod +x file_conversor*
+```
+
+- **Option 2. Install .DEB or .RPM packages**
+  - Download the latest version of the app (check [Releases](https://github.com/andre-romano/file_conversor/releases/)) page
+  - For Debian-based distros:
+    ```bash
+    sudo dpkg -i file_conversor*.deb
+    ```
+  - For RPM-based distros:
+    ```bash
+    sudo rpm -i file_conversor*.rpm
+    ```
+
+- **Option 2. Docker**
 
 ```bash
 docker run --rm -it -v $(pwd):/app andreromano/file_conversor:latest 
 ```
 
-- **Option 2. PyPi**
-
+- **Option 3. Compile from Source**  
 ```bash
-pip install file_conversor
+go install github.com/andre-romano/file_conversor@latest
 ```
 
 ## Contributing & Support
@@ -135,7 +146,7 @@ pip install file_conversor
 - **Support us**:
   - If you enjoy this project, consider supporting us with a donation in our Github Sponsors.
 - **Acknowledgements**
-  - We're grateful to the icon designers whose work is featured in the app: [Freepik](https://www.flaticon.com/authors/freepik), [atomicicon](https://www.flaticon.com/authors/atomicicon), [swifticons](https://www.flaticon.com/authors/swifticons), [iconir](https://www.flaticon.com/authors/iconir), [iconjam](https://www.flaticon.com/authors/iconjam), [muhammad-andy](https://www.flaticon.com/authors/muhammad-andy), [Shuvo.Das](https://www.flaticon.com/authors/shuvodas), [Laisa Islam Ani](https://www.flaticon.com/authors/laisa-islam-ani), [riajulislam](https://www.flaticon.com/authors/riajulislam), [howcolour](https://www.flaticon.com/authors/howcolour) (via [Flaticon](https://www.flaticon.com))
+  - We're grateful to the following contributors, whose work is featured in the app: [Freepik](https://www.flaticon.com/authors/freepik), [atomicicon](https://www.flaticon.com/authors/atomicicon), [swifticons](https://www.flaticon.com/authors/swifticons), [iconir](https://www.flaticon.com/authors/iconir), [iconjam](https://www.flaticon.com/authors/iconjam), [muhammad-andy](https://www.flaticon.com/authors/muhammad-andy), [Shuvo.Das](https://www.flaticon.com/authors/shuvodas), [Laisa Islam Ani](https://www.flaticon.com/authors/laisa-islam-ani), [riajulislam](https://www.flaticon.com/authors/riajulislam), [howcolour](https://www.flaticon.com/authors/howcolour) (via [Flaticon](https://www.flaticon.com))
 
 ## License and Copyright
 
@@ -143,5 +154,4 @@ Distributed under the **Apache License 2.0**.
 
 By using this software, you agree to comply with the terms of the Apache License 2.0. Further, you agree to respect the licenses of any third-party tools integrated or utilized by this software. 
 
-Licenses are provided in the [`LICENSES`](./LICENSES) folder.
-
+Licenses are provided in the [`LICENSES`](./LICENSES) folder.  Please review these licenses to ensure compliance when using the software and its dependencies.

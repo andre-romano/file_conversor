@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
-ARG PYTHON_VERSION="3.13.7-slim-bookworm"
+ARG TARGETPLATFORM
+ARG APP_NAME="file_conversor"
+ARG DOCKER_BASE_IMAGE="stable-slim"
 ARG APT_DEPENDENCIES=" \
 git \
 ca-certificates \
@@ -20,45 +22,33 @@ FROM andreromano/oxipng:latest AS oxipng
 # --------------------
 # STAGE 1 - build
 # --------------------
-FROM python:${PYTHON_VERSION} AS build
+FROM ${DOCKER_BASE_IMAGE} AS build
 
 COPY --from=gifsicle /usr/local/bin /root/.local/bin
 COPY --from=mozjpeg /usr/local/bin /root/.local/bin
 COPY --from=oxipng /usr/local/bin /root/.local/bin
 
-COPY . /app
-WORKDIR /app
-
-# INSTALL BUILD DEPENDENCIES AND BUILD APP:
-RUN echo "Installing Python dependencies ..." \
-    && python -m pip install --upgrade pip \
-    && python -m pip install --upgrade setuptools wheel pdm \
-    && python -m pdm install --dev --no-lock \
-    && echo "Installing Python dependencies ... OK" \
-    && echo "Building .whl ..." \
-    && python -m pdm run invoke pypi.build \
-    && echo "Building .whl ... OK" 
-
 # --------------------
 # STAGE 2 - release
 # --------------------
-FROM python:${PYTHON_VERSION} AS release
 
-COPY --from=build /root/.local/bin /root/.local/bin
-COPY --from=build /app/dist /app/dist
+FROM ${DOCKER_BASE_IMAGE} AS release
 
 WORKDIR /app
 
+COPY ${TARGETPLATFORM}/${APP_NAME}.deb /app
+COPY --from=build /root/.local/bin /root/.local/bin
+
 ENV PATH="/root/.local/bin:${PATH}"
-RUN apt-get update \
-    && echo "Installing system dependencies ..." \
+RUN echo "Installing system dependencies ..." \
+    && apt-get update \
     && apt-get install -y --no-install-recommends ${APT_DEPENDENCIES} \
     && echo "Installing system dependencies ... OK" \
-    && echo "Installing Python app from wheel ..." \
-    && python -m pip install --no-cache-dir --upgrade pip \
-    && python -m pip install --no-cache-dir --upgrade setuptools wheel \
-    && python -m pip install --no-cache-dir /app/dist/*.whl \
-    && echo "Installing Python app from wheel ... OK" \    
+    && echo "Installing app ..." \
+    && dpkg -i ${APP_NAME}.deb \
+    && chmod +rx /root/.local/bin/* \
+    && chmod +rx /usr/bin/${APP_NAME} \
+    && echo "Installing app ... OK" \
     && echo "Cleaning up ..." \
     && apt-get autoremove -y \
     && apt-get clean \
@@ -75,14 +65,13 @@ RUN apt-get update \
         /var/tmp/* \
         /tmp/* \
         /root/.cache/* \
-        /app/dist/* \
+        /app/* \
     && echo "Cleaning up ... OK" \
     && echo "Testing installation ..." \
-    && python -m file_conversor --version \
-    && python -m file_conversor --self-test \
+    && ${APP_NAME} --version \
     && echo "Testing installation ... OK" \
     && echo "All done."
 
 # final settings
-EXPOSE 5000 
-ENTRYPOINT [ "python", "-m", "file_conversor" ]
+# EXPOSE 5000 
+ENTRYPOINT [ "${APP_NAME}" ]

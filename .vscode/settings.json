@@ -1,71 +1,20 @@
 {
-    "git.ignoreLimitWarning": false,
-    // "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.unusedImports": "explicit",
-            "source.organizeImports.ruff": "explicit",
-            // "source.fixAll.ruff": "explicit", // Uncomment this line to enable automatic fixing on save. Disabled for now to avoid unintended changes (ruff as linter only).
+    "editor.formatOnSave": true,
+    "[yaml]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "keep",
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.defaultColorDecorators": "never",
+        "editor.quickSuggestions": {
+            "strings": true,
+            "other": true,
+            "comments": false
         },
+        "editor.formatOnSave": false,
     },
-    "ruff.enable": true,
-    "ruff.lint.enable": true,
-    "ruff.organizeImports": true,
-    "pylint.enabled": true,
-    "pylint.importStrategy": "fromEnvironment",
-    "python.analysis.autoFormatStrings": true,
-    "python.analysis.userFileIndexingLimit": -1,
-    "python.analysis.packageIndexDepths": [
-        {
-            "name": "PySide6",
-            "depth": 3,
-            "includeAllSymbols": true
-        }
-    ],
-    "autopep8.args": [
-        "--ignore=E501",
-        "--exclude=__pycache__,*.egg-info,venv/,.venv/,*.pyc",
-    ],
-    "python.testing.pytestArgs": [
-        "src/file_conversor/tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "files.exclude": {
-        "**/.coverage/**": true,
-        "**/.coverage*/**": true,
-        "**/.import_linter_cache/**": true,
-        "**/.pytest_cache/**": true,
-        "**/.pdm-build/**": true,
-        "**/.pdm-python/**": true,
-        "**/.ruff_cache/**": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/.DS_Store": true,
-        "**/node_modules/**": true,
-        "**/Thumbs.db": true,
-        "**/coverage.xml": true,
-        "**/*.spec": true,
-    },
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "**/*.code-search": true,
-        "**/.cache": true,
-        "**/.pytest_cache": true,
-        "**/.pdm-build/**": true,
-        "**/.pdm-python/**": true,
-        "**/.ruff_cache/**": true,
-        "**/.venv": true,
-        "**/venv": true,
-        "**/build": true,
-        "**/dist": true,
-        "**/htmlcov": true,
-        "**/pdm.lock": true,
-        "**/coverage.xml": true,
-        "**/*.spec": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "andre-romano",

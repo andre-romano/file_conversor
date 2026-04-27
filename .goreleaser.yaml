@@ -1,0 +1,316 @@
+# .goreleaser.yaml - GoReleaser configuration file
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+project_name: &project_name "file_conversor"
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+    - go test -v ./...
+
+env:
+  - CHECKSUM_FILE=checksums.sha256          
+
+# binary builds (.exe, etc.)
+builds:
+  - main: ./cmd/...
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.ShortCommit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+
+# archives (tar.gz, zip, etc.)
+archives:
+  - formats: [ tar.gz ]
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: [ zip ]
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}-{{ .Version }}_{{ title .Os }}-{{ if eq .Arch "amd64"
+      }}x86_64{{ else }}{{ .Arch }}{{ end }}
+    # wrap files in a directory inside the archive
+    wrap_in_directory: true
+    # include additional files in the archive (optional)
+    files:
+      - LICENSE*
+      - NOTICE*
+      - configs/*
+      - scripts/*
+      - src: "*.md"
+        dst: docs
+    # set executable permissions for all files in the archive (optional)
+    builds_info:
+      group: root
+      owner: root
+      mode: 755
+
+# deb and rpm packages
+nfpms:
+  - vendor: &author "Andre Luiz Romano Madureira"
+    homepage: &homepage "https://github.com/andre-romano/file_conversor"
+    maintainer: &maintainer "Andre Luiz Romano Madureira <andre@noreply.github.com>"
+    description: &summary "A multi-format file conversion tool (image, document, etc)."
+    license: &license "Apache-2.0"
+    bindir: /usr/bin
+    formats:
+      - deb
+      - rpm
+
+    # dependency packages (optional)
+    dependencies:
+      - ca-certificates
+
+    # packages provided by this project (optional, but recommended for package managers to auto-detect executables)
+    provides:
+      - *project_name
+      - &project_name_gui "file_conversor_gui"
+
+    # OS dependencies (optional)
+    # recommends:
+    #   - libreoffice-headless
+
+    # OS optional dependencies (optional)
+    # suggests:
+    #  - ffmpeg
+
+    # include additional files in the package (optional)
+    contents:
+      - src: LICENSE*
+        dst: /usr/share/doc/{{ .ProjectName }}/
+        type: "config"
+
+      - src: NOTICE*
+        dst: /usr/share/doc/{{ .ProjectName }}/
+        type: "config"
+
+      - src: scripts/*
+        dst: /etc/{{ .ProjectName }}/scripts/
+        type: "config"
+
+      - src: configs/*
+        dst: /etc/{{ .ProjectName }}/configs/
+        type: "config|noreplace"
+
+    # systemd service (optional — remove if not a daemon)
+    # contents:
+    #   - src: packaging/linux/myapp.service
+    #     dst: /lib/systemd/system/myapp.service
+    #     type: config
+    #   - src: packaging/linux/myapp.conf
+    #     dst: /etc/myapp/myapp.conf
+    #     type: config|noreplace   # never overwrite user config on upgrade
+
+    # pre/post install/remove scripts (optional)
+    scripts:
+      preinstall: "scripts/preinstall.sh"
+      postinstall: scripts/postinstall.sh
+      preremove: scripts/preremove.sh
+      postremove: scripts/postremove.sh
+
+    # RPM-specific
+    rpm:
+      # group is a required field for older RPM packages (for categorization in package managers)
+      #   (it doesn't have a direct equivalent in DEB, so we set it to a generic value).
+      group: Applications/System
+
+    # deb-specific
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+
+# chocolatey .nupkg (https://chocolatey.org/)
+chocolateys:
+  - name: *project_name
+    title: &title "File Conversor"
+    owners: *author
+    authors: *author
+    package_source_url: "https://github.com/andre-romano/file_conversor"
+    project_url: *homepage
+    license_url: &license_url "https://github.com/andre-romano/file_conversor/blob/master/LICENSE"
+    docs_url: "https://github.com/andre-romano/file_conversor/blob/master/README.md"
+    icon_url: "https://github.com/andre-romano/file_conversor/raw/master/configs/icons/icon.png"
+    release_notes: "https://github.com/andre-romano/file_conversor/releases/tag/{{ .Tag }}"
+    bug_tracker_url: "https://github.com/andre-romano/file_conversor/issues"
+    require_license_acceptance: false
+    tags: "file_conversor cli gui pdf image video document converter"
+    summary: *summary
+    description: &description |
+      {{ .ProjectName }}
+
+      Multi-format file conversion tool (image, document, video, etc) with CLI, GUI, Context Menu (Win Explorer) interfaces.
+
+      ## Features
+      - Cross-platform 
+      - CLI and GUI interfaces
+      - Context-menu integration (Windows Explorer)
+      - Supports multiple formats (image, document, video, etc)
+      - Automation-friendly (scripting, pipe support)
+
+      ## Documentation
+      See [GitHub repository](https://github.com/andre-romano/file_conversor).
+
+    api_key: "{{ .Env.CHOCO_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
+    skip_publish: false # set to true to skip pushing to Chocolatey (useful for testing)
+
+# Scoop manifest (https://scoop.sh/)
+scoops:
+  - repository:
+      owner: &repository_owner "andre-romano"
+      name: &scoop_repository "file_conversor_scoop_bucket"
+      branch: master
+      token: "{{ .Env.SCOOP_BUCKET_TOKEN }}"
+
+    directory: bucket
+    # A two-dimensional array of string, specifies the shortcut values to make available in the startmenu.
+    shortcuts: [ [ "file_conversor_gui.exe", *title ] ]
+
+    name: *project_name
+    homepage: *homepage
+    description: *summary
+    license: *license_url
+
+    commit_author:
+      name: goreleaser-bot
+      email: goreleaser@noreply.github.com
+    commit_msg_template: "chore: Scoop publish for {{ .Tag }}"
+    skip_upload: false # set to true to skip pushing to the bucket (useful for testing)
+
+# docker images
+dockers_v2:
+  - dockerfile: Dockerfile
+    images:
+      - "andreromano/file_conversor"
+    tags:
+      - "{{ .Tag }}"
+      - "{{ if .IsNightly }}nightly{{ else }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.source: "{{ .GitURL }}"
+      org.opencontainers.image.licenses: *license
+    disable: false # set to true to skip building and pushing Docker images (useful for testing)
+
+# checksums file
+checksum:
+  name_template: "{{ .Env.CHECKSUM_FILE }}"
+  algorithm: sha256
+  split: false # single file with all checksums (instead of one file per artifact)
+
+# signatures for checksums file (keyless with cosign and OIDC)
+signs:
+  - artifacts: checksum
+    cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - "sign-blob"
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - "--yes"
+
+# release notes (changelog)
+changelog:
+  use: github
+  sort: asc
+  abbrev: 20 # shorten commit SHAs to 20 chars 
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^[M|m]erge "
+  groups:
+    - title: "🚀 Features"
+      regexp: "^feat"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^fix"
+      order: 1
+    - title: "⚡ Performance"
+      regexp: "^perf"
+      order: 2
+    - title: "🔒 Security"
+      regexp: "^sec"
+      order: 3
+    - title: "Other"
+      order: 999
+
+# GitHub release
+release:
+  github:
+    owner: *repository_owner
+    name: *project_name
+  # review before publishing (optional, but recommended)
+  draft: true
+  replace_existing_draft: true
+  make_latest: true
+  # release already exists with the same tag 
+  mode: keep-existing
+  # mark pre-release if the tag contains "alpha", "beta" or "rc"
+  prerelease: auto
+
+  name_template: "{{ .Tag }}"
+  header: |
+    ## What's new in {{ .Tag }}
+
+    See [CHANGELOG.md](https://github.com/andre-romano/file_conversor/blob/master/CHANGELOG.md) for full details.
+  footer: |
+    ---
+    **Full Changelog**: https://github.com/andre-romano/file_conversor/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+    ## Install
+
+    **Scoop (Windows)**
+    ```powershell
+    scoop install git
+    scoop bucket add {{ .ProjectName }} "https://github.com/andre-romano/file_conversor_scoop_bucket"
+    scoop install {{ .ProjectName }}
+    ```
+
+    **Chocolatey (Windows)**
+    ```powershell
+    choco install {{ .ProjectName }}
+    ```
+
+    **DEB**
+    ```sh
+    sudo dpkg -i file_conversor*.deb
+    ```
+
+    **RPM**
+    ```sh
+    sudo rpm -i file_conversor*.rpm
+    ```
+
+    **Docker**
+    ```sh
+    docker pull docker.io/andreromano/{{ .ProjectName }}:{{ .Tag }}
+    ```
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
