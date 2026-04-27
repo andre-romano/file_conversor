@@ -45,10 +45,10 @@ archives:
         formats: [ zip ]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      {{ .ProjectName }}-{{ .Version }}_{{ title .Os }}-{{ if eq .Arch "amd64"
+      {{ .ProjectName }}-{{ .Version }}_{{ .Os }}-{{ if eq .Arch "amd64"
       }}x86_64{{ else }}{{ .Arch }}{{ end }}
     # wrap files in a directory inside the archive
-    wrap_in_directory: true
+    wrap_in_directory: false
     # include additional files in the archive (optional)
     files:
       - LICENSE*
@@ -68,7 +68,7 @@ nfpms:
   - vendor: &author "Andre Luiz Romano Madureira"
     homepage: &homepage "https://github.com/andre-romano/file_conversor"
     maintainer: &maintainer "Andre Luiz Romano Madureira <andre@noreply.github.com>"
-    description: &summary "A multi-format file conversion tool (image, document, etc)."
+    description: &summary "A multi-format file conversion tool (jpg, doc, mp4, xlsx, etc)."
     license: &license "Apache-2.0"
     bindir: /usr/bin
     formats:
@@ -166,9 +166,8 @@ chocolateys:
       - Automation-friendly (scripting, pipe support)
 
       ## Documentation
-      See [GitHub repository](https://github.com/andre-romano/file_conversor).
-
-    api_key: "{{ .Env.CHOCO_API_KEY }}"
+      See [GitHub repository](https://github.com/andre-romano/file_conversor).    
+    api_key: "{{ .Env.CHOCO_API_KEY }}"    
     source_repo: "https://push.chocolatey.org/"
     skip_publish: false # set to true to skip pushing to Chocolatey (useful for testing)
 
@@ -187,7 +186,7 @@ scoops:
     name: *project_name
     homepage: *homepage
     description: *summary
-    license: *license_url
+    license: *license
 
     commit_author:
       name: goreleaser-bot
