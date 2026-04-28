@@ -13,6 +13,7 @@
     - [Text files (json, yaml, ini, etc)](#text-files-json-yaml-ini-etc)
     - [Hash files (sha256, md5, etc)](#hash-files-sha256-md5-etc)
     - [Windows utilities](#windows-utilities)
+    - [Linux utilities](#linux-utilities)
     - [App configuration](#app-configuration)
     - [Processing pipelines](#processing-pipelines)
 
@@ -124,6 +125,14 @@
 | win uninstall-menu   | Uninstalls app context menu (right click in Windows Explorer) | No input files | No output files |
 | win restart-explorer | Restarts explorer.exe                                         | No input files | No output files |
 
+
+### Linux utilities
+
+
+| Command              | Description                                                   | Input formats  | Output formats  |
+| -------------------- | ------------------------------------------------------------- | -------------- | --------------- |
+| lin install-menu     | Installs app context menu (right click in Dolphin)   | No input files | No output files |
+| lin uninstall-menu   | Uninstalls app context menu (right click in Dolphin) | No input files | No output files |
 
 
 ### App configuration
