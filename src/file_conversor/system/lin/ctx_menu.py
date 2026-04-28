@@ -73,7 +73,6 @@ class LinuxContextMenu(ContextMenu):
             "Type=Service",
             "ServiceTypes=KonqPopupMenu/Plugin",
             "X-KDE-ServiceTypes=KonqPopupMenu/Plugin",
-            "X-KDE-AuthorizeAction=shell_access",
             "X-KDE-Priority=TopLevel",
             f"X-KDE-Submenu={self.MENU_NAME}",
             f"MimeType={mime};",
