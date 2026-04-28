@@ -33,7 +33,7 @@ class LinuxContextMenu(ContextMenu):
         import hashlib
 
         mime_clean = re.sub(r"[^A-Za-z0-9-]", "-", mime)
-        digest = hashlib.sha1(dedupe_key.encode("utf-8")).hexdigest()[:12]
+        digest = hashlib.sha1(dedupe_key.encode("utf-8")).hexdigest()[:12]  # noqa: S4790
         return f"fileconversor-{mime_clean}-{digest}"
 
     def _cmd_dedupe_key(self, cmd: ContextMenuItem) -> str:
