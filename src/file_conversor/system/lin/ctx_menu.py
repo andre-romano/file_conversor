@@ -68,12 +68,18 @@ class LinuxContextMenu(ContextMenu):
         actions = self._entries[mime]
         action_ids = [self._action_id(mime, key) for key in actions]
 
+        app_icon = self._icons_folder / "icon.png"
+        if not app_icon.exists():
+            app_icon = self._icons_folder / "icon.ico"  # fallback just in case
+
         lines: list[str] = [
             "[Desktop Entry]",
             "Type=Service",
             "ServiceTypes=KonqPopupMenu/Plugin",
             "X-KDE-ServiceTypes=KonqPopupMenu/Plugin",
             "X-KDE-Priority=TopLevel",
+            f"Icon={app_icon}",
+            f"X-KDE-SubMenuIcon={app_icon}",  # fallback
             f"X-KDE-Submenu={self.MENU_NAME}",
             f"MimeType={mime};",
             f"Actions={';'.join(action_ids)};",
