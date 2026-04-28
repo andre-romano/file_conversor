@@ -28,13 +28,12 @@ class LinuxContextMenu(ContextMenu):
         mime, _ = mimetypes.guess_type(f"file{ext}")
         return mime or f"application/x-{ext.lstrip('.').lower()}"
 
-    def _action_id(self, mime: str, dedupe_key: str) -> str:
-        """Build a unique, KDE-safe action identifier."""
-        import hashlib
-
-        mime_clean = re.sub(r"[^A-Za-z0-9-]", "-", mime)
-        digest = hashlib.sha1(dedupe_key.encode("utf-8")).hexdigest()[:12]  # noqa: S4790
-        return f"fileconversor-{mime_clean}-{digest}"
+    def _action_id(self, mime: str, index: int, cmd: ContextMenuItem) -> str:
+        """Build a stable, KDE-safe action identifier."""
+        mime_clean = re.sub(r"[^A-Za-z0-9-]", "-", mime).strip("-")
+        name_slug = re.sub(r"[^A-Za-z0-9-]", "-", cmd.description.casefold()).strip("-")
+        name_slug = re.sub(r"-+", "-", name_slug) or "action"
+        return f"fileconversor-{mime_clean}-{index:02d}-{name_slug}"
 
     def _cmd_dedupe_key(self, cmd: ContextMenuItem) -> str:
         icon = str(cmd.icon) if cmd.icon else ""
@@ -66,7 +65,18 @@ class LinuxContextMenu(ContextMenu):
     def _build_desktop_content(self, mime: str) -> str:
         """Render the .desktop file content for a single MIME type."""
         actions = self._entries[mime]
-        action_ids = [self._action_id(mime, key) for key in actions]
+        ordered_actions = sorted(
+            actions.items(),
+            key=lambda item: (
+                item[1].description.casefold(),
+                item[1].name.casefold(),
+                item[0],
+            ),
+        )
+        action_ids = [
+            self._action_id(mime, index, cmd)
+            for index, (_, cmd) in enumerate(ordered_actions, start=1)
+        ]
 
         app_icon = self._icons_folder / "icon.png"
         if not app_icon.exists():
@@ -86,8 +96,8 @@ class LinuxContextMenu(ContextMenu):
             "",
         ]
 
-        for key, cmd in actions.items():
-            action_id = self._action_id(mime, key)
+        for index, (_, cmd) in enumerate(ordered_actions, start=1):
+            action_id = self._action_id(mime, index, cmd)
             exec_str = self._build_exec(cmd)
             lines += [
                 f"[Desktop Action {action_id}]",
