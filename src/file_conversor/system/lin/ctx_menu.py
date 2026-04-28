@@ -128,9 +128,8 @@ class LinuxContextMenu(ContextMenu):
         for directory in dirs:
             if not directory.exists():
                 continue
-            result.extend(directory.glob(f"{self.APP_NAME}_*.desktop"))
+            result.extend(sorted(directory.glob(f"{self.APP_NAME}_*.desktop")))
         # Remove duplicate paths while preserving order.
-        # FIXME: It does fix the duplicates but it's actually not in order.
         return list(dict.fromkeys(result))
 
 
