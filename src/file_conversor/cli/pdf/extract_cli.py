@@ -34,6 +34,7 @@ class PdfExtractCLI(AbstractTyperCommand):
                     description="Extract",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / 'extract.ico',
+                    keep_terminal_open=True,
                 ),
             ])
 

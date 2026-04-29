@@ -53,6 +53,7 @@ class VideoEnhanceCLI(AbstractTyperCommand):
                     description="Enhance",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / "color.ico",
+                    keep_terminal_open=True,
                 ),
             ])
 

@@ -32,6 +32,7 @@ class PdfEncryptCLI(AbstractTyperCommand):
                     description="Encrypt",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / "padlock_locked.ico",
+                    keep_terminal_open=True,
                 ),
             ])
 

@@ -87,15 +87,21 @@ class AbstractBackend:
                 continue
 
             # supported pkg manager found, proceed to check for dependencies
-            missing_deps = self._check_missing_deps(pkg_mgr)
+            missing_deps = pkg_mgr.get_missing_dependencies()
             if not missing_deps:
+                # this pkg manager sees no missing deps: nothing to do
                 continue
 
-            # install package manager, if not present already
-            self._check_pkg_manager_installed(pkg_mgr)
+            # check if the pkg manager itself is installed before trying to use it
+            if not pkg_mgr.get_pkg_manager_installed():
+                # pkg manager not available, skip and let another handle it
+                continue
 
             # install missing dependencies
             self._install_missing_deps(pkg_mgr, missing_deps)
+            # re-check: if deps are now satisfied, stop trying other pkg managers
+            if not pkg_mgr.get_missing_dependencies():
+                break
 
     def _check_missing_deps(self, pkg_mgr: AbstractPackageManager) -> set[str]:
         """

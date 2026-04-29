@@ -36,6 +36,7 @@ class ImageCompressCLI(AbstractTyperCommand):
                     description="Compress",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / 'compress.ico',
+                    keep_terminal_open=True,
                 ),
             ])
 

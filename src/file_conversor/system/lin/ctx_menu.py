@@ -49,7 +49,12 @@ class LinuxContextMenu(ContextMenu):
                 return f'"{escaped}"'
             return escaped
 
-        return " ".join(_quote(arg) for arg in launcher)
+        exec_str = " ".join(_quote(arg) for arg in launcher)
+        if cmd.keep_terminal_open:
+            # TODO: Allow users to configure their preferred terminal emulator in the future.
+            # TODO: Add a GUI for this instead of a CLI prompt?
+            return f"konsole --hold -e {exec_str}"
+        return exec_str
 
     @override
     def add_extension(self, ext: str, commands: list[ContextMenuItem]) -> None:

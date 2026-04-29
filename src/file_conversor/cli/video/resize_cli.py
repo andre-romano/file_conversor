@@ -43,6 +43,7 @@ class VideoResizeCLI(AbstractTyperCommand):
                     description="Resize",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / "resize.ico",
+                    keep_terminal_open=True,
                 ),
             ])
 

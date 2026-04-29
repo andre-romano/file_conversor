@@ -61,12 +61,6 @@ class CompressBackend(AbstractBackend):
         :raises RuntimeError: if dependency is not found
         """
         super().__init__()
-        # get required dependencies
-        for mode in CompressBackend.SupportedInFormats:
-            mode.backend(
-                install_deps=install_deps,
-                verbose=verbose,
-            )
         self._install_deps = install_deps
         self._verbose = verbose
 

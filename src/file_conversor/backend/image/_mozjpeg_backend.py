@@ -10,7 +10,7 @@ from typing import Any
 # user-provided imports
 from file_conversor.backend.abstract_backend import AbstractBackend
 from file_conversor.config import LOG, Environment, get_translation
-from file_conversor.dependency import BrewPackageManager, ScoopPackageManager
+from file_conversor.dependency import AptPackageManager, BrewPackageManager, DnfPackageManager, ScoopPackageManager
 
 
 _ = get_translation()
@@ -53,6 +53,12 @@ class MozJPEGBackend(AbstractBackend):  # pyright: ignore[reportUnusedClass]
                 }),
                 BrewPackageManager({
                     "cjpeg": "mozjpeg"
+                }),
+                DnfPackageManager({
+                    "cjpeg": "libjpeg-turbo-utils"
+                }),
+                AptPackageManager({
+                    "cjpeg": "libjpeg-turbo-progs"
                 }),
             },
             install_answer=install_deps,

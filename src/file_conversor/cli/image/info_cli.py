@@ -31,6 +31,7 @@ class ImageInfoCLI(AbstractTyperCommand):
                     description="Get Info",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / "info.ico",
+                    keep_terminal_open=True,
                 ),
             ])
 
