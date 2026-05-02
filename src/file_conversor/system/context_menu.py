@@ -42,7 +42,7 @@ class ContextMenu:
 
     def _execute_callbacks(self) -> None:
         while self._register_callbacks:
-            callback = self._register_callbacks.pop()
+            callback = self._register_callbacks.pop(0)
             callback(self, self._icons_folder)
 
     def register_callback(self, function: 'ContextMenu.CallbackSignature') -> None:

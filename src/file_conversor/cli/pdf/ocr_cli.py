@@ -30,6 +30,7 @@ class PdfOcrCLI(AbstractTyperCommand):
                     description="OCR",
                     args=[self.GROUP_NAME, self.COMMAND_NAME],
                     icon=icons_folder / 'ocr.ico',
+                    keep_terminal_open=True,
                 ),
             ])
 

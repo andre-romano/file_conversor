@@ -24,6 +24,7 @@ from file_conversor.cli.pipeline import PipelineTyperGroup
 from file_conversor.cli.ppt import PptTyperGroup
 from file_conversor.cli.text import TextTyperGroup
 from file_conversor.cli.video import VideoTyperGroup
+from file_conversor.cli.lin import LinTyperGroup
 from file_conversor.cli.win import WinTyperGroup
 from file_conversor.cli.xls import XlsTyperGroup
 
@@ -116,6 +117,7 @@ class AppTyperGroup(AbstractTyperGroup):
         TEXT = "text"
         VIDEO = "video"
         WIN = "win"
+        LIN = "lin"
         XLS = "xls"
 
     # main callback to pass common options
@@ -218,6 +220,7 @@ class AppTyperGroup(AbstractTyperGroup):
 
             # UTILS and CONFIG
             WinTyperGroup(self.Commands.WIN.value, rich_help_panel=self.Panels.UTILS_CONFIG.value, hidden=System.Platform.get() != System.Platform.WINDOWS),
+            LinTyperGroup(self.Commands.LIN.value, rich_help_panel=self.Panels.UTILS_CONFIG.value, hidden=System.Platform.get() != System.Platform.LINUX),
             ConfigTyperGroup(self.Commands.CONFIG.value, rich_help_panel=self.Panels.UTILS_CONFIG.value),
             PipelineTyperGroup(self.Commands.PIPELINE.value, rich_help_panel=self.Panels.UTILS_CONFIG.value),
         )

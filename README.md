@@ -16,7 +16,7 @@ A powerful Python-based CLI and GUI tool for converting, compressing, and manipu
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
     - [GUI - Graphical user interface](#gui---graphical-user-interface)
-    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
+    - [Context Menu (Windows / KDE Linux)](#context-menu-windows--kde-linux)
   - [Why use File Conversor?](#why-use-file-conversor)
   - [Features](#features)
   - [External dependencies](#external-dependencies)
@@ -40,9 +40,9 @@ Run ``file_conversor -h`` to explore all available commands and options.
 
 Run ``file_conversor_gui`` to launch the GUI application or double click the Windows Shortcut.
 
-### Windows Context Menu (Windows OS only)
+### Context Menu (Windows / KDE Linux)
 
-1. Right click a file in Windows Explorer
+1. Right click a file in your file explorer
 2. Choose an action from "File Conversor" menu
   
 <img src="./assets/ctx_menu.jpg" width="600px">
@@ -80,6 +80,7 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 
 - **Multiple Interfaces**  
   - **Windows Explorer integration**: right-click files for quick actions
+  - **KDE Linux integration**: right-click files in Dolphin for quick actions
   - CLI for scripting and automation  
 
 *For full feature set, check* [`FEATURE_SET.md`](FEATURE_SET.md)
