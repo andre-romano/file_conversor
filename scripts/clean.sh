@@ -2,12 +2,14 @@
 # clean.sh - A script to clean build artifacts.
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
-set -euo pipefail
+set -Eeuo pipefail
 
 # Trap errors and print the command that failed, its exit code, and the line number before exiting with the same code.
 trap 'rc=$?;
 echo "ERROR: command \"${BASH_COMMAND}\" failed with exit code $rc at line ${LINENO}";
 exit $rc' ERR
+
+. "$(dirname "$0")/_env.sh"
 
 echo "Cleaning build artifacts ..."
 

@@ -1,5 +1,8 @@
 {
     "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+    },
     "[yaml]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 2,
@@ -13,8 +16,30 @@
         },
         "editor.formatOnSave": false,
     },
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit",
+    "code-runner.runInTerminal": true,
+    "files.associations": {
+        "*.md.tmpl": "markdown",
+        "*.json.tmpl": "json",
+        "*.yaml.tmpl": "yaml",
+        "*.yml.tmpl": "yaml",
+        "*.toml.tmpl": "toml",
+        "*.ini.tmpl": "ini",
+        "*.sh.tmpl": "shellscript",
+        "*.bash.tmpl": "shellscript",
+        "*.ps1.tmpl": "powershell",
+        "*.iss.tmpl": "innosetup",
+        "*.plist.tmpl": "xml",
+        "*.xml.tmpl": "xml",
+        "*.nuspec.tmpl": "xml",
+        "*.html.tmpl": "html",
+        "*.css.tmpl": "css",
+        "*.py.tmpl": "python",
+        "*.js.tmpl": "javascript",
+        "*.ts.tmpl": "typescript",
+        "*.go.tmpl": "go",
+        "*.rb.tmpl": "ruby",
+        "Dockerfile.tmpl": "dockerfile",
+        ".dockerignore.tmpl": "dockerignore",
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "andre-romano",

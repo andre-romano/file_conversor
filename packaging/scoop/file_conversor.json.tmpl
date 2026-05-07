@@ -1,0 +1,24 @@
+
+{
+    "version": "{{ .App.Version }}",
+    "description": "{{ .App.Summary }}",
+    "homepage": "{{ .App.Urls.Homepage }}",
+    "license": "{{ .App.License.Spdx }}",
+    "url": "{{ .App.Zip.Url }}",
+    "hash": "{{ .App.Zip.Hash }}",
+    "bin": [
+        "{{ .App.Entrypoints.Cli }}.exe"
+    ],
+    "shortcuts": [
+        ["{{ .App.Entrypoints.Gui }}.exe", "{{ .App.Title }}"]
+    ],
+    "checkver": {
+        "github": "{{ .App.Urls.Repository }}"
+    },
+    "autoupdate": {
+        "url": "{{ .App.Urls.Releases }}/v$version/file_conversor-v$version-windows_amd64.zip",
+        "hash": {
+            "url": "{{ .App.Urls.Releases }}/v$version/{{ .App.Checksum.File }}"
+        }
+    }
+}

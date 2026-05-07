@@ -1,0 +1,38 @@
+# nfpm.yaml - NFPM configuration file for building .deb and .rpm packages.
+# yaml-language-server: $schema=https://nfpm.goreleaser.com/schema.json
+
+name: "{{ .App.Name }}"
+arch: "{{ .Env.GOARCH }}"
+platform: linux
+version: "{{ .App.Version }}"
+section: utils
+priority: optional
+
+maintainer: "{{ (index .App.Authors 0).Name }} <{{ (index .App.Authors 0).Email }}>"
+description: |
+  {{ .App.Summary }}
+
+homepage: "{{ .App.Urls.Homepage }}"
+license: "{{ .App.License.Spdx }}"
+
+contents:
+  - src: ./{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}
+    dst: /usr/bin/{{ .App.Entrypoints.Cli }}
+  
+  - src: ./{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}
+    dst: /usr/bin/{{ .App.Entrypoints.Gui }}
+
+  - src: ./docs
+    dst: /usr/share/doc/{{ .App.Name }}/docs
+
+  - src: ./LICENSE
+    dst: /usr/share/doc/{{ .App.Name }}/LICENSE
+
+  - src: ./NOTICE
+    dst: /usr/share/doc/{{ .App.Name }}/NOTICE
+
+scripts:
+  preinstall: ./build/packaging/nfpm/preinstall.sh
+  postinstall: ./build/packaging/nfpm/postinstall.sh
+  preremove: ./build/packaging/nfpm/preremove.sh
+  postremove: ./build/packaging/nfpm/postremove.sh

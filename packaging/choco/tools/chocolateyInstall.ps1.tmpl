@@ -1,0 +1,22 @@
+# tools/chocolateyInstall.ps1
+
+$ErrorActionPreference = 'Stop'
+
+$packageName = "{{ .App.Name }}"
+$version = "{{ .App.Version }}" 
+$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$dir = Join-Path ${env:ProgramFiles(x86)} "$packageName"
+$url = "{{ .App.Installer.Url }}"
+$checksum = "{{ .App.Installer.Hash }}"  # SHA256
+
+Write-Output "Installing app ..."
+Install-ChocolateyPackage -PackageName $packageName `
+    -FileType "exe" `
+    -SilentArgs "/DIR=`"$dir`" /ALLUSERS /SUPPRESSMSGBOXES /VERYSILENT /NORESTART /SP-" `
+    -Url $url `
+    -Checksum $checksum `
+    -ChecksumType "sha256"
+
+Write-Output "Installing shim ..."
+$exePath = Join-Path $dir "{{ .App.Entrypoints.Cli }}.exe"
+Install-BinFile -Name "{{ .App.Name }}" -Path $exePath

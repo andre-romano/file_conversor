@@ -1,0 +1,133 @@
+# project.yml
+
+env: # to be injected by Go at runtime
+  goos: ""
+  goarch: ""
+  version: ""
+  pwd: ""
+
+# Metadata
+app: 
+  title: File Conversor
+  name: file_conversor
+  version: "{{ .Env.VERSION }}"
+
+  authors:
+    - name: André Luiz Romano Madureira
+      email: fileconversor@gmail.com
+
+  license: 
+    spdx: Apache-2.0
+    url: "{{ .App.Urls.Blob }}/master/LICENSE"
+
+  tags: [ "file_conversor", "crossplatform", "cli", "gui", "pdf", "image", "video", "document", "converter" ]
+
+  summary: |
+    Multi-format cross-platform file conversion and manipulation tool (image, document, video, etc).
+
+  description: |
+    ## {{ .App.Title }}
+
+    {{ .App.Summary }}
+
+    ### Features
+    - Cross-platform 
+    - CLI and GUI interfaces
+    - Context-menu integration (Windows Explorer)
+    - Supports multiple formats (image, document, video, etc)
+    - Automation-friendly (scripting, pipe support)
+
+    ### Usage
+
+    #### CLI - Command line interface
+
+    ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}@master/.readme_assets/cli_demo.gif)
+
+    Run ``file_conversor -h`` to explore all available commands and options.
+
+    #### GUI - Graphical user interface
+
+    ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}@master/.readme_assets/gui.jpg)
+
+    #### File Explorer Context Menu (Windows, Linux still in development)
+
+    1. Right click a file in File Explorer (Windows Explorer, Nautilus, Dolphin, etc)
+    2. Choose an action from "File Conversor" menu
+
+    ![windows_context_menu](https://cdn.jsdelivr.net/gh/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}@master/.readme_assets/ctx_menu.jpg)
+
+    ### Documentation
+    See [GitHub repository]({{ .App.Urls.Repository }}).  
+
+  entrypoints:
+    cli: file_conversor
+    gui: file_conversor_gui
+
+  repository:
+    owner: file-conversor
+    name: file_conversor 
+    tag: v{{ .App.Version }}
+
+  urls:
+    homepage: "https://{{ .App.Repository.Owner }}.github.io/{{ .App.Repository.Name }}"
+    repository: "https://github.com/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}"
+    releases: "{{ .App.Urls.Repository }}/releases/download"
+    blob: "{{ .App.Urls.Repository }}/blob"
+    raw: "https://raw.githubusercontent.com/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}"
+
+  icon: 
+    png: assets/icons/icon.png
+    ico: assets/icons/icon.ico
+    url: "{{ .App.Urls.Raw }}/{{ .App.Repository.Tag }}/{{ .App.Icon.Png }}"
+
+  source:
+    dir: "{{ .Env.PWD }}"
+
+  build:
+    platform: "{{ .Env.GOOS }}"
+    arch: "{{ .Env.GOARCH }}"
+    dir: build/{{ .App.Build.Platform }}-{{ .App.Build.Arch }}
+
+  packaging:
+    fileprefix: "{{ .App.Name }}-{{ .App.Repository.Tag }}-{{ .App.Build.Platform }}_{{ .App.Build.Arch }}"
+    dir: dist    
+    
+  checksum:
+    file: "checksums.txt"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Checksum.File }}"
+
+  installer:
+    file: "{{ .App.Packaging.Fileprefix }}-Installer.exe"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Installer.File }}"
+    hash: "" # to be updated by Go with actual hash
+
+  targz:
+    file: "{{ .App.Packaging.Fileprefix }}.tar.gz"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Targz.File }}"
+    hash: "" # to be updated by Go with actual hash
+    contents:
+      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}"
+      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}"
+      - "LICENSE"
+      - "NOTICE"
+
+  zip:
+    file: "{{ .App.Packaging.Fileprefix }}.zip"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Zip.File }}"
+    hash: "" # to be updated by Go with actual hash
+    contents:
+      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}.exe"
+      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}.exe"
+      - "LICENSE"
+      - "NOTICE"
+  
+  deb:
+    file: "{{ .App.Packaging.Fileprefix }}.deb"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Deb.File }}"
+    hash: "" # to be updated by Go with actual hash
+
+  rpm:
+    file: "{{ .App.Packaging.Fileprefix }}.rpm"
+    url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Rpm.File }}"
+    hash: "" # to be updated by Go with actual hash
+  

@@ -1,0 +1,28 @@
+<!-- packaging/choco/file_conversor.nuspec -->
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>{{ .App.Name | escape }}</id>
+    <version>{{ .App.Version | escape }}</version>
+    <title>{{ .App.Title | escape }}</title>
+    <authors>{{ (index .App.Authors 0).Name | escape }}</authors>
+    <description>
+        {{ .App.Description | escape }}
+    </description>
+    <summary>{{ .App.Summary | escape }}</summary>
+    <tags>{{ join .App.Tags " " | escape }}</tags>
+    <iconUrl>{{ .App.Icon.Url }}</iconUrl>
+    <projectUrl>{{ .App.Urls.Homepage }}</projectUrl>
+    <projectSourceUrl>{{ .App.Urls.Repository }}</projectSourceUrl>
+    <packageSourceUrl>https://github.com/{{ .App.Repository.Owner }}/choco</packageSourceUrl>
+    <licenseUrl>{{ .App.License.Url }}</licenseUrl>
+    <releaseNotes>{{ .App.Urls.Repository }}/releases/{{ .App.Repository.Tag }}</releaseNotes>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+        <dependency id="chocolatey-core.extension" version="1.3.3" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>  
+</package>

@@ -1,17 +1,16 @@
-.assets
+.readme_assets
 .vscode
 .idea
 .git
+.github
 .env
 .venv
 venv
 __pycache__
-node_modules
 bin
 build
 dist
-bucket
-tests
+docs
 *.log
 *.log.*
 *.pyc
@@ -19,4 +18,3 @@ tests
 *.swp
 .DS_Store
 Thumbs.db
-Dockerfile.*

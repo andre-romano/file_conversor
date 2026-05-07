@@ -1,5 +1,5 @@
 #!/bin/bash
-# package.sh - A script to package the app using Chocolatey, FPM, etc.
+# preremove.sh - pre-removal script for Linux package
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
 set -Eeuo pipefail
@@ -9,18 +9,7 @@ trap 'rc=$?;
 echo "ERROR: command \"${BASH_COMMAND}\" failed with exit code $rc at line ${LINENO}";
 exit $rc' ERR
 
-. "$(dirname "$0")/_env.sh"
+{{ .App.Entrypoints.Cli }} sys uninstall-menu
 
-echo "Packaging ..."
-
-mkdir -p build/packaging
-rm -rf build/packaging/*
-
-echo "    1. Generating package manifest files ..."
-go run tools/gen_packages/main.go
-
-echo "    2. Compiling packages ..."
-go run tools/build_packages/main.go
-
-echo "Packaging ... Done!"
-echo
+# if need service daemon, uncomment the following lines and adjust them 
+# systemctl disable {{ .App.Name }}.service

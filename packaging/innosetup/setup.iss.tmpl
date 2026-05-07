@@ -4,9 +4,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 
 [Setup]
-AppName=File Conversor
-AppVersion={#AppVersion}
-DefaultDirName={autopf}/file_conversor
+AppName={{ .App.Title }}
+AppVersion={{ .App.Version }}
+DefaultDirName={autopf}/{{ .App.Name }}
 Compression=lzma2/max
 SolidCompression=yes
 ShowLanguageDialog=yes
@@ -14,11 +14,11 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 LicenseFile=.\LICENSE
 InfoBeforeFile=.\NOTICE
-SetupIconFile=.\config\icons\icon.ico
-UninstallDisplayIcon={app}\icon.ico
-SourceDir=.
-OutputDir={#OutputDir}
-OutputBaseFilename={#OutputFilename}
+SetupIconFile=.\{{ .App.Icon.Ico | winpath }}
+UninstallDisplayIcon={app}\{{ .App.Icon.Ico | winpath }}
+SourceDir={{ .App.Source.Dir | winpath }}
+OutputDir={{ .App.Packaging.Dir | winpath }}
+OutputBaseFilename={{ .App.Installer.File | winpath }}
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -46,12 +46,11 @@ Name: ctx_menu; Description: Install context menu entries; Components: cli; Flag
 Name: "{app}"; Permissions: everyone-full
 
 [Files]
+Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion allowunsafefiles recursesubdirs
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
 Source: "NOTICE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
-Source: "THIRD_PARTY_LICENSES.md"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
-Source: "configs"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles recursesubdirs
-Source: "build\windows-amd64\file_conversor.exe"; DestDir: "{app}"; Components: cli; Flags: ignoreversion allowunsafefiles
-Source: "build\windows-amd64\file_conversor_gui.exe"; DestDir: "{app}"; Components: gui; Flags: ignoreversion allowunsafefiles
+Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Cli }}.exe"; DestDir: "{app}"; Components: cli; Flags: ignoreversion allowunsafefiles
+Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Gui }}.exe"; DestDir: "{app}"; Components: gui; Flags: ignoreversion allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -61,13 +60,13 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Check: IsAdmin()
 
 [Icons]
-Name: "{group}\File Conversor"; Filename: "{app}\file_conversor_gui.exe"; WorkingDir: "{app}"; IconFilename: "{app}\icon.ico"; Tasks: start_menu_icon
-Name: "{autodesktop}\File Conversor"; Filename: "{app}\file_conversor_gui.exe"; WorkingDir: "{app}"; IconFilename: "{app}\icon.ico"; Tasks: desktop_icon
+Name: "{group}\{{ .App.Title }}"; Filename: "{app}\{{ .App.Entrypoints.Gui }}.exe"; WorkingDir: "{app}"; IconFilename: "{app}\{{ .App.Icon.Ico | winpath }}"; Tasks: start_menu_icon
+Name: "{autodesktop}\{{ .App.Title }}"; Filename: "{app}\{{ .App.Entrypoints.Gui }}.exe"; WorkingDir: "{app}"; IconFilename: "{app}\{{ .App.Icon.Ico | winpath }}"; Tasks: desktop_icon
 
 [Run]
-StatusMsg: "Installing file_conversor context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\file_conversor.exe"" win install-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\{{ .App.Entrypoints.Cli }}.exe"" win install-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated
 
 [UninstallRun]
-StatusMsg: "Uninstalling file_conversor context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\file_conversor.exe"" win uninstall-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
+StatusMsg: "Uninstalling context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\{{ .App.Entrypoints.Cli }}.exe"" win uninstall-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
 StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{app}"""; Flags: runhidden runascurrentuser; RunOnceId: "cleanup_files"
 
