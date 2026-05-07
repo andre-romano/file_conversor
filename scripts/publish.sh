@@ -13,10 +13,22 @@ exit $rc' ERR
 
 echo "Publishing ..."
 
+SUPPORTED_REPOS=""
+if [[ "$GOOS" == "windows" ]]; then
+    SUPPORTED_REPOS="scoop choco"
+elif [[ "$GOOS" == "linux" ]]; then
+    SUPPORTED_REPOS=""
+elif [[ "$GOOS" == "darwin" ]]; then
+    SUPPORTED_REPOS="homebrew-tap"
+else
+    echo "Unsupported OS: $GOOS"
+    exit 1
+fi
+
 echo "    1. Cloning packaging repositories ..."
 mkdir -p build/packaging
 cd build/packaging
-for package in $PACKAGES_REPOS; do
+for package in $SUPPORTED_REPOS; do
     mkdir -p "$package"
     rm -rf "$package/*"
     git clone git@github.com:file-conversor/$package.git
@@ -26,8 +38,9 @@ echo "    2. Generating package manifest files ..."
 cd "$REPO_DIR"
 go run tools/gen_packages/main.go
 
-for repo in $PACKAGES_REPOS ; do
-    echo "    3. Publishing to $repo (git push) ..."
+echo "    3. Publishing repos for '$GOOS' (git push) ..."
+for repo in $SUPPORTED_REPOS ; do        
+    echo "        - Publishing $repo ..."
     cd "build/packaging/${repo}"
     git add .
     git commit -m "Update package files to $TAG"
