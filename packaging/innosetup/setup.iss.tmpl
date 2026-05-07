@@ -18,7 +18,7 @@ SetupIconFile=.\{{ .App.Icon.Ico | winpath }}
 UninstallDisplayIcon={app}\{{ .App.Icon.Ico | winpath }}
 SourceDir={{ .App.Source.Dir | winpath }}
 OutputDir={{ .App.Packaging.Dir | winpath }}
-OutputBaseFilename={{ .App.Installer.File | winpath }}
+OutputBaseFilename={{ replace .App.Installer.File ".exe" "" | winpath }}
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"

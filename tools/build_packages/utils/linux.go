@@ -4,6 +4,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,17 +28,17 @@ func BuildLinuxPackages(meta *gen_utils.Metadata) error {
 	// create targz package
 	pkg := NewPackage(meta, meta.App.Targz.File, meta.App.Targz.Contents, CreateTarGzFile)
 	if err := pkg.Build(); err != nil {
-		return err
+		return fmt.Errorf("failed to build tar.gz package: %w", err)
 	}
 	// create deb
 	outputFile := filepath.Join(meta.App.Packaging.Dir, meta.App.Deb.File)
 	if err := buildNfpmPackages(outputFile); err != nil {
-		return err
+		return fmt.Errorf("failed to build deb package: %w", err)
 	}
 	// create rpm
 	outputFile = filepath.Join(meta.App.Packaging.Dir, meta.App.Rpm.File)
 	if err := buildNfpmPackages(outputFile); err != nil {
-		return err
+		return fmt.Errorf("failed to build rpm package: %w", err)
 	}
 	return nil
 }

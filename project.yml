@@ -22,8 +22,7 @@ app:
 
   tags: [ "file_conversor", "crossplatform", "cli", "gui", "pdf", "image", "video", "document", "converter" ]
 
-  summary: |
-    Multi-format cross-platform file conversion and manipulation tool (image, document, video, etc).
+  summary: Multi-format cross-platform file conversion and manipulation tool (image, document, video, etc).
 
   description: |
     ## {{ .App.Title }}

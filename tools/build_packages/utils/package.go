@@ -4,6 +4,7 @@
 package utils
 
 import (
+	"fmt"
 	"path/filepath"
 
 	gen_utils "github.com/file-conversor/file_conversor/tools/gen_packages/utils"
@@ -33,7 +34,7 @@ func NewPackage(
 func (p *Package) Build() error {
 	outputFile := filepath.Join(p.Meta.App.Packaging.Dir, p.OutputFileBasename)
 	if err := p.CreateFunc(outputFile, p.InputFiles); err != nil {
-		return err
+		return fmt.Errorf("fail create package '%s': %w", outputFile, err)
 	}
 	return nil
 }

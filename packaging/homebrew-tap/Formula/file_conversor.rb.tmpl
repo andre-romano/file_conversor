@@ -1,0 +1,16 @@
+class FileConversor < Formula
+  desc "{{ .App.Summary }}"
+  homepage "{{ .App.Urls.Repository }}"
+  version "{{ .App.Version }}"
+  
+  depends_on arch: :x86_64
+  
+  on_macos do
+    url "{{ .App.Targz.Url }}"
+    sha256 "{{ .App.Targz.Hash }}"
+  end
+
+  def install
+    bin.install "{{ .App.Name }}"
+  end
+end

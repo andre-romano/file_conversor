@@ -73,30 +73,35 @@ type Checksum struct {
 }
 
 type Installer struct {
-	Hashable
-	Url string `yaml:"url"`
+	File string `yaml:"file"`
+	Url  string `yaml:"url"`
+	Hash string `yaml:"hash"`
 }
 
 type Targz struct {
-	Hashable
+	File     string   `yaml:"file"`
 	Url      string   `yaml:"url"`
+	Hash     string   `yaml:"hash"`
 	Contents []string `yaml:"contents"`
 }
 
 type Zip struct {
-	Hashable
+	File     string   `yaml:"file"`
 	Url      string   `yaml:"url"`
+	Hash     string   `yaml:"hash"`
 	Contents []string `yaml:"contents"`
 }
 
 type Deb struct {
-	Hashable
-	Url string `yaml:"url"`
+	File string `yaml:"file"`
+	Url  string `yaml:"url"`
+	Hash string `yaml:"hash"`
 }
 
 type Rpm struct {
-	Hashable
-	Url string `yaml:"url"`
+	File string `yaml:"file"`
+	Url  string `yaml:"url"`
+	Hash string `yaml:"hash"`
 }
 
 type App struct {

@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -26,11 +27,23 @@ func ReadChecksums(meta *utils.Metadata, checksums string) error {
 		filename = strings.TrimPrefix(filename, "*")
 		filename = filepath.Base(filename) // get the base name of the file
 		// match the file paths in metadata, and set the corresponding hash field
-		meta.App.Installer.SetHashIfMatch(filename, hash)
-		meta.App.Zip.SetHashIfMatch(filename, hash)
-		meta.App.Targz.SetHashIfMatch(filename, hash)
-		meta.App.Deb.SetHashIfMatch(filename, hash)
-		meta.App.Rpm.SetHashIfMatch(filename, hash)
+		switch filename {
+		case meta.App.Installer.File:
+			meta.App.Installer.Hash = hash
+			fmt.Printf("Checksum for installer: %s\n", hash)
+		case meta.App.Zip.File:
+			meta.App.Zip.Hash = hash
+			fmt.Printf("Checksum for zip: %s\n", hash)
+		case meta.App.Targz.File:
+			meta.App.Targz.Hash = hash
+			fmt.Printf("Checksum for targz: %s\n", hash)
+		case meta.App.Deb.File:
+			meta.App.Deb.Hash = hash
+			fmt.Printf("Checksum for deb: %s\n", hash)
+		case meta.App.Rpm.File:
+			meta.App.Rpm.Hash = hash
+			fmt.Printf("Checksum for rpm: %s\n", hash)
+		}
 		return nil
 	})
 }
@@ -43,13 +56,16 @@ func main() {
 	handleError(err)
 
 	fmt.Println("    2. Parsing checksums.txt ...")
-	err = ReadChecksums(meta,
-		filepath.Join(
-			meta.App.Packaging.Dir,
-			meta.App.Checksum.File,
-		),
+	checksum_file := filepath.Join(
+		meta.App.Packaging.Dir,
+		meta.App.Checksum.File,
 	)
-	handleError(err)
+	if _, err := os.Stat(checksum_file); err == nil {
+		err = ReadChecksums(meta, checksum_file)
+		handleError(err)
+	} else {
+		fmt.Printf("[SKIP] checksum parsing ... Checksum file '%s' not found\n", checksum_file)
+	}
 
 	fmt.Println("    3. Parsing templates ...")
 	template := utils.Template{

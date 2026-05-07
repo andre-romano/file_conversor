@@ -6,7 +6,7 @@ echo
 
 export REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-export PACKAGES_REPOS="choco scoop"
+export PACKAGES_REPOS="choco scoop homebrew-tap"
 
 if [[ -z "${CGO_ENABLED:-}" ]]; then
     export CGO_ENABLED=1

@@ -4,6 +4,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -22,11 +23,11 @@ func BuildWindowsPackages(meta *gen_utils.Metadata) error {
 	// create zip package
 	zipPackage := NewPackage(meta, meta.App.Zip.File, meta.App.Zip.Contents, CreateZipFile)
 	if err := zipPackage.Build(); err != nil {
-		return err
+		return fmt.Errorf("failed to build zip package: %w", err)
 	}
 	// build Inno Setup installer
 	if err := buildInnoSetupInstaller(); err != nil {
-		return err
+		return fmt.Errorf("failed to build Inno Setup installer: %w", err)
 	}
 	return nil
 }
