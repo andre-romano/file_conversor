@@ -29,7 +29,6 @@ type License struct {
 
 type Entrypoints struct {
 	Cli string `yaml:"cli"`
-	Gui string `yaml:"gui"`
 }
 
 type Repository struct {
@@ -129,10 +128,10 @@ type App struct {
 }
 
 type Env struct {
-	GOOS    string
-	GOARCH  string
-	VERSION string
-	PWD     string
+	GOOS    string `yaml:"goos"`
+	GOARCH  string `yaml:"goarch"`
+	VERSION string `yaml:"version"`
+	PWD     string `yaml:"pwd"`
 }
 
 type Metadata struct {

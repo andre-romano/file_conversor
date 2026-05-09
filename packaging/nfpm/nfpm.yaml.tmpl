@@ -19,9 +19,6 @@ contents:
   - src: ./{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}
     dst: /usr/bin/{{ .App.Entrypoints.Cli }}
   
-  - src: ./{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}
-    dst: /usr/bin/{{ .App.Entrypoints.Gui }}
-
   - src: ./docs
     dst: /usr/share/doc/{{ .App.Name }}/docs
 

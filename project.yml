@@ -20,7 +20,7 @@ app:
     spdx: Apache-2.0
     url: "{{ .App.Urls.Blob }}/master/LICENSE"
 
-  tags: [ "file_conversor", "crossplatform", "cli", "gui", "pdf", "image", "video", "document", "converter" ]
+  tags: [ "file_conversor", "crossplatform", "cli", "pdf", "image", "video", "document", "converter" ]
 
   summary: Multi-format cross-platform file conversion and manipulation tool (image, document, video, etc).
 
@@ -31,7 +31,7 @@ app:
 
     ### Features
     - Cross-platform 
-    - CLI and GUI interfaces
+    - CLI interface
     - Context-menu integration (Windows Explorer)
     - Supports multiple formats (image, document, video, etc)
     - Automation-friendly (scripting, pipe support)
@@ -43,10 +43,6 @@ app:
     ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}@master/.readme_assets/cli_demo.gif)
 
     Run ``file_conversor -h`` to explore all available commands and options.
-
-    #### GUI - Graphical user interface
-
-    ![cli_terminal_demo](https://cdn.jsdelivr.net/gh/{{ .App.Repository.Owner }}/{{ .App.Repository.Name }}@master/.readme_assets/gui.jpg)
 
     #### File Explorer Context Menu (Windows, Linux still in development)
 
@@ -60,7 +56,6 @@ app:
 
   entrypoints:
     cli: file_conversor
-    gui: file_conversor_gui
 
   repository:
     owner: file-conversor
@@ -90,7 +85,7 @@ app:
   packaging:
     fileprefix: "{{ .App.Name }}-{{ .App.Repository.Tag }}-{{ .App.Build.Platform }}_{{ .App.Build.Arch }}"
     dir: dist    
-    
+
   checksum:
     file: "checksums.txt"
     url: "{{ .App.Urls.Releases }}/{{ .App.Repository.Tag }}/{{ .App.Checksum.File }}"
@@ -106,7 +101,6 @@ app:
     hash: "" # to be updated by Go with actual hash
     contents:
       - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}"
-      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}"
       - "LICENSE"
       - "NOTICE"
 
@@ -116,7 +110,6 @@ app:
     hash: "" # to be updated by Go with actual hash
     contents:
       - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Cli }}.exe"
-      - "{{ .App.Build.Dir }}/{{ .App.Entrypoints.Gui }}.exe"
       - "LICENSE"
       - "NOTICE"
   

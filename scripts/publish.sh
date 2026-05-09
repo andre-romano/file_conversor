@@ -1,5 +1,6 @@
 #!/bin/bash
-# publish.sh - A script to publish the app to package repos.
+# scripts/publish.sh 
+# - A script to publish the app to package repos.
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
 set -Eeuo pipefail
@@ -13,41 +14,36 @@ exit $rc' ERR
 
 echo "Publishing ..."
 
-SUPPORTED_REPOS=""
-if [[ "$GOOS" == "windows" ]]; then
-    SUPPORTED_REPOS="scoop choco"
-elif [[ "$GOOS" == "linux" ]]; then
-    SUPPORTED_REPOS=""
-elif [[ "$GOOS" == "darwin" ]]; then
-    SUPPORTED_REPOS="homebrew-tap"
-else
-    echo "Unsupported OS: $GOOS"
-    exit 1
-fi
-
 echo "    1. Cloning packaging repositories ..."
 mkdir -p build/packaging
-cd build/packaging
-for package in $SUPPORTED_REPOS; do
-    mkdir -p "$package"
-    rm -rf "$package/*"
-    git clone git@github.com:file-conversor/$package.git
+pushd build/packaging
+for repo in $SUPPORTED_REPOS; do
+    mkdir -p "$repo"
+    rm -rf "${repo}/*"
+    git clone git@github.com:${OWNER_REPO}/${repo}.git
 done
+popd > /dev/null # move back to project dir root (defined in _env.sh script)
 
 echo "    2. Generating package manifest files ..."
-cd "$REPO_DIR"
 go run tools/gen_packages/main.go
 
-echo "    3. Publishing repos for '$GOOS' (git push) ..."
+if [ "$GOOS" = "linux" ]; then
+    echo "    3. Generating Linux repositories (DEB, RPM) ..."
+    . "$(dirname "$0")/_gen_lin_repos.sh"
+else
+    echo "    3. Generating Linux repositories (DEB, RPM) ... [SKIPPED] (GOOS='$GOOS')"
+fi
+
+echo "    4. Publishing repos for '$GOOS' (git push) ..."
 for repo in $SUPPORTED_REPOS ; do        
     echo "        - Publishing $repo ..."
-    cd "build/packaging/${repo}"
+    pushd "build/packaging/${repo}"
     git add .
     git commit -m "Update package files to $TAG"
     git push
     git tag -f "$TAG"
     git push --tags --force    
-    cd "$REPO_DIR"
+    popd > /dev/null # move back to project dir root (defined in _env.sh script)
 done
 
 echo "Publishing ... Done!"

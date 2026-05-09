@@ -1,5 +1,6 @@
 #!/bin/bash
-# clean.sh - A script to clean build artifacts.
+# scripts/clean.sh
+#  - A script to clean build artifacts.
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
 set -Eeuo pipefail

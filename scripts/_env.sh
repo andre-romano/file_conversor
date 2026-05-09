@@ -1,10 +1,11 @@
 #!/bin/bash
-# _env.sh - A script to set environment variables for build and package scripts.
+# scripts/_env.sh 
+# - A script to set environment variables for build and package scripts.
 
 echo "Setting environment variables ..."
 echo
 
-export REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+export PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 if [[ -z "${CGO_ENABLED:-}" ]]; then
     export CGO_ENABLED=1
@@ -24,8 +25,23 @@ export COMMIT=$(git rev-parse --short HEAD)
 export DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 export BUILT_BY="git_actions_bot"
 
+export OWNER_REPO="file-conversor"
+
+SUPPORTED_REPOS=""
+if [[ "$GOOS" == "windows" ]]; then
+    SUPPORTED_REPOS="scoop choco"
+elif [[ "$GOOS" == "linux" ]]; then
+    SUPPORTED_REPOS=""
+elif [[ "$GOOS" == "darwin" ]]; then
+    SUPPORTED_REPOS="homebrew-tap"
+else
+    echo "Unsupported OS: $GOOS"
+    exit 1
+fi
+export SUPPORTED_REPOS
+
 echo "Environment variables:"
-echo "    PACKAGES_REPOS: $PACKAGES_REPOS"
+echo "    SUPPORTED_REPOS: $SUPPORTED_REPOS"
 echo "    CGO_ENABLED: $CGO_ENABLED"
 echo "    GOOS: $GOOS"
 echo "    GOARCH: $GOARCH"

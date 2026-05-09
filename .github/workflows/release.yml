@@ -107,7 +107,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           cd dist
-          sha256sum * > ../checksums.txt          
+          find . -maxdepth 1 -type f -print0 | xargs -0 sha256sum > ../checksums.txt          
           mv ../checksums.txt ./
           cat checksums.txt
         shell: bash
@@ -154,18 +154,18 @@ jobs:
         with:
           fetch-depth: 0 # full history — GoReleaser needs all tags
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.x
-          cache: true
-      
       - name: Download distribution artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: dist-*
           path: dist
           merge-multiple: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.x
+          cache: true
       
       - name: Setting env variables
         run: |

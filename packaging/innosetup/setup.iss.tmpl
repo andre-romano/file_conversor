@@ -34,23 +34,19 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
 Name: cli; Description: Command-line interface (CLI); Types: full compact
-Name: gui; Description: Graphical user interface (GUI); Types: full
 Name: plugins; Description: Plugins; Types: full
 
 [Tasks]
-Name: desktop_icon; Description: Create desktop icon; Components: gui
-Name: start_menu_icon; Description: Create start menu icon; Components: gui
 Name: ctx_menu; Description: Install context menu entries; Components: cli; Flags: restart
 
 [Dirs]
 Name: "{app}"; Permissions: everyone-full
 
 [Files]
-Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion allowunsafefiles recursesubdirs
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
 Source: "NOTICE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
+Source: "{{ .App.Icon.Ico | winpath }}"; DestDir: "{app}\{{ .App.Icon.Ico | winpath }}"; Flags: ignoreversion allowunsafefiles recursesubdirs
 Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Cli }}.exe"; DestDir: "{app}"; Components: cli; Flags: ignoreversion allowunsafefiles
-Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Gui }}.exe"; DestDir: "{app}"; Components: gui; Flags: ignoreversion allowunsafefiles
 
 [Registry]
 ; Adds app_folder to the USER PATH
@@ -58,10 +54,6 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; Value
 
 ; Adds app_folder to the SYSTEM PATH (requires admin privileges)
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Check: IsAdmin()
-
-[Icons]
-Name: "{group}\{{ .App.Title }}"; Filename: "{app}\{{ .App.Entrypoints.Gui }}.exe"; WorkingDir: "{app}"; IconFilename: "{app}\{{ .App.Icon.Ico | winpath }}"; Tasks: start_menu_icon
-Name: "{autodesktop}\{{ .App.Title }}"; Filename: "{app}\{{ .App.Entrypoints.Gui }}.exe"; WorkingDir: "{app}"; IconFilename: "{app}\{{ .App.Icon.Ico | winpath }}"; Tasks: desktop_icon
 
 [Run]
 StatusMsg: "Installing context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\{{ .App.Entrypoints.Cli }}.exe"" win install-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated

@@ -1,5 +1,6 @@
 #!/bin/bash
-# package.sh - A script to package the app using Chocolatey, FPM, etc.
+# scripts/package.sh 
+# - A script to package the app using Chocolatey, FPM, etc.
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
 set -Eeuo pipefail

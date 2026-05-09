@@ -1,5 +1,6 @@
 #!/bin/bash
-# build.sh - A script to build the app using Go.
+# scripts/build.sh
+#  - A script to build the app using Go.
 
 # Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and prevent errors in a pipeline from being masked.
 set -Eeuo pipefail

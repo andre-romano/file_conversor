@@ -64,7 +64,7 @@ func (s *System) BuildPackages(meta *gen_utils.Metadata) error {
 		err = fmt.Errorf("Unsupported system: %s", s.OS)
 	}
 	if err != nil {
-		return fmt.Errorf("fail build packages: %w", err)
+		return fmt.Errorf("build packages: %w", err)
 	}
 	return nil
 }

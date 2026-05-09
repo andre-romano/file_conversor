@@ -34,7 +34,7 @@ func NewPackage(
 func (p *Package) Build() error {
 	outputFile := filepath.Join(p.Meta.App.Packaging.Dir, p.OutputFileBasename)
 	if err := p.CreateFunc(outputFile, p.InputFiles); err != nil {
-		return fmt.Errorf("fail create package '%s': %w", outputFile, err)
+		return fmt.Errorf("create package '%s': %w", outputFile, err)
 	}
 	return nil
 }
