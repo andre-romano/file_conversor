@@ -181,4 +181,6 @@ jobs:
       - name: Publish to repositories (${{ matrix.os }})
         run: |
           ./scripts/publish.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.FILE_CONVERSOR_ORG_TOKEN }} # for pushing to scoop bucket, homebrew tap, etc
         shell: bash
