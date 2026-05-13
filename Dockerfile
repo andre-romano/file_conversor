@@ -3,6 +3,14 @@
 ARG APP_NAME="file_conversor"
 ARG BUILD_BASE_IMAGE="golang:latest"
 ARG RELEASE_BASE_IMAGE="debian:stable-slim"
+ARG SYSTEM_DEPENDENCIES=" \
+    git \
+    ca-certificates \
+    ffmpeg \
+    ghostscript \
+    libreoffice-nogui \
+    calibre \
+"
 
 # --------------------
 # STAGE 0 - binaries
@@ -38,10 +46,8 @@ COPY --from=build /root/.local/bin /root/.local/bin
 ENV PATH="/root/.local/bin:${PATH}"
 RUN echo "Installing system dependencies ..." \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        git \
-        ca-certificates \
-    && echo "Installing system dependencies ... OK" \    
+    && apt-get install -y --no-install-recommends ${SYSTEM_DEPENDENCIES} \
+    && echo "Installing system dependencies ... OK" \
     && echo "Cleaning up ..." \
     && apt-get autoremove -y \
     && apt-get clean \
