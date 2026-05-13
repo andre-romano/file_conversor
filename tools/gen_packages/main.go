@@ -73,10 +73,12 @@ func main() {
 		InputDir:  "packaging",
 		OutputDir: "build/packaging",
 		FuncMaps: utils.TemplateFuncMap{
-			"winpath": utils.WinPath,
-			"join":    strings.Join,
-			"escape":  utils.EscapeXml,
-			"replace": strings.ReplaceAll,
+			"dirname":  filepath.Dir,
+			"basename": filepath.Base,
+			"winpath":  utils.WinPath,
+			"join":     strings.Join,
+			"escape":   utils.EscapeXml,
+			"replace":  strings.ReplaceAll,
 		},
 	}
 	err = template.ParseTemplates()

@@ -1,6 +1,10 @@
 {
     "recommendations": [
         "golang.go",
+        "redhat.vscode-yaml",
+        "SonarSource.sonarlint-vscode",
+        "formulahendry.code-runner",
+        "chouzz.vscode-innosetup",
     ],
     "unwantedRecommendations": [],
 }

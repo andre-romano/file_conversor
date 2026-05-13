@@ -1,17 +1,20 @@
 
-; Copywright(c) -- Andre Luiz Romano Madureira
+; Copyright(c) -- Andre Luiz Romano Madureira
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 
 [Setup]
 AppName={{ .App.Title }}
 AppVersion={{ .App.Version }}
-DefaultDirName={autopf}/{{ .App.Name }}
+DefaultDirName={autopf}\{{ replace .App.Title " " "_" | winpath }}
 Compression=lzma2/max
 SolidCompression=yes
 ShowLanguageDialog=yes
+ChangesEnvironment=yes
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 LicenseFile=.\LICENSE
 InfoBeforeFile=.\NOTICE
 SetupIconFile=.\{{ .App.Icon.Ico | winpath }}
@@ -27,38 +30,186 @@ Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
 Name: "pt"; MessagesFile: "compiler:Languages\Portuguese.isl"
 
-[Types]
-Name: "full"; Description: "Full installation"
-Name: "compact"; Description: "Compact installation"
-Name: "custom"; Description: "Custom installation"; Flags: iscustom
+; [Types]
+; Name: "full"; Description: "Full installation"
+; Name: "compact"; Description: "Compact installation"
+; Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
-[Components]
-Name: cli; Description: Command-line interface (CLI); Types: full compact
-Name: plugins; Description: Plugins; Types: full
+; [Components]
+; Name: cli; Description: Command-line interface (CLI); Types: full compact
+; Name: plugins; Description: Plugins; Types: full
 
 [Tasks]
-Name: ctx_menu; Description: Install context menu entries; Components: cli; Flags: restart
+Name: task_ctx_menu; Description: Install context menu entries
+Name: task_add_path; Description: Add to system PATH
+; Flags: restart
 
-[Dirs]
-Name: "{app}"; Permissions: everyone-full
+; [Dirs]
+; Name: "{app}"; Permissions: everyone-full
 
 [Files]
-Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
-Source: "NOTICE"; DestDir: "{app}"; Flags: ignoreversion allowunsafefiles
-Source: "{{ .App.Icon.Ico | winpath }}"; DestDir: "{app}\{{ .App.Icon.Ico | winpath }}"; Flags: ignoreversion allowunsafefiles recursesubdirs
-Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Cli }}.exe"; DestDir: "{app}"; Components: cli; Flags: ignoreversion allowunsafefiles
+Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "NOTICE"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "{{ .App.Icon.Ico | winpath }}"; DestDir: "{app}\{{ .App.Icon.Ico | dirname | winpath }}"; Flags: ignoreversion  
+Source: "{{ .App.Build.Dir | winpath }}\{{ .App.Entrypoints.Cli }}.exe"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "{{ .App.Build.Dir | dirname | winpath }}\packaging\innosetup\*.reg"; DestDir: "{app}"; Flags: ignoreversion 
 
 [Registry]
 ; Adds app_folder to the USER PATH
-Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Check: not IsAdmin()
+Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Tasks: task_add_path; Check: not IsAdmin() and NeedsAddPath(ExpandConstant('{app}'))
 
 ; Adds app_folder to the SYSTEM PATH (requires admin privileges)
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Check: IsAdmin()
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Flags: preservestringtype; Tasks: task_add_path; Check: IsAdmin() and NeedsAddPath(ExpandConstant('{app}'))
 
 [Run]
-StatusMsg: "Installing context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\{{ .App.Entrypoints.Cli }}.exe"" win install-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated
+StatusMsg: "Installing context menu (For current user only)..."; Filename: "reg.exe"; Parameters: "import install_ctx_menu_user.reg"; WorkingDir: "{app}"; Tasks: task_ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; Check: not IsAdmin() 
+StatusMsg: "Installing context menu (For all users)..."; Filename: "reg.exe"; Parameters: "import install_ctx_menu_all.reg"; WorkingDir: "{app}"; Tasks: task_ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; Check: IsAdmin() 
 
 [UninstallRun]
-StatusMsg: "Uninstalling context menu ..."; Filename: "cmd.exe"; Parameters: "/C """"{app}\{{ .App.Entrypoints.Cli }}.exe"" win uninstall-menu"""; WorkingDir: "{app}"; Tasks: ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; RunOnceId: "uninstall_menu"
-StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{app}"""; Flags: runhidden runascurrentuser; RunOnceId: "cleanup_files"
+StatusMsg: "Removing context menu (For current user only)..."; Filename: "reg.exe"; Parameters: "import remove_ctx_menu_user.reg"; WorkingDir: "{app}"; Tasks: task_ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; Check: not IsAdmin(); RunOnceId: "uninstall_menu_user"
+StatusMsg: "Removing context menu (For all users)..."; Filename: "reg.exe"; Parameters: "import remove_ctx_menu_all.reg"; WorkingDir: "{app}"; Tasks: task_ctx_menu; Flags: runhidden runascurrentuser waituntilterminated; Check: IsAdmin(); RunOnceId: "uninstall_menu_all"
+; StatusMsg: "Clean up files ..."; Filename: "cmd.exe"; Parameters: "/C rmdir /s /q ""{app}"""; Flags: runhidden runascurrentuser; RunOnceId: "cleanup_files"
 
+[Code]
+
+function NeedsAddPath(AppPath: string): Boolean;
+var
+  RootKey: Integer;
+  SubKey: string;
+  RawPath: string;
+begin
+  if IsAdmin() then
+  begin
+    RootKey := HKLM;
+    SubKey  := 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
+  end 
+  else begin
+    RootKey := HKCU;
+    SubKey  := 'Environment';
+  end;
+
+  if RegQueryStringValue(RootKey, SubKey, 'PATH', RawPath) then    
+    Result := Pos(';' + AppPath + ';', ';' + RawPath + ';') = 0
+  else
+    Result := True;
+end;
+
+function TrimStr(const S: string): string;
+var
+  I, J: Integer;
+begin
+  I := 1;
+  while (I <= Length(S)) and (S[I] = ' ') do Inc(I);
+  J := Length(S);
+  while (J >= I) and (S[J] = ' ') do Dec(J);
+  Result := Copy(S, I, J - I + 1);
+end;
+
+// Splits PATH string into individual entries, trimming whitespace from each.
+// Skips empty entries produced by double semicolons or leading/trailing semicolons.
+procedure SplitPath(const RawPath: string; Parts: TStringList);
+var
+  I, Start: Integer;
+  Entry: string;
+begin
+  Start := 1;
+  for I := 1 to Length(RawPath) do
+  begin
+    if RawPath[I] = ';' then
+    begin
+      Entry := TrimStr(Copy(RawPath, Start, I - Start));
+      if Entry <> '' then
+        Parts.Add(Entry);
+      Start := I + 1;
+    end;
+  end;
+  // Last segment after final semicolon (or whole string if no semicolon)
+  Entry := TrimStr(Copy(RawPath, Start, Length(RawPath) - Start + 1));
+  if Entry <> '' then
+    Parts.Add(Entry);
+end;
+
+// Reassembles a TStringList of path entries into a semicolon-delimited string.
+function JoinPath(Parts: TStringList): string;
+var
+  I: Integer;
+begin
+  Result := '';
+  for I := 0 to Parts.Count - 1 do
+  begin
+    if Result <> '' then
+      Result := Result + ';';
+    Result := Result + Parts[I];
+  end;
+end;
+
+// Case-insensitive path comparison, also normalises trailing backslash.
+function PathsEqual(const A, B: string): Boolean;
+var
+  NormA, NormB: string;
+begin
+  NormA := A;
+  NormB := B;
+  // Strip trailing backslash for comparison only
+  if (Length(NormA) > 0) and (NormA[Length(NormA)] = '\') then
+    NormA := Copy(NormA, 1, Length(NormA) - 1);
+  if (Length(NormB) > 0) and (NormB[Length(NormB)] = '\') then
+    NormB := Copy(NormB, 1, Length(NormB) - 1);
+  Result := CompareText(NormA, NormB) = 0;
+end;
+
+procedure RemoveAppFromPath(const AppPath: string);
+var
+  RootKey: Integer;
+  SubKey: string;
+  RawPath: string;
+  Parts, NewParts: TStringList;
+  I: Integer;
+  Removed: Boolean;
+begin
+  if IsAdmin() then
+  begin
+    RootKey := HKLM;
+    SubKey  := 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
+  end else
+  begin
+    RootKey := HKCU;
+    SubKey  := 'Environment';
+  end;
+
+  if not RegQueryStringValue(RootKey, SubKey, 'PATH', RawPath) then
+    Exit; // PATH key doesn't exist — nothing to do
+
+  Parts    := TStringList.Create;
+  NewParts := TStringList.Create;
+  try
+    SplitPath(RawPath, Parts);
+
+    Removed := False;
+    for I := 0 to Parts.Count - 1 do
+    begin
+      // Expand any %variables% in stored entry before comparing
+      if PathsEqual(ExpandConstant(Parts[I]), AppPath) or
+         PathsEqual(Parts[I], AppPath) then
+        Removed := True  // drop this entry
+      else
+        NewParts.Add(Parts[I]);  // keep everything else untouched
+    end;
+
+    // Only write back if we actually changed something
+    if Removed then
+      RegWriteExpandStringValue(RootKey, SubKey, 'PATH', JoinPath(NewParts));
+
+  finally
+    Parts.Free;
+    NewParts.Free;
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+  begin
+    RemoveAppFromPath(ExpandConstant('{app}'));    
+  end;
+end;
