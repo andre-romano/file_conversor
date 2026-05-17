@@ -54,6 +54,15 @@ func Temp() (string, error) {
 	return dirs.mkdirAll(os.TempDir())
 }
 
+// Logfile returns the path to the log file for the application.
+func Logfile(appName string) (string, error) {
+	logDir, err := Logs()
+	if err != nil {
+		return "", fmt.Errorf("log folder: %w", err)
+	}
+	return filepath.Join(logDir, appName+".log"), nil
+}
+
 // --- internal ---
 func (a *Dirs) mkdirAll(base string) (string, error) {
 	return a.ensure(filepath.Join(base, a.appName))
