@@ -3,10 +3,9 @@ package logger
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log/slog"
-	"time"
+	"strings"
 )
 
 // PrettyHandler is a human-readable handler with colour and aligned output.
@@ -34,13 +33,15 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	// level
 	lvl := r.Level.String()
 
-	// Timestamp
-	ts := r.Time.Format(time.DateTime) // "01/05 15:04:05"
-
 	// Build attr string
-	attrs := ""
+	var attrsStrBuilder strings.Builder
+	attrsStrBuilder.Grow(64) // preallocate some space to avoid multiple allocations
 	fn := func(a slog.Attr) bool {
-		attrs += " " + a.Key + " " + a.Value.String()
+		// faster to build string than concat or sprintf
+		attrsStrBuilder.WriteByte(' ')
+		attrsStrBuilder.WriteString(a.Key)
+		attrsStrBuilder.WriteByte('=')
+		attrsStrBuilder.WriteString(a.Value.String())
 		return true
 	}
 	for _, a := range h.attrs {
@@ -48,12 +49,17 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	}
 	r.Attrs(fn)
 
-	_, err := fmt.Fprintf(h.w, "%s - [%s] - %s%s",
-		ts,
-		lvl,
-		r.Message,
-		attrs,
-	)
+	// allocate final log line in one go and write to output
+	var logStrBuilder strings.Builder
+	logStrBuilder.Grow(128 + attrsStrBuilder.Len())
+
+	logStrBuilder.WriteByte('[')
+	logStrBuilder.WriteString(lvl)
+	logStrBuilder.WriteString("] - ")
+	logStrBuilder.WriteString(r.Message)
+	logStrBuilder.WriteString(attrsStrBuilder.String())
+
+	_, err := io.WriteString(h.w, logStrBuilder.String())
 	return err
 }
 

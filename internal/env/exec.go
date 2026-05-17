@@ -1,6 +1,6 @@
-// internal/utils/exec.go
+// internal/env/exec.go
 
-package utils
+package env
 
 import (
 	"fmt"

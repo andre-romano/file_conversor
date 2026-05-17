@@ -20,8 +20,8 @@ go mod tidy
 echo "    2. Running go generate ..."
 go generate ./...
 
-echo "    3. Running go test ..."
-go test -v ./...
+echo "    3. Running go test -race -count=1 -v ..."
+go test -race -count=1 -v ./...
 
 echo "    4. Building go build ..."
 for cmd in ./cmd/* ; do

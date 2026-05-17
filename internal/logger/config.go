@@ -23,6 +23,19 @@ type Config struct {
 	AddSource bool
 }
 
+func DefaultConfig(logfile string) *Config {
+	return &Config{
+		TerminalLevel:  InfoLevel,    // less noise on terminal
+		TerminalFormat: PrettyFormat, // human-friendly for terminal
+
+		LogFile:    logfile,
+		FileLevel:  DebugLevel, // capture everything to disk
+		FileFormat: TextFormat, // structured logs are easier to analyze and query
+
+		AddSource: false, // will not work here, as using custom functions for logging, not slog's built-in methods
+	}
+}
+
 func (cfg *Config) New() (*slog.Logger, io.Closer, error) {
 	var handlers []slog.Handler
 
@@ -43,12 +56,7 @@ func (cfg *Config) New() (*slog.Logger, io.Closer, error) {
 		}
 		fileCloser = f
 
-		// Files almost always want JSON or text, never pretty
-		fileFmt := cfg.FileFormat
-		if fileFmt == PrettyFormat || fileFmt == "" {
-			fileFmt = JSONFormat
-		}
-		fileHandler := cfg.newHandler(f, fileFmt, cfg.FileLevel)
+		fileHandler := cfg.newHandler(f, cfg.FileFormat, cfg.FileLevel)
 		handlers = append(handlers, fileHandler)
 	}
 

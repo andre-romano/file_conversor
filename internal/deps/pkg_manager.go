@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/file-conversor/file_conversor/internal/env"
 	"github.com/file-conversor/file_conversor/internal/logger"
-	"github.com/file-conversor/file_conversor/internal/utils"
 )
 
 // defines an interface for pkg mgrs that can be used to install dependencies.
@@ -71,7 +71,7 @@ func (p *pkgMgr) update(dry_run bool) error {
 		logger.Warnf("[SKIP] Skipping update: pkg mgr '%s' was updated less than 24 hours ago ...\n", p.Name)
 		return nil
 	}
-	if err := utils.RunCommand(p.UpdateCmd...); err != nil {
+	if err := env.RunCommand(p.UpdateCmd...); err != nil {
 		return fmt.Errorf("update pkg mgr '%s': %w", p.Name, err)
 	}
 	p.lastUpdated = time.Now()
@@ -90,13 +90,13 @@ func (p *pkgMgr) install(dry_run bool, postInstallCmds [][]string, preInstallCmd
 		fmt.Printf("  $ %s %s\n", strings.Join(p.InstallCmd, " "), pkgName)
 		return nil
 	}
-	if err := utils.RunCommands(preInstallCmds...); err != nil {
+	if err := env.RunCommands(preInstallCmds...); err != nil {
 		return fmt.Errorf("pre-install cmd: %w", err)
 	}
-	if err := utils.RunCommand(append(p.InstallCmd, pkgName)...); err != nil {
+	if err := env.RunCommand(append(p.InstallCmd, pkgName)...); err != nil {
 		return fmt.Errorf("install pkg '%s' using '%s': %w", pkgName, p.Name, err)
 	}
-	if err := utils.RunCommands(postInstallCmds...); err != nil {
+	if err := env.RunCommands(postInstallCmds...); err != nil {
 		return fmt.Errorf("post-install cmd: %w", err)
 	}
 	return nil
