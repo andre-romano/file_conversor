@@ -13,11 +13,11 @@ A powerful plugin-based CLI and GUI tool for converting, compressing, and manipu
 - [File Conversor](#file-conversor)
   - [Usage](#usage)
     - [CLI - Command line interface](#cli---command-line-interface)
-    - [GUI - Graphical user interface](#gui---graphical-user-interface)
-    - [Windows Context Menu (Windows OS only)](#windows-context-menu-windows-os-only)
+    - [File Explorer Context Menu](#file-explorer-context-menu)
   - [Why use File Conversor?](#why-use-file-conversor)
   - [Features](#features)
   - [External dependencies](#external-dependencies)
+    - [Automatic Dependency Installation](#automatic-dependency-installation)
   - [Installing](#installing)
     - [For Windows](#for-windows)
     - [For Linux / MacOS](#for-linux--macos)
@@ -32,16 +32,11 @@ A powerful plugin-based CLI and GUI tool for converting, compressing, and manipu
 
 Run ``file_conversor -h`` to explore all available commands and options.
 
-### GUI - Graphical user interface
+### File Explorer Context Menu
 
-<img src="./.readme_assets/gui.jpg" >
-
-Run ``file_conversor_gui`` to launch the GUI application or double click the Windows Shortcut.
-
-### Windows Context Menu (Windows OS only)
-
-1. Right click a file in Windows Explorer
-2. Choose an action from "File Conversor" menu
+1. Install File Conversor using the Installer (`.exe` - support for Linux and MacOS coming soon) 
+2. Right click a file in Windows Explorer (support for other file managers is planned for future releases)
+3. Choose an action from "File Conversor" menu
   
 <img src="./.readme_assets/ctx_menu.jpg" width="600px">
 
@@ -51,6 +46,7 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 - Manipulate various media formats with a single tool
 - Integrate seamlessly with scripting workflows
 - Configure advanced file processing pipelines
+- Parallelize tasks for massive multi-threaded processing
 
 ## Features
 
@@ -76,17 +72,33 @@ Run ``file_conversor_gui`` to launch the GUI application or double click the Win
 - **Batch Processing**  
   - Use pipelines and config files for automation and advanced tasks.
 
+- **Cross-Platform Compatibility**
+  - Runs on Windows, Linux, and MacOS.
+
 - **Multiple Interfaces**  
   - **Windows Explorer integration**: right-click files for quick actions
-  - CLI for scripting and automation  
+  - **CLI**: for scripting and automation  
 
 *For full feature set, check* [`FEATURE_SET.md`](FEATURE_SET.md)
 
 ## External dependencies
 
-This project has external dependencies. By installing and using this software, you agree to comply with the licenses of these third-party tools. 
+- This software uses several third-party tools (such as FFmpeg, Calibre, LibreOffice, and others), via interprocess communication (i.e., processes, pipes, etc), to provide advanced features that are not feasible to implement internally (either due to complexity or licensing restrictions).
+- These external tools are open-source projects, maintained independently from this software, and are **not bundled** with the distributed packages (`.exe`, `.deb`, `.rpm`, `.tar.gz`, etc). This approach helps:
+  - reduce installer/package size;
+  - avoid potential licensing and redistribution issues;
+  - allow users to manage external dependencies independently.
+- External dependencies are **not covered** by this software's license. All trademarks, copyrights, and licensing rights remain the property of their respective owners. Additional information is available in the [NOTICE](./NOTICE) file.
 
-In prompts will assist you in downloading missing dependencies when required, using package managers installed in your system (e.g., `apt`, `brew`, `scoop`, `choco`). 
+### Automatic Dependency Installation
+
+- When a feature requires a missing external dependency, the software may prompt the user to install it automatically using supported user-level package managers (e.g., `brew`, `scoop`).
+- **On Linux**:
+  - Automatic dependency installation on Linux is currently **not supported** (and is unlikely to be supported in the future), primarily due to:
+    1. Security and privilege concerns associated with system-wide package installation required by most Linux package managers (e.g., `apt`, `dnf`, `yum`, `pacman`, etc).
+    2. Package naming and packaging inconsistencies across Linux distributions and package managers (e.g., `libreoffice-headless` vs. `libreoffice-nogui`).
+    3. Differences in repository availability and package versions.
+  - When a required dependency is missing on Linux, the software will instead prompt the user to install it manually.
 
 ## Installing
 
@@ -95,27 +107,37 @@ In prompts will assist you in downloading missing dependencies when required, us
 
 ### For Windows
 
-- **Option 1. Portable Zip Files**:
-  - Extract the ``.zip`` file.
-  - Run the application (CLI or GUI).
+- **Option 1. Installer**:
+  - Run the installer (`.exe` file) and follow the on-screen instructions.
+  - This option **includes context menu** integration (right-click files for quick actions), if enabled during installation.
+  - Portable version is also available (see Option 2 below).
 
-- **Option 2. Scoop Package Manager**
+- **Option 2. Portable Archive**:
+  - Extract the ``.zip`` file.
+  - Run the application.
+  - This option DOES NOT include context menu integration (right-click files for quick actions).
+
+- **Option 3. Scoop Package Manager**
+  - This option allows you to install the app for the current user (**without administrator privileges**).
+  - This option DOES NOT include context menu integration (right-click files for quick actions).
 ```bash
 scoop install git
 scoop bucket add file_conversor https://github.com/andre-romano/file_conversor_scoop_bucket
 scoop install file_conversor
 ```
 
-- **Option 3. Choco Package Manager**
+- **Option 4. Choco Package Manager**
+  - This option **requires administrator privileges** and will install the app system-wide.
+  - This option **will install context menu integration** (right-click files for quick actions) for all users on the system.
 ```bash
 choco install file_conversor -y
 ```
 
 ### For Linux / MacOS
 
-- **Option 1. AppImage**:
+- **Option 1. Portable Archive**:
 ```bash
-tar -xvf file_conversor*.tar.gz
+tar -xvaf file_conversor*.tar.gz
 chmod +x file_conversor*
 ```
 
@@ -138,7 +160,7 @@ docker run --rm -it -v $(pwd):/app andreromano/file_conversor:latest
 
 - **Option 3. Compile from Source**  
 ```bash
-go install github.com/andre-romano/file_conversor@latest
+go install github.com/file-conversor/file_conversor@latest
 ```
 
 ## Contributing & Support
@@ -152,6 +174,8 @@ go install github.com/andre-romano/file_conversor@latest
 
 Distributed under the **Apache License 2.0**.
 
-By using this software, you agree to comply with the terms of the Apache License 2.0. Further, you agree to respect the licenses of any third-party tools integrated or utilized by this software. 
+By using this software, you agree to comply with the terms of the Apache License 2.0, as specified in the [`LICENSE`](./LICENSE) file. 
 
-Licenses are provided in the [`LICENSES`](./LICENSES) folder.  Please review these licenses to ensure compliance when using the software and its dependencies.
+Further, you agree to respect the licenses of any third-party tools integrated or utilized by this software, as specified in the [`NOTICE`](./NOTICE) file. 
+
+Please review software licenses to ensure compliance and avoid potential legal issues.

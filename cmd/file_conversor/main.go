@@ -2,9 +2,15 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/file-conversor/file_conversor/internal/deps"
 )
 
 func main() {
-	fmt.Println("Hello, Go!")
-	defer func() { fmt.Println("This will be printed after the panic is recovered.") }()
+	cmd, err := deps.FFmpegDep.EnsureInstalled(false, false)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("Path: %s\n", cmd)
 }
