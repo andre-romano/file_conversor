@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/file-conversor/file_conversor/internal/deps"
 	"github.com/file-conversor/file_conversor/internal/logger"
 )
@@ -24,5 +22,5 @@ func main() {
 		logger.Errorf("Error: %v\n", err)
 		return
 	}
-	fmt.Printf("Path: %s\n", cmd)
+	logger.Infof("Path: %s\n", cmd)
 }

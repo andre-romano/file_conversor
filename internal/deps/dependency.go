@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+
+	"github.com/file-conversor/file_conversor/internal/logger"
 )
 
 type Package struct {
@@ -82,18 +84,19 @@ func (d *Dependency) EnsureInstalled(prompt_user bool, dry_run bool) (string, er
 			if err := d.promptUser(); err != nil {
 				return "", err
 			}
+			logger.Warnf("User accepted the installation of '%s', licensed under '%s' ...\n", d.Name, d.License.ShortName)
 		} else {
-			fmt.Printf("[WARN] Auto-install flag is set. User automatically accepts the installation of '%s', licensed under '%s' ...\n", d.Name, d.License.ShortName)
+			logger.Warnf("Auto-install flag is set. User automatically accepts the installation of '%s', licensed under '%s' ...\n", d.Name, d.License.ShortName)
 		}
 
 		// try to install dependency
-		fmt.Printf("Installing '%s' dependency ...\n", d.Name)
+		logger.Infof("Installing '%s' dependency ...\n", d.Name)
 		if err := d.install(dry_run); err != nil {
 			return "", fmt.Errorf("dependency install '%s': %v", d.Name, err)
 		}
 
 		// check if binary is available after installation
-		fmt.Printf("Checking if '%s' is available ...\n", d.Name)
+		logger.Infof("Checking if '%s' is available ...\n", d.Name)
 		bin, err := exec.LookPath(d.Binary)
 		if err != nil {
 			return "", fmt.Errorf("cannot find '%s' binary: %v", d.Name, err)

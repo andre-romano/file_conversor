@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/file-conversor/file_conversor/internal/logger"
 	"github.com/file-conversor/file_conversor/internal/utils"
 )
 
@@ -67,7 +68,7 @@ func (p *pkgMgr) update(dry_run bool) error {
 		return nil
 	}
 	if time.Since(p.lastUpdated) < 24*time.Hour {
-		fmt.Printf("[SKIP] Skipping update: pkg mgr '%s' was updated less than 24 hours ago ...\n", p.Name)
+		logger.Warnf("[SKIP] Skipping update: pkg mgr '%s' was updated less than 24 hours ago ...\n", p.Name)
 		return nil
 	}
 	if err := utils.RunCommand(p.UpdateCmd...); err != nil {
