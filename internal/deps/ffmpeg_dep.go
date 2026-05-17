@@ -7,10 +7,14 @@ var FFmpegDep = &Dependency{
 	Binary:   "ffmpeg",
 	Homepage: "https://ffmpeg.org/",
 	License:  GPLv2,
-	MapPkgToPkgMgr: map[string]pkgMgrs{
-		"ffmpeg": {
-			BrewPkgMgr,
-			ScoopPkgMgr,
+	Packages: []Package{
+		{
+			Name:    "ffmpeg",
+			Manager: BrewPkgMgr,
+		},
+		{
+			Name:    "ffmpeg",
+			Manager: ScoopPkgMgr,
 		},
 	},
 }

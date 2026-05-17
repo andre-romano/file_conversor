@@ -1,0 +1,33 @@
+// internal/utils/exec.go
+
+package utils
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+)
+
+func RunCommand(cmd ...string) error {
+	if len(cmd) == 0 {
+		return fmt.Errorf("empty command")
+	}
+	c := exec.Command(cmd[0], cmd[1:]...)
+	c.Stdout, c.Stderr = os.Stdout, os.Stderr
+	return c.Run()
+}
+
+func RunCommands(cmds ...[]string) error {
+	for _, cmd := range cmds {
+		if len(cmd) == 0 {
+			return fmt.Errorf("empty command")
+		}
+		c := exec.Command(cmd[0], cmd[1:]...)
+		c.Stdout, c.Stderr = os.Stdout, os.Stderr
+		if err := c.Run(); err != nil {
+			return fmt.Errorf("cmd '%s': %w", strings.Join(cmd, " "), err)
+		}
+	}
+	return nil
+}

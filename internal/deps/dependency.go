@@ -10,36 +10,38 @@ import (
 	"sync"
 )
 
-type pkgMgrs []*pkgMgr
+type Package struct {
+	Name            string
+	Manager         *pkgMgr
+	preInstallCmds  [][]string
+	postInstallCmds [][]string
+}
 
 type Dependency struct {
-	Name           string
-	Binary         string
-	License        license
-	Homepage       string
-	MapPkgToPkgMgr map[string]pkgMgrs
-	lock           sync.Mutex
+	Name     string
+	Binary   string
+	License  license
+	Homepage string
+	Packages []Package
+	lock     sync.Mutex
 }
 
 func (d *Dependency) install(dry_run bool) error {
-	for pkg, pkgMgrs := range d.MapPkgToPkgMgr {
+	for _, depMgr := range d.Packages {
 		var errGrp error = nil
-		// try to install pkg with each pkg mgr, if all pkg mgrs return error, return the error group
-		for _, pkgMgr := range pkgMgrs {
-			// check if pkg mgr is available for current OS, if not, skip to next pkg mgr
-			if pkgMgr.IsAvailableForCurrOS() != nil {
-				continue
-			}
+		var pkgMgr = depMgr.Manager
 
-			// try to install pkg with pkg mgr, if error, add to errGrp and try with next pkg mgr
-			if err := pkgMgr.InstallAll(dry_run, pkg); err != nil {
-				errGrp = errors.Join(errGrp, err)
-				continue
-			}
-
-			// no error, break the loop and return nil
-			return nil
+		// check if pkg mgr is available for current OS, if not, skip to next pkg mgr
+		if pkgMgr.IsAvailableForCurrOS() != nil {
+			continue
 		}
+
+		// try to install pkg with pkg mgr, if error, add to errGrp and try with next pkg mgr
+		if err := pkgMgr.InstallAll(dry_run, depMgr.postInstallCmds, depMgr.preInstallCmds, depMgr.Name); err != nil {
+			errGrp = errors.Join(errGrp, err)
+			continue
+		}
+
 		// all pkg mgrs return error, show error group for pkg
 		return errGrp
 	}
@@ -81,7 +83,7 @@ func (d *Dependency) EnsureInstalled(prompt_user bool, dry_run bool) (string, er
 				return "", err
 			}
 		} else {
-			fmt.Printf("[WARN] Auto-install flag is set. Accepting installation of '%s', licensed under '%s' ...\n", d.Name, d.License.ShortName)
+			fmt.Printf("[WARN] Auto-install flag is set. User automatically accepts the installation of '%s', licensed under '%s' ...\n", d.Name, d.License.ShortName)
 		}
 
 		// try to install dependency

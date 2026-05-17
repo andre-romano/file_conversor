@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/file-conversor/file_conversor/internal/utils"
 )
 
 // defines an interface for pkg mgrs that can be used to install dependencies.
@@ -68,9 +70,7 @@ func (p *pkgMgr) update(dry_run bool) error {
 		fmt.Printf("[SKIP] Skipping update: pkg mgr '%s' was updated less than 24 hours ago ...\n", p.Name)
 		return nil
 	}
-	cmd := exec.Command(p.UpdateCmd[0], p.UpdateCmd[1:]...)
-	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := utils.RunCommand(p.UpdateCmd...); err != nil {
 		return fmt.Errorf("update pkg mgr '%s': %w", p.Name, err)
 	}
 	p.lastUpdated = time.Now()
@@ -78,26 +78,30 @@ func (p *pkgMgr) update(dry_run bool) error {
 }
 
 // install installs the specified package using the pkg mgr.
-func (p *pkgMgr) install(pkgName string, dry_run bool) error {
+func (p *pkgMgr) install(dry_run bool, postInstallCmds [][]string, preInstallCmds [][]string, pkgName string) error {
 	if len(p.InstallCmd) == 0 {
 		return fmt.Errorf("install command not defined for pkg mgr '%s'", p.Name)
 	}
 	if dry_run {
+		for _, cmd := range preInstallCmds {
+			fmt.Printf("  $ %s\n", strings.Join(cmd, " "))
+		}
 		fmt.Printf("  $ %s %s\n", strings.Join(p.InstallCmd, " "), pkgName)
 		return nil
 	}
-	cmd := exec.Command(
-		p.InstallCmd[0],
-		append(p.InstallCmd[1:], pkgName)...,
-	)
-	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := utils.RunCommands(preInstallCmds...); err != nil {
+		return fmt.Errorf("pre-install cmd: %w", err)
+	}
+	if err := utils.RunCommand(append(p.InstallCmd, pkgName)...); err != nil {
 		return fmt.Errorf("install pkg '%s' using '%s': %w", pkgName, p.Name, err)
+	}
+	if err := utils.RunCommands(postInstallCmds...); err != nil {
+		return fmt.Errorf("post-install cmd: %w", err)
 	}
 	return nil
 }
 
-func (p *pkgMgr) InstallAll(dry_run bool, pkgName ...string) error {
+func (p *pkgMgr) InstallAll(dry_run bool, postInstallCmds [][]string, preInstallCmds [][]string, pkgName ...string) error {
 	// Lock to ensure that only one goroutine can attempt issuing pkg mgr
 	// commands at a time, preventing potential race conditions.
 	p.lock.Lock()
@@ -117,7 +121,7 @@ func (p *pkgMgr) InstallAll(dry_run bool, pkgName ...string) error {
 
 	// install packages
 	for _, pkg := range pkgName {
-		if err := p.install(pkg, dry_run); err != nil {
+		if err := p.install(dry_run, postInstallCmds, preInstallCmds, pkg); err != nil {
 			return err
 		}
 	}
