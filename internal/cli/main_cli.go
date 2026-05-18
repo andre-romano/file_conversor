@@ -11,23 +11,15 @@ import (
 	"github.com/file-conversor/file_conversor/internal/logger"
 )
 
-type ConvertCmd struct {
-	Input   string `arg:"" type:"existingfile" help:"Input file."`
-	Output  string `arg:"" optional:""         help:"Output file."`
-	Format  string `short:"f"                  help:"Target format."`
-	Quality int    `short:"q" default:"90"     help:"Output quality."`
-}
-
-func (c *ConvertCmd) Run(ctx *kong.Context) error {
-	// TODO: conversion logic here
-	return nil
-}
-
 type MainCLI struct {
-	Convert ConvertCmd `cmd:"" help:"Convert a file."`
+	// Args:
+	Pdf PdfCLI `cmd:"" help:"PDF conversion and manipulation commands."`
 
-	Verbose bool `short:"v" help:"Verbose output."`
-	Install bool `short:"i" help:"Install dependencies (no user prompts)."`
+	// Flags :
+	Quiet     bool `short:"q" help:"Quiet output (show errors only)."`
+	Verbose   bool `short:"v" help:"Verbose output (show debug information)."`
+	Overwrite bool `short:"O" help:"Overwrite output files."`
+	Install   bool `short:"I" help:"Install dependencies, if needed (no user prompts)."`
 }
 
 func callback(appName string, ctx *MainCLI) (io.Closer, error) {
@@ -37,17 +29,22 @@ func callback(appName string, ctx *MainCLI) (io.Closer, error) {
 		return nil, fmt.Errorf("logfile get: %w", err)
 	}
 	logCfg := logger.DefaultConfig(logfile)
+	logMode := "Normal"
 	if ctx.Verbose {
 		// set verbose logging to terminal
+		logMode = "Verbose"
 		logCfg.TerminalLevel = logger.DebugLevel
+	}
+	if ctx.Quiet {
+		// set quiet logging to terminal
+		logMode = "Quiet"
+		logCfg.TerminalLevel = logger.ErrorLevel
 	}
 	file, err := logger.SetupLogger(logCfg)
 	if err != nil {
 		return nil, fmt.Errorf("logger setup: %w", err)
 	}
-	if ctx.Verbose {
-		logger.Infof("Verbose mode: ENABLED\n")
-	}
+	logger.Debugf("Log mode: %s\n", logMode)
 	return file, nil
 }
 
